@@ -21,10 +21,11 @@ namespace Iis.Domain.Users
         public bool IsAdmin { get; set; }
         public int AccessLevel { get; set; }
         public UserSource Source { get; set; }
-        public IEnumerable<Role> Roles {get;set;} = new List<Role>();
+        public IEnumerable<Role> Roles { get; set; } = new List<Role>();
         public AccessGrantedList AccessGrantedItems { get; set; } = new AccessGrantedList();
         public List<AccessGranted> Tabs => AccessGrantedItems.Where(ag => ag.Category == AccessCategory.Tab).ToList();
         public List<AccessGranted> Entities => AccessGrantedItems.Where(ag => ag.Category == AccessCategory.Entity).ToList();
+        public string FullUserName => $"{this.LastName} {this.FirstName} {this.Patronymic}";
         public bool IsGranted(AccessKind kind, AccessOperation operation, AccessCategory category)
         {
             return IsAdmin || AccessGrantedItems.IsGranted(kind, operation, category);

@@ -359,7 +359,7 @@ namespace IIS.Services.Materials
                     .ToList();
 
             return MaterialsDto.Create(materials, searchResult.Count, searchResult.Items, searchResult.Aggregations);
-        }        
+        }
 
         public async Task<MaterialsDto> GetMaterialsCommonForEntitiesAsync(Guid userId,
             IEnumerable<Guid> nodeIdList,

@@ -72,6 +72,14 @@ namespace AcceptanceTests.UISteps
             driver.WaitFor(10);
         }
 
+        [When(@"I entered the value (.*) in the search field")]
+        public void WhenIEnteredTheValueInTheSearchField(string input)
+        {
+            objectsOfStudyPage.SearchField.SendKeys(input);
+            driver.WaitFor(2);
+        }
+
+
         [When(@"I clicked on the first search result title in the Objects of study section")]
         public void WhenIClickedOnTheFirstSearchResultTitle()
         {
@@ -369,6 +377,15 @@ namespace AcceptanceTests.UISteps
                 (!open && accordionElement.FindElement(By.TagName("i")).HasClass("is-active")))
                 accordionElement.Click();
         }
+
+        [When(@"I clicked on the (.*) autocomplete button")]
+        public void WhenIClickedOnTheAutocompleteButton(string objectOfStudy)
+        {
+            var objectInTheList = driver.FindElement(By.XPath($"//div[contains(@class, 'entity-search__autocomplete')]//div[contains(text(),'{objectOfStudy}')]/following::button[@class='el-button alias-autocomplete__select-entity-button el-button--default']"));
+            objectInTheList.Click();
+            driver.WaitFor(2);
+        }
+
 
         #endregion
 

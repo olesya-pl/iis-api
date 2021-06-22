@@ -296,7 +296,7 @@ namespace Iis.Services
 
             if (typeId == ThemeTypeEntity.EntityEventId)
             {
-                var count = await _elasticService.CountByAllFieldsAsync(indexes, filter);
+                var count = await _elasticService.CountEntitiesByConfiguredFieldsAsync(indexes, filter);
                 return new QueryResult
                 {
                     Count = count,

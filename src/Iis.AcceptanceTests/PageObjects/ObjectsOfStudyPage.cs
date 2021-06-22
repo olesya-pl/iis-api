@@ -208,6 +208,9 @@ namespace AcceptanceTests.PageObjects
         [FindsBy(How = How.CssSelector, Using = "div[name = 'country'] .el-input__inner")]
         public IWebElement DislocationSectionCountryField;
 
+        [FindsBy(How = How.XPath, Using = "//span[@class='multiselect__tag-label']")]
+        public IWebElement TagInTheSearchField;
+
         public ObjectsSearch GetObjectByTitle(string title)
         {
             return new ObjectsSearch(driver, title);
@@ -232,5 +235,6 @@ namespace AcceptanceTests.PageObjects
             var elementToClick = driver.FindElement(By.XPath($"//div[contains(text(),'{relationshipLinkTitle}')]"));
             elementToClick.Click();
         }
+
     }
 }

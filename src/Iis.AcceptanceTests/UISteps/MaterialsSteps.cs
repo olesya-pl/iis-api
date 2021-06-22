@@ -216,6 +216,12 @@ namespace AcceptanceTests.UISteps
             driver.WaitFor(2);
         }
 
+        [When(@"I clicked on the clear search button")]
+        public void WhenIClickedOnTheClearSearchButton()
+        {
+            materialsSectionPage.ClearSearchFieldButton.Click();
+            driver.WaitFor(1);
+        }
 
         #endregion When
 
@@ -366,7 +372,12 @@ namespace AcceptanceTests.UISteps
             Assert.Contains(materialsSectionPage.MaterialsRelatedEvents, _ => _.Title == eventUniqueName);
         }
 
-
+        [Then(@"I must see the (.*) title of the material")]
+        public void ThenIMustSeeTheTitleOfTheMaterial(string expectedMaterialName)
+        {
+            var actualMaterialName = materialsSectionPage.MaterialTitle.Text;
+            Assert.Contains(expectedMaterialName, actualMaterialName);
+        }
         #endregion
     }
 }
