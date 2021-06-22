@@ -553,6 +553,14 @@ namespace AcceptanceTests.UISteps
             var actualTagValue = objectsOfStudyPage.TagInTheSearchField.Text;
             Assert.Equal(expectedTag, actualTagValue);
         }
+
+        [Then(@"I must see sign value (.*) in first search result")]
+        public void ThenIMustSeeSignValueInFirstSearchResult(string expectedSignValue)
+        {
+            var actualsignValue = objectsOfStudyPage.FirstSearchResultSignValue.Text;
+            Assert.Equal(expectedSignValue, actualsignValue);
+        }
+
         #endregion
     }
 }
