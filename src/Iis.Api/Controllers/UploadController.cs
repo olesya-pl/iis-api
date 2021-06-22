@@ -11,6 +11,7 @@ using Iis.Services.Contracts.Interfaces;
 using IIS.Core;
 using IIS.Core.GraphQL.Files;
 using IIS.Core.Materials;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
@@ -57,6 +58,7 @@ namespace Iis.Api.Controllers
         }
 
         [HttpPost]
+        [DisableCors]
         [DisableRequestSizeLimit]
         public Task<UploadResult> Post([FromForm] IFormFile file, [FromForm]string fileInfo,  CancellationToken ct)
         {
