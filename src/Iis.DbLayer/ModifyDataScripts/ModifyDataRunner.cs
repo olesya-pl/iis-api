@@ -45,6 +45,7 @@ namespace Iis.DbLayer.ModifyDataScripts
             _items.Add("SetupNewTypesForPhoneSign", actions.SetupNewTypesForPhoneSign);
             _items.Add("AddTitlePhotosToObject", actions.AddTitlePhotosToObject);
             _items.Add("RemoveMaterialLinkAccessObjects", actions.RemoveMaterialLinkAccessObjects);
+            _items.Add("AddEventTitle", actions.AddEventTitle);
         }
         public bool Run()
         {
