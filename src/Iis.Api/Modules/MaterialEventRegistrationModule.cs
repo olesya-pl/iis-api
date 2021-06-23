@@ -1,10 +1,7 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-using Iis.Api.Configuration;
-using IIS.Core;
 using IIS.Core.Materials;
-using IIS.Core.Materials.Handlers;
 using IIS.Core.Materials.Handlers.Configurations;
 using Iis.Api.Materials;
 using Iis.Api.Materials.Handlers;
@@ -20,8 +17,6 @@ namespace Iis.Api.Modules
         private const string elasticSaverSectionName = "elasticSaver";
         public static IServiceCollection RegisterMaterialEventServices(this IServiceCollection services, IConfiguration configuration)
         {
-            var gsmWorkerUrl = configuration.GetValue<string>("gsmWorkerUrl");
-
             var meConfig = configuration.GetSection(eventSectionName)
                                             .Get<MaterialEventConfiguration>();
             var assignerConfig = configuration.GetSection(assignerSectionName)

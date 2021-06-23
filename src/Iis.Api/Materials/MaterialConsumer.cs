@@ -101,17 +101,6 @@ namespace Iis.Api.Materials
                 eventProducer.SendMaterialEvent(materialEvent);
                 eventProducer.SendMaterialFeatureEvent(materialEvent);
 
-                // todo: multiple queues for different material types
-                if (message.FileId.HasValue && message.Type == "cell.voice")
-                {
-                    eventProducer.SendMaterialAddedEventAsync(
-                        new MaterialAddedEvent
-                        {
-                            FileId = message.FileId.Value,
-                            MaterialId = message.MaterialId
-                        });
-                }
-
                 return Task.CompletedTask;
             }
         }
