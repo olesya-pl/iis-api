@@ -554,6 +554,9 @@ namespace Iis.DbLayer.ModifyDataScripts
             const string DbObjectPropName = "dbObject";
             const string LocationXPropName = "locationX";
             const string LocationYPropName = "locationY";
+            const string AbstractSatellitePhoneSignName = "AbstractSatellitePhoneSign";
+
+            if (data.Schema.GetEntityTypeByName(AbstractSatellitePhoneSignName) != null) return;
 
             var objectSignType = data.Schema.GetEntityTypeByName(EntityTypeNames.ObjectSign.ToString());
             var satIridiumPhoneSignType = data.Schema.GetEntityTypeByName("SatelliteIridiumPhoneSign");
@@ -577,7 +580,7 @@ namespace Iis.DbLayer.ModifyDataScripts
             if(recordsAdded > 0) context.SaveChanges();
 
             //create and setup new abstract type AbstractSatellitePhoneSign
-            var abstractSatPhoneSignType = data.Schema.CreateEntityType("AbstractSatellitePhoneSign", "Супутниковий телефон (абстрактний)", true, objectSignType.Id);
+            var abstractSatPhoneSignType = data.Schema.CreateEntityType(AbstractSatellitePhoneSignName, "Супутниковий телефон (абстрактний)", true, objectSignType.Id);
             data.Schema.CreateAttributeType(abstractSatPhoneSignType.Id, BeamPropName, "Луч", ScalarType.String, EmbeddingOptions.Optional);
             data.Schema.CreateAttributeType(abstractSatPhoneSignType.Id, DbObjectPropName, "Об'єкт (локальний)", ScalarType.String, EmbeddingOptions.Optional);
 
@@ -698,6 +701,22 @@ namespace Iis.DbLayer.ModifyDataScripts
             var enitiesToRemove = new[] { materialDorLinkId, eventLinkId };
             context.AccessObjects.RemoveRange(context.AccessObjects.Where(p => enitiesToRemove.Contains(p.Id)));
             context.SaveChanges();
+        }
+
+        public void AddEventTitle(OntologyContext context, IOntologyNodesData data)
+        {
+            var eventType = data.Schema.GetEntityTypeByName("Event");
+            if (eventType == null) return;
+            if (eventType.GetRelationByName("__title") != null) return;
+            data.Schema.CreateAttributeTypeJson(
+                eventType.Id,
+                "__title",
+                "Заголовок",
+                ScalarType.String,
+                EmbeddingOptions.Optional,
+                "{\"Formula\": \"{name};\\\"Об'єкт без назви\\\"\"}"
+            );
+            SaveOntologySchema(data.Schema);
         }
     }
 }
