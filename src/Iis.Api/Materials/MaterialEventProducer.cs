@@ -17,13 +17,11 @@ namespace IIS.Core.Materials
 {
     public interface IMaterialEventProducer : IDisposable
     {
-        void SendMaterialAddedEventAsync(MaterialAddedEvent eventData);
         void SendMaterialEvent(MaterialEventMessage eventMessage);
         void SendMaterialFeatureEvent(MaterialEventMessage eventMessage);
         void SendAvailableForOperatorEvent(Guid materialId);
         void SaveMaterialToElastic(Guid id);
         void SendMaterialSavedToElastic(List<Guid> ids);
-
         void PublishMaterialCreatedMessage(MaterialCreatedMessage message);
     }
 
@@ -68,19 +66,6 @@ namespace IIS.Core.Materials
             _channel = _connection.CreateModel();
 
             _materialEventChannel = ConfigChannel(_connection.CreateModel(), _eventConfiguration.TargetChannel);
-        }
-
-        public void SendMaterialAddedEventAsync(MaterialAddedEvent eventData)
-        {
-            _channel.QueueDeclare("gsm", true, false);
-
-            var json = JObject.FromObject(eventData).ToString();
-            var body = Encoding.UTF8.GetBytes(json);
-
-            _channel.BasicPublish(exchange: "",
-                                routingKey: "gsm",
-                                basicProperties: null,
-                                body: body);
         }
 
         public void SendMaterialEvent(MaterialEventMessage eventMessage)
