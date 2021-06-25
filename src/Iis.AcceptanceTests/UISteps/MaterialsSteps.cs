@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Linq;
+using System.Threading.Tasks;
 using AcceptanceTests.Helpers;
 using AcceptanceTests.PageObjects;
 using OpenQA.Selenium;
 using TechTalk.SpecFlow;
+using TechTalk.SpecFlow.Assist;
 using Xunit;
 
 namespace AcceptanceTests.UISteps
@@ -79,6 +81,26 @@ namespace AcceptanceTests.UISteps
             driver.WaitFor(2);
             materialsSectionPage.SearchField.SendKeys(Keys.Enter);
             driver.WaitFor(5);
+        }
+
+        [When(@"I searched for uploaded material in the materials")]
+        public void WhenISearchedForUploadedMaterialInTheMaterials()
+        {
+            materialsSectionPage.SearchField.SendKeys(context.Get<string>("uploadedMaterial"));
+            driver.WaitFor(2);
+            materialsSectionPage.SearchField.SendKeys(Keys.Enter);
+            driver.WaitFor(5);
+        }
+
+        [Given(@"I upload a new docx material via API")]
+        public async Task GivenIUploadANewDocxMaterialViaAPI(Table table)
+        {
+            var uniqueSuffix = Guid.NewGuid().ToString();
+            var materialModel = table.CreateInstance<MaterialModel>();
+            materialModel.FileName = materialModel.FileName + uniqueSuffix;
+            materialModel.Content = materialModel.Content + uniqueSuffix;
+            context.Set(materialModel.FileName, "uploadedMaterial");
+            await MaterialsHelper.UploadDocxMaterial(materialModel);
         }
 
         [When(@"I set importance (.*) value")]
