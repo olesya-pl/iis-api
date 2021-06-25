@@ -40,7 +40,6 @@ namespace Iis.Api.Controllers
         private readonly IUserElasticService _userElasticService;
         private readonly IAdminOntologyElasticService _adminElasticService;
         private readonly IHost _host;
-        private readonly IConfiguration _configuration;
         private readonly IOntologyDataService _nodesDataService;
         private readonly IConnectionStringService _connectionStringService;
         private readonly IAccessLevelService _accessLevelService;
