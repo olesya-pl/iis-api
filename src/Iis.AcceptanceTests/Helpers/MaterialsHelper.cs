@@ -8,18 +8,19 @@ using System.Threading.Tasks;
 using IIS.Core.GraphQL.Materials;
 using Newtonsoft.Json;
 using NPOI.XWPF.UserModel;
+using Org.BouncyCastle.Bcpg.OpenPgp;
 using Xunit;
 
 namespace AcceptanceTests.Helpers
 {
     public class MaterialsHelper
     {
-        private static (long, byte[]) GenerateDocxMaterial(string fileName)
+        private static (long, byte[]) GenerateDocxMaterial(string fileName, string content)
         {
             XWPFDocument doc = new XWPFDocument();
             var p = doc.CreateParagraph();
             var run = p.CreateRun();
-            run.SetText(fileName);
+            run.SetText(content);
             using var ms = new MemoryStream();
 
             using var fs1 = new FileStream(fileName + ".docx", FileMode.Create);
@@ -102,7 +103,7 @@ namespace AcceptanceTests.Helpers
 
         public static async Task UploadDocxMaterial(MaterialModel materialModel)
         {
-            var material = MaterialsHelper.GenerateDocxMaterial(materialModel.FileName);
+            var material = MaterialsHelper.GenerateDocxMaterial(materialModel.FileName, materialModel.Content);
             var materialInput = Create(material.Item1,
                 null, materialModel.Content,
                 materialModel.SourceReliabilityText,
