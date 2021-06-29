@@ -238,26 +238,33 @@ namespace Iis.OntologyData.DataTypes
                 });
             return new DotNameValues(list);
         }
-        public IReadOnlyList<INode> GetDirectAttributeNodes(ScalarType? scalarType = null)
-        {
-            return _outgoingRelations
-                .Where(r => r.IsLinkToAttribute
-                    && (scalarType == null || r.TargetNode.NodeType.AttributeType.ScalarType == scalarType))
+
+        public IReadOnlyList<INode> GetDirectAttributeNodes(ScalarType? scalarType = null) =>
+            GetDirectChildNodes(n => n.NodeType.IsAttributeType
+               && (scalarType == null || n.NodeType.AttributeType.ScalarType == scalarType));
+        
+        public IReadOnlyList<INode> GetDirectChildNodes(Func<INode, bool> filter) =>
+            _outgoingRelations
+                .Where(r => filter(r.TargetNode))
                 .Select(r => r.TargetNode)
                 .ToList();
-        }
-        public IReadOnlyList<INode> GetAllAttributeNodes(ScalarType? scalarType = null)
+        public IReadOnlyList<INode> GetAllChildNodes(Func<INode, bool> filter)
         {
             var result = new List<INode>();
 
-            result.AddRange(GetDirectAttributeNodes(scalarType));
-            foreach (var relation in _outgoingRelations.Where(r => r.IsLinkToInternalObject))
+            result.AddRange(GetDirectChildNodes(filter));
+            foreach (var relation in _outgoingRelations.Where(r => r.IsLinkToInternalObject 
+                && !r.TargetNode.NodeType.IsEnum))
             {
-                result.AddRange(relation.TargetNode.GetDirectAttributeNodes(scalarType));
+                result.AddRange(relation.TargetNode.GetDirectChildNodes(filter));
             }
 
             return result;
         }
+        public IReadOnlyList<INode> GetAllAttributeNodes(ScalarType? scalarType = null) =>
+            GetAllChildNodes(n => n.NodeType.Kind == Kind.Attribute
+               && (scalarType == null || n.NodeType.AttributeType.ScalarType == scalarType));
+
         public IReadOnlyList<IRelation> GetIncomingRelations(IEnumerable<string> relationTypeNameList)
         {
             return AllData.Locker.ReadLock(() => _incomingRelations
@@ -270,9 +277,11 @@ namespace Iis.OntologyData.DataTypes
         {
             var node = NodeType.Kind == Kind.Relation ? this.Relation.TargetNode : this;
             var sb = new StringBuilder();
+            bool isFirst = true;
 
-            while (!node.NodeType.IsObject)
+            while (isFirst || !node.NodeType.IsObject)
             {
+                isFirst = false;
                 if (sb.Length > 0) sb.Insert(0, ".");
                 sb.Insert(0, node.IncomingRelations.First().Node.NodeType.Name);
 
