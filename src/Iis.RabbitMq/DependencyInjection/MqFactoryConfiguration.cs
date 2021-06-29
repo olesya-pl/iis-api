@@ -1,9 +1,9 @@
-namespace Iis.Services.Contracts.Configurations
+namespace Iis.RabbitMq.DependencyInjection
 {
     /// <summary>
     /// Type for message queue configuration
     /// </summary>
-    public class MqConfiguration
+    public class MqFactoryConfiguration
     {
         public string HostName { get; set; }
         public string VirtualHost { get; set; }
