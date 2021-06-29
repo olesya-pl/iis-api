@@ -30,6 +30,7 @@ using Iis.Domain;
 using Iis.Domain.Vocabularies;
 using Iis.Elastic;
 using Iis.EventMaterialAutoAssignment;
+using Iis.RabbitMq.DependencyInjection;
 using Iis.FlightRadar.DataModel;
 using Iis.Interfaces.Common;
 using Iis.Interfaces.Elastic;
