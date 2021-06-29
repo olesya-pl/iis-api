@@ -16,7 +16,7 @@ namespace Iis.Interfaces.Ontology.Data
         EmbeddingOptions EmbeddingOptions { get; }
         string RelationTypeName { get; }
         bool IsLinkToSeparateObject { get; }
-        bool IsLinkToObject { get; }
+        bool IsLinkToExternalObject { get; }
         bool IsLinkToAttribute { get; }
         bool IsLinkToInternalObject { get; }
         string TypeName { get; }
