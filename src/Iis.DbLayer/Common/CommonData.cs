@@ -10,16 +10,14 @@ namespace Iis.DbLayer.Common
     public class CommonData : ICommonData
     {
         private IOntologyNodesData _ontologyData;
-        public IAccessLevels AccessLevels { get; private set; }
+        private IAccessLevels _accessLevels;
+        public IAccessLevels AccessLevels =>
+            _accessLevels ?? (_accessLevels = _ontologyData.GetAccessLevels());
 
         public CommonData(IOntologyNodesData ontologyData)
         {
             _ontologyData = ontologyData;
-            _ontologyData.OnAccessLevelsChanged += RefreshAccessLevels;
-            RefreshAccessLevels();
+            _ontologyData.OnAccessLevelsChanged += () => { _accessLevels = null; };
         }
-
-        private void RefreshAccessLevels() =>
-            AccessLevels = _ontologyData.GetAccessLevels();
     }
 }

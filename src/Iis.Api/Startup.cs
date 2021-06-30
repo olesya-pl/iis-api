@@ -122,6 +122,8 @@ namespace IIS.Core
             services.AddTransient(provider => new DbContextOptionsBuilder().UseNpgsql(dbConnectionString).Options);
             if (enableContext)
             {
+                MigrateOntologyContext(OntologyContext.GetContext(dbConnectionString));
+
                 services.AddDbContext<OntologyContext>(
                     options => options
                         .UseNpgsql(dbConnectionString)
@@ -421,16 +423,9 @@ namespace IIS.Core
         private void UpdateDatabase(IApplicationBuilder app)
         {
             using (var serviceScope = app.ApplicationServices
-            .GetRequiredService<IServiceScopeFactory>()
-            .CreateScope())
+                .GetRequiredService<IServiceScopeFactory>()
+                .CreateScope())
             {
-                using (var context = serviceScope.ServiceProvider.GetService<OntologyContext>())
-                {
-                    var defaultCommandTimeout = context.Database.GetCommandTimeout();
-                    context.Database.SetCommandTimeout(TimeSpan.FromMinutes(10));
-                    context.Database.Migrate();
-                    context.Database.SetCommandTimeout(defaultCommandTimeout);
-                }
                 try
                 {
                     using (var context = serviceScope.ServiceProvider.GetService<FlightsContext>())
@@ -456,6 +451,14 @@ namespace IIS.Core
                     host.StopAsync().Wait();
                 }
             }
+        }
+
+        private void MigrateOntologyContext(OntologyContext context)
+        {
+            var defaultCommandTimeout = context.Database.GetCommandTimeout();
+            context.Database.SetCommandTimeout(TimeSpan.FromMinutes(10));
+            context.Database.Migrate();
+            context.Database.SetCommandTimeout(defaultCommandTimeout);
         }
 
         private static async Task ReportHealthCheck(HttpContext c, HealthReport r)

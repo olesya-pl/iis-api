@@ -35,6 +35,8 @@ namespace Iis.DbLayer.ModifyDataScripts
             _items.Add("RemoveEventWikiLinks", actions.RemoveEventWikiLinks);
             _items.Add("AddAccessLevelAccessObject", actions.AddAccessLevelAccessObject);
             _items.Add("FixFlightRadarLocationHistory", actions.FixFlightRadarLocationHistory);
+            _items.Add("AddPhotoType", actions.AddPhotoType);
+            _items.Add("AddObjectType", actions.AddObjectType);
             _items.Add("AddAccessLevels", actions.AddAccessLevels);
             _items.Add("AddAccessLevelToObject", actions.AddAccessLevelToObject);
             _items.Add("InitNewColumnsForAccessObjects", actions.InitNewColumnsForAccessObjects);

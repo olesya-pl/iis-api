@@ -46,6 +46,49 @@ namespace Iis.DbLayer.ModifyDataScripts
             });
         }
 
+        public void AddPhotoType(OntologyContext context, IOntologyNodesData data)
+        {
+            var photoType = data.Schema.GetEntityTypeByName(EntityTypeNames.Photo.ToString());
+            if (photoType == null)
+            {
+                photoType = data.Schema.CreateEntityType(EntityTypeNames.Photo.ToString(), "Зображення", false);
+                data.Schema.CreateAttributeType(photoType.Id, "image", "Фото", ScalarType.File, EmbeddingOptions.Required);
+                data.Schema.CreateAttributeType(photoType.Id, "title", "Заголовок");
+            }
+        }
+
+        public void AddObjectType(OntologyContext context, IOntologyNodesData data)
+        {
+            var objectType = data.Schema.GetEntityTypeByName(EntityTypeNames.Object.ToString());
+            if (objectType == null)
+            {
+                objectType = data.Schema.CreateEntityType(EntityTypeNames.Object.ToString(), "Базовий об'єкт", false);
+                data.Schema.CreateAttributeType(objectType.Id, "title", "Заголовок");
+                data.Schema.CreateAttributeTypeJson(
+                    objectType.Id,
+                    "__title",
+                    "Повна назва",
+                    ScalarType.String,
+                    EmbeddingOptions.Optional,
+                    "{\"Formula\": \"{title};\\\"Об'єкт без назви\\\"\"}"
+                );
+            }
+
+            var objectOfStudyType = data.Schema.GetEntityTypeByName(EntityTypeNames.ObjectOfStudy.ToString());
+            if (!objectOfStudyType.IsInheritedFrom(EntityTypeNames.Object.ToString()))
+            {
+                data.Schema.SetInheritance(objectOfStudyType.Id, objectType.Id);
+            }
+
+            var eventType = data.Schema.GetEntityTypeByName(EntityTypeNames.Event.ToString());
+            if (!eventType.IsInheritedFrom(EntityTypeNames.Object.ToString()))
+            {
+                data.Schema.SetInheritance(eventType.Id, objectType.Id);
+            }
+
+            SaveOntologySchema(data.Schema);
+        }
+
         public void AddAccessLevelAccessObject(OntologyContext context, IOntologyNodesData data)
         {
             var entityId = new Guid("a60af6c5d930476c96218ea5c0147fb7");

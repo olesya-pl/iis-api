@@ -363,7 +363,9 @@ namespace Iis.OntologySchema.DataTypes
 
             foreach (var relationType in GetEmbeddingRelationsIncludeInherited())
             {
-                if (relationType.TargetType.IsObject || relationType.TargetType.Name == Name) continue;
+                if (relationType.TargetType.IsObject ||
+                    relationType.TargetType.IsObjectOfStudy ||
+                    relationType.TargetType.Name == Name) continue;
 
                 var relationTypeName = $"{dotName}.{relationType.NodeType.Name}";
                 var relationAttributes = relationType._targetType.GetNodeTypesRecursive(relationTypeName);

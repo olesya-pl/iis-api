@@ -328,23 +328,29 @@ namespace Iis.OntologySchema
         }
         public INodeTypeLinked UpdateNodeType(INodeTypeUpdateParameter updateParameter)
         {
-            ValidateNodeTypeUpdateParameter(updateParameter);
-            if (updateParameter.Id == null)
+            try
             {
-                return CreateNodeType(updateParameter);
+                ValidateNodeTypeUpdateParameter(updateParameter);
+                if (updateParameter.Id == null)
+                {
+                    return CreateNodeType(updateParameter);
+                }
+                var nodeType = _storage.GetNodeTypeById((Guid)updateParameter.Id);
+
+                switch (nodeType.Kind)
+                {
+                    case Kind.Entity:
+                        return UpdateNodeType(nodeType, updateParameter);
+                    case Kind.Relation:
+                        return UpdateRelationNodeType(nodeType, updateParameter);
+                    case Kind.Attribute:
+                        return UpdateRelationNodeType(nodeType._relationType._nodeType, updateParameter);
+                }
             }
-            var nodeType = _storage.GetNodeTypeById((Guid)updateParameter.Id);
-            
-            switch (nodeType.Kind)
+            finally
             {
-                case Kind.Entity:
-                    return UpdateNodeType(nodeType, updateParameter);
-                case Kind.Relation:
-                    return UpdateRelationNodeType(nodeType, updateParameter);
-                case Kind.Attribute:
-                    return UpdateRelationNodeType(nodeType._relationType._nodeType, updateParameter);
+                ResetCaches();
             }
-            ResetCaches();
             return null;
         }
         public INodeTypeLinked CreateEntityType(string name, string title = null, bool isAbstract = false, Guid? ancestorId = null)
