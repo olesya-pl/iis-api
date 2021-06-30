@@ -18,7 +18,7 @@ namespace AcceptanceTests.PageObjects
             PageFactory.InitElements(driver, this);
         }
 
-        [FindsBy(How = How.XPath, Using = "//div[contains(text(),'Обʼєкти')]")]
+        [FindsBy(How = How.CssSelector, Using = ".sidebar__nav li.objects")]
         public IWebElement ObjectOfStudySectionButton;
 
         [FindsBy(How = How.CssSelector, Using = ".entity-search .entity-search__toggle button")]

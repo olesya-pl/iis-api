@@ -18,7 +18,7 @@ namespace AcceptanceTests.PageObjects
             PageFactory.InitElements(driver, this);
         }
 
-        [FindsBy(How = How.CssSelector, Using = "div:nth-of-type(1) > li:nth-of-type(8)")]
+        [FindsBy(How = How.CssSelector, Using = ".sidebar__nav li.inputStream")]
         [CacheLookup]
         public IWebElement MaterialsSection;
 
