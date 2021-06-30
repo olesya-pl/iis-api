@@ -1,6 +1,8 @@
-﻿using AcceptanceTests.Helpers;
+﻿using System;
+using AcceptanceTests.Helpers;
 using AcceptanceTests.PageObjects;
 using OpenQA.Selenium;
+using OpenQA.Selenium.Support.UI;
 using TechTalk.SpecFlow;
 using Xunit;
 
@@ -25,11 +27,15 @@ namespace AcceptanceTests.UISteps
         [Given(@"I sign in with the user (.*) and password (.*) in the Contour")]
         public void IWantToAuthorizeInTheContour(string login, string password)
         {
+            WebDriverWait authorizeWait = new WebDriverWait(driver, TimeSpan.FromSeconds(80));
+            authorizeWait.IgnoreExceptionTypes(typeof(NoSuchElementException));
+            
             loginPageObjects.Navigate();
             loginPageObjects.LoginField.SendKeys(login);
             loginPageObjects.PasswordField.SendKeys(password);
             loginPageObjects.LoginButton.Click();
-            driver.WaitFor(15);
+            
+            authorizeWait.Until(webDriver => webDriver.FindElement(By.CssSelector(".default-layout")));
         }
 
         [When(@"I pressed Sign out button")]
