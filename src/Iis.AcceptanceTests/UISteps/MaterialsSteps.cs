@@ -245,6 +245,14 @@ namespace AcceptanceTests.UISteps
             driver.WaitFor(1);
         }
 
+        [When(@"I close the material card")]
+        public void ThenICloseTheMaterialCard()
+        {
+            materialsSectionPage.CloseMaterialCardButton.Click();
+            driver.WaitFor(5);
+        }
+
+
         #endregion When
 
         #region Then

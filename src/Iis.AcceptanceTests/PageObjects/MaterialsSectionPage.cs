@@ -134,6 +134,9 @@ namespace AcceptanceTests.PageObjects
         [FindsBy(How = How.XPath, Using = "//button[contains(@class, 'search__clear-button')]")]
         public IWebElement ClearSearchFieldButton;
 
+        [FindsBy(How = How.CssSelector, Using = ".icon-wrapper-close")]
+        public IWebElement CloseMaterialCardButton;
+
         public void ScrollToEnd()
         {
             Actions actions = new Actions(driver);
