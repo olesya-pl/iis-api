@@ -46,7 +46,7 @@ namespace Iis.Services
                 var ontologySchema = OntologySchema.OntologySchema.GetInstance(ontologyRawData, schemaSource);
                 return ontologySchema;
             }
-            catch
+            catch (Exception ex)
             {
                 return OntologySchema.OntologySchema.GetInstance(null, schemaSource);
             }

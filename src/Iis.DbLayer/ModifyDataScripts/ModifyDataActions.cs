@@ -46,6 +46,49 @@ namespace Iis.DbLayer.ModifyDataScripts
             });
         }
 
+        public void AddPhotoType(OntologyContext context, IOntologyNodesData data)
+        {
+            var photoType = data.Schema.GetEntityTypeByName(EntityTypeNames.Photo.ToString());
+            if (photoType == null)
+            {
+                photoType = data.Schema.CreateEntityType(EntityTypeNames.Photo.ToString(), "Зображення", false);
+                data.Schema.CreateAttributeType(photoType.Id, "image", "Фото", ScalarType.File, EmbeddingOptions.Required);
+                data.Schema.CreateAttributeType(photoType.Id, "title", "Заголовок");
+            }
+        }
+
+        public void AddObjectType(OntologyContext context, IOntologyNodesData data)
+        {
+            var objectType = data.Schema.GetEntityTypeByName(EntityTypeNames.Object.ToString());
+            if (objectType == null)
+            {
+                objectType = data.Schema.CreateEntityType(EntityTypeNames.Object.ToString(), "Базовий об'єкт", false);
+                data.Schema.CreateAttributeType(objectType.Id, "title", "Заголовок");
+                data.Schema.CreateAttributeTypeJson(
+                    objectType.Id,
+                    "__title",
+                    "Повна назва",
+                    ScalarType.String,
+                    EmbeddingOptions.Optional,
+                    "{\"Formula\": \"{title};\\\"Об'єкт без назви\\\"\"}"
+                );
+            }
+
+            var objectOfStudyType = data.Schema.GetEntityTypeByName(EntityTypeNames.ObjectOfStudy.ToString());
+            if (!objectOfStudyType.IsInheritedFrom(EntityTypeNames.Object.ToString()))
+            {
+                data.Schema.SetInheritance(objectOfStudyType.Id, objectType.Id);
+            }
+
+            var eventType = data.Schema.GetEntityTypeByName(EntityTypeNames.Event.ToString());
+            if (!eventType.IsInheritedFrom(EntityTypeNames.Object.ToString()))
+            {
+                data.Schema.SetInheritance(eventType.Id, objectType.Id);
+            }
+
+            SaveOntologySchema(data.Schema);
+        }
+
         public void AddAccessLevelAccessObject(OntologyContext context, IOntologyNodesData data)
         {
             var entityId = new Guid("a60af6c5d930476c96218ea5c0147fb7");
@@ -548,6 +591,19 @@ namespace Iis.DbLayer.ModifyDataScripts
                     .Select(e => e.Id)
                     .ToArray();
         }
+        private INodeTypeLinked GetOrCreateSatelliteIridiumPhoneSignType(IOntologyNodesData data)
+        {
+            const string NAME = "SatelliteIridiumPhoneSign";
+            var signType = data.Schema.GetEntityTypeByName(NAME);
+            if (signType == null)
+            {
+                signType = data.Schema.CreateEntityType(NAME, "Супутниковий телефон Iridium", false);
+                data.Schema.CreateAttributeType(signType.Id, "tmsi", "TMSI");
+                data.Schema.CreateAttributeType(signType.Id, "imsi", "IMSI");
+                data.Schema.CreateAttributeType(signType.Id, "imei", "IMEI");
+            }
+            return signType;
+        }
         public void SetupNewTypesForPhoneSign(OntologyContext context, IOntologyNodesData data)
         {
             const string BeamPropName = "beam";
@@ -559,7 +615,7 @@ namespace Iis.DbLayer.ModifyDataScripts
             if (data.Schema.GetEntityTypeByName(AbstractSatellitePhoneSignName) != null) return;
 
             var objectSignType = data.Schema.GetEntityTypeByName(EntityTypeNames.ObjectSign.ToString());
-            var satIridiumPhoneSignType = data.Schema.GetEntityTypeByName("SatelliteIridiumPhoneSign");
+            var satIridiumPhoneSignType = GetOrCreateSatelliteIridiumPhoneSignType(data);
             var satPhoneSignType = data.Schema.GetEntityTypeByName("SatellitePhoneSign");
 
             var iridiumSignList = data.GetNodesByTypeId(satIridiumPhoneSignType.Id);
