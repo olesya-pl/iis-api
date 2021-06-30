@@ -14,12 +14,10 @@ namespace Iis.UnitTests.Csv
             var items = GetTestData();
             var csvManager = new CsvManager(items);
             var actual = csvManager.GetCsv();
-            var expected =
-@"""Aaa"",""Bbb"",""Bbb__1"",""Bbb__2"",""Ccc"",""Ccc__1"",""Ddd""
-""Aaa1"",,,,""Ccc11"",""Ccc12""
-""Aaa2"",""Bbb21"",""Bbb22"",""Bbb23""
-,,,,""Ccc31"",,""Ddd""""3""""""
-";
+            var expected =  @"""Aaa"",""Bbb"",""Bbb__1"",""Bbb__2"",""Ccc"",""Ccc__1"",""Ddd"""+Environment.NewLine+
+                            @"""Aaa1"",,,,""Ccc11"",""Ccc12"""+Environment.NewLine+
+                            @"""Aaa2"",""Bbb21"",""Bbb22"",""Bbb23"""+Environment.NewLine+
+                            @",,,,""Ccc31"",,""Ddd""""3"""""""+Environment.NewLine;
 
             Assert.Equal(expected, actual);
         }
