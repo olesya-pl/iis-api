@@ -18,6 +18,7 @@ Feature: MaterialsSectionUI - Sanity
         When I pressed Back button
         Then I must see that importance value must be set to Друга категорія value
         Then I must see that reliability value must be set to Достовірна value
+        When I close the material card
 
     @sanity @UI @MaterialsSanityUI
     Scenario: IIS-6374 - ML results display for DOCX material
@@ -28,6 +29,7 @@ Feature: MaterialsSectionUI - Sanity
         And I clicked on the ML tab in the material card
         And I pressed Show button to show Text classifier ML output
         Then I must see Text classifier ML output form
+        When I close the material card
 
     @sanity @UI @MaterialsSanityUI
     Scenario: IIS-5837- Connect a material with an object of study from material
@@ -44,6 +46,7 @@ Feature: MaterialsSectionUI - Sanity
         And I clicked on the delete button to destroy relation between the material and the РОМАНОВ А.Г object
         When I pressed the confirm button
         Then I must not see the related РОМАНОВ А.Г object in the material
+        When I close the material card
 
     @sanity @UI @MaterialsSanityUI
     Scenario: IIS-6363 - Search a material by keyword from the material
