@@ -15,7 +15,7 @@ namespace AcceptanceTests.PageObjects
             PageFactory.InitElements(driver, this);
         }
 
-        [FindsBy(How = How.CssSelector, Using = "div:nth-of-type(1) > li:nth-of-type(3)")]
+        [FindsBy(How = How.CssSelector, Using = ".sidebar__nav li.reports")]
         [CacheLookup]
         public IWebElement ReportSection;
 

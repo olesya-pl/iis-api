@@ -11,6 +11,7 @@ using Iis.Domain.Materials;
 using Iis.Domain.MachineLearning;
 using Iis.DbLayer.Repositories;
 using Iis.DbLayer.MaterialEnum;
+using Iis.DbLayer.MaterialDictionaries;
 using Iis.DataModel.Materials;
 using Iis.Interfaces.Roles;
 using Iis.Interfaces.Elastic;
@@ -38,7 +39,7 @@ namespace IIS.Core.Materials.EntityFramework
         private readonly IMaterialSignRepository _materialSignRepository;
         private readonly IUserService _userService;
         private readonly ICommonData _commonData;
-        private readonly ILogger<MaterialService<TUnitOfWork>> _logger;        
+        private readonly ILogger<MaterialService<TUnitOfWork>> _logger;
 
         public MaterialService(IFileService fileService,
             IMapper mapper,
@@ -182,8 +183,17 @@ namespace IIS.Core.Materials.EntityFramework
 
             responseEntity = await _mLResponseRepository.SaveAsync(responseEntity);
 
-            await RunWithoutCommitAsync(async unitOfWork =>
-                await unitOfWork.MaterialRepository.PutMaterialToElasticSearchAsync(responseEntity.MaterialId));
+            await RunWithoutCommitAsync(uow => uow.MaterialRepository.PutMaterialToElasticSearchAsync(responseEntity.MaterialId));
+
+            if(responseEntity.HandlerCode == MlHandlerCodeList.ImageVector)
+            {
+                var parentId = await RunWithoutCommitAsync(uow => uow.MaterialRepository.GetParentIdByChildIdAsync(responseEntity.MaterialId));
+
+                if(parentId.HasValue)
+                {
+                    await RunWithoutCommitAsync(uow => uow.MaterialRepository.PutMaterialToElasticSearchAsync(parentId.Value));
+                }
+            }
 
             return _mapper.Map<MLResponse>(responseEntity);
         }

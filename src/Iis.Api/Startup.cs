@@ -30,6 +30,7 @@ using Iis.Domain;
 using Iis.Domain.Vocabularies;
 using Iis.Elastic;
 using Iis.EventMaterialAutoAssignment;
+using Iis.RabbitMq.DependencyInjection;
 using Iis.FlightRadar.DataModel;
 using Iis.Interfaces.Common;
 using Iis.Interfaces.Elastic;
@@ -41,6 +42,7 @@ using Iis.OntologyData;
 using Iis.Services;
 using Iis.Services.Contracts;
 using Iis.Services.Contracts.Configurations;
+using Iis.Services.Contracts.Csv;
 using Iis.Services.Contracts.Interfaces;
 using Iis.Services.Contracts.Matrix;
 using Iis.Services.DI;
@@ -204,6 +206,7 @@ namespace IIS.Core
             services.AddTransient<NodeMapper>();
             services.AddSingleton<FileUrlGetter>();
             services.AddSingleton<PropertyTranslator>();
+            services.AddTransient<ICsvService, CsvService>();
 
             services.AddTransient<IChangeHistoryService, ChangeHistoryService<IIISUnitOfWork>>();
             services.AddTransient<ILocationHistoryService, LocationHistoryService<IIISUnitOfWork>>();

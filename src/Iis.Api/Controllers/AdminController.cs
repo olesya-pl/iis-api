@@ -9,6 +9,7 @@ using Iis.Interfaces.Enums;
 using Iis.Interfaces.Ontology.Schema;
 using Iis.OntologyData;
 using Iis.OntologyData.IisAccessLevels;
+using Iis.Services.Contracts.Csv;
 using Iis.Services.Contracts.Interfaces;
 using Iis.Services.Contracts.Params;
 using IIS.Core;
@@ -20,6 +21,7 @@ using MoreLinq;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -40,10 +42,10 @@ namespace Iis.Api.Controllers
         private readonly IUserElasticService _userElasticService;
         private readonly IAdminOntologyElasticService _adminElasticService;
         private readonly IHost _host;
-        private readonly IConfiguration _configuration;
         private readonly IOntologyDataService _nodesDataService;
         private readonly IConnectionStringService _connectionStringService;
         private readonly IAccessLevelService _accessLevelService;
+        private readonly ICsvService _csvService;
 
         public AdminController(
             IMaterialService materialService,
@@ -56,7 +58,8 @@ namespace Iis.Api.Controllers
             IHost host,
             IConnectionStringService connectionStringService,
             IOntologyDataService nodesDataService,
-            IAccessLevelService accessLevelService)
+            IAccessLevelService accessLevelService,
+            ICsvService csvService)
         {
             _elasticManager = elasticManager;
             _materialService = materialService;
@@ -69,6 +72,7 @@ namespace Iis.Api.Controllers
             _nodesDataService = nodesDataService;
             _connectionStringService = connectionStringService;
             _accessLevelService = accessLevelService;
+            _csvService = csvService;
         }
 
         [HttpGet("ReInitializeOntologyIndexes/{indexNames}")]
@@ -305,6 +309,16 @@ namespace Iis.Api.Controllers
         {
             var result = await _userService.CreateMatrixUsersAsync();
             return Content(result);
+        }
+
+        [HttpGet("GetCsv/{typeName}")]
+        public async Task<IActionResult> GetCsv(string typeName, CancellationToken ct)
+        {
+            var result = _csvService.GetDorCsvByTypeName(typeName);
+            var bytes = Encoding.Unicode.GetBytes(result);
+            var csv = Encoding.Unicode.GetPreamble().Concat(bytes).ToArray();
+
+            return File(csv, "text/csv", $"{typeName}.csv");
         }
 
         private void LogElasticResult(StringBuilder log, IEnumerable<ElasticBulkResponse> response)

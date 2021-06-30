@@ -18,7 +18,7 @@ namespace AcceptanceTests.PageObjects
             PageFactory.InitElements(driver, this);
         }
 
-        [FindsBy(How = How.CssSelector, Using = "div:nth-of-type(1) > li:nth-of-type(8)")]
+        [FindsBy(How = How.CssSelector, Using = ".sidebar__nav li.inputStream")]
         [CacheLookup]
         public IWebElement MaterialsSection;
 
@@ -133,6 +133,9 @@ namespace AcceptanceTests.PageObjects
 
         [FindsBy(How = How.XPath, Using = "//button[contains(@class, 'search__clear-button')]")]
         public IWebElement ClearSearchFieldButton;
+
+        [FindsBy(How = How.CssSelector, Using = ".icon-wrapper-close")]
+        public IWebElement CloseMaterialCardButton;
 
         public void ScrollToEnd()
         {

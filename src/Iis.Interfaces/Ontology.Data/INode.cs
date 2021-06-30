@@ -1,4 +1,5 @@
 ﻿using Iis.Interfaces.Ontology.Schema;
+using System;
 using System.Collections.Generic;
 
 namespace Iis.Interfaces.Ontology.Data
@@ -28,6 +29,8 @@ namespace Iis.Interfaces.Ontology.Data
         IDotNameValues GetComputedValues();
         string ResolveFormula(string formula);
         IReadOnlyList<INode> GetDirectAttributeNodes(ScalarType? scalarType = null);
+        IReadOnlyList<INode> GetDirectChildNodes(Func<INode, bool> filter);
+        IReadOnlyList<INode> GetAllChildNodes(Func<INode, bool> filter);
         IReadOnlyList<INode> GetAllAttributeNodes(ScalarType? scalarType = null);
         IReadOnlyList<IRelation> GetIncomingRelations(IEnumerable<string> relationTypeNameList);
         string GetComputedValue(string name);

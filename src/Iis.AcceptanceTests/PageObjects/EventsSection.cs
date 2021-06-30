@@ -19,7 +19,7 @@ namespace AcceptanceTests.PageObjects
 			PageFactory.InitElements(driver, this);
 		}
 
-		[FindsBy(How = How.XPath, Using = "//div[contains(text(),'Події')]")]
+		[FindsBy(How = How.CssSelector, Using = ".sidebar__nav li.events")]
 		public IWebElement EventsPage;
 
 		[FindsBy(How = How.CssSelector, Using = ".add-button")]
