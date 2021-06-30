@@ -591,6 +591,19 @@ namespace Iis.DbLayer.ModifyDataScripts
                     .Select(e => e.Id)
                     .ToArray();
         }
+        private INodeTypeLinked GetOrCreateSatelliteIridiumPhoneSignType(IOntologyNodesData data)
+        {
+            const string NAME = "SatelliteIridiumPhoneSign";
+            var signType = data.Schema.GetEntityTypeByName(NAME);
+            if (signType == null)
+            {
+                signType = data.Schema.CreateEntityType(NAME, "Супутниковий телефон Iridium", false);
+                data.Schema.CreateAttributeType(signType.Id, "tmsi", "TMSI");
+                data.Schema.CreateAttributeType(signType.Id, "imsi", "IMSI");
+                data.Schema.CreateAttributeType(signType.Id, "imei", "IMEI");
+            }
+            return signType;
+        }
         public void SetupNewTypesForPhoneSign(OntologyContext context, IOntologyNodesData data)
         {
             const string BeamPropName = "beam";
@@ -602,7 +615,7 @@ namespace Iis.DbLayer.ModifyDataScripts
             if (data.Schema.GetEntityTypeByName(AbstractSatellitePhoneSignName) != null) return;
 
             var objectSignType = data.Schema.GetEntityTypeByName(EntityTypeNames.ObjectSign.ToString());
-            var satIridiumPhoneSignType = data.Schema.GetEntityTypeByName("SatelliteIridiumPhoneSign");
+            var satIridiumPhoneSignType = GetOrCreateSatelliteIridiumPhoneSignType(data);
             var satPhoneSignType = data.Schema.GetEntityTypeByName("SatellitePhoneSign");
 
             var iridiumSignList = data.GetNodesByTypeId(satIridiumPhoneSignType.Id);
