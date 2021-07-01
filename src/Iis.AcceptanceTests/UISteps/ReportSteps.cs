@@ -17,19 +17,21 @@ namespace AcceptanceTests.UISteps
         private readonly ScenarioContext context;
 
         private ReportPageObjects reportPageObjects;
+        private readonly NavigationSection navigationSection;
 
         public ReportSteps(ScenarioContext injectedContext, IWebDriver driver)
         {
             reportPageObjects = new ReportPageObjects(driver);
+            navigationSection = new NavigationSection(driver);
             context = injectedContext;
             this.driver = driver;
         }
 
-        #region When 
+        #region When
         [When(@"I navigated to Report section")]
         public void INavigatedToReportSection()
         {
-            reportPageObjects.ReportSection.Click();
+            navigationSection.ReportsLink.Click();
             driver.WaitFor(2);
         }
 

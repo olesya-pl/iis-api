@@ -13,9 +13,6 @@ namespace AcceptanceTests.PageObjects
             PageFactory.InitElements(driver, this);
         }
 
-        [FindsBy(How = How.CssSelector, Using = ".sidebar__nav li.map")]
-        public IWebElement MapSection;
-
         [FindsBy(How = How.XPath, Using = "//form[@role='search']")]
         public IWebElement MapSearch;
     }

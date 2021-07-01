@@ -15,11 +15,13 @@ namespace AcceptanceTests.UISteps
     {
         private readonly IWebDriver driver;
         private readonly ScenarioContext context;
-        private MaterialsSectionPage materialsSectionPage;
+        private readonly MaterialsSectionPage materialsSectionPage;
+        private readonly NavigationSection navigationSection;
 
         public MaterialsSteps(ScenarioContext injectedContext, IWebDriver driver)
         {
             materialsSectionPage = new MaterialsSectionPage(driver);
+            navigationSection = new NavigationSection(driver);
 
             context = injectedContext;
             this.driver = driver;
@@ -29,7 +31,7 @@ namespace AcceptanceTests.UISteps
         [When(@"I navigated to Materials page")]
         public void IWantNavigateToMaterialsPage()
         {
-            materialsSectionPage.MaterialsSection.Click();
+            navigationSection.MaterialsLink.Click();
             driver.WaitFor(7);
         }
 
@@ -153,7 +155,7 @@ namespace AcceptanceTests.UISteps
         public void WhenIClickedOnTheFirstSearchResultInTheMaterialsSection()
         {
             materialsSectionPage.FirstSearchResult.Click();
-            driver.WaitFor(1);
+            driver.WaitFor(5);
         }
 
         [When(@"I pressed Show button to show Text classifier ML output")]

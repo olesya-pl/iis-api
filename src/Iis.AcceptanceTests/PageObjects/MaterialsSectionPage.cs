@@ -18,10 +18,6 @@ namespace AcceptanceTests.PageObjects
             PageFactory.InitElements(driver, this);
         }
 
-        [FindsBy(How = How.CssSelector, Using = ".sidebar__nav li.inputStream")]
-        [CacheLookup]
-        public IWebElement MaterialsSection;
-
         [FindsBy(How = How.XPath, Using = "//div[@class='infinity-table materials-table']//tbody[@class='p-datatable-tbody']/tr")]
         public IWebElement FirstMaterialInTheMaterialsList;
 
@@ -51,21 +47,14 @@ namespace AcceptanceTests.PageObjects
         [FindsBy(How = How.XPath, Using = "//span[contains(text(),'PhoneNumber')]/following-sibling::span[1]")]
         public IWebElement PhoneNumberPatternNode;
 
-        [FindsBy(How = How.XPath, Using = "//div/ul/li[@class='el-menu-item action-tab--objects']")]
-        public IWebElement ObjectsTab;
-
-        [FindsBy(How = How.XPath, Using = "//li[contains(text(),'Обробка ML')]")]
+        [FindsBy(How = How.CssSelector, Using = ".material__tabs-menu > .action-tab--ml")]
         public IWebElement MLTab;
 
         [FindsBy(How = How.CssSelector, Using = ".material-events__header .el-input__inner")]
         [CacheLookup]
         public IWebElement EventsSearch;
 
-        [FindsBy(How = How.CssSelector, Using = ".el-menu > .el-menu-item:nth-of-type(2)")]
-        [CacheLookup]
-        public IWebElement MLTabSearch;
-
-		[FindsBy(How = How.XPath, Using = "//div[contains(text(), \"Об'єкти\")]//following::input")]
+		[FindsBy(How = How.CssSelector, Using = ".sidebar__nav li.objects")]
         public IWebElement ObjectsTabSearch;
 
         public MaterialPage MaterialPage => new MaterialPage(driver);

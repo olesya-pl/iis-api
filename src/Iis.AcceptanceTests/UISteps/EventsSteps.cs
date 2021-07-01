@@ -16,12 +16,14 @@ namespace AcceptanceTests.UISteps
 
         private EventPage eventPage;
         private EventsSection eventsSection;
+        private readonly NavigationSection navigationSection;
 
         #region Given/When
         public EventsSteps(ScenarioContext injectedContext, IWebDriver driver)
         {
             eventPage = new EventPage(driver);
             eventsSection = new EventsSection(driver);
+            navigationSection = new NavigationSection(driver);
             context = injectedContext;
             this.driver = driver;
         }
@@ -29,7 +31,7 @@ namespace AcceptanceTests.UISteps
         [When(@"I navigated to Events page")]
         public void IWantNavigateToEventsPage()
         {
-            eventsSection.EventsPage.Click();
+            navigationSection.EventsLink.Click();
             driver.WaitFor(3);
         }
 

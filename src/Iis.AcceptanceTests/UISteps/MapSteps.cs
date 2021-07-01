@@ -12,20 +12,21 @@ namespace AcceptanceTests.UISteps
         private readonly IWebDriver driver;
         private readonly ScenarioContext context;
         private MapPageObjects mapPage;
+        private readonly NavigationSection navigationSection;
 
         public MapSteps(ScenarioContext injectedContext, IWebDriver driver)
         {
             context = injectedContext;
             this.driver = driver;
             mapPage = new MapPageObjects(driver);
-
+            navigationSection = new NavigationSection(driver);
         }
 
         #region When
         [When(@"I navigated to Map page")]
         public void INavigatedToMapPage()
         {
-            mapPage.MapSection.Click();
+            navigationSection.MapLink.Click();
             driver.WaitFor(10);
         }
         #endregion

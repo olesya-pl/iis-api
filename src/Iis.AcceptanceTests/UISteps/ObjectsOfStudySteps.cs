@@ -15,10 +15,12 @@ namespace AcceptanceTests.UISteps
     {
         private readonly IWebDriver driver;
         private readonly ScenarioContext context;
-        private ObjectsOfStudyPageObjects objectsOfStudyPage;
+        private readonly ObjectsOfStudyPageObjects objectsOfStudyPage;
+        private readonly NavigationSection navigationSection;
         public ObjectsOfStudySteps(ScenarioContext injectedContext, IWebDriver driver)
         {
             objectsOfStudyPage = new ObjectsOfStudyPageObjects(driver);
+            navigationSection = new NavigationSection(driver);
             context = injectedContext;
             this.driver = driver;
         }
@@ -28,7 +30,7 @@ namespace AcceptanceTests.UISteps
         [When(@"I clicked on the Objects section")]
         public void WhenIClickedOnTheObjectsSection()
         {
-            objectsOfStudyPage.ObjectOfStudySectionButton.Click();
+            navigationSection.ObjectOfStudyLink.Click();
         }
 
 

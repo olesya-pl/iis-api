@@ -14,12 +14,7 @@ namespace AcceptanceTests.PageObjects
             PageFactory.InitElements(driver, this);
         }
 
-        [FindsBy(How = How.CssSelector, Using = ".sidebar__nav li.admin")]
-        public IWebElement AdministrationPage;
-
         [FindsBy(How = How.CssSelector, Using = "tbody > tr:nth-of-type(1)")]
         public IWebElement FirstUserOnTheAdminPage;
-
-
     }
 }
