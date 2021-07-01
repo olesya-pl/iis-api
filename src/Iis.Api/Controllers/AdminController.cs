@@ -26,6 +26,8 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Iis.Services;
+using IIS.Services.Contracts.Interfaces;
 
 namespace Iis.Api.Controllers
 {
@@ -42,10 +44,13 @@ namespace Iis.Api.Controllers
         private readonly IUserElasticService _userElasticService;
         private readonly IAdminOntologyElasticService _adminElasticService;
         private readonly IHost _host;
+        private readonly IConfiguration _configuration;
         private readonly IOntologyDataService _nodesDataService;
         private readonly IConnectionStringService _connectionStringService;
         private readonly IAccessLevelService _accessLevelService;
         private readonly ICsvService _csvService;
+        private readonly IMaterialProvider _materialProvider;
+        private readonly NodeMaterialRelationService<IIISUnitOfWork> _nodeMaterialRelationService;
 
         public AdminController(
             IMaterialService materialService,
@@ -59,7 +64,9 @@ namespace Iis.Api.Controllers
             IConnectionStringService connectionStringService,
             IOntologyDataService nodesDataService,
             IAccessLevelService accessLevelService,
-            ICsvService csvService)
+            ICsvService csvService,
+            IMaterialProvider materialProvider,
+            NodeMaterialRelationService<IIISUnitOfWork> nodeMaterialRelationService)
         {
             _elasticManager = elasticManager;
             _materialService = materialService;
@@ -73,6 +80,19 @@ namespace Iis.Api.Controllers
             _connectionStringService = connectionStringService;
             _accessLevelService = accessLevelService;
             _csvService = csvService;
+            _materialProvider = materialProvider;
+            _nodeMaterialRelationService = nodeMaterialRelationService;
+        }
+        
+        [HttpGet("CreateBindingNodesToMaterial/{nodeId}/{limit}")]
+        public async Task<string> CreateBindingNodesToMaterial(Guid nodeId, int limit)
+        {
+            var materialsIds = await _materialProvider.GetMaterialsIdsAsync(limit);
+            
+            await _nodeMaterialRelationService.CreateMultipleRelations(
+                new HashSet<Guid>(new[] { nodeId }), new HashSet<Guid>(materialsIds), null);
+            
+            return nodeId.ToString();
         }
 
         [HttpGet("ReInitializeOntologyIndexes/{indexNames}")]

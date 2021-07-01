@@ -70,6 +70,13 @@ namespace Iis.DbLayer.Repositories
             return await GetMaterialsQuery(includes)
                             .ToArrayAsync();
         }
+        
+        public async Task<IEnumerable<MaterialEntity>> GetAllAsync(int limit, params MaterialIncludeEnum[] includes)
+        {
+            return await GetMaterialsQuery(includes)
+                .Take(limit)
+                .ToArrayAsync();
+        }
 
         public async Task<IEnumerable<MaterialEntity>> GetAllForRelatedNodeListAsync(IEnumerable<Guid> nodeIdList)
         {
