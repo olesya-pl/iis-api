@@ -565,6 +565,11 @@ object Tests_IisAcceptanceTestsSmoke : BuildType({
     }
 
     steps {
+        exec {
+            name = "Wait apps to start"
+            path = "sleep"
+            arguments = "180"
+        }
         dotnetTest {
             name = "Run tests"
             projects = "src/Iis.AcceptanceTests/Iis.AcceptanceTests.csproj"
@@ -575,11 +580,6 @@ object Tests_IisAcceptanceTestsSmoke : BuildType({
             dockerImage = "mcr.microsoft.com/dotnet/core/sdk:3.1"
             dockerRunParameters = "-e TargetEnvironment=Dev3"
             param("dotNetCoverage.dotCover.home.path", "%teamcity.tool.JetBrains.dotCover.CommandLineTools.DEFAULT%")
-        }
-        exec {
-            name = "Wait apps to start"
-            path = "sleep"
-            arguments = "180"
         }
     }
 
