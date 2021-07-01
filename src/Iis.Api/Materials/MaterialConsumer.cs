@@ -5,6 +5,7 @@ using Iis.Api.BackgroundServices;
 using Iis.Api.Materials.Handlers;
 using IIS.Core.Materials;
 using Iis.Messages;
+using Iis.Messages.Materials;
 using Iis.Utility;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -59,7 +60,6 @@ namespace Iis.Api.Materials
                 autoDelete: false);
 
             _channel.BasicQos(0, PrefetchCount, global: false);
-            
 
             ConfigureConsumer(_channel, ProcessMessage);
 
@@ -83,7 +83,7 @@ namespace Iis.Api.Materials
             {
                 var eventProducer = scope.ServiceProvider.GetService<IMaterialEventProducer>();
                 ThemeCounterBackgroundService.SignalMaterialUpdateNeeded();
-                
+
                 eventProducer.SaveMaterialToElastic(message.MaterialId);
 
                 if (!message.ParentId.HasValue)
@@ -117,7 +117,7 @@ namespace Iis.Api.Materials
                     {
                         throw new InvalidOperationException("We received empty message.");
                     }
-                    
+
                     await handler(args.Body.FromBytes<MaterialCreatedMessage>());
 
                     channel.BasicAck(args.DeliveryTag, false);

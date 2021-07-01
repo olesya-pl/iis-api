@@ -1,16 +1,15 @@
 using System;
 using System.Text;
 using System.Threading;
+using System.Collections.Generic;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Exceptions;
-using Iis.Api.Configuration;
-using Iis.Api.Materials;
-using Iis.Messages;
 using Iis.Utility;
-using System.Collections.Generic;
-using Newtonsoft.Json;
+using Iis.Messages;
+using Iis.Messages.Materials;
 using Iis.Services.Contracts.Configurations;
 
 namespace IIS.Core.Materials

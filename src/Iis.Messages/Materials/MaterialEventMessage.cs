@@ -1,9 +1,8 @@
 using System;
-
-namespace IIS.Core.Materials
+namespace Iis.Messages.Materials
 {
     /// <summary>
-    /// Message type for publish when Material is created|updated
+    /// generic Message type for publish Material
     /// </summary>
     public class MaterialEventMessage
     {
