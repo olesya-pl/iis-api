@@ -200,7 +200,9 @@ namespace Iis.Api.Controllers
                 KeywordProperty.Create("SessionPriority.Title", false),
                 ByteProperty.Create("SessionPriority.OrderNumber"),
                 IntegerProperty.Create("NodesCount"),
-                DenseVectorProperty.Create("ImageVectors.Vector", MaterialDocument.ImageVectorDimensionsCount)
+                DenseVectorProperty.Create("ImageVectors.Vector", MaterialDocument.ImageVectorDimensionsCount),
+                TextProperty.Create("MLResponses.namedEntityRecognition", ElasticConfiguration.DefaultTermVector),
+                TextProperty.Create("MLResponses.textAnnotation", ElasticConfiguration.DefaultTermVector)
             });
 
             await _elasticManager.CreateIndexesAsync(new[] { materialIndex },
