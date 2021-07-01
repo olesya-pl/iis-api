@@ -576,6 +576,11 @@ object Tests_IisAcceptanceTestsSmoke : BuildType({
             dockerRunParameters = "-e TargetEnvironment=Dev3"
             param("dotNetCoverage.dotCover.home.path", "%teamcity.tool.JetBrains.dotCover.CommandLineTools.DEFAULT%")
         }
+        exec {
+            name = "Wait apps to start"
+            path = "sleep"
+            arguments = "180"
+        }
     }
 
     triggers {
@@ -631,8 +636,8 @@ object Tests_PrepareElasticIntegrationTestEnv : BuildType({
     name = "Prepare_Elastic_Integration_Test_Env"
 
     params {
-        param("env.NOMAD_ADDR", "http://is-dev-srv1.contour.net:4646")
         param("NOMAD_ENV", "elastic-integration")
+        param("env.NOMAD_ADDR", "http://is-dev-srv1.contour.net:4646")
         param("env.CONSUL_HTTP_ADDR", "http://is-dev-srv1.contour.net:8500")
     }
 
