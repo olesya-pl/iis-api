@@ -1,5 +1,6 @@
 using System.Threading;
 using Iis.Messages;
+using Iis.Messages.Materials;
 using Iis.Utility;
 using Microsoft.Extensions.Logging;
 using RabbitMQ.Client;

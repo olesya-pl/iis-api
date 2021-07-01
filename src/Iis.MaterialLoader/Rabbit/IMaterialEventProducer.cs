@@ -1,5 +1,6 @@
 using System;
 using Iis.Messages;
+using Iis.Messages.Materials;
 
 namespace Iis.MaterialLoader.Rabbit
 {
