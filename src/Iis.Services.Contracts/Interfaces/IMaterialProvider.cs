@@ -43,5 +43,6 @@ namespace IIS.Services.Contracts.Interfaces
         Task<(List<Material> Materials, int Count)> GetMaterialsByAssigneeIdAsync(Guid assigneeId);
         Task<(IEnumerable<Material> Materials,  int Count)> GetMaterialsLikeThisAsync(Guid userId, Guid materialId, PaginationParams page, SortingParams sorting);
         Task<bool> MaterialExists(Guid value);
+        Task<IReadOnlyCollection<Guid>> GetMaterialsIdsAsync(int limit);
     }
 }
