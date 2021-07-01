@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using AutoMapper;
 using MediatR;
 using Iis.Utility;
-using Iis.Messages;
+using Iis.Messages.Materials;
 using Iis.Domain.Materials;
 using Iis.Domain.MachineLearning;
 using Iis.DbLayer.Repositories;
