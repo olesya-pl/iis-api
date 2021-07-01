@@ -537,6 +537,11 @@ object Tests_IisAcceptanceTestsSanity : BuildType({
             dockerRunParameters = "-e TargetEnvironment=Dev3"
             param("dotNetCoverage.dotCover.home.path", "%teamcity.tool.JetBrains.dotCover.CommandLineTools.DEFAULT%")
         }
+        exec {
+            name = "Wait apps to start"
+            path = "sleep"
+            arguments = "180"
+        }
     }
 
     triggers {
