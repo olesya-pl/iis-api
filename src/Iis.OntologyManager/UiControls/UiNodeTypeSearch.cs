@@ -30,7 +30,7 @@ namespace Iis.OntologyManager.UiControls
 
             container.GoToNewColumn();
 
-            AddSearchButton(container, "FormField", GetWithFormFieldType);
+            AddSearchButton(container, "FormFieldType", GetWithFormFieldType);
             AddSearchButton(container, "FormFieldLines", GetWithFormFieldLines);
             AddSearchButton(container, "FormFieldHint", GetWithFormFieldHint);
             AddSearchButton(container, "FormFieldIcon", GetWithFormFieldIcon);
@@ -49,7 +49,7 @@ namespace Iis.OntologyManager.UiControls
         }
 
         private IEnumerable<INodeTypeLinked> GetRelationNodeTypes() =>
-            _schema.GetAllNodeTypes().Where(nt => nt.Kind == Kind.Relation);
+            _schema.GetAllNodeTypes().Where(nt => nt.RelationType?.Kind == RelationKind.Embedding);
 
         public string GetWithAggregation()
         {
@@ -107,12 +107,38 @@ namespace Iis.OntologyManager.UiControls
             return ConvertToString(nodeTypes, nt => nt.MetaObject.FormField.Hint);
         }
 
+        public string GetFormFieldType(INodeTypeLinked relationNodeType)
+        {
+            var targetType = relationNodeType.RelationType.TargetType;
+
+            var formFieldType = targetType.Name switch
+            {
+                "FuzzyDate" => "fuzzyDate",
+                "FuzzyDateRange" => "fuzzyDateRange",
+                "Photo" => "photo",
+                "EventImportance" => "radioGroup",
+                "EventState" => "radioGroup",
+                "EventComponent" => "dropdownTree",
+                "EventType" => "dropdownTree",
+                "TaggableString" => "taggableString",
+                _ => null
+            };
+
+            if (formFieldType != null) return formFieldType;
+
+            if (targetType.IsEnum || targetType.IsObject) return "dropdown";
+
+            return formFieldType ??
+                (targetType.Kind == Kind.Entity ? "form" : null);
+        }
+
         public string GetWithFormFieldType()
         {
             var nodeTypes = GetRelationNodeTypes()
-                .Where(nt => !string.IsNullOrEmpty(nt.MetaObject.FormField?.Type));
+                .Where(nt => nt.MetaObject.FormField?.Type != GetFormFieldType(nt))
+                .OrderBy(nt => nt.MetaObject.FormField?.Type);
 
-            return ConvertToString(nodeTypes, nt => $"{nt.TargetType.Name} => {nt.MetaObject.FormField.Type}");
+            return ConvertToString(nodeTypes, nt => $"{nt.MetaObject.FormField?.Type} => {nt.TargetType.Name} => {GetFormFieldType(nt)}");
         }
 
         public string GetWithFormFieldIcon()

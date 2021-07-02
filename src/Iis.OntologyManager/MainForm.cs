@@ -235,7 +235,6 @@ namespace Iis.OntologyManager
             _uiOntologyDataControl.SetEnabled(enabled);
             _uiEntityTypeControl.SetEnabled(enabled);
             _uiRelationAttributeControl.SetEnabled(enabled);
-            _uiRelationEntityControl.SetEnabled(enabled);
             _filterControl.SetEnabled(enabled);
             panelTop.Enabled = enabled;
             btnTypeBack.Enabled = enabled;

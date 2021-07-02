@@ -1,6 +1,9 @@
-﻿using Iis.Interfaces.Ontology.Schema;
+﻿using Iis.Domain.Meta;
+using Iis.Interfaces.Meta;
+using Iis.Interfaces.Ontology.Schema;
 using Iis.OntologyManager.Style;
 using Iis.OntologySchema.ChangeParameters;
+using Iis.OntologySchema.DataTypes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -33,14 +36,8 @@ namespace Iis.OntologyManager.UiControls
         CheckBox cbEditing;
         CheckedListBox clbTargetTypes;
 
-        TextBox txtFormFieldType;
         TextBox txtFormFieldLines;
-        TextBox txtFormFieldHint;
-        ComboBox cmbFormFieldIcon;
-
-        TextBox txtContainerId;
-        TextBox txtContainerTitle;
-        TextBox txtContainerType;
+        ComboBox cmbContainer;
 
         CheckBox cbIsInversed;
         TextBox txtInversedCode;
@@ -52,9 +49,11 @@ namespace Iis.OntologyManager.UiControls
 
         private List<string> _valuesForFormat = new List<string> { "", "email", "phone" };
 
+        private INodeTypeLinked _nodeType;
         private Guid? Id => string.IsNullOrEmpty(txtId.Text) ? (Guid?)null : new Guid(txtId.Text);
         private Guid? _parentTypeId;
-        
+        private List<IContainerMeta> _containers;
+
         private RelationControlMode _mode;
         public UiRelationControl(
             UiControlsCreator uiControlsCreator, 
@@ -75,10 +74,13 @@ namespace Iis.OntologyManager.UiControls
             containerTop.Add(txtName = new TextBox(), "Ім'я");
             containerTop.Add(txtTitle = new TextBox(), "Заголовок");
             containerTop.Add(cmbEmbedding = _uiControlsCreator.GetEnumComboBox(typeof(EmbeddingOptions)), "Обов'язковість");
+            containerTop.Add(cmbContainer = new ComboBox(), "Контейнер");
+            cmbContainer.DisplayMember = "Title";
             containerTop.Add(txtSortOrder = new TextBox(), "Індекс сортування");
+            containerTop.Add(cbEditing = new CheckBox { Text = "Можливе редактування" });
             containerTop.Add(cbHidden = new CheckBox { Text = "Відключений" });
             btnSave = new Button { Text = "Зберегти" };
-            btnSave.Click += (sender, e) => { OnSave?.Invoke(GetUpdateParameter()); };
+            btnSave.Click += (sender, e) => { ValidateAndSave(); };
             containerTop.Add(btnSave);
             
             containerTop.GoToNewColumn();
@@ -119,13 +121,17 @@ namespace Iis.OntologyManager.UiControls
 
         public void SetUiValues(INodeTypeLinked nodeType, List<string> aliases)
         {
+            _nodeType = nodeType;
             txtId.Text = nodeType.Id.ToString("N");
             txtName.Text = nodeType.Name;
             txtTitle.Text = nodeType.Title;
             txtMeta.Text = nodeType.Meta;
             cbHidden.Checked = nodeType.MetaObject?.Hidden ?? false;
             txtSortOrder.Text = nodeType.MetaObject?.SortOrder?.ToString();
+            cbEditing.Checked = nodeType.CanBeEditedOnUi;
+
             _uiControlsCreator.SetSelectedValue(cmbEmbedding, nodeType.RelationType.EmbeddingOptions.ToString());
+            FillContainers(nodeType);
 
             if (_mode == RelationControlMode.ToEntity)
             {
@@ -163,6 +169,104 @@ namespace Iis.OntologyManager.UiControls
             }
         }
 
+        private List<IContainerMeta> GetAllContainers(INodeTypeLinked entityType)
+        {
+            var containers = entityType.GetAllProperties()
+               .Where(nt => 
+                    nt.MetaObject.Container != null && 
+                    !string.IsNullOrEmpty(nt.MetaObject.Container.Title))
+               .Select(nt => nt.MetaObject.Container)
+               .ToList();
+
+            var result = new List<IContainerMeta>();
+
+            foreach (var container in containers)
+            {
+                if (!result.Any(c => c.Id == container.Id))
+                {
+                    result.Add(container);
+                }
+            }
+
+            return result.OrderBy(c => c.Title).ToList();
+        }
+
+        private void FillContainers(INodeTypeLinked nodeType)
+        {
+            var sourceType = nodeType.RelationType.SourceType;
+            var _containers = GetAllContainers(sourceType);
+            cmbContainer.DataSource = _containers;
+        }
+
+        private int? GetCurrentSortOrder() =>
+            string.IsNullOrEmpty(txtSortOrder.Text) ? (int?) null : int.Parse(txtSortOrder.Text);
+
+        private string GetCurrentFormat() =>
+            string.IsNullOrEmpty(cmbFormat.Text) ? null : cmbFormat.Text;
+
+        private EntityOperation[] GetCurrentAcceptsEntityOperations() =>
+            cbEditing.Checked ? new[] { EntityOperation.Create, EntityOperation.Update, EntityOperation.Delete } :
+            (EntityOperation[])null;
+
+        private string[] GetCurrentTargetTypes()
+        {
+            if (clbTargetTypes.Items.Count == clbTargetTypes.CheckedItems.Count) return null;
+
+            var result = new List<string>();
+            foreach (var item in clbTargetTypes.CheckedItems)
+            {
+                result.Add(item.ToString());
+            }
+            return result.ToArray();
+        }
+
+        private int? GetCurrentFormFieldLines() =>
+            string.IsNullOrEmpty(txtFormFieldLines.Text) ? (int?)null : int.Parse(txtFormFieldLines.Text);
+
+        private IFormField GetCurrentFormField()
+        {
+            var type = _nodeType.MetaObject?.FormField?.Type;
+            var hint = _nodeType.MetaObject?.FormField?.Hint;
+            var lines = GetCurrentFormFieldLines();
+            var icon = _nodeType.MetaObject?.FormField?.Icon;
+
+            return type == null && hint == null && lines == null && icon == null ? null :
+                new FormField
+                {
+                    Type = type,
+                    Hint = hint,
+                    Lines = lines,
+                    Icon = icon
+                };
+        }
+
+        private IContainerMeta GetCurrentContainer()
+        {
+            if (string.IsNullOrWhiteSpace(cmbContainer.Text)) return null;
+            
+            var selected = (IContainerMeta)cmbContainer.SelectedItem;
+            return selected == null ?
+                new SchemaContainer { Id = Guid.NewGuid(), Title = cmbContainer.Text } :
+                new SchemaContainer { Id = selected.Id, Title = selected.Title, Type = selected.Type };
+        }
+
+        private ISchemaMeta GetMeta()
+        {
+            var meta = new SchemaMeta();
+            meta.Hidden = cbHidden.Checked;
+            meta.Formula = txtFormula.Text;
+            meta.IsAggregated = cbIsAggregated.Checked;
+            meta.SortOrder = GetCurrentSortOrder();
+            meta.Format = GetCurrentFormat();
+            meta.IsImportantRelation = cbIsImportantRelation.Checked;
+            meta.AcceptsEntityOperations = GetCurrentAcceptsEntityOperations();
+            meta.TargetTypes = GetCurrentTargetTypes();
+            meta.FormField = GetCurrentFormField();
+            meta.Container = GetCurrentContainer();
+
+            return meta;
+        }
+
         private INodeTypeUpdateParameter GetUpdateParameter()
         {
             var isNew = string.IsNullOrEmpty(txtId.Text);
@@ -176,6 +280,31 @@ namespace Iis.OntologyManager.UiControls
                 TargetTypeId = (Guid)cmbTargetType.SelectedValue,
                 ParentTypeId = _parentTypeId
             };
+        }
+
+        private void ValidateAndSave()
+        {
+            var errors = GetValidationErrors();
+            if (string.IsNullOrEmpty(errors))
+            {
+                OnSave?.Invoke(GetUpdateParameter()); 
+            }
+            else
+            {
+                MessageBox.Show(errors);
+            }
+        }
+
+        private string GetValidationErrors()
+        {
+            var sb = new StringBuilder();
+            int n;
+
+            if (!string.IsNullOrEmpty(txtSortOrder.Text) && !int.TryParse(txtSortOrder.Text, out n))
+            {
+                sb.AppendLine("Індекс сортування повинен бути цілим числом");
+            }
+            return sb.ToString();
         }
 
         public void SetParentTypeId(Guid? parentTypeId)

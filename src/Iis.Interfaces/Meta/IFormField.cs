@@ -14,11 +14,14 @@ namespace Iis.Interfaces.Meta
     };
     public interface IFormField
     {
-        string Type { get; set; }
-        string Hint { get; set; }
-        string Icon { get; set; }
         int? Lines { get; set; }
 
+        [Obsolete("Changed to computed property in Attributes.cs")]
+        string Type { get; set; }
+        [Obsolete]
+        string Hint { get; set; }
+        [Obsolete("Changed to computed property in Attributes.cs")]
+        string Icon { get; set; }
         [Obsolete]
         bool? HasIndexColumn { get; set; }
         [Obsolete]

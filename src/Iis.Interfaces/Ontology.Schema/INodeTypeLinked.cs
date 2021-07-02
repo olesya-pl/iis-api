@@ -77,6 +77,7 @@ namespace Iis.Interfaces.Ontology.Schema
         bool AcceptsScalar(object value);
         bool AcceptsOperation(EntityOperation create);
         string GetIconName();
+        bool CanBeEditedOnUi { get; }
     }
 
     public class NodeAggregationInfo
