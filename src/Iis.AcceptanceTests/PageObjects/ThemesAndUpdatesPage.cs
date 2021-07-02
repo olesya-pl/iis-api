@@ -16,10 +16,6 @@ namespace AcceptanceTests.PageObjects
             PageFactory.InitElements(driver, this);
         }
 
-        [FindsBy(How = How.CssSelector, Using = ".sidebar__nav li.themes")]
-        [CacheLookup]
-        public IWebElement ThemesAndUpdatesSection;
-
         [FindsBy(How = How.CssSelector, Using = ".themes-table .p-datatable-tbody > tr")]
         [CacheLookup]
         public IWebElement FirstThemeInTheThemeList;

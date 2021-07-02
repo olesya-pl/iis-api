@@ -17,13 +17,13 @@ namespace AcceptanceTests.UISteps
         private ThemesAndUpdatesPageObjects themesAndUpdatesPageObjects;
 
         private ObjectsOfStudyPageObjects objectsOfStudyPageObjects;
-        private MaterialsSectionPage materialsSectionPage;
+        private readonly NavigationSection navigationSection;
 
         public ThemesAndUpdatesSteps(ScenarioContext injectedContext, IWebDriver driver)
         {
             themesAndUpdatesPageObjects = new ThemesAndUpdatesPageObjects(driver);
             objectsOfStudyPageObjects = new ObjectsOfStudyPageObjects(driver);
-            materialsSectionPage = new MaterialsSectionPage(driver);
+            navigationSection = new NavigationSection(driver);
             context = injectedContext;
             this.driver = driver;
         }
@@ -33,7 +33,7 @@ namespace AcceptanceTests.UISteps
         public void INavigatedToThemesAndUpdatesSection()
         {
             driver.WaitFor(2);
-            themesAndUpdatesPageObjects.ThemesAndUpdatesSection.Click();
+            navigationSection.ThemesLink.Click();
         }
 
         [When(@"I pressed on the Create theme button in the objects section")]

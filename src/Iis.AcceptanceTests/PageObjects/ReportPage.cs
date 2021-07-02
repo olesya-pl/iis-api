@@ -15,10 +15,6 @@ namespace AcceptanceTests.PageObjects
             PageFactory.InitElements(driver, this);
         }
 
-        [FindsBy(How = How.CssSelector, Using = ".sidebar__nav li.reports")]
-        [CacheLookup]
-        public IWebElement ReportSection;
-
         [FindsBy(How = How.CssSelector, Using = ".reports-table .p-datatable-tbody > tr")]
         public IWebElement FirstReportInTheReportList;
 

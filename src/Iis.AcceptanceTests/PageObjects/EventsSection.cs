@@ -19,9 +19,6 @@ namespace AcceptanceTests.PageObjects
 			PageFactory.InitElements(driver, this);
 		}
 
-		[FindsBy(How = How.CssSelector, Using = ".sidebar__nav li.events")]
-		public IWebElement EventsPage;
-
 		[FindsBy(How = How.CssSelector, Using = ".add-button")]
 		[CacheLookup]
 		public IWebElement CreateEventButton;
