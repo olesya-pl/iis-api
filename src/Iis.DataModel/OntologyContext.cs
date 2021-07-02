@@ -13,8 +13,6 @@ namespace Iis.DataModel
 {
     public class OntologyContext : DbContext
     {
-        //public SemaphoreSlim Semaphore = new SemaphoreSlim(1, int.MaxValue);
-
         public DbSet<NodeTypeEntity> NodeTypes { get; set; }
         public DbSet<RelationTypeEntity> RelationTypes { get; set; }
         public DbSet<AttributeTypeEntity> AttributeTypes { get; set; }

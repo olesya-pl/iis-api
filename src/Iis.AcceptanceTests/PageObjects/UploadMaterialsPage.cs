@@ -17,8 +17,7 @@ namespace AcceptanceTests.PageObjects
         [CacheLookup]
         public IWebElement LoadMaterialsSection;
 
-        [FindsBy(How = How.XPath, Using = "//span[contains(text(),'Завантажити')]")]
-        [CacheLookup]
-        public IWebElement UploadMaterialButton;
+        [FindsBy(How = How.XPath, Using = "//div[@class='upload']")]
+        public IWebElement UploadFunctionalityWindow;
     }
 }

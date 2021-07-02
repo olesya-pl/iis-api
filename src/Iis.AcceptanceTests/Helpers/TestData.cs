@@ -28,7 +28,7 @@ namespace AcceptanceTests.Helpers
             ReadTestData(targetEnvironment.ToString());
             if (string.IsNullOrWhiteSpace(environmentVariable))
             {
-                RemoteWebDriverUrl = "http://localhost:4444/wd/hub";
+                RemoteWebDriverUrl = "http://iis-test-selenoid1.contour.net:8081/wd/hub";
             }
         }
 

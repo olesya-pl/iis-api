@@ -34,7 +34,7 @@ namespace IIS.Core.GraphQL.Files
         {
             var uploadTasks = new List<Task<UploadResult>>();
 
-            var tokenPayload = context.ContextData[TokenPayload.TokenPropertyName] as TokenPayload;
+            var tokenPayload = context.GetToken();
 
             foreach (var file in inputs)
             {
@@ -54,6 +54,14 @@ namespace IIS.Core.GraphQL.Files
                 else if (input.Name.EndsWith(".pdf"))
                 {
                     return await UploadFileAsync(fileService, uploadConfiguration.PdfDirectory, input, user);
+                }
+                else if (input.Name.EndsWith(".mp4"))
+                {
+                    return await UploadFileAsync(fileService, uploadConfiguration.VideoDirectory, input, user);
+                }
+                else if (input.Name.EndsWith(".mp3"))
+                {
+                    return await UploadFileAsync(fileService, uploadConfiguration.AudioDirectory, input, user);
                 }
                 else if (input.Name.EndsWith(".png"))
                 {
@@ -94,7 +102,7 @@ namespace IIS.Core.GraphQL.Files
                 if(user != null)
                 {
                     loadData.LoadedBy = $"{user.LastName} {user.FirstName} {user.Patronymic}";
-                };
+                }
 
                 var material = new Material
                 {
@@ -121,6 +129,10 @@ namespace IIS.Core.GraphQL.Files
 
         private static async Task<UploadResult> UploadFileAsync(IFileService fileService, string directory, UploadInput input, User user)
         {
+            var result = await fileService.IsDuplicatedAsync(input.Content);
+            if (result.IsDuplicate)
+                return DuplicatedUploadResult;
+
             var byteArray = input.Content;
             var fileName = System.IO.Path.Combine(directory, input.Name);
             var dataFileName = $"{System.IO.Path.GetFileNameWithoutExtension(input.Name)}{DataFileExtension}";

@@ -546,8 +546,6 @@ object Tests_IisAcceptanceTestsSanity : BuildType({
     }
 
     dependencies {
-        snapshot(Tests_IisAcceptanceTestsSmoke) {
-        }
         snapshot(Tests_PrepareTestEnv) {
             onDependencyFailure = FailureAction.CANCEL
             onDependencyCancel = FailureAction.CANCEL

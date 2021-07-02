@@ -964,6 +964,9 @@ namespace Iis.DataModel.Migrations
                     b.Property<int>("AccessLevel")
                         .HasColumnType("integer");
 
+                    b.Property<string>("Annotation")
+                        .HasColumnType("text");
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp without time zone");
 
@@ -1224,6 +1227,13 @@ namespace Iis.DataModel.Migrations
                             EntityTypeName = "EntityEvent",
                             ShortTitle = "П",
                             Title = "Подія"
+                        },
+                        new
+                        {
+                            Id = new Guid("2b4b2a5a-bd2a-4159-839e-02e169fc018c"),
+                            EntityTypeName = "EntityReport",
+                            ShortTitle = "З",
+                            Title = "Звіт"
                         });
                 });
 
@@ -1299,6 +1309,9 @@ namespace Iis.DataModel.Migrations
 
                     b.Property<string>("Patronymic")
                         .HasColumnType("text");
+
+                    b.Property<int>("Source")
+                        .HasColumnType("integer");
 
                     b.Property<string>("UserNameActiveDirectory")
                         .HasColumnType("text");

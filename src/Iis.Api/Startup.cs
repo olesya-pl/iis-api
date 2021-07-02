@@ -18,6 +18,7 @@ using Iis.Api.FlightRadar;
 using Iis.Api.GraphQL.Access;
 using Iis.Api.Modules;
 using Iis.Api.Ontology;
+using Iis.Core.Tools;
 using Iis.DataModel;
 using Iis.DataModel.Cache;
 using Iis.DbLayer.Common;
@@ -30,6 +31,7 @@ using Iis.DbLayer.Repositories;
 using Iis.Domain;
 using Iis.Domain.Vocabularies;
 using Iis.Elastic;
+using Iis.EventMaterialAutoAssignment;
 using Iis.FlightRadar.DataModel;
 using Iis.Interfaces.Common;
 using Iis.Interfaces.Elastic;
@@ -42,6 +44,7 @@ using Iis.Services;
 using Iis.Services.Contracts;
 using Iis.Services.Contracts.Interfaces;
 using Iis.Services.DI;
+using Iis.Services.ExternalUserServices;
 using Iis.Utility;
 using IIS.Core.Analytics.EntityFramework;
 using IIS.Core.GraphQL.Entities.Resolvers;
@@ -49,7 +52,6 @@ using IIS.Core.Materials;
 using IIS.Core.Materials.EntityFramework;
 using IIS.Core.Materials.EntityFramework.FeatureProcessors;
 using IIS.Core.Materials.FeatureProcessors;
-using IIS.Core.NodeMaterialRelation;
 using IIS.Core.Ontology.EntityFramework;
 using IIS.Core.Tools;
 using IIS.Repository.Factories;
@@ -124,6 +126,13 @@ namespace IIS.Core
                     contextLifetime: ServiceLifetime.Transient,
                     optionsLifetime: ServiceLifetime.Transient);
 
+                services.AddDbContext<AssignmentConfigContext>(
+                    options => options
+                        .UseNpgsql(dbConnectionString)
+                        .UseLoggerFactory(MyLoggerFactory),
+                    contextLifetime: ServiceLifetime.Transient,
+                    optionsLifetime: ServiceLifetime.Transient);
+
                 services.AddDbContext<FlightsContext>(
                     options => options
                         .UseNpgsql(flightRadarDbConnectionString)
@@ -192,7 +201,6 @@ namespace IIS.Core
             services.AddTransient<IConnectionStringService, ConnectionStringService>();
             services.AddTransient<IAccessLevelService, AccessLevelService>();
             services.AddTransient<AccessObjectService>();
-            services.AddTransient<NodeMaterialRelationService<IIISUnitOfWork>>();
             services.AddTransient<IFeatureProcessorFactory, FeatureProcessorFactory>();
             services.AddTransient<NodeToJObjectMapper>();
             services.AddSingleton<FileUrlGetter>();
@@ -221,7 +229,7 @@ namespace IIS.Core
                     catch (Exception e)
                     {
                         if (!(e is AuthenticationException) && !(e is InvalidOperationException) && !(e is AccessViolationException))
-                            throw e;
+                            throw;
 
                         var errorHandler = context.Services.GetService<IErrorHandler>();
                         var error = ErrorBuilder.New()
@@ -298,8 +306,12 @@ namespace IIS.Core
             services.RegisterElasticModules();
             services.AddMediatR(typeof(ReportEventHandler));
             services.AddTransient<ModifyDataRunner>();
-        }
+            services.RegisterEventMaterialAutoAssignment(Configuration);
 
+            var eusConfiguration = Configuration.GetSection("externalUserService").Get<ExternalUserServiceConfiguration>();
+            services.AddTransient<IExternalUserService>(_ => (new ExternalUserServiceFactory()).GetInstance(eusConfiguration));
+            services.AddTransient<ExternalUserSeeder>();
+        }
 
         private void _authenticate(IQueryContext context, HashSet<string> publiclyAccesible)
         {
@@ -325,13 +337,17 @@ namespace IIS.Core
 
                 var operationName = context.Request.OperationName ?? fieldNode.Name.Value;
 
-                var graphQLAccessItem = graphQLAccessList.GetAccessItem(operationName);
+                var graphQLAccessItems = graphQLAccessList.GetAccessItem(operationName, context.Request.VariableValues);
 
                 var validatedToken = TokenHelper.ValidateToken(token, Configuration, userService);
 
-                if (graphQLAccessItem != null && graphQLAccessItem.Kind != AccessKind.FreeForAll)
+                foreach (var graphQLAccessItem in graphQLAccessItems)
                 {
-                    if (!validatedToken.User.IsGranted(graphQLAccessItem.Kind, graphQLAccessItem.Operation))
+                    if (graphQLAccessItem == null || graphQLAccessItem.Kind == AccessKind.FreeForAll)
+                    {
+                        break;   
+                    }
+                    if (!validatedToken.User.IsGranted(graphQLAccessItem.Kind, graphQLAccessItem.Operation, AccessCategory.Entity))
                     {
                         throw new AccessViolationException($"Access denied to {operationName} for user {validatedToken.User.UserName}");
                     }
@@ -349,6 +365,7 @@ namespace IIS.Core
             }
             UpdateDatabase(app);
             app.SeedUser();
+            app.SeedExternalUsers();
             app.UpdateMartialStatus();
             app.ReloadElasticFieldsConfiguration();
 
@@ -394,6 +411,14 @@ namespace IIS.Core
                 try
                 {
                     using (var context = serviceScope.ServiceProvider.GetService<FlightsContext>())
+                    {
+                        context.Database.Migrate();
+                    }
+                }
+                catch { }
+                try
+                {
+                    using (var context = serviceScope.ServiceProvider.GetService<AssignmentConfigContext>())
                     {
                         context.Database.Migrate();
                     }

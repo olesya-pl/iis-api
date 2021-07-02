@@ -53,7 +53,7 @@ namespace Iis.Services
 
             var (from, size) = searchParams.Page.ToElasticPage();
 
-            var queryString = noSuggestion ? "ParentId:NULL" : $"{searchParams.Suggestion} AND ParentId:NULL";
+            var queryString = noSuggestion ? "ParentId:NULL" : $"({searchParams.Suggestion}) AND ParentId:NULL";
 
             var query = new ExactQueryBuilder()
                 .WithPagination(from, size)
@@ -70,7 +70,7 @@ namespace Iis.Services
 
             var elasticResult = await _elasticManager
                 .WithUserId(userId)
-                .SearchAsync(query.ToString(), _elasticState.MaterialIndexes, ct);
+                .SearchAsync(query.ToString(Formatting.None), _elasticState.MaterialIndexes, ct);
 
             var searchResult = elasticResult.ToSearchResult();
 
@@ -205,11 +205,11 @@ namespace Iis.Services
             return searchResult.ToSearchResult();
         }
 
-        public async Task<SearchResult> SearchByImageVector(Guid userId, decimal[] imageVector, PaginationParams page, CancellationToken ct = default)
+        public async Task<SearchResult> SearchByImageVector(Guid userId, IReadOnlyCollection<decimal[]> imageVectorList, PaginationParams page, CancellationToken ct = default)
         {
             var (from, size) = page.ToElasticPage();
 
-            var query = new SearchByImageQueryBuilder(imageVector)
+            var query = new SearchByImageQueryBuilder(imageVectorList)
                 .WithPagination(from, size)
                 .BuildSearchQuery()
                 .WithAggregation(_aggregationsFieldList);
@@ -244,7 +244,7 @@ namespace Iis.Services
                 "processedStatus" => ("ProcessedStatus.OrderNumber", sorting.Order),
                 "sessionPriority" => ("SessionPriority.OrderNumber", sorting.Order),
                 "importance" => ("Importance.OrderNumber", sorting.Order),
-                "nodes" => ("NodesCount", sorting.Order),
+                "nodes" => ("ObjectsOfStudyCount", sorting.Order),
                 _ => (null, null)
             };
         }

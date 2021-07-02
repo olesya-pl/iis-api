@@ -67,7 +67,7 @@ namespace Iis.Api
                 .ForMember(dest => dest.Transcriptions, opts => opts.MapFrom(src => src.Infos.Select(info => info.Data)))
                 .ForMember(dest => dest.Children, opts => opts.MapFrom(src => src.Children))
                 .ForMember(dest => dest.Highlight, opts => opts.Ignore())
-                .ForMember(dest => dest.CreatedDate, opts => opts.MapFrom(src => src.CreatedDate.ToString("MM/dd/yyyy HH:mm:ss")))
+                .ForMember(dest => dest.CreatedDate, opts => opts.MapFrom(src => src.CreatedDate.ToString("yyyy-MM-ddTHH:mm:ss.fffZ")))
                 .ForMember(dest => dest.AccessLevel, opts => opts.MapFrom(src => src.AccessLevel))
                 .AfterMap((src, dest, context) => { context.Mapper.Map(src.LoadData, dest); });
 
@@ -109,8 +109,8 @@ namespace Iis.Api
                     .MapFrom(src => src.AllowedOperations.Contains(AccessGranted.SearchAccessName)))
                 .ForMember(dest => dest.CommentingAllowed, opts => opts
                     .MapFrom(src => src.AllowedOperations.Contains(AccessGranted.CommentingAccessName)))
-                .ForMember(dest => dest.AccessLevelUpdateGranted, opts => opts
-                    .MapFrom(src => src.GrantedOperations.Contains(AccessGranted.AccessLevelUpdateAccessName)))
+                .ForMember(dest => dest.AccessLevelUpdateAllowed, opts => opts
+                    .MapFrom(src => src.AllowedOperations.Contains(AccessGranted.AccessLevelUpdateAccessName)))
                 .ForMember(dest => dest.ReadGranted, opts => opts
                     .MapFrom(src => src.GrantedOperations.Contains(AccessGranted.ReadAccessName)))
                 .ForMember(dest => dest.CreateGranted, opts => opts
@@ -150,7 +150,7 @@ namespace Iis.Api
             CreateMap<Iis.Domain.MachineLearning.MLResponse, IIS.Core.GraphQL.ML.MachineLearningResult>()
                 .ForMember(dest => dest.ProcessingDateTime, opts => opts.MapFrom(src => src.ProcessingDate.ToString("MM/dd/yyyy HH:mm:ss")));
 
-            CreateMap<IIS.Core.GraphQL.NodeMaterialRelation.DeleteNodeMaterialRelationInput, IIS.Core.NodeMaterialRelation.NodeMaterialRelation>();
+            CreateMap<IIS.Core.GraphQL.NodeMaterialRelation.DeleteNodeMaterialRelationInput, Iis.Services.NodeMaterialRelation>();
 
             CreateMap<IIisElasticField, ElasticFieldEntity>();
             CreateMap<IIisElasticField, Iis.Domain.Elastic.IisElasticField>();

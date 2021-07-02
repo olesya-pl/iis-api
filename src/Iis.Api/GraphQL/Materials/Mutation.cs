@@ -17,7 +17,7 @@ namespace IIS.Core.GraphQL.Materials
             [Service] IMapper mapper,
             [GraphQLNonNullType] MaterialUpdateInput input)
         {
-            var tokenPayload = ctx.ContextData[TokenPayload.TokenPropertyName] as TokenPayload;
+            var tokenPayload = ctx.GetToken();
             var material = await materialService.UpdateMaterialAsync(input, tokenPayload.User);
             return mapper.Map<Material>(material);
         }
@@ -30,7 +30,7 @@ namespace IIS.Core.GraphQL.Materials
             [GraphQLType(typeof(int))] int newAccessLevel
         )
         {
-            var tokenPayload = context.ContextData[TokenPayload.TokenPropertyName] as TokenPayload;
+            var tokenPayload = context.GetToken();
 
             var material = await materialService.ChangeMaterialAccessLevel(materialId, newAccessLevel, tokenPayload.User);
 
@@ -42,7 +42,7 @@ namespace IIS.Core.GraphQL.Materials
             AssignMaterialsOperatorInput input
             )
         {
-            var tokenPayload = context.ContextData[TokenPayload.TokenPropertyName] as TokenPayload;
+            var tokenPayload = context.GetToken();
             await materialService.AssignMaterialsOperatorAsync(new HashSet<Guid>(input.MaterialIds), input.AssigneeId, tokenPayload.User);
             return new AssignMaterialsOperatorResult
             {

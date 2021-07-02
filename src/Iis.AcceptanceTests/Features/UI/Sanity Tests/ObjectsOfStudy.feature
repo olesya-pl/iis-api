@@ -10,22 +10,15 @@ Feature: ObjectsOfStudySection - sanity
 
     @sanity @UI @ObjectOfStudySectionUI
     Scenario: IIS-6119 - Possibility to switch between hierarchy objects in the OOS section
-        When I clicked on Hierarchy tab in the Object of study section
-        And I double clicked on the Силові структури card in the hierarchy
+        When I clicked on the hierarchy tab in the object of study section
+        And I collapsed relation of the Силові структури parent card
+        When I expanded relation of the Силові структури parent card
         Then I must see these cards in hierarchy
 
             | ФСБ РФ   |
-            | СЗР РФ   |
+            | ЗС РФ    |
             | ФСВНГ РФ |
             | ЗС РФ    |
-
-        When I double clicked on the ЗС РФ expand button in the hierarchy
-        Then I must see these cards in hierarchy
-
-            | ЗВО                                      |
-            | ГШ ЗС РФ                                 |
-            | Центральні органи військового управління |
-            | ОСК Північ                               |
 
 
     @sanity @UI @ObjectOfStudySectionUI
@@ -64,6 +57,7 @@ Feature: ObjectsOfStudySection - sanity
         And I clicked on the create a new military organization button
         And I entered the джокер value in the affiliation field
         And I entered the першочерговий value in the importance field
+        And I entered the НВ - Не визначено value in the security classification
         And I clicked on the classifiers block
         And I entered the 28 обр РХБЗ value in the direct reporting relationship field
         And I clicked on the general info block

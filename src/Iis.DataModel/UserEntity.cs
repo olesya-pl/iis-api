@@ -3,6 +3,7 @@ using Iis.DataModel.Roles;
 using System.Collections.Generic;
 using Iis.Interfaces.Enums;
 using System;
+using Iis.Interfaces.Users;
 
 namespace Iis.DataModel
 {
@@ -15,9 +16,11 @@ namespace Iis.DataModel
         public string Patronymic { get; set; }
         public string Comment { get; set; }
         public string PasswordHash { get; set; }
+        [Obsolete("Deprecated in favor of Source")]
         public string UserNameActiveDirectory { get; set; }
         public bool IsBlocked { get; set; }
         public int AccessLevel { get; set; }
+        public UserSource Source { get; set; }
         public List<UserRoleEntity> UserRoles { get; set; }
         public List<MaterialEntity> Materials { get; internal set; }
     }

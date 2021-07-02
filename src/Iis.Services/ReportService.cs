@@ -37,7 +37,7 @@ namespace Iis.Services
             var reportEntity = _mapper.Map<ReportEntity>(report);
 
             reportEntity.Id = Guid.NewGuid();
-            reportEntity.CreatedAt = DateTime.UtcNow;
+            reportEntity.CreatedAt = DateTime.UtcNow;            
 
             await RunAsync(uow => uow.ReportRepository.Create(reportEntity));
 
@@ -57,6 +57,7 @@ namespace Iis.Services
             reportEntity.Recipient = report.Recipient;
             reportEntity.Title = report.Title;
             reportEntity.AccessLevel = report.AccessLevel;
+            reportEntity.Annotation = report.Annotation;
 
             await RunAsync(uow => uow.ReportRepository.Update(reportEntity));
 
@@ -85,8 +86,9 @@ namespace Iis.Services
 
             var copiedReport = new ReportEntity(sourceReport, Guid.NewGuid(), DateTime.UtcNow);
 
-            copiedReport.Title = newReport.Title ?? newReport.Title;
-            copiedReport.Recipient = newReport.Recipient ?? newReport.Recipient;
+            copiedReport.Title = newReport.Title ?? copiedReport.Title;
+            copiedReport.Recipient = newReport.Recipient ?? copiedReport.Recipient;
+            copiedReport.AccessLevel = newReport.AccessLevel;
 
             await RunAsync(uow => uow.ReportRepository.Create(copiedReport));
 

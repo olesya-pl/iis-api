@@ -8,6 +8,7 @@ namespace Iis.Elastic
 {
     public abstract class ElasticMappingProperty
     {
+        private const string TypePropertyName = "type";
         protected const char PropertyNameSeparator = '.';
         public string Name { get; set; }
         public abstract ElasticMappingPropertyType Type { get; }
@@ -18,11 +19,22 @@ namespace Iis.Elastic
         {
             var result = new JObject();
             PopulatePropertyIntoJObject(result);
-            if (Type != ElasticMappingPropertyType.Nested || Properties.Count == 0)
+            if (!IsNonEmptyNestedProperty() || IsDenseVectorContainer())
             {
-                result["type"] = Type.ToString().ToUnderscore();
+                result[TypePropertyName] = Type.ToString().ToUnderscore();
             }
+
             return result;
+        }
+
+        private bool IsDenseVectorContainer()
+        {
+            return Properties.Any(p => p.Type == ElasticMappingPropertyType.DenseVector);
+        }
+
+        private bool IsNonEmptyNestedProperty()
+        {
+            return (Type == ElasticMappingPropertyType.Nested && Properties.Count != 0);
         }
 
         public override string ToString() => Name;

@@ -29,6 +29,7 @@ namespace Iis.Services
         private readonly IOntologySchema _ontologySchema;
         private readonly IElasticService _elasticService;
         private readonly IMaterialElasticService _materialElasticService;
+        private readonly IReportElasticService _reportService;
         private readonly IElasticState _elasticState;
 
         public ThemeService(IUnitOfWorkFactory<TUnitOfWork> unitOfWorkFactory,
@@ -37,6 +38,7 @@ namespace Iis.Services
             IOntologySchema ontologySchema,
             IElasticService elasticService,
             IMaterialElasticService materialElasticService,
+            IReportElasticService reportService,
             IElasticState elasticState) : base(unitOfWorkFactory)
         {
             _context = context;
@@ -44,6 +46,7 @@ namespace Iis.Services
             _ontologySchema = ontologySchema;
             _elasticService = elasticService;
             _materialElasticService = materialElasticService;
+            _reportService = reportService;
             _elasticState = elasticState;
         }
 
@@ -266,6 +269,7 @@ namespace Iis.Services
                 _ when typeId == ThemeTypeEntity.EntityMaterialId => _elasticState.MaterialIndexes,
                 _ when typeId == ThemeTypeEntity.EntityObjectId || typeId == ThemeTypeEntity.EntityMapId => GetOntologyIndexes(EntityTypeNames.ObjectOfStudy.ToString()),
                 _ when typeId == ThemeTypeEntity.EntityEventId => GetOntologyIndexes(EntityTypeNames.Event.ToString()),
+                _ when typeId == ThemeTypeEntity.EntityReportId => new[] { _elasticState.ReportIndex },
                 _ => (IEnumerable<string>)null
             };
 
@@ -290,6 +294,18 @@ namespace Iis.Services
             {
                 var page = new PaginationParams(1, 50);
                 var count = await _materialElasticService.CountMaterialsByConfiguredFieldsAsync(userId, new SearchParams { Page = page, Suggestion = filter.Suggestion });
+                return new QueryResult
+                {
+                    Count = count,
+                    Query = query,
+                    TypeId = typeId
+                };
+            }
+            else if (typeId == ThemeTypeEntity.EntityReportId)
+            {
+                var count = await _reportService.CountAsync(new ReportSearchParams { 
+                    Suggestion = filter.Suggestion
+                });
                 return new QueryResult
                 {
                     Count = count,

@@ -26,14 +26,13 @@ namespace AcceptanceTests.PageObjects.Controls
 
         public bool Displayed => _themeTableElement.Displayed;
         public IWebElement EditButton => _themeTableElement.FindElement(By.CssSelector(".theme__controls .theme__action--edit"));
-        public IWebElement DeleteButton => _themeTableElement.FindElement(By.CssSelector(".el-icon-delete"));
+        public IWebElement DeleteButton => _themeTableElement.FindElement(By.XPath("//button[@class='el-button el-tooltip theme__action--delete el-button--default']"));
         public IWebElement ListViewButton => _themeTableElement.FindElement(By.CssSelector(".theme__controls .theme__action--open-list-view"));
         public IWebElement MapViewButton => _themeTableElement.FindElement(By.CssSelector(".theme__controls .theme__action--open-map-view"));
 
         public void DeleteTheme()
         {
             DeleteButton.Click();
-            //_driver.WaitFor(0.5);
             _driver.WithTimeout(0.5).FindElement(By.CssSelector(".el-button--primary")).Click();
             _driver.WaitFor(0.2);
         }
@@ -50,7 +49,7 @@ namespace AcceptanceTests.PageObjects.Controls
         public Theme(IWebDriver driver, string value)
         {
             _driver = driver;
-            _themeTableElement = driver.FindElement(By.XPath($@"//div[contains(text(),'{value}')]/ancestor::tr"));
+            _themeTableElement = driver.FindElement(By.XPath($@"//div[contains(text(),'{value}')]"));
         }
     }
 }

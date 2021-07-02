@@ -1,17 +1,18 @@
-﻿using Iis.DbLayer.Repositories;
-using Iis.Domain.Elastic;
-using Iis.Elastic.SearchQueryExtensions;
-using Iis.Interfaces.Elastic;
-using Iis.Interfaces.Ontology.Data;
-using Iis.Services.Contracts.Interfaces;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using System.Collections.Generic;
+using Iis.DbLayer.Repositories;
+using Iis.Domain.Elastic;
+using Iis.Elastic.SearchQueryExtensions;
+using Iis.Services.Contracts;
+using Iis.Services.Contracts.Interfaces;
+using Iis.Interfaces.Elastic;
+using Iis.Interfaces.Ontology.Data;
+using Iis.Interfaces.Ontology.Schema;
 
 namespace IIS.Core.Ontology.EntityFramework
 {
@@ -37,16 +38,18 @@ namespace IIS.Core.Ontology.EntityFramework
 
         public Task<int> CountByAllFieldsAsync(IEnumerable<string> typeNames, ElasticFilter filter, CancellationToken ct = default)
         {
+            var queryExpression = string.IsNullOrEmpty(filter.Suggestion) ? "*" : $"{filter.Suggestion}";
+
             var searchParams = new IisElasticSearchParams
             {
                 BaseIndexNames = typeNames.ToList(),
-                Query = $"*{filter.Suggestion}*"
+                Query = SearchQueryExtension.IsExactQuery(queryExpression) ? queryExpression : $"*{queryExpression}*"
             };
 
             return _elasticManager.CountAsync(searchParams, ct);
         }
 
-        public async Task<SearchResult> SearchByConfiguredFieldsAsync(IEnumerable<string> typeNames, ElasticFilter filter, CancellationToken ct = default)
+        public async Task<SearchResult> SearchByConfiguredFieldsAsync(IEnumerable<string> typeNames, ElasticFilter filter, Guid userId, CancellationToken ct = default)
         {
             var ontologyFields
                 = _elasticConfiguration.GetOntologyIncludedFields(typeNames.Where(p => _elasticState.ObjectIndexes.Contains(p)));
@@ -62,7 +65,7 @@ namespace IIS.Core.Ontology.EntityFramework
                 SortOrder = filter.SortOrder
             };
 
-            var searchResult = await _elasticManager.SearchAsync(searchParams, ct);
+            var searchResult = await _elasticManager.WithUserId(userId).SearchAsync(searchParams, ct);
 
             return new SearchResult
             {
@@ -89,7 +92,7 @@ namespace IIS.Core.Ontology.EntityFramework
             return _elasticManager.CountAsync(searchParams, ct);
         }
 
-        private bool ShouldReturnAllEntities(ElasticFilter filter)
+        public bool ShouldReturnAllEntities(ElasticFilter filter)
         {
             return SearchQueryExtension.IsMatchAll(filter.Suggestion) 
                    && !filter.FilteredItems.Any() 
@@ -111,14 +114,14 @@ namespace IIS.Core.Ontology.EntityFramework
                         ElasticConfigConstants.NodeTypeTitleAlias,
                         ElasticConfigConstants.NodeTypeTitleAggregateField)
                 };
-                
+
                 var query = new MatchAllQueryBuilder()
                     .WithPagination(filter.Offset, filter.Limit)
                     .BuildSearchQuery()
                     .WithAggregation(defaultAggregations)
                     .WithHighlights()
                     .ToString();
-                
+
                 var results = await _elasticManager.WithUserId(userId).SearchAsync(query, typeNames, ct);
                 return results.ToOutputSearchResult();
             }
@@ -137,15 +140,15 @@ namespace IIS.Core.Ontology.EntityFramework
                 .BuildSearchQuery()
                 .WithHighlights()
                 .ToString();
-            
+
             var aggregationQuery = new MatchAllQueryBuilder()
                 .WithPagination(0, 0)
                 .BuildSearchQuery()
                 .WithAggregation(aggregationFieldList, filter)
                 .ToString();
 
-            var searchResult = await _elasticManager.SearchAsync(multiSearchQuery, typeNames, ct);
-            var aggregationResult = await _elasticManager.SearchAsync(aggregationQuery, typeNames, ct);
+            var searchResult = await _elasticManager.WithUserId(userId).SearchAsync(multiSearchQuery, typeNames, ct);
+            var aggregationResult = await _elasticManager.WithUserId(userId).SearchAsync(aggregationQuery, typeNames, ct);
 
             if (historicalResult != null && historicalResult.Count > 0)
             {
@@ -167,6 +170,10 @@ namespace IIS.Core.Ontology.EntityFramework
 
         private Dictionary<string, AggregationItem> ExtractSubAggregations(Dictionary<string, AggregationItem> aggregations)
         {
+            if (aggregations == null)
+            {
+                return SearchResultsExtension.EmptyAggregation;
+            }
             return aggregations.ToDictionary(x => x.Key, pair => pair.Value.SubAggs);
         }
 
@@ -197,11 +204,11 @@ namespace IIS.Core.Ontology.EntityFramework
             var (multiSearchParams, _)= await PrepareMultiElasticSearchParamsAsync(typeNames, filter, ct);
             var query = new MultiSearchParamsQueryBuilder(multiSearchParams.SearchParams)
                 .WithLeniency(multiSearchParams.IsLenient)
-                .BuildCountQuery()                
+                .BuildCountQuery()
                 .ToString();
             return await _elasticManager.CountAsync(query, typeNames, ct);
         }
-        
+
         private async Task<(MultiElasticSearchParams MultiSearchParams, IElasticSearchResult HistoricalResult)> PrepareMultiElasticSearchParamsAsync(IEnumerable<string> typeNames, ElasticFilter filter, CancellationToken ct = default) 
         {
             var useHistoricalSearch = !string.IsNullOrEmpty(filter.Suggestion);
@@ -220,12 +227,12 @@ namespace IIS.Core.Ontology.EntityFramework
                     (ShouldReturnAllEntities(filter) ? "*" : $"{filter.ToQueryString()}", searchFields)
                 }
             };
-            
+
             if(!useHistoricalSearch)
                 return (multiSearchParams, null);
-            
+
             IElasticSearchResult historySearchResult;
-            
+
             var historicalIndexes = typeNames.Select(GetHistoricalIndex).ToList();
             if (SearchQueryExtension.IsExactQuery(filter.Suggestion))
             {
@@ -349,7 +356,7 @@ namespace IIS.Core.Ontology.EntityFramework
             return response.All(x => x.IsSuccess);
         }
 
-        public async Task<IEnumerable<IElasticSearchResultItem>> SearchByFieldsAsync(string query, IReadOnlyCollection<string> fieldNames, IReadOnlyCollection<string> typeNames, int size, CancellationToken ct = default)
+        public async Task<IEnumerable<IElasticSearchResultItem>> SearchByFieldsAsync(string query, IReadOnlyCollection<string> fieldNames, IReadOnlyCollection<string> typeNames, int size, Guid userId, CancellationToken ct = default)
         {
             var searchParams = new IisElasticSearchParams
             {
@@ -358,7 +365,9 @@ namespace IIS.Core.Ontology.EntityFramework
                 Size = size,
                 SearchFields = fieldNames.Select(x => new IisElasticField { Name = x}).ToArray()
             };
-            var searchResult = await _elasticManager.SearchAsync(searchParams, ct);
+            var searchResult = await _elasticManager
+                .WithUserId(userId)
+                .SearchAsync(searchParams, ct);
             return searchResult.Items;
         }
 
@@ -386,6 +395,13 @@ namespace IIS.Core.Ontology.EntityFramework
             var indexName = _elasticState.OntologyIndexes.Union(_elasticState.EventIndexes).FirstOrDefault(e => e.Equals(typeName, StringComparison.OrdinalIgnoreCase));
 
             return _elasticManager.DeleteDocumentAsync(indexName, id.ToString("N"), ct);
+        }
+
+        public bool TypeIsAvalilable(INodeTypeLinked type, bool entitySearchGranted, bool wikiSearchGranted)
+        {
+            return (entitySearchGranted && _elasticState.OntologyIndexes.Contains(type.Name))
+                || (wikiSearchGranted && _elasticState.WikiIndexes.Contains(type.Name))
+                || (!_elasticState.WikiIndexes.Contains(type.Name) && !_elasticState.OntologyIndexes.Contains(type.Name));
         }
     }
 }

@@ -26,6 +26,8 @@ using MaterialLoadData = Iis.Domain.Materials.MaterialLoadData;
 using Iis.Interfaces.Common;
 using Microsoft.Extensions.Logging;
 using Serilog;
+using System.Text;
+using Newtonsoft.Json;
 
 namespace IIS.Core.Materials.EntityFramework
 {
@@ -40,7 +42,7 @@ namespace IIS.Core.Materials.EntityFramework
         private readonly IMaterialSignRepository _materialSignRepository;
         private readonly IUserService _userService;
         private readonly ICommonData _commonData;
-        private readonly ILogger<MaterialService<TUnitOfWork>> _logger;
+        private readonly ILogger<MaterialService<TUnitOfWork>> _logger;        
 
         public MaterialService(IFileService fileService,
             IMapper mapper,
@@ -52,7 +54,8 @@ namespace IIS.Core.Materials.EntityFramework
             IMediator mediator,
             IMaterialSignRepository materialSignRepository,
             IUnitOfWorkFactory<TUnitOfWork> unitOfWorkFactory,
-            ICommonData commonData) : base(unitOfWorkFactory)
+            ICommonData commonData,
+            ILogger<MaterialService<TUnitOfWork>> logger) : base(unitOfWorkFactory)
         {
             _fileService = fileService;
             _mapper = mapper;
@@ -63,6 +66,7 @@ namespace IIS.Core.Materials.EntityFramework
             _userService = userService;
             _materialSignRepository = materialSignRepository;
             _commonData = commonData;
+            _logger = logger;
         }
 
         public async Task SaveAsync(Material material, Guid? changeRequestId = null)
@@ -277,7 +281,7 @@ namespace IIS.Core.Materials.EntityFramework
                         return;
                     }
 
-                    var user = await RunWithoutCommitAsync(uowfactory => uowfactory.UserRepository.GetByIdAsync(p));
+                    var user = await RunWithoutCommitAsync(uowfactory => uowfactory.UserRepository.GetByIdAsync(p, CancellationToken.None));
 
                     changesList.Add(new ChangeHistoryDto
                     {
@@ -292,8 +296,10 @@ namespace IIS.Core.Materials.EntityFramework
                     material.Assignee = null;
                     material.AssigneeId = input.AssigneeId;
                 });
+                var eventReassignmentNeeded = false;
                 if (input.Content != null && !string.Equals(material.Content, input.Content, StringComparison.Ordinal))
                 {
+                    eventReassignmentNeeded = true;
                     changesList.Add(new ChangeHistoryDto
                     {
                         Date = DateTime.UtcNow,
@@ -337,12 +343,22 @@ namespace IIS.Core.Materials.EntityFramework
 
                 await Task.WhenAll(new[] { fillElasticTask, addHistoryTask });
 
+                if (eventReassignmentNeeded)
+                {
+                    SendMaterialUpdatedMessage(material);
+                }
+
                 if (MaterialShouldBeQueuedForMachineLearning(material))
                 {
                     QueueMaterialForMachineLearning(material);
                 }
             }
             return await _materialProvider.GetMaterialAsync(input.Id, user);
+        }
+
+        private void SendMaterialUpdatedMessage(MaterialEntity material)
+        {
+            _eventProducer.SendMaterialSavedToElastic(new List<Guid>() { material.Id });
         }
 
         private void CreateChangeHistory(Guid targetId,
@@ -501,7 +517,7 @@ namespace IIS.Core.Materials.EntityFramework
             _logger.LogDebug("Start RemoveMaterials");
             var fileIds = await RunWithoutCommitAsync(uow => uow.FileRepository.GetMaterialFileIds());
             _logger.LogDebug("Found {Count} files to remove", fileIds.Count);
-            await RunAsync(uow => uow.MaterialRepository.RemoveMaterialsAndRelatedData());
+            await RunAsync(uow => uow.MaterialRepository.RemoveMaterialsAndRelatedData(fileIds));
             var removeFiles = _fileService.RemoveFiles(fileIds);
             _logger.LogDebug("Removed {Count} files", removeFiles);
         }
@@ -514,7 +530,7 @@ namespace IIS.Core.Materials.EntityFramework
         }
         private bool IsUserAuthorizedForChangeAccessLevel(User user)
         {
-            return user.IsGranted(AccessKind.Material, AccessOperation.AccessLevelUpdate);
+            return user.IsGranted(AccessKind.Material, AccessOperation.AccessLevelUpdate, AccessCategory.Entity);
         }
     }
 }

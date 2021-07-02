@@ -128,6 +128,7 @@ namespace AcceptanceTests.UISteps
         public void WhenIClickedOnTheFirstSearchResultInTheMaterialsSection()
         {
             materialsSectionPage.FirstSearchResult.Click();
+            driver.WaitFor(1);
         }
 
         [When(@"I pressed Show button to show Text classifier ML output")]
@@ -207,6 +208,7 @@ namespace AcceptanceTests.UISteps
             driver.WaitFor(1);
             materialsSectionPage.EventsSearch.SendKeys(Keys.Down);
             materialsSectionPage.EventsSearch.SendKeys(Keys.Enter);
+            materialsSectionPage.EventsSearch.SendKeys(Keys.Escape);
             driver.WaitFor(2);
         }
 

@@ -64,9 +64,10 @@ namespace Iis.OntologyManager
         UiOntologyDataControl _uiOntologyDataControl;
         UiAccessLevelControl _uiAccessLevelControl;
         RemoveEntityUiControl _removeEntityUiControl;
+        Panel pnlTop;
         Dictionary<NodeViewType, IUiNodeTypeControl> _nodeTypeControls = new Dictionary<NodeViewType, IUiNodeTypeControl>();
         Dictionary<string, IDataViewControl> _dataViewControls = new Dictionary<string, IDataViewControl>();
-        const string VERSION = "1.35";
+        const string VERSION = "1.36";
         Button btnMigrate;
         Button btnDuplicates;
         ILogger _logger;
@@ -151,7 +152,7 @@ namespace Iis.OntologyManager
 
         private void SetControlsTabMain(Panel rootPanel)
         {
-            var pnlTop = new Panel();
+            pnlTop = new Panel();
             pnlTop.Location = new Point(0, 0);
             pnlTop.Size = new Size(rootPanel.Width, _style.ButtonHeightDefault * 2);
             pnlTop.BorderStyle = BorderStyle.FixedSingle;
@@ -225,6 +226,20 @@ namespace Iis.OntologyManager
             menu.Items.Add("Знищити сутність");
             menu.Items[1].Click += (sender, e) => { RemoveNodeType(SelectedNodeType); };
             gridTypes.ContextMenuStrip = menu;
+        }
+
+        private void SetEnabled(bool enabled)
+        {
+            gridTypes.Enabled = enabled;
+            _uiAccessLevelControl.SetEnabled(enabled);
+            _uiOntologyDataControl.SetEnabled(enabled);
+            _uiEntityTypeControl.SetEnabled(enabled);
+            _uiRelationAttributeControl.SetEnabled(enabled);
+            _uiRelationEntityControl.SetEnabled(enabled);
+            _filterControl.SetEnabled(enabled);
+            panelTop.Enabled = enabled;
+            btnTypeBack.Enabled = enabled;
+            btnSwitch.Enabled = enabled;
         }
 
         private void SetTypeViewHeader(Panel rootPanel)
@@ -575,22 +590,30 @@ namespace Iis.OntologyManager
 
         private async Task<RequestResult> SaveAccessLevels(ChangeAccessLevelsParams param)
         {
-            return await WaitCursorActionAsync(async () =>
+            try
             {
-                var requestWrapper = GetRequestWrapper();
+                SetEnabled(false);
+                return await WaitCursorActionAsync(async () =>
+                {
+                    var requestWrapper = GetRequestWrapper();
 
-                var result = await requestWrapper.ChangeAccessLevelsAsync(param);
+                    var result = await requestWrapper.ChangeAccessLevelsAsync(param);
 
-                var sb = new StringBuilder()
-                        .AppendLine($"Адреса:{result.RequestUrl}")
-                        .AppendLine($"Повідомлення: {result.Message}");
+                    var sb = new StringBuilder()
+                            .AppendLine($"Адреса:{result.RequestUrl}")
+                            .AppendLine($"Повідомлення: {result.Message}");
 
-                LoadCurrentSchema(SelectedSchemaSource);
+                    LoadCurrentSchema(SelectedSchemaSource);
 
-                ShowMessage(sb.ToString(), result.IsSuccess ? string.Empty : "Помилка");
+                    ShowMessage(sb.ToString(), result.IsSuccess ? string.Empty : "Помилка");
 
-                return result;
-            });
+                    return result;
+                });
+            }
+            finally
+            {
+                SetEnabled(true);
+            }
         }
 
         private async Task ReIndexElastic(IndexKeys indexKey)

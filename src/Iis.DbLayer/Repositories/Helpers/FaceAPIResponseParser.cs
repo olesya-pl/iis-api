@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Collections.Generic;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -9,32 +10,39 @@ namespace Iis.DbLayer.Repositories.Helpers
     {
         private const string ImageVectorResultPropery = "result";
         private const string ImageVectorEncodingProperty = "encoding";
-        public static decimal[] GetEncoding(string content)
+        private static readonly IReadOnlyCollection<decimal[]> EmptyFaceVectorList = Array.Empty<decimal[]>();
+
+        public static decimal[] GetFaceVector(string content)
         {
-            if(string.IsNullOrWhiteSpace(content)) return null;
+            return GetFaceVectorList(content).FirstOrDefault();
+        }
+        public static IReadOnlyCollection<decimal[]> GetFaceVectorList(string content)
+        {
+            if(string.IsNullOrWhiteSpace(content)) return EmptyFaceVectorList;
 
             var json = JToken.Parse(content);
 
-            if(json.GetType() == typeof(JArray)) return JsonConvert.DeserializeObject<decimal[]>(content);
+            if(json.GetType() == typeof(JArray))
+            {
+                var vector = JsonConvert.DeserializeObject<decimal[]>(content);
+
+                return new decimal[][] {vector};
+            }
 
             var resultProperty = json[ImageVectorResultPropery];
 
-            if(resultProperty is null) return null;
+            if(resultProperty is null) return EmptyFaceVectorList;
 
-            var encodings = resultProperty.Children()[ImageVectorEncodingProperty];
+            var encodingList = resultProperty.Children()[ImageVectorEncodingProperty];
 
-            if(!encodings.Any()) return null;
+            if(!encodingList.Any()) return EmptyFaceVectorList;
 
-            content = encodings.First().ToString();
-
-            if(string.IsNullOrWhiteSpace(content)) return null;
-
-            var vector = JsonConvert.DeserializeObject<decimal[]>(content);
-
-            if(!vector.Any()) return null;
-
-            return vector;
+            return encodingList
+                .Select(e => e.ToString())
+                .Where(e => !string.IsNullOrWhiteSpace(e))
+                .Select(JsonConvert.DeserializeObject<decimal[]>)
+                .Where(e => e.Length != 0)
+                .ToArray();
         }
-        public static decimal[] EmptyImageVector => Array.Empty<decimal>();
     }
 }

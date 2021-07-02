@@ -7,6 +7,7 @@ using Iis.Interfaces.Roles;
 using Iis.Interfaces.Ontology.Data;
 using Iis.Interfaces.Ontology.Schema;
 using Iis.Services.Contracts.Interfaces;
+using Iis.OntologySchema.ChangeParameters;
 
 namespace Iis.DbLayer.ModifyDataScripts
 {
@@ -19,6 +20,8 @@ namespace Iis.DbLayer.ModifyDataScripts
             _ontologySchemaService = ontologySchemaService;
             _connectionStringService = connectionStringService;
         }
+        private void SaveOntologySchema(IOntologySchema schema) =>
+            _ontologySchemaService.SaveToDatabase(schema, _connectionStringService.GetIisApiConnectionString());
         public void RemoveEventWikiLinks(OntologyContext context, IOntologyNodesData data)
         {
             var list = new List<IRelation>();
@@ -97,7 +100,7 @@ namespace Iis.DbLayer.ModifyDataScripts
             var enumEntityType = data.Schema.GetEntityTypeByName(EntityTypeNames.Enum.ToString());
             var accessLevelType = data.Schema.CreateEntityType(EntityTypeNames.AccessLevel.ToString(), "Грифи (рівні доступу)", false, enumEntityType.Id);
             data.Schema.CreateAttributeType(accessLevelType.Id, NUMERIC_INDEX, "Числовий індекс", ScalarType.Int, EmbeddingOptions.Required);
-            _ontologySchemaService.SaveToDatabase(data.Schema, _connectionStringService.GetIisApiConnectionString());
+            SaveOntologySchema(data.Schema);
 
             data.WriteLock(() =>
             {
@@ -146,7 +149,7 @@ namespace Iis.DbLayer.ModifyDataScripts
                 EmbeddingOptions.Optional,
                 jsonMeta);
 
-            _ontologySchemaService.SaveToDatabase(data.Schema, _connectionStringService.GetIisApiConnectionString());
+            SaveOntologySchema(data.Schema);
         }
 
         public void InitNewColumnsForAccessObjects(OntologyContext context, IOntologyNodesData data)
@@ -234,7 +237,7 @@ namespace Iis.DbLayer.ModifyDataScripts
                 {
                     Id = new Guid("cda32d549dd4403a94c391f8ff6d5bca"),
                     Title = "Довідник ОІВТ",
-                    Kind = AccessKind.WikiTab,
+                    Kind = AccessKind.Wiki,
                     Category = AccessCategory.Tab,
                     ReadAllowed = true,
                 });
@@ -382,6 +385,140 @@ namespace Iis.DbLayer.ModifyDataScripts
                 context.AccessObjects.Update(materialsTab);
             }
 
+            context.SaveChanges();
+        }
+
+        public void RemoveCreareFromMaterialEntityAccess(OntologyContext context, IOntologyNodesData data)
+        {
+            var materialsEntityId = new Guid("02c1895f7d444512a0a97ebbf6c6690c");
+            var materialsEntity = context.AccessObjects.Find(materialsEntityId);
+            if (materialsEntity == null)
+            {
+                context.AccessObjects.Add(new AccessObjectEntity
+                {
+                    Id = new Guid("02c1895f7d444512a0a97ebbf6c6690c"),
+                    Title = "Матеріали",
+                    Kind = AccessKind.Material,
+                    Category = AccessCategory.Entity,
+                    CreateAllowed = false,
+                    ReadAllowed = true,
+                    UpdateAllowed = true,
+                    AccessLevelUpdateAllowed = true,
+                    CommentingAllowed = true,
+                    SearchAllowed = true
+                });
+            }
+            else
+            {
+                materialsEntity.AccessLevelUpdateAllowed = materialsEntity.CommentingAllowed = materialsEntity.SearchAllowed = true;
+                materialsEntity.CreateAllowed = false;
+                context.AccessObjects.Update(materialsEntity);
+            }
+            context.SaveChanges();
+        }
+        public void DefaultAccessLevelsForDors(OntologyContext context, IOntologyNodesData data)
+        {
+            const string ACCESS_LEVEL = "accessLevel";
+            var noAccessLevelNodes = data.GetAllNodes()
+                .Where(n =>
+                    n.NodeType.IsObject && n.GetSingleProperty(ACCESS_LEVEL) == null)
+                .ToList();
+
+            var accessLevelType = data.Schema.GetEntityTypeByName(EntityTypeNames.AccessLevel.ToString());
+            if (accessLevelType == null)
+                throw new Exception("Сутність AccessType не знайдена в Онтології");
+
+            var defaultAccessLevelId = data.GetNodesByTypeId(accessLevelType.Id)
+                .Where(n => n.GetSingleProperty("numericIndex").Value == "0")
+                .Select(n => n.Id)
+                .Single();
+
+            var objectEntity = data.Schema.GetEntityTypeByName(EntityTypeNames.Object.ToString());
+            var accessLevelRelationType = objectEntity.GetProperty("accessLevel");
+
+            data.WriteLock(() =>
+            {
+                foreach (var node in noAccessLevelNodes)
+                {
+                    data.CreateRelation(node.Id, defaultAccessLevelId, accessLevelRelationType.Id);
+                }
+            });
+
+            data.Schema.UpdateNodeType(new NodeTypeUpdateParameter 
+            { 
+                Id = accessLevelRelationType.Id,
+                EmbeddingOptions = EmbeddingOptions.Required
+            });
+            SaveOntologySchema(data.Schema);
+        }
+
+        public void AddPhotosToObject(OntologyContext context, IOntologyNodesData data)
+        {
+            const string PHOTO = "Photo";
+            if (data.Schema.GetEntityTypeByName(PHOTO) != null) return;
+
+            var photoType = data.Schema.CreateEntityType(PHOTO);
+            data.Schema.CreateAttributeType(photoType.Id, "image", "Фото", ScalarType.File, EmbeddingOptions.Required);
+            data.Schema.CreateAttributeType(photoType.Id, "title", "Заголовок", ScalarType.String, EmbeddingOptions.Optional);
+
+            var objectType = data.Schema.GetEntityTypeByName(EntityTypeNames.Object.ToString());
+            data.Schema.CreateRelationType(objectType.Id, photoType.Id, "photos", "Фото", EmbeddingOptions.Multiple);
+
+            SaveOntologySchema(data.Schema);
+        }
+
+        public void AddWikiEntityAccessObject(OntologyContext context, IOntologyNodesData data)
+        {
+            var wikiEntityId = new Guid("c28c097bd74e49d1a8cbbeb0ecf43b08");
+            var wikiEntity = context.AccessObjects.Find(wikiEntityId);
+            if (wikiEntity == null)
+            {
+                context.AccessObjects.Add(new AccessObjectEntity
+                {
+                    Id = new Guid("c28c097bd74e49d1a8cbbeb0ecf43b08"),
+                    Title = "Довідник ОІВТ",
+                    Kind = AccessKind.Wiki,
+                    Category = AccessCategory.Entity,
+                    CreateAllowed = true,
+                    ReadAllowed = true,
+                    UpdateAllowed = true,
+                    AccessLevelUpdateAllowed = true,
+                    CommentingAllowed = true,
+                    SearchAllowed = true
+                });
+            }
+        }
+
+        public void AddTitlePhotosToObject(OntologyContext context, IOntologyNodesData data)
+        {
+            var photoType = data.Schema.GetEntityTypeByName("Photo");
+            if (photoType == null) throw new Exception("Photo entity type is not found");
+            var imageProperty = photoType.GetRelationByName("image");
+
+            var objectType = data.Schema.GetEntityTypeByName(EntityTypeNames.Object.ToString());
+            var titlePhotosProperty = data.Schema.CreateRelationType(objectType.Id, photoType.Id, "titlePhotos", "Фото в заголовку", EmbeddingOptions.Multiple);
+
+            SaveOntologySchema(data.Schema);
+
+            var objectNodes = data.GetAllNodes().Where(n => n.NodeType.IsObject);
+            foreach (var node in objectNodes)
+            {
+                var photoProperty = node.GetSingleProperty("photo");
+                if (photoProperty != null)
+                {
+                    var photoNode = data.CreateNode(photoType.Id);
+                    data.CreateRelationWithAttribute(photoNode.Id, imageProperty.Id, photoProperty.Value);
+                    data.CreateRelation(node.Id, photoNode.Id, titlePhotosProperty.Id);
+                }
+            }
+        }
+
+        public void RemoveMaterialLinkAccessObjects(OntologyContext context, IOntologyNodesData data)
+        {
+            var materialDorLinkId = new Guid("0971390a21fa4ab4ae277bb4c7c5bd45");
+            var eventLinkId = new Guid("102617ecd2514b5f97e8be1a9bf99bc3");
+            var enitiesToRemove = new[] { materialDorLinkId, eventLinkId };
+            context.AccessObjects.RemoveRange(context.AccessObjects.Where(p => enitiesToRemove.Contains(p.Id)));
             context.SaveChanges();
         }
     }

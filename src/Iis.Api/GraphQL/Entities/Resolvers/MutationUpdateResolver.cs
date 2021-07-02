@@ -6,16 +6,14 @@ using HotChocolate.Resolvers;
 using Iis.Domain;
 using Attribute = Iis.Domain.Attribute;
 using Iis.Interfaces.Ontology.Schema;
-using Newtonsoft.Json;
-using Iis.Api.BackgroundServices;
 using MediatR;
 using Iis.Events.Entities;
 using Iis.Services.Contracts.Interfaces;
-using Iis.OntologySchema.DataTypes;
 using Iis.Services.Contracts;
 using Iis.Interfaces.AccessLevels;
 using Iis.Interfaces.Ontology.Data;
 using Iis.Interfaces.Common;
+using Iis.Services;
 
 namespace IIS.Core.GraphQL.Entities.Resolvers
 {
@@ -26,6 +24,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
         private readonly IOntologySchema _ontologySchema;
         private readonly IChangeHistoryService _changeHistoryService;
         private readonly IMediator _mediator;
+        private readonly CreateEntityService _createEntityService;
         private readonly IResolverContext _resolverContext;
         private readonly IAccessLevels _accessLevels;
         private Guid _rootNodeId;
@@ -37,7 +36,8 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
             IChangeHistoryService changeHistoryService,
             IMediator mediator,
             ICommonData commonData,
-            MutationCreateResolver mutationCreateResolver)
+            MutationCreateResolver mutationCreateResolver,
+            CreateEntityService createEntityService)
         {
             _mutationCreateResolver = mutationCreateResolver;
             _ontologySchema = ontologySchema;
@@ -45,6 +45,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
             _changeHistoryService = changeHistoryService;
             _accessLevels = commonData.AccessLevels;
             _mediator = mediator;
+            _createEntityService = createEntityService;
         }
         public MutationUpdateResolver(IResolverContext ctx)
         {
@@ -54,6 +55,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
             _changeHistoryService = ctx.Service<IChangeHistoryService>();
             _mediator = ctx.Service<IMediator>();
             _accessLevels = ctx.Service<IOntologyNodesData>().GetAccessLevels();
+            _createEntityService = ctx.Service<CreateEntityService>();
             _resolverContext = ctx;
         }
 
@@ -64,7 +66,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
             if (!data.ContainsKey(LastConfirmedFieldName))
                 data.Add(LastConfirmedFieldName, DateTime.UtcNow);
 
-            var tokenPayload = ctx.ContextData[TokenPayload.TokenPropertyName] as TokenPayload;
+            var tokenPayload = ctx.GetToken();
             VerifyAccess(id, data, tokenPayload.User);
 
             var type = _ontologySchema.GetEntityTypeByName(typeName);
@@ -189,7 +191,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
                 {
                     case "create":
                         var relations = 
-                            await _mutationCreateResolver.CreateMultipleProperties(_rootNodeId, embed, v, string.Empty, dotName, requestId);
+                            await _createEntityService.CreateMultipleProperties(_rootNodeId, embed, v, string.Empty, dotName, requestId, GetCurrentUser());
                         foreach (var relation in relations)
                         {
                             node.AddNode(relation);
@@ -203,7 +205,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
                     case "delete":
                         foreach (var dv in list)
                         {
-                            var id = InputExtensions.ParseGuid(dv);
+                            var id = InputTypesExtensions.ParseGuid(dv);
                             var relation = node.GetRelation(embed, id);
                             node.RemoveNode(relation);
                             await SaveChangesForDeletedRelation(relation, requestId);
@@ -222,7 +224,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
             Relation relation;
             if (embed.EmbeddingOptions == EmbeddingOptions.Multiple)
             {
-                var relationId = InputExtensions.ParseGuid(uvdict["id"]); // this is NOT target entity id, but relation id
+                var relationId = InputTypesExtensions.ParseGuid(uvdict["id"]); // this is NOT target entity id, but relation id
                 relation = node.GetRelation(embed, relationId);
             }
             else
@@ -234,7 +236,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
             {
                 if (uvdict.ContainsKey("target"))
                 {
-                    var (typeName, targetValue) = InputExtensions.ParseInputUnion(uvdict["target"]);
+                    var (typeName, targetValue) = InputTypesExtensions.ParseInputUnion(uvdict["target"]);
                     var type = _ontologySchema.GetEntityTypeByName(typeName);
                     var updatedNode = await UpdateEntity(type, relation.Target.Id, targetValue, dotName, requestId);
                     if (relation.Target.Id != updatedNode.Id)
@@ -250,7 +252,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
                 {
                     node.RemoveNode(relation);
                     var newRel = 
-                        await _mutationCreateResolver.CreateSinglePropertyAsync(_rootNodeId, embed, uvdict, null, dotName, requestId);
+                        await _createEntityService.CreateSinglePropertyAsync(_rootNodeId, embed, uvdict, null, dotName, requestId, GetCurrentUser());
                     node.AddNode(newRel);
                 }
             }
@@ -320,7 +322,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
                         oldRelation.Target.Id;
 
                 var newRelation = 
-                    await _mutationCreateResolver.CreateSinglePropertyAsync(_rootNodeId, embed, value, oldValue, dotName, requestId);
+                    await _createEntityService.CreateSinglePropertyAsync(_rootNodeId, embed, value, oldValue, dotName, requestId, GetCurrentUser());
                 node.AddNode(newRelation);
             }
         }
@@ -329,7 +331,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
         {
             if (_resolverContext is null) return "system";
 
-            var tokenPayload = _resolverContext.ContextData[TokenPayload.TokenPropertyName] as TokenPayload;
+            var tokenPayload = _resolverContext.GetToken();
             return tokenPayload?.User?.UserName;
         }
 
@@ -362,7 +364,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
             }
             else
             {
-                var children = relation.GetChildAttributes();
+                var children = relation.GetTopLevelAttributes();
                 foreach (var child in children)
                 {
                     var value = child.attribute.Value.ToString();
@@ -377,6 +379,14 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
                             requestId);
                 }
             }
+        }
+
+        private User GetCurrentUser()
+        {
+            if (_resolverContext is null) return null;
+
+            var tokenPayload = _resolverContext.GetToken();
+            return tokenPayload?.User;
         }
     }
 }

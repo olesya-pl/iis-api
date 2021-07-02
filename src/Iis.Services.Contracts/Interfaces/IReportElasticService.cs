@@ -12,7 +12,8 @@ namespace Iis.Services.Contracts.Interfaces
         Task<List<ElasticBulkResponse>> PutAsync(IEnumerable<ReportDto> reports);
         Task<bool> PutAsync(ReportDto report);
         Task<bool> RemoveAsync(Guid id);
-        Task<(int Count, List<ReportDto> Items)> SearchAsync(ReportSearchParams search);
+        Task<(int Count, List<ReportDto> Items)> SearchAsync(ReportSearchParams search, User user);
+        Task<int> CountAsync(ReportSearchParams search);
         Task<ReportDto> GetAsync(Guid id);
     }
 }

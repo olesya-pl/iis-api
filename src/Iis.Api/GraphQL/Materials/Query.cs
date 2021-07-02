@@ -28,7 +28,7 @@ namespace IIS.Core.GraphQL.Materials
             SearchByImageInput searchByImageInput,
             SearchByRelationInput searchByRelation = null)
         {
-            var tokenPayload = ctx.ContextData[TokenPayload.TokenPropertyName] as TokenPayload;
+            var tokenPayload = ctx.GetToken();
 
             var filterQuery = filter?.Suggestion ?? filter?.SearchQuery;
             var sortingParam = mapper.Map<SortingParams>(sorting) ?? SortingParams.Default;
@@ -38,7 +38,7 @@ namespace IIS.Core.GraphQL.Materials
             {
                 var content = Convert.FromBase64String(searchByImageInput.Content);
                 var result = await materialProvider
-                    .GetMaterialsByImageAsync(tokenPayload.UserId, pageParam, searchByImageInput.Name, content.ToArray());
+                    .GetMaterialsByImageAsync(tokenPayload.UserId, pageParam, searchByImageInput.Name, content);
                 var mapped = result.Materials.Select(m => mapper.Map<Material>(m)).ToList();
                 return (mapped, result.Aggregations, result.Count);
             }
@@ -86,7 +86,7 @@ namespace IIS.Core.GraphQL.Materials
             [Service] IMapper mapper,
             Guid materialId)
         {
-            var tokenPayload = ctx.ContextData[TokenPayload.TokenPropertyName] as TokenPayload;
+            var tokenPayload = ctx.GetToken();
             var material = await materialProvider.GetMaterialAsync(materialId, tokenPayload.User);
             var res = mapper.Map<Material>(material);
             return res;
@@ -170,7 +170,7 @@ namespace IIS.Core.GraphQL.Materials
             var pageParam = new PaginationParams(pagination.Page, pagination.PageSize);
             var sortingParams = new SortingParams(sorting.ColumnName, sorting.Order);
 
-            var tokenPayload = ctx.ContextData[TokenPayload.TokenPropertyName] as TokenPayload;
+            var tokenPayload = ctx.GetToken();
             var materialsResult = await materialProvider.GetMaterialsLikeThisAsync(tokenPayload.UserId, materialId, pageParam, sortingParams);
 
             var materials = materialsResult.Materials

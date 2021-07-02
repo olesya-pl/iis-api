@@ -9,28 +9,8 @@ namespace Iis.Elastic.SearchQueryExtensions
 {
     public static class SearchResultsExtension
     {
-        private static readonly Dictionary<string, AggregationItem> EmptyAggregation =
+        public static readonly Dictionary<string, AggregationItem> EmptyAggregation =
             new Dictionary<string, AggregationItem>();
-
-        private static Dictionary<string, AggregationItem> RemoveOnlyOtherValuesAggregations(
-            Dictionary<string, AggregationItem> aggregations)
-        {
-            if (aggregations == EmptyAggregation) return aggregations;
-
-            var noValueKeyCollection = aggregations
-                .ToArray()
-                .Where(e => e.Value.Buckets.Count() == 1 &&
-                            e.Value.Buckets.Single().Key == SearchQueryExtension.MissingValueKey)
-                .Select(e => e.Key)
-                .ToArray();
-
-            foreach (var key in noValueKeyCollection)
-            {
-                aggregations.Remove(key);
-            }
-
-            return aggregations;
-        }
 
         public static SearchEntitiesByConfiguredFieldsResult ToOutputSearchResult(
             this IElasticSearchResult elasticResult)
@@ -40,8 +20,6 @@ namespace Iis.Elastic.SearchQueryExtensions
             var aggregations = elasticResult.Aggregations is null
                 ? EmptyAggregation
                 : elasticResult.Aggregations.Where(p => p.Value.Buckets.Any()).ToDictionary(p => p.Key, p => p.Value);
-
-            aggregations = RemoveOnlyOtherValuesAggregations(aggregations);
 
             return new SearchEntitiesByConfiguredFieldsResult
             {
@@ -60,8 +38,6 @@ namespace Iis.Elastic.SearchQueryExtensions
                 ? EmptyAggregation
                 : aggregations.Where(p => p.Value.Buckets.Any()).ToDictionary(p => p.Key, p => p.Value);
 
-            aggregations = RemoveOnlyOtherValuesAggregations(aggregations);
-
             return new SearchEntitiesByConfiguredFieldsResult
             {
                 Count = elasticResult.Count,
@@ -76,9 +52,7 @@ namespace Iis.Elastic.SearchQueryExtensions
                 ? EmptyAggregation
                 : elasticSearchResult.Aggregations.Where(p => p.Value.Buckets.Any())
                     .ToDictionary(p => p.Key, p => p.Value);
-
-            aggregations = RemoveOnlyOtherValuesAggregations(aggregations);
-
+            
             return new QuerySearchResult
             {
                 Count = elasticSearchResult.Count,

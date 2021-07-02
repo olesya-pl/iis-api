@@ -47,7 +47,7 @@ namespace Iis.Services
                 TargetId = targetId,
                 UserName = userName,
                 PropertyName = attributeDotName,
-                Date = DateTime.Now,
+                Date = DateTime.UtcNow,
                 OldValue = oldInfo.value,
                 NewValue = newInfo.value,
                 RequestId = requestId,
@@ -97,9 +97,9 @@ namespace Iis.Services
             var node = _ontologyNodesData.GetNode(id);
             if (node == null) return null;
 
-            if (node.NodeType.IsObjectOfStudy)
+            if (node.NodeType.IsEvent)
             {
-
+                return node.GetSingleProperty("name")?.Value;
             }
 
             return node.GetComputedValue("__title") ?? node.GetSingleProperty("name")?.Value;
@@ -156,7 +156,7 @@ namespace Iis.Services
         {
             var entityList = await RunWithoutCommitAsync(uow =>
                 uow.ChangeHistoryRepository.GetManyAsync(
-                    parameters.EntityIdentityList,
+                    parameters.EntityIdentityList.ToArray(),
                     parameters.PropertyName,
                     parameters.DateFrom,
                     parameters.DateTo)
@@ -208,7 +208,7 @@ namespace Iis.Services
 
         public async Task<IReadOnlyCollection<ChangeHistoryDto>> GetLocationHistoryAsync(ChangeHistoryParams parameters)
         {
-            var locations = await RunWithoutCommitAsync(uow => uow.FlightRadarRepository.GetLocationHistoryAsync(parameters.EntityIdentityList, parameters.DateFrom, parameters.DateTo));
+            var locations = await RunWithoutCommitAsync(uow => uow.FlightRadarRepository.GetLocationHistoryAsync(parameters.EntityIdentityList.ToArray(), parameters.DateFrom, parameters.DateTo));
 
             var propertyNameDict = parameters.EntityIdentityList
                 .Select(id => (Id:id, PropertyName: GetSignPropertyName(id)))

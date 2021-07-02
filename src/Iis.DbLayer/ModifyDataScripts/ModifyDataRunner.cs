@@ -38,6 +38,12 @@ namespace Iis.DbLayer.ModifyDataScripts
             _items.Add("AddAccessLevels", actions.AddAccessLevels);
             _items.Add("AddAccessLevelToObject", actions.AddAccessLevelToObject);
             _items.Add("InitNewColumnsForAccessObjects", actions.InitNewColumnsForAccessObjects);
+            _items.Add("RemoveCreareFromMaterialEntityAccess", actions.RemoveCreareFromMaterialEntityAccess);
+            _items.Add("DefaultAccessLevelsForDors", actions.DefaultAccessLevelsForDors);
+            _items.Add("AddPhotosToObject", actions.AddPhotosToObject);
+            _items.Add("AddWikiEntityAccessObject", actions.AddWikiEntityAccessObject);
+            _items.Add("AddTitlePhotosToObject", actions.AddTitlePhotosToObject);
+            _items.Add("RemoveMaterialLinkAccessObjects", actions.RemoveMaterialLinkAccessObjects);
         }
         public bool Run()
         {

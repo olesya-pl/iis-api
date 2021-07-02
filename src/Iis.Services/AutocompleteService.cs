@@ -1,6 +1,7 @@
 ﻿using Iis.Interfaces.Elastic;
 using Iis.Interfaces.Ontology.Schema;
 using Iis.Elastic.SearchQueryExtensions;
+using Iis.Services.Contracts;
 using Iis.Services.Contracts.Dtos;
 using Iis.Services.Contracts.Interfaces;
 using Newtonsoft.Json.Linq;
@@ -42,7 +43,7 @@ namespace Iis.Services
                 .ToArray();
         }
 
-        public async Task<IReadOnlyCollection<AutocompleteEntityDto>> GetEntitiesAsync(string query, string[] types, int size, CancellationToken ct = default)
+        public async Task<IReadOnlyCollection<AutocompleteEntityDto>> GetEntitiesAsync(string query, string[] types, int size, User user, CancellationToken ct = default)
         {
             if(SearchQueryExtension.IsMatchAll(query)) return EmptyAutoCompleteList;
 
@@ -55,7 +56,7 @@ namespace Iis.Services
 
             if(!_elasticService.TypesAreSupported(typeNameList)) return EmptyAutoCompleteList;
 
-            var response = await _elasticService.SearchByFieldsAsync(query, SearchableFields, typeNameList, size, ct);
+            var response = await _elasticService.SearchByFieldsAsync(query, SearchableFields, typeNameList, size, user.Id, ct);
 
             return response.Select(x => new AutocompleteEntityDto
             {

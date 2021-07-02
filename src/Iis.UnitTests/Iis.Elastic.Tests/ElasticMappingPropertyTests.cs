@@ -380,5 +380,25 @@ namespace Iis.UnitTests.Iis.Elastic.Tests
             actual.Should().BeEquivalentTo(expected);
         }
 
+        [Fact]
+        public void DenseVectorProperty_ComplexNameProperty()
+        {
+            var actual = DenseVectorProperty.Create("PropertyName.NestedPropertyName", 1).ToJObject();
+
+            var expected = JObject.Parse(
+                @"{
+                    'type': 'nested',
+                    'properties':{
+                        'NestedPropertyName':{
+                            'type':'dense_vector',
+                            'dims':1
+                        }
+                    }
+                }"
+            );
+
+            actual.Should().BeEquivalentTo(expected);
+        }
+
     }
 }

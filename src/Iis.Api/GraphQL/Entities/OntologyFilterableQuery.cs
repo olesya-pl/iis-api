@@ -31,7 +31,7 @@ namespace IIS.Core.GraphQL.Entities
             AllEntitiesFilterInput filter
             )
         {
-            var tokenPayload = ctx.ContextData[TokenPayload.TokenPropertyName] as TokenPayload;
+            var tokenPayload = ctx.GetToken();
             var types = filter.Types is null || !filter.Types.Any() ? EntityList : filter.Types;
 
             var elasticFilter = new ElasticFilter
@@ -42,7 +42,7 @@ namespace IIS.Core.GraphQL.Entities
                 CherryPickedItems = filter.CherryPickedItems.ToList(),
                 FilteredItems = filter.FilteredItems
             };
-            var response = await ontologyService.FilterNodeAsync(types, elasticFilter, tokenPayload.UserId);
+            var response = await ontologyService.FilterNodeAsync(types, elasticFilter, tokenPayload.User);
             var mapped = mapper.Map<OntologyFilterableQueryResponse>(response);
             EnrichWithSelectedFilteredItems(mapped.Aggregations, elasticFilter);
             mapped.Aggregations = EnrichWithNodeTypeNames(nodesData, mapped.Aggregations);
@@ -70,6 +70,7 @@ namespace IIS.Core.GraphQL.Entities
         }
 
         public async Task<OntologyFilterableQueryResponse> GetEventList(
+            IResolverContext ctx,
             [Service] IOntologyService ontologyService,
             [Service] IMapper mapper,
             PaginationInput pagination,
@@ -78,6 +79,7 @@ namespace IIS.Core.GraphQL.Entities
         )
         {
             var sortingParam = mapper.Map<SortingParams>(sorting) ?? SortingParams.Default;
+            var tokenPayload = ctx.GetToken();
 
             var response = await ontologyService.SearchEventsAsync(new ElasticFilter
             {
@@ -86,7 +88,7 @@ namespace IIS.Core.GraphQL.Entities
                 Suggestion = filter?.Suggestion ?? filter?.SearchQuery,
                 SortColumn = sortingParam.ColumnName,
                 SortOrder = sortingParam.Order
-            });
+            }, tokenPayload.User);
 
             return new OntologyFilterableQueryResponse()
             {

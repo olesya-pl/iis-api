@@ -12,6 +12,7 @@ Feature: EventsSection - sanity
         When I navigated to Events page
         And I created a new Тестова подія event
         And I searched for the Тестова подія created event
+        And I pressed the review event button
         And I pressed the edit event button
         And I binded a 130403-Project_Application_Guidelines.docx material to the event
         And I pressed the save event changes button
@@ -23,6 +24,7 @@ Feature: EventsSection - sanity
         When I navigated to Events page
         And I created a new Тестова подія event
         And I searched for the Тестова подія created event
+        And I pressed the review event button
         And I pressed the edit event button
         And I binded an Попов object of study to the event
         And I pressed the save event changes button

@@ -12,7 +12,6 @@ namespace AcceptanceTests.PageObjects
 
 		private readonly IWebElement _tableRowElement;
 
-
 		public MaterialRelatedItems(IWebDriver driver, IWebElement webElement)
 		{
 			_driver = driver;
@@ -32,7 +31,7 @@ namespace AcceptanceTests.PageObjects
 		public MaterialRelatedItems(IWebDriver driver, string value)
 		{
 			_driver = driver;
-			_tableRowElement = driver.FindElement(By.XPath($@"//table[@class='el-table__body']//tr/td[1]//b[.='{value}']"));
+			_tableRowElement = driver.FindElement(By.XPath($@"//table[@class='el-table__body']//tr//b[.='{value}']"));
 		}
 	}
 }

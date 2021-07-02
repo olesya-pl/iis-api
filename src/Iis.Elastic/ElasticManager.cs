@@ -15,20 +15,20 @@ using Iis.Elastic.ElasticMappingProperties;
 using Iis.Elastic.SearchQueryExtensions;
 using Newtonsoft.Json;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace Iis.Elastic
 {
     internal class ElasticManager : IElasticManager
     {
-        public const string NullValue = "NULL";
         private ElasticLowLevelClient _lowLevelClient;
         private readonly ElasticConfiguration _configuration;
         private readonly SearchResultExtractor _resultExtractor;
         private readonly ILogger<ElasticManager> _logger;
         private readonly ElasticLogUtils _responseLogUtils;
-
+        public const string NullValue = "NULL";
         public static readonly HashSet<char> RemoveSymbolsPattern = new HashSet<char> { '№' };
-        public static readonly HashSet<char> EscapeSymbolsPattern = new HashSet<char> { '^', '\"', '~', ':', '(', ')', '{', '}', '[', ']', '\\', '/', '!' };
+        public static readonly HashSet<char> EscapeSymbolsPattern = new HashSet<char> { '^',   ':', '{', '}', '[', ']', '/', '!' };
 
         public ElasticManager(ElasticConfiguration configuration,
             SearchResultExtractor resultExtractor,
@@ -283,6 +283,9 @@ namespace Iis.Elastic
             mappingConfiguration.Properties.Add(KeywordProperty.Create($"{ElasticConfigConstants.NodeTypeTitleField}{SearchQueryExtension.AggregateSuffix}", false));
             mappingConfiguration.Properties.Add(TextProperty.Create(ElasticConfigConstants.NodeTypeTitleField, true));
             mappingConfiguration.Properties.Add(AliasProperty.Create(ElasticConfigConstants.NodeTypeTitleAlias, ElasticConfigConstants.NodeTypeTitleAggregateField));
+            mappingConfiguration.Properties.Add(DateProperty.Create(ElasticConfigConstants.CreatedAtField, ElasticConfiguration.DefaultDateFormats));
+            mappingConfiguration.Properties.Add(DateProperty.Create(ElasticConfigConstants.UpdatedAtField, ElasticConfiguration.DefaultDateFormats));
+
             var indexUrl = GetRealIndexName(attributesList.EntityTypeName);
             var jObject = mappingConfiguration.ToJObject();
             ApplyRussianAnalyzerAsync(jObject);
@@ -534,12 +537,22 @@ namespace Iis.Elastic
                 return input;
             }
 
+            if(IsDoubleQuoted(input))
+            {
+                return $"{input} OR {input}~";
+            }
+
             return $"\"{input}\" OR {input}~";
         }
 
         private static bool IsWildCard(string input)
         {
             return input.Contains('*');
+        }
+
+        private static bool IsDoubleQuoted(string input)
+        {
+            return input.StartsWith('\"') && input.EndsWith('\"');
         }
 
         private async Task<StringResponse> DoRequestAsync(HttpMethod httpMethod, string path, string data, IRequestParameters requestParameters, CancellationToken cancellationToken)

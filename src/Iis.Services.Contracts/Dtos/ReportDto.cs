@@ -10,6 +10,7 @@ namespace Iis.Services.Contracts.Dtos
         public string Recipient { get; set; }
         public int AccessLevel { get; set; }
         public DateTime CreatedAt { get; set; }
+        public string Annotation { get; set; }
         public IEnumerable<Guid> ReportEventIds { get; set; }
     }
 }

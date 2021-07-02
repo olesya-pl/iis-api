@@ -4,9 +4,9 @@ using AutoMapper;
 using HotChocolate;
 using HotChocolate.Resolvers;
 using Iis.DbLayer.Repositories;
+using Iis.Services;
 using IIS.Core.GraphQL.Materials;
 using IIS.Core.Materials;
-using IIS.Core.NodeMaterialRelation;
 
 namespace IIS.Core.GraphQL.NodeMaterialRelation
 {
@@ -19,7 +19,7 @@ namespace IIS.Core.GraphQL.NodeMaterialRelation
             [Service] IMapper mapper,
             [GraphQLNonNullType] NodeMaterialRelationInput input)
         {
-            var tokenPayload = ctx.ContextData[TokenPayload.TokenPropertyName] as TokenPayload;
+            var tokenPayload = ctx.GetToken();
             var materialsSet = input.MaterialIds.ToHashSet();
             var nodesSet = input.NodeIds.ToHashSet();
             await relationService.CreateMultipleRelations(nodesSet, materialsSet, tokenPayload.User.UserName);
@@ -32,7 +32,7 @@ namespace IIS.Core.GraphQL.NodeMaterialRelation
             [Service] NodeMaterialRelationService<IIISUnitOfWork> relationService,
             [GraphQLNonNullType] MultipleNodeMaterialRelationInput input)
         {
-            var tokenPayload = ctx.ContextData[TokenPayload.TokenPropertyName] as TokenPayload;
+            var tokenPayload = ctx.GetToken();
             await relationService.CreateMultipleRelations(tokenPayload.UserId, input.Query, input.NodeId, tokenPayload.User.UserName);
             return new CreateRelationsResponse
             {
@@ -47,8 +47,8 @@ namespace IIS.Core.GraphQL.NodeMaterialRelation
             [Service] IMapper mapper,
             [GraphQLNonNullType] DeleteNodeMaterialRelationInput input)
         {
-            var tokenPayload = ctx.ContextData[TokenPayload.TokenPropertyName] as TokenPayload;
-            await relationService.Delete(mapper.Map<Core.NodeMaterialRelation.NodeMaterialRelation>(input), tokenPayload.User.UserName);
+            var tokenPayload = ctx.GetToken();
+            await relationService.Delete(mapper.Map<Iis.Services.NodeMaterialRelation>(input), tokenPayload.User.UserName);
             var material = await materialProvider.GetMaterialAsync(input.MaterialId, tokenPayload.User);
             return mapper.Map<Material>(material);
         }

@@ -44,7 +44,7 @@ namespace AcceptanceTests.UISteps
         [When(@"I entered the (.*) theme name in the objects section")]
         public void WhenIEnteredTheThemeName(string themeName)
         {
-            var themeUniqueName = $"{themeName} {DateTime.Now.ToLocalTime()} {Guid.NewGuid().ToString("N")}";
+            var themeUniqueName = $"{themeName} {DateTime.Now.ToString("dd/MM/yyyy/HH:mm:ss")} {Guid.NewGuid()}";
             context.Set(themeUniqueName, "themeName");
             themesAndUpdatesPageObjects.EnterThemeNameField.SendKeys(themeUniqueName);
             themesAndUpdatesPageObjects.EnterThemeNameField.SendKeys(Keys.Enter);
@@ -53,7 +53,7 @@ namespace AcceptanceTests.UISteps
         [Given(@"I created a theme with a name (.*)")]
         public void GivenICreatedAThemeWithAName(string themeName)
         {
-            var themeUniqueName = themeName + Guid.NewGuid();
+			var themeUniqueName = $"{ themeName} {DateTime.Now.ToString("dd/MM/yyyy/HH:mm:ss")} {Guid.NewGuid()}";
             context.Set(themeUniqueName, themeName);
             objectsOfStudyPageObjects.SearchLoopButton.Click();
             objectsOfStudyPageObjects.SearchField.SendKeys("Попов");
@@ -69,7 +69,6 @@ namespace AcceptanceTests.UISteps
         public void WhenIDeleteTheme(string themeName)
         {
             var themeUniqueName = context.Get<string>(themeName);
-            driver.WaitFor(15);
             var theme = themesAndUpdatesPageObjects.GetThemeByTitle(themeUniqueName);
             theme.DeleteTheme();
         }
@@ -86,6 +85,7 @@ namespace AcceptanceTests.UISteps
         [Then(@"I must see a theme with specified name")]
         public void ThenIMustSeeAThemeWithASpecifiedName()
         {
+            driver.WaitFor(7);
             var list = themesAndUpdatesPageObjects.Themes.First().Title;
             var themeName = context.Get<string>("themeName");
             Assert.True(themesAndUpdatesPageObjects.GetThemeByTitle(themeName).Displayed);
@@ -94,7 +94,6 @@ namespace AcceptanceTests.UISteps
         [Then(@"I must not see a theme (.*)")]
         public void ThenIMustNotSeeATheme(string themeName)
         {
-            driver.WaitFor(15);
             var themeUniqueName = context.Get<string>(themeName);
             Assert.True(themesAndUpdatesPageObjects.Themes.Count(_ => _.Title == themeUniqueName) == 0);
         }

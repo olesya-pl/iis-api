@@ -30,9 +30,9 @@ namespace Iis.Services.Contracts
             return this;
         }
 
-        public bool IsGranted(AccessKind kind, AccessOperation operation)
+        public bool IsGranted(AccessKind kind, AccessOperation operation, AccessCategory category)
         {
-            var item = this.SingleOrDefault(ag => ag.Kind == kind);
+            var item = this.SingleOrDefault(ag => ag.Kind == kind && ag.Category == category);
             return item == null ? false : item.IsGranted(operation);
         }
     }

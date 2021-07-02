@@ -1,5 +1,6 @@
 ﻿using Iis.Domain.Elastic;
 using Iis.Interfaces.Elastic;
+using Iis.Services.Contracts;
 using Iis.Services.Contracts.Dtos;
 using Iis.Services.Contracts.Interfaces;
 using Iis.Services.Contracts.Params;
@@ -36,7 +37,7 @@ namespace Iis.Services
             return _elasticManager.DeleteDocumentAsync(_elasticIndex, id.ToString("N"));
         }
 
-        public async Task<(int Count, List<ReportDto> Items)> SearchAsync(ReportSearchParams search) 
+        public async Task<(int Count, List<ReportDto> Items)> SearchAsync(ReportSearchParams search, User user) 
         {
             var searchParams = new IisElasticSearchParams
             {
@@ -52,8 +53,19 @@ namespace Iis.Services
                 searchParams.SortOrder = search.SortOrder;
             }
 
-            var searchResult = await _elasticManager.SearchAsync(searchParams);
+            var searchResult = await _elasticManager.WithUserId(user.Id).SearchAsync(searchParams);
             return (searchResult.Count, searchResult.Items.Select(x => x.SearchResult.ToObject<ReportDto>()).ToList());
+        }
+
+        public async Task<int> CountAsync(ReportSearchParams search)
+        {
+            var searchParams = new IisElasticSearchParams
+            {
+                BaseIndexNames = new List<string> { _elasticIndex },
+                Query = string.IsNullOrEmpty(search.Suggestion) ? "*" : $"{search.Suggestion}"
+            };
+
+            return await _elasticManager.CountAsync(searchParams);
         }
 
         public async Task<ReportDto> GetAsync(Guid id) 

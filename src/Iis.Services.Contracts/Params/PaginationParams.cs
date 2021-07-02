@@ -18,5 +18,7 @@ namespace Iis.Services.Contracts.Params
         {
             return (Page * Size - Size, Size);
         }
+
+        public (int Skip, int Take) ToEFPage() => (Page * Size - Size, Size);
     }
 }

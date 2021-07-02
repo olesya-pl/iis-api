@@ -69,14 +69,14 @@ namespace AcceptanceTests.UISteps
         {
             objectsOfStudyPage.SearchField.SendKeys(input);
             objectsOfStudyPage.SearchField.SendKeys(Keys.Enter);
-            driver.WaitFor(12);
+            driver.WaitFor(4);
 
         }
 
         [When(@"I clicked on the first search result title in the Objects of study section")]
         public void WhenIClickedOnTheFirstSearchResultTitle()
         {
-            objectsOfStudyPage.FirstSearchResultTitle.Click();
+            objectsOfStudyPage.FirstSearchResultRow.Click();
             driver.WaitFor(0.5);
         }
 
@@ -111,7 +111,7 @@ namespace AcceptanceTests.UISteps
             objectsOfStudyPage.RelationsTab.Click();
         }
 
-        [When(@"I clicked on Hierarchy tab in the Object of study section")]
+        [When(@"I clicked on the hierarchy tab in the object of study section")]
         public void WhenIClickedOnHierarchyTabInTheObjectOfStudySectiion()
         {
             objectsOfStudyPage.HierarchyTab.Click();
@@ -124,10 +124,20 @@ namespace AcceptanceTests.UISteps
             objectsOfStudyPage.GetHierarchyCardByTitle(cardName).DoubleClickOnCard();
         }
 
-        [When(@"I double clicked on the (.*) expand button in the hierarchy")]
-        public void WhenIDoubleClickedOnTheExpandButtonInTheHierarchy(string cardName)
+        [When(@"I collapsed relation of the (.*) parent card")]
+        public void WhenICollapsedRelationOfTheParentCard(string cardName)
         {
-            objectsOfStudyPage.GetHierarchyCardByTitle(cardName).Expand();
+            var card = objectsOfStudyPage.GetHierarchyCardByTitle(cardName);
+            card.Toggle();
+            Assert.True(card.IsCollapsed());
+        }
+
+        [When(@"I expanded relation of the (.*) parent card")]
+        public void WhenIExpandedRelationOfTheParentCard(string cardName)
+        {
+            var card = objectsOfStudyPage.GetHierarchyCardByTitle(cardName);
+            card.Toggle();
+            Assert.False(card.IsCollapsed());
         }
 
         [When(@"I clicked on the create a new object of study button")]
@@ -177,6 +187,15 @@ namespace AcceptanceTests.UISteps
             objectsOfStudyPage.ImportanceField.SendKeys(Keys.Down);
             objectsOfStudyPage.ImportanceField.SendKeys(Keys.Enter);
         }
+
+        [When(@"I entered the (.*) value in the security classification")]
+        public void WhenIEnteredTheValueInTheSecurityClassification(string securityClassificationValue)
+        {
+            objectsOfStudyPage.SecurityClassificationField.SendKeys(securityClassificationValue);
+            objectsOfStudyPage.SecurityClassificationField.SendKeys(Keys.Down);
+            objectsOfStudyPage.SecurityClassificationField.SendKeys(Keys.Enter);
+        }
+
 
         [When(@"I entered the (.*) value in the name real full field")]
         public void WhenIEnteredTheValueInTheRealNameFullField(string objectOfStudyName)
@@ -358,14 +377,14 @@ namespace AcceptanceTests.UISteps
         [Then(@"I must see object of study (.*) as first search result")]
         public void IMustSeeObjectOfStudyInTheSearchResults(string objectOfStudyTitle)
         {
-            var actualTitle = objectsOfStudyPage.TitleOfTheFirstObject.Text;
+            var actualTitle = objectsOfStudyPage.FirstSearchResultTitle.Text;
             Assert.Equal(objectOfStudyTitle, actualTitle);
         }
 
         [Then(@"I must not see object of study (.*) as first search result")]
         public void IMustNotSeeObjectOfStudyAsFirstResult(string objectOfStudyTitle)
         {
-            var actualTitle = objectsOfStudyPage.TitleOfTheFirstObject.Text;
+            var actualTitle = objectsOfStudyPage.FirstSearchResultTitle.Text;
             Assert.NotEqual(objectOfStudyTitle, actualTitle);
         }
 

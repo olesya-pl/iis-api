@@ -5,14 +5,7 @@ using HotChocolate.Resolvers;
 using HotChocolate.Types;
 using IIS.Core.GraphQL.Common;
 using IIS.Core.GraphQL.Entities;
-using IIS.Core.Ontology;
-using Iis.Domain;
-using Iis.Domain.Meta;
 using Iis.Interfaces.Ontology.Schema;
-using Iis.Interfaces.Meta;
-using Iis.Api.GraphQL.Common;
-using Microsoft.EntityFrameworkCore;
-using Iis.OntologySchema.DataTypes;
 
 namespace IIS.Core.GraphQL
 {
@@ -86,5 +79,12 @@ namespace IIS.Core.GraphQL
 
             return query.Skip(pagination.Offset()).Take(pagination.PageSize);
         }
+        public static TokenPayload GetToken(this IResolverContext context)
+        {
+            if(context is null) return null;
+
+            return context.ContextData[TokenPayload.TokenPropertyName] as TokenPayload;
+        }
+
     }
 }

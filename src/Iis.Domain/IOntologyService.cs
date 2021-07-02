@@ -16,7 +16,7 @@ namespace Iis.Domain
         IReadOnlyCollection<IncomingRelation> GetIncomingEntities(Guid entityId);
         IEnumerable<Node> GetEventsAssociatedWithEntity(Guid entityId);
         Dictionary<Guid, int> CountEventsAssociatedWithEntities(HashSet<Guid> entityIds);
-        Task<SearchEntitiesByConfiguredFieldsResult> FilterNodeAsync(IEnumerable<string> typeNameList, ElasticFilter filter, Guid userId, CancellationToken cancellationToken = default);
+        Task<SearchEntitiesByConfiguredFieldsResult> FilterNodeAsync(IEnumerable<string> typeNameList, ElasticFilter filter, User user, CancellationToken cancellationToken = default);
         Task<SearchEntitiesByConfiguredFieldsResult> FilterNodeCoordinatesAsync(IEnumerable<string> typeNameList, ElasticFilter filter, CancellationToken cancellationToken = default);
         (IEnumerable<Node> nodes, int count) GetNodesByIds(IEnumerable<Guid> matchList, CancellationToken cancellationToken = default);
         void SaveNode(Node node);
@@ -30,6 +30,6 @@ namespace Iis.Domain
         IReadOnlyCollection<Guid> GetNodeIdListByFeatureIdList(IEnumerable<Guid> featureIdList);
         string GetAttributeValueByDotName(Guid id, string dotName);
         Dictionary<Guid, int> GetRelationsCount(HashSet<Guid> entityIds);
-        Task<SearchEntitiesByConfiguredFieldsResult> SearchEventsAsync(ElasticFilter filter);
+        Task<SearchEntitiesByConfiguredFieldsResult> SearchEventsAsync(ElasticFilter filter, User user);
     }
 }

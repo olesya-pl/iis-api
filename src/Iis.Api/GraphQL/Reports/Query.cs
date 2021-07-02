@@ -1,4 +1,5 @@
 using HotChocolate;
+using HotChocolate.Resolvers;
 using HotChocolate.Types;
 using Iis.Api.GraphQL.Common;
 using Iis.Services.Contracts.Interfaces;
@@ -15,11 +16,13 @@ namespace IIS.Core.GraphQL.Reports
     {
         [GraphQLNonNullType]
         public async Task<GraphQLCollection<Report>> GetReportList(
+            IResolverContext ctx,
             [Service] IReportElasticService reportElasticService, 
             [GraphQLNonNullType] PaginationInput pagination, 
             SortingInput sorting, 
             FilterInput filter)
         {
+            var tokenPayload = ctx.GetToken();
 
             var (count, items) = await reportElasticService.SearchAsync(new ReportSearchParams
             {
@@ -28,7 +31,7 @@ namespace IIS.Core.GraphQL.Reports
                 SortColumn = sorting?.ColumnName,
                 SortOrder = sorting?.Order,
                 Suggestion = filter?.Suggestion
-            });
+            }, tokenPayload.User);
             return new GraphQLCollection<Report>(items.Select(x => new Report(x)).ToList(), count);
         }
 

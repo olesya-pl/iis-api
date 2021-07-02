@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json.Linq;
-using Iis.Interfaces.Enums;
 using Iis.DataModel;
 namespace Iis.DbLayer.Repositories
 {
@@ -33,10 +32,11 @@ namespace Iis.DbLayer.Repositories
         public int ProcessedMlHandlersCount { get; set; }
         public Guid[] NodeIds { get; set; }
         public int NodesCount { get; set; }
+        public int ObjectsOfStudyCount { get; set; }
         public Assignee Assignee { get; set; }
         public JObject MLResponses { get; set; }
         public string Title { get; set; }
-        public decimal[] ImageVector { get; set; } = new decimal[ImageVectorDimensionsCount].Select(p => -10000m).ToArray();
+        public ImageVector[] ImageVectors { get; set; }
         public SecurityAttributes SecurityAttributes { get; set; } = new SecurityAttributes();
     }
 
@@ -67,5 +67,15 @@ namespace Iis.DbLayer.Repositories
         public IEnumerable<string> Objects { get; set; } = new List<string>();
         public IEnumerable<string> Tags { get; set; } = new List<string>();
         public IEnumerable<string> States { get; set; } = new List<string>();
+    }
+
+    public class ImageVector
+    {
+        public decimal[] Vector { get; }
+
+        public ImageVector(decimal[] imageVector)
+        {
+            Vector = imageVector;
+        }
     }
 }

@@ -157,12 +157,12 @@ namespace Iis.Api.Controllers
                 ByteProperty.Create("AccessLevel"),
                 TextProperty.Create("Content", ElasticConfiguration.DefaultTermVector),
                 KeywordProperty.Create("Metadata.features.PhoneNumber", false),
-                DateProperty.Create("Metadata.RegTime", formats:ElasticConfiguration.DefaultDateFormats),
-                DateProperty.Create("Metadata.RegDate", formats:ElasticConfiguration.DefaultDateFormats),
+                DateProperty.Create("Metadata.RegTime", ElasticConfiguration.DefaultDateFormats),
+                DateProperty.Create("Metadata.RegDate", ElasticConfiguration.DefaultDateFormats),
+                TextProperty.Create("Metadata.Duration"),
                 DateProperty.Create("CreatedDate", ElasticConfiguration.DefaultDateFormats),
                 DateProperty.Create("LoadData.ReceivingDate", ElasticConfiguration.DefaultDateFormats),
                 KeywordProperty.Create("ParentId", true),
-                DenseVectorProperty.Create("ImageVector", MaterialDocument.ImageVectorDimensionsCount),
                 TextProperty.Create("Type", true),
                 TextProperty.Create("Source", true),
                 KeywordProperty.Create("ProcessedStatus.Title", false),
@@ -175,7 +175,8 @@ namespace Iis.Api.Controllers
                 KeywordProperty.Create("SourceReliability.Title", false),
                 KeywordProperty.Create("SessionPriority.Title", false),
                 ByteProperty.Create("SessionPriority.OrderNumber"),
-                IntegerProperty.Create("NodesCount")
+                IntegerProperty.Create("NodesCount"),
+                DenseVectorProperty.Create("ImageVectors.Vector", MaterialDocument.ImageVectorDimensionsCount)
             });
 
             await _elasticManager.CreateIndexesAsync(new[] { materialIndex },
@@ -201,8 +202,10 @@ namespace Iis.Api.Controllers
 
             var indexSecurityParam = new List<(IReadOnlyCollection<string>, string)>{
                 (_elasticState.MaterialIndexes, "AccessLevel"),
+                (new [] { _elasticState.ReportIndex }, "AccessLevel"),
                 (_elasticState.OntologyIndexes, "__accessLevel"),
                 (_elasticState.WikiIndexes, "__accessLevel"),
+                (_elasticState.EventIndexes, "__accessLevel"),
             };
             await _elasticManager.CreateSecurityMappingAsync(indexSecurityParam, cancellationToken);
 
@@ -276,13 +279,13 @@ namespace Iis.Api.Controllers
             }
         }
 
-        private async Task<IActionResult> CreateOntologyIndexes(string indexNames, IEnumerable<string> baseIndexList, bool isHistorical, CancellationToken ct)
+        private async Task<IActionResult> CreateOntologyIndexes(string indexNames, IReadOnlyCollection<string> baseIndexList, bool isHistorical, CancellationToken ct)
         {
             var stopwatch = Stopwatch.StartNew();
 
             var indexes = indexNames == AllIndexes ? baseIndexList : indexNames.Split(",");
-                
-            var notValidIndexes = indexes.Where(name => !baseIndexList.Contains(name, StringComparer.OrdinalIgnoreCase)).ToList();
+
+            var notValidIndexes = indexes.Where(name => !baseIndexList.Contains(name, StringComparer.OrdinalIgnoreCase)).ToArray();
 
             if (notValidIndexes.Any())
             {

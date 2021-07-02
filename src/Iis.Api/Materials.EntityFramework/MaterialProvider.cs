@@ -1,4 +1,4 @@
-using AutoMapper;
+﻿using AutoMapper;
 using Iis.Api.Ontology;
 using Iis.DataModel.Materials;
 using Iis.DbLayer.MaterialEnum;
@@ -7,6 +7,7 @@ using Iis.DbLayer.Repositories.Helpers;
 using Iis.Domain;
 using Iis.Domain.MachineLearning;
 using Iis.Domain.Materials;
+using Iis.Interfaces.Constants;
 using Iis.Interfaces.Elastic;
 using Iis.Interfaces.Ontology.Data;
 using Iis.Interfaces.Ontology.Schema;
@@ -133,7 +134,7 @@ namespace IIS.Core.Materials.EntityFramework
 
             if (entity is null || !entity.CanBeAccessedBy(user.AccessLevel))
             {
-                throw new ArgumentException($"Cannot find material with id {id}");
+                throw new ArgumentException($"{FrontEndErrorCodes.NotFound}:Матеріал не знайдено");
             }
 
             var mapped = Map(entity);
@@ -347,18 +348,18 @@ namespace IIS.Core.Materials.EntityFramework
 
         public async Task<MaterialsDto> GetMaterialsByImageAsync(Guid userId, PaginationParams page, string fileName, byte[] content)
         {
-            decimal[] imageVector;
+            IReadOnlyCollection<decimal[]> imageVectorList;
             try
             {
-                imageVector = await VectorizeImage(content, fileName);
+                imageVectorList = await VectorizeImage(content, fileName);
 
-                if (imageVector is null) throw new Exception("Image vector is empty.");
+                if (!imageVectorList.Any()) throw new Exception("No image vectors have found.");
             }
             catch (Exception e)
             {
                 throw new Exception("Failed to vectorize image", e);
             }
-            var searchResult = await _materialElasticService.SearchByImageVector(userId, imageVector, page);
+            var searchResult = await _materialElasticService.SearchByImageVector(userId, imageVectorList, page);
 
             var materials = searchResult.Items.Values
                     .Select(p => JsonConvert.DeserializeObject<MaterialDocument>(p.SearchResult.ToString(), _materialDocSerializeSettings))
@@ -368,7 +369,7 @@ namespace IIS.Core.Materials.EntityFramework
             return MaterialsDto.Create(materials, searchResult.Count, searchResult.Items, searchResult.Aggregations);
         }
 
-        public async Task<decimal[]> VectorizeImage(byte[] fileContent, string fileName)
+        private async Task<IReadOnlyCollection<decimal[]>> VectorizeImage(byte[] fileContent, string fileName)
         {
             using var form = new MultipartFormDataContent();
             using var content = new ByteArrayContent(fileContent);
@@ -378,7 +379,7 @@ namespace IIS.Core.Materials.EntityFramework
             var response = await httpClient.PostAsync(_imageVectorizerUrl, form);
             response.EnsureSuccessStatusCode();
             var contentJson = await response.Content.ReadAsStringAsync();
-            return FaceAPIResponseParser.GetEncoding(contentJson);
+            return FaceAPIResponseParser.GetFaceVectorList(contentJson);
         }
 
         public async Task<MaterialsDto> GetMaterialsCommonForEntitiesAsync(Guid userId,
