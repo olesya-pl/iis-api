@@ -4,6 +4,7 @@ using Iis.Interfaces.Ontology.Schema;
 using Iis.OntologyManager.Style;
 using Iis.OntologySchema.ChangeParameters;
 using Iis.OntologySchema.DataTypes;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -199,13 +200,13 @@ namespace Iis.OntologyManager.UiControls
         }
 
         private int? GetCurrentSortOrder() =>
-            string.IsNullOrEmpty(txtSortOrder.Text) ? (int?) null : int.Parse(txtSortOrder.Text);
+            string.IsNullOrEmpty(txtSortOrder?.Text) ? (int?) null : int.Parse(txtSortOrder.Text);
 
         private string GetCurrentFormat() =>
-            string.IsNullOrEmpty(cmbFormat.Text) ? null : cmbFormat.Text;
+            string.IsNullOrEmpty(cmbFormat?.Text) ? null : cmbFormat.Text;
 
         private EntityOperation[] GetCurrentAcceptsEntityOperations() =>
-            cbEditing.Checked ? new[] { EntityOperation.Create, EntityOperation.Update, EntityOperation.Delete } :
+            cbEditing?.Checked == true ? new[] { EntityOperation.Create, EntityOperation.Update, EntityOperation.Delete } :
             (EntityOperation[])null;
 
         private string[] GetCurrentTargetTypes()
@@ -221,7 +222,7 @@ namespace Iis.OntologyManager.UiControls
         }
 
         private int? GetCurrentFormFieldLines() =>
-            string.IsNullOrEmpty(txtFormFieldLines.Text) ? (int?)null : int.Parse(txtFormFieldLines.Text);
+            string.IsNullOrEmpty(txtFormFieldLines?.Text) ? (int?)null : int.Parse(txtFormFieldLines.Text);
 
         private IFormField GetCurrentFormField()
         {
@@ -242,7 +243,7 @@ namespace Iis.OntologyManager.UiControls
 
         private IContainerMeta GetCurrentContainer()
         {
-            if (string.IsNullOrWhiteSpace(cmbContainer.Text)) return null;
+            if (string.IsNullOrWhiteSpace(cmbContainer?.Text)) return null;
             
             var selected = (IContainerMeta)cmbContainer.SelectedItem;
             return selected == null ?
@@ -254,11 +255,11 @@ namespace Iis.OntologyManager.UiControls
         {
             var meta = new SchemaMeta();
             meta.Hidden = cbHidden.Checked;
-            meta.Formula = txtFormula.Text;
-            meta.IsAggregated = cbIsAggregated.Checked;
+            meta.Formula = txtFormula?.Text;
+            meta.IsAggregated = cbIsAggregated?.Checked;
             meta.SortOrder = GetCurrentSortOrder();
             meta.Format = GetCurrentFormat();
-            meta.IsImportantRelation = cbIsImportantRelation.Checked;
+            meta.IsImportantRelation = cbIsImportantRelation?.Checked;
             meta.AcceptsEntityOperations = GetCurrentAcceptsEntityOperations();
             meta.TargetTypes = GetCurrentTargetTypes();
             meta.FormField = GetCurrentFormField();
@@ -266,6 +267,8 @@ namespace Iis.OntologyManager.UiControls
 
             return meta;
         }
+
+        private string GetMetaJson() => JsonConvert.SerializeObject(GetMeta());
 
         private INodeTypeUpdateParameter GetUpdateParameter()
         {
@@ -275,7 +278,7 @@ namespace Iis.OntologyManager.UiControls
                 Id = isNew ? (Guid?)null : new Guid(txtId.Text),
                 Name = txtName.Text,
                 Title = txtTitle.Text,
-                Meta = txtMeta.Text,
+                Meta = GetMetaJson(),
                 EmbeddingOptions = (EmbeddingOptions)cmbEmbedding.SelectedItem,
                 TargetTypeId = (Guid)cmbTargetType.SelectedValue,
                 ParentTypeId = _parentTypeId
