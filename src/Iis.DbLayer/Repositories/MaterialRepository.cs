@@ -579,6 +579,7 @@ namespace Iis.DbLayer.Repositories
                     MaterialIncludeEnum.WithNodes => resultQuery.WithNodes(),
                     MaterialIncludeEnum.WithChildren => resultQuery.WithChildren(),
                     MaterialIncludeEnum.WithFiles => resultQuery.WithFiles(),
+                    MaterialIncludeEnum.OnlyParent => resultQuery.OnlyParent(),
                     _ => resultQuery
                 };
             }
