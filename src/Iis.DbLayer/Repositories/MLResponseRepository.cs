@@ -26,7 +26,7 @@ namespace Iis.DbLayer.Repositories
                             .ToListAsync();
         }
 
-        public async Task<IEnumerable<MLResponseEntity>> GetAllForMaterialListAsync(IEnumerable<Guid> materialIdList)
+        public async Task<IReadOnlyCollection<MLResponseEntity>> GetAllForMaterialListAsync(IReadOnlyCollection<Guid> materialIdList)
         {
             return await _context.MLResponses
                             .Where(e => materialIdList.Contains(e.MaterialId))

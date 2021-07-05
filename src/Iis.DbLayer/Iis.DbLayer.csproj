@@ -18,6 +18,7 @@
     <ProjectReference Include="..\Iis.OntologySchema.Saver\Iis.OntologySchema.Saver.csproj" />
     <ProjectReference Include="..\Iis.OntologySchema\Iis.OntologySchema.csproj" />
     <ProjectReference Include="..\IIS.Repository\IIS.Repository.csproj" />
+    <ProjectReference Include="..\Iis.Services.Contracts\Iis.Services.Contracts.csproj" />
     <ProjectReference Include="..\Iis.Utility\Iis.Utility.csproj" />
   </ItemGroup>
 

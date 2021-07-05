@@ -18,9 +18,6 @@ namespace AcceptanceTests.PageObjects
             PageFactory.InitElements(driver, this);
         }
 
-        [FindsBy(How = How.XPath, Using = "//div[contains(text(),'Обʼєкти')]")]
-        public IWebElement ObjectOfStudySectionButton;
-
         [FindsBy(How = How.CssSelector, Using = ".entity-search .entity-search__toggle button")]
         [CacheLookup]
         public IWebElement SearchLoopButton;
@@ -32,7 +29,7 @@ namespace AcceptanceTests.PageObjects
         [FindsBy(How = How.XPath, Using = "//div[@class='summary-person-row text-ellipsis']/span[@class='title']")]
         public IWebElement FirstSearchResultTitle;
 
-        [FindsBy(How = How.XPath, Using = "//div[@class='el-table__body-wrapper is-scrolling-none']//tr[1]")]
+        [FindsBy(How = How.XPath, Using = "//div[@class='infinity-table objects-table']//tbody[@class='p-datatable-tbody']/tr[1]")]
         public IWebElement FirstSearchResultRow;
 
         [FindsBy(How = How.XPath, Using = "//div[@class='icon-wrapper icon-wrapper-edit']")]
@@ -59,6 +56,10 @@ namespace AcceptanceTests.PageObjects
         [FindsBy(How = How.CssSelector, Using = ".summary-person-row .title")]
         [CacheLookup]
         public IWebElement PersonSearchResult;
+
+        [FindsBy(How = How.CssSelector, Using = ".p-datatable-scrollable-body-table tr:nth-child(1) .highlight span em")]
+        [CacheLookup]
+        public IWebElement FirstSearchResultSignValue;
 
         [FindsBy(How = How.CssSelector, Using = ".entity-search__result-counter")]
         [CacheLookup]
@@ -123,7 +124,7 @@ namespace AcceptanceTests.PageObjects
         [FindsBy(How = How.CssSelector, Using = ".entity-search__result-counter")]
         public IWebElement OOSSearchCounter;
 
-        [FindsBy(How = How.CssSelector, Using = ".is-scrolling-none .el-table__empty-block")]
+        [FindsBy(How = How.CssSelector, Using = ".objects-table .p-datatable-emptymessage .empty-state__message")]
         [CacheLookup]
         public IWebElement OOSEmptySearchResults;
 
@@ -139,14 +140,14 @@ namespace AcceptanceTests.PageObjects
         [CacheLookup]
         public IWebElement RussianMilitaryForcesExpandButton;
 
-        [FindsBy(How = How.XPath, Using = "//ul//li[contains(.,\"Зв'язки\")]")]
+        [FindsBy(How = How.CssSelector, Using = ".objects-page .header-nav ul > li.graph")]
         public IWebElement RelationsTab;
 
         [FindsBy(How = How.XPath, Using = "//div[contains(text(),'3 окрема мотострілецька бригада \"Беркут\"')]")]
         [CacheLookup]
         public IWebElement ThirdBrigadeSearchResult;
 
-        [FindsBy(How = How.XPath, Using = "//span[contains(text(),' Створити обʼєкт... ')]")]
+        [FindsBy(How = How.CssSelector, Using = ".quick-access-panel__actions button.add-button")]
         public IWebElement CreateANewObjectOfStudyButton;
 
         [FindsBy(How = How.XPath, Using = "//span[contains(@class, 'el-tree-node__label') and text() = 'Військовий підрозділ']")]
@@ -167,7 +168,7 @@ namespace AcceptanceTests.PageObjects
         [FindsBy(How = How.CssSelector, Using = "div[name='parent'] .el-input__inner")]
         public IWebElement DirectReportingRelationship;
 
-        [FindsBy(How = How.XPath, Using = "//span[contains(text(),'Підтвердити')]")]
+        [FindsBy(How = How.CssSelector, Using = ".confirm-message-box button.confirm-message-box__action-confirm")]
         public IWebElement ConfirmSaveOfANewObjectOfStudyButton;
 
         [FindsBy(How = How.XPath, Using = "//div[contains(text(),' Дислокація ')]")]
@@ -194,7 +195,7 @@ namespace AcceptanceTests.PageObjects
         [FindsBy(How = How.CssSelector, Using = ".el-collapse-item:nth-of-type(22) .el-input--mini:nth-of-type(2) .el-input__inner")]
         public IWebElement CountryFieldInTheTemporaryDisclocationBlock;
 
-        [FindsBy(How = How.XPath, Using = "//li[contains(text(),'Події')]")]
+        [FindsBy(How = How.CssSelector, Using = ".objects-page .header-nav ul > li.events")]
         public IWebElement EventsTabInTheBigObjectOfStudyCard;
 
         [FindsBy(How = How.XPath, Using = "//div[@name='title']/div[@class='el-form-item__content']")]
@@ -203,6 +204,9 @@ namespace AcceptanceTests.PageObjects
 
         [FindsBy(How = How.CssSelector, Using = "div[name = 'country'] .el-input__inner")]
         public IWebElement DislocationSectionCountryField;
+
+        [FindsBy(How = How.XPath, Using = "//span[@class='multiselect__tag-label']")]
+        public IWebElement TagInTheSearchField;
 
         public ObjectsSearch GetObjectByTitle(string title)
         {
@@ -213,7 +217,7 @@ namespace AcceptanceTests.PageObjects
             return new HierarchyCard(driver, title);
         }
 
-        public List<Event> Events => driver.FindElements(By.ClassName("el-table__row"))
+        public List<Event> Events => driver.FindElements(By.CssSelector(".events-table tbody.p-datatable-tbody > tr"))
                    .Select(webElement => new Event(driver, webElement)).ToList();
 
         public void ScrollDown(string value)
@@ -228,5 +232,6 @@ namespace AcceptanceTests.PageObjects
             var elementToClick = driver.FindElement(By.XPath($"//div[contains(text(),'{relationshipLinkTitle}')]"));
             elementToClick.Click();
         }
+
     }
 }

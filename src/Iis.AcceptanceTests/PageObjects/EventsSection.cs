@@ -19,14 +19,11 @@ namespace AcceptanceTests.PageObjects
 			PageFactory.InitElements(driver, this);
 		}
 
-		[FindsBy(How = How.XPath, Using = "//div[contains(text(),'Події')]")]
-		public IWebElement EventsPage;
-
 		[FindsBy(How = How.CssSelector, Using = ".add-button")]
 		[CacheLookup]
 		public IWebElement CreateEventButton;
 
-		[FindsBy(How = How.CssSelector, Using = "tbody > tr:nth-of-type(1)")]
+		[FindsBy(How = How.CssSelector, Using = ".events-table .p-datatable-tbody > tr")]
 		[CacheLookup]
 		public IWebElement FirstEventInTheEventsList;
 
@@ -50,7 +47,7 @@ namespace AcceptanceTests.PageObjects
 			return Events.Where(i => i.Name.Contains(eventName)).ToList();
 		}
 
-		public List<Event> Events => driver.FindElements(By.ClassName("el-table__row"))
+		public List<Event> Events => driver.FindElements(By.ClassName(".events-table tbody.p-datatable-tbody > tr"))
 				   .Select(webElement => new Event(driver, webElement)).ToList();
 	}
 }

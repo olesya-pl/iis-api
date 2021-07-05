@@ -243,40 +243,40 @@ namespace AcceptanceTests.Features.UI.SmokeTests
 #line 27
         testRunner.And("I clicked on the create a new military organization button", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-                TechTalk.SpecFlow.Table table5 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table7 = new TechTalk.SpecFlow.Table(new string[] {
                             "Accordion",
                             "FieldName",
                             "FieldValueValue"});
-                table5.AddRow(new string[] {
+                table7.AddRow(new string[] {
                             "",
                             "Приналежність",
                             "ворожий"});
-                table5.AddRow(new string[] {
+                table7.AddRow(new string[] {
                             "",
                             "Важливість",
                             "першочерговий"});
-                table5.AddRow(new string[] {
+                table7.AddRow(new string[] {
                             "",
                             "Гриф (рівень доступу)",
                             "НВ - Не визначено"});
-                table5.AddRow(new string[] {
+                table7.AddRow(new string[] {
                             "Загальна інформація",
                             "Найменування дійсне повне розширене",
                             "Тестове найменування дійсне повне розширене"});
-                table5.AddRow(new string[] {
+                table7.AddRow(new string[] {
                             "Загальна інформація",
                             "Найменування дійсне скорочене",
                             "Тестове найменування дійсне скорочене"});
-                table5.AddRow(new string[] {
+                table7.AddRow(new string[] {
                             "Загальна інформація",
                             "Умовне (відкрите) найменування",
                             "Тестове умовне (відкрите) найменування"});
-                table5.AddRow(new string[] {
+                table7.AddRow(new string[] {
                             "Загальна інформація",
                             "Оперативне (бойове) призначення",
                             "Тестове оперативне (бойове) призначення"});
 #line 28
-        testRunner.When("I filled in the form", ((string)(null)), table5, "When ");
+        testRunner.When("I filled in the form", ((string)(null)), table7, "When ");
 #line hidden
 #line 39
         testRunner.Then("I must see Тестове найменування дійсне скорочене title of the object", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
@@ -346,25 +346,25 @@ namespace AcceptanceTests.Features.UI.SmokeTests
 #line 50
         testRunner.And("I clicked on enlarge small card button", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-                TechTalk.SpecFlow.Table table6 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table8 = new TechTalk.SpecFlow.Table(new string[] {
                             "BigCardProfileTab"});
-                table6.AddRow(new string[] {
+                table8.AddRow(new string[] {
                             "BigCardMaterialsTab"});
-                table6.AddRow(new string[] {
+                table8.AddRow(new string[] {
                             "BigCardEventsTab"});
-                table6.AddRow(new string[] {
+                table8.AddRow(new string[] {
                             "BigCardChangeHistoryTab"});
-                table6.AddRow(new string[] {
+                table8.AddRow(new string[] {
                             "BigCardRelationsTab"});
 #line 51
-        testRunner.Then("I must see these tabs in the big object of study card", ((string)(null)), table6, "Then ");
+        testRunner.Then("I must see these tabs in the big object of study card", ((string)(null)), table8, "Then ");
 #line hidden
-                TechTalk.SpecFlow.Table table7 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table9 = new TechTalk.SpecFlow.Table(new string[] {
                             "BigCardAffiliation"});
-                table7.AddRow(new string[] {
+                table9.AddRow(new string[] {
                             "BigCardImportance"});
 #line 59
-        testRunner.Then("I must see the specific text blocks in big object of study card", ((string)(null)), table7, "Then ");
+        testRunner.Then("I must see the specific text blocks in big object of study card", ((string)(null)), table9, "Then ");
 #line hidden
             }
             this.ScenarioCleanup();

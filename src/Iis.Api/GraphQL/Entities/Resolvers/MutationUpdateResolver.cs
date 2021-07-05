@@ -9,11 +9,11 @@ using Iis.Interfaces.Ontology.Schema;
 using MediatR;
 using Iis.Events.Entities;
 using Iis.Services.Contracts.Interfaces;
-using Iis.Services.Contracts;
 using Iis.Interfaces.AccessLevels;
 using Iis.Interfaces.Ontology.Data;
 using Iis.Interfaces.Common;
 using Iis.Services;
+using Iis.Domain.Users;
 
 namespace IIS.Core.GraphQL.Entities.Resolvers
 {

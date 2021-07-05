@@ -25,9 +25,9 @@ namespace Iis.OntologyData.DataTypes
         public EmbeddingOptions EmbeddingOptions => _node.NodeType.RelationType.EmbeddingOptions;
         public string RelationTypeName => _node.NodeType.Name;
         public bool IsLinkToSeparateObject => _targetNode.NodeType.IsSeparateObject;
-        public bool IsLinkToObject => _targetNode.NodeType.IsObject;
+        public bool IsLinkToExternalObject => _targetNode.NodeType.IsObject;
         public bool IsLinkToAttribute => _targetNode.NodeType.Kind == Kind.Attribute;
-        public bool IsLinkToInternalObject => !IsLinkToAttribute && !IsLinkToObject;
+        public bool IsLinkToInternalObject => !IsLinkToAttribute && !IsLinkToExternalObject;
         public string TypeName => _node.NodeType.Name;
         public override string ToString() => $"{Node.NodeType.Name} {Id}";
 

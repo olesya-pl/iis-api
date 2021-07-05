@@ -1,11 +1,8 @@
 using System;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using Newtonsoft.Json;
-
-using Iis.Domain.Elastic;
 using Iis.Interfaces.Elastic;
 using Iis.Elastic.SearchQueryExtensions;
 using Iis.Services.Contracts.Enums;
@@ -49,11 +46,12 @@ namespace Iis.Services
 
         public async Task<SearchResult> SearchMaterialsByConfiguredFieldsAsync(Guid userId, SearchParams searchParams, CancellationToken ct = default)
         {
-            var noSuggestion = string.IsNullOrEmpty(searchParams.Suggestion);
-
             var (from, size) = searchParams.Page.ToElasticPage();
 
-            var queryString = noSuggestion ? "ParentId:NULL" : $"({searchParams.Suggestion}) AND ParentId:NULL";
+            var queryString = SearchQueryExtension.CreateMaterialsQueryString(
+                searchParams.Suggestion, 
+                searchParams.FilteredItems, 
+                searchParams.CherryPickedItems);
 
             var query = new ExactQueryBuilder()
                 .WithPagination(from, size)
@@ -91,7 +89,6 @@ namespace Iis.Services
                 searchResult.Count = await _elasticManager
                     .WithUserId(userId)
                     .CountAsync(countQuery, _elasticState.MaterialIndexes, ct);
-
             }
 
             return searchResult;
@@ -104,11 +101,12 @@ namespace Iis.Services
 
         public async Task<SearchResult> BeginSearchByScrollAsync(Guid userId, SearchParams searchParams, CancellationToken ct = default)
         {
-            var noSuggestion = string.IsNullOrEmpty(searchParams.Suggestion);
-
             var (from, size) = searchParams.Page.ToElasticPage();
 
-            var queryString = noSuggestion ? "ParentId:NULL" : $"{searchParams.Suggestion} AND ParentId:NULL";
+            var queryString = SearchQueryExtension.CreateMaterialsQueryString(
+                searchParams.Suggestion,
+                searchParams.FilteredItems,
+                searchParams.CherryPickedItems);
 
             var scrollDuration = _elasticConfiguration.ScrollDurationMinutes == default(int)
                 ? ElasticConstants.DefaultScrollDurationMinutes
@@ -223,15 +221,22 @@ namespace Iis.Services
 
         public Task<int> CountMaterialsByConfiguredFieldsAsync(Guid userId, SearchParams searchParams, CancellationToken ct = default)
         {
-            var elasticSearchParams = new IisElasticSearchParams
-            {
-                BaseIndexNames = MaterialIndexes.ToList(),
-                Query = string.IsNullOrEmpty(searchParams.Suggestion) ? "ParentId:NULL" : $"{searchParams.Suggestion} AND ParentId:NULL"
-            };
+            var queryString = SearchQueryExtension.CreateMaterialsQueryString(
+                searchParams.Suggestion,
+                searchParams.FilteredItems,
+                searchParams.CherryPickedItems);
+
+            var pagination = searchParams.Page.ToEFPage();
+            
+            var exactQueryBuilder = new ExactQueryBuilder()
+                .WithQueryString(queryString)
+                .WithLeniency(true)
+                .WithPagination(pagination.Skip, pagination.Take)
+                .BuildCountQuery();
 
             return _elasticManager
                 .WithUserId(userId)
-                .CountAsync(elasticSearchParams, ct);
+                .CountAsync(exactQueryBuilder.ToString(), _elasticState.MaterialIndexes, ct);
         }
 
         private static (string SortColumn, string SortOrder) MapSortingToElastic(SortingParams sorting)

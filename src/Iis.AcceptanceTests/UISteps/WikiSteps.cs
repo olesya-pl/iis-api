@@ -14,10 +14,12 @@ namespace AcceptanceTests.UISteps
 		private readonly IWebDriver driver;
 		private readonly ScenarioContext context;
 		private WikiSectionPageObjects wikiPage;
+		private readonly NavigationSection navigationSection;
 
 		public WikiSteps(ScenarioContext injectedContext, IWebDriver driver)
 		{
 			wikiPage = new WikiSectionPageObjects(driver);
+			navigationSection = new NavigationSection(driver);
 			context = injectedContext;
 			this.driver = driver;
 		}
@@ -25,7 +27,7 @@ namespace AcceptanceTests.UISteps
 		[When(@"I navigated to the Wiki page")]
 		public void WhenINavigatedToTheWikiPage()
 		{
-			wikiPage.WikiSection.Click();
+			navigationSection.WikiLink.Click();
 		}
 
 		[Then(@"I must see the Wiki page")]

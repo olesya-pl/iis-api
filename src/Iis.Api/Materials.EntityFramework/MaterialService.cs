@@ -6,28 +6,25 @@ using System.Collections.Generic;
 using AutoMapper;
 using MediatR;
 using Iis.Utility;
-using Iis.Messages;
+using Iis.Messages.Materials;
 using Iis.Domain.Materials;
 using Iis.Domain.MachineLearning;
 using Iis.DbLayer.Repositories;
 using Iis.DbLayer.MaterialEnum;
+using Iis.DbLayer.MaterialDictionaries;
 using Iis.DataModel.Materials;
 using Iis.Interfaces.Roles;
-using Iis.Interfaces.Enums;
 using Iis.Interfaces.Elastic;
 using Iis.Interfaces.Materials;
 using IIS.Repository;
 using IIS.Repository.Factories;
-using Iis.Services;
-using Iis.Services.Contracts;
 using Iis.Services.Contracts.Dtos;
 using Iis.Services.Contracts.Interfaces;
 using MaterialLoadData = Iis.Domain.Materials.MaterialLoadData;
 using Iis.Interfaces.Common;
 using Microsoft.Extensions.Logging;
-using Serilog;
-using System.Text;
-using Newtonsoft.Json;
+using Iis.Domain.Users;
+using IIS.Services.Contracts.Interfaces;
 
 namespace IIS.Core.Materials.EntityFramework
 {
@@ -42,7 +39,7 @@ namespace IIS.Core.Materials.EntityFramework
         private readonly IMaterialSignRepository _materialSignRepository;
         private readonly IUserService _userService;
         private readonly ICommonData _commonData;
-        private readonly ILogger<MaterialService<TUnitOfWork>> _logger;        
+        private readonly ILogger<MaterialService<TUnitOfWork>> _logger;
 
         public MaterialService(IFileService fileService,
             IMapper mapper,
@@ -186,8 +183,17 @@ namespace IIS.Core.Materials.EntityFramework
 
             responseEntity = await _mLResponseRepository.SaveAsync(responseEntity);
 
-            await RunWithoutCommitAsync(async unitOfWork =>
-                await unitOfWork.MaterialRepository.PutMaterialToElasticSearchAsync(responseEntity.MaterialId));
+            await RunWithoutCommitAsync(uow => uow.MaterialRepository.PutMaterialToElasticSearchAsync(responseEntity.MaterialId));
+
+            if(responseEntity.HandlerCode == MlHandlerCodeList.ImageVector)
+            {
+                var parentId = await RunWithoutCommitAsync(uow => uow.MaterialRepository.GetParentIdByChildIdAsync(responseEntity.MaterialId));
+
+                if(parentId.HasValue)
+                {
+                    await RunWithoutCommitAsync(uow => uow.MaterialRepository.PutMaterialToElasticSearchAsync(parentId.Value));
+                }
+            }
 
             return _mapper.Map<MLResponse>(responseEntity);
         }
@@ -418,7 +424,7 @@ namespace IIS.Core.Materials.EntityFramework
         public async Task AssignMaterialOperatorAsync(Guid materialId, Guid assigneeId, User user = null)
         {
             var accessLevel = user?.AccessLevel ?? int.MaxValue;
-            
+
             var material = await RunWithoutCommitAsync(async unitOfWork =>
                 await unitOfWork.MaterialRepository.GetByIdAsync(materialId));
             if (material == null || !material.CanBeAccessedBy(accessLevel))
@@ -461,16 +467,14 @@ namespace IIS.Core.Materials.EntityFramework
             };
         }
 
-        public Task<List<ElasticBulkResponse>> PutAllMaterialsToElasticSearchAsync(CancellationToken cancellationToken)
+        public Task<List<ElasticBulkResponse>> PutAllMaterialsToElasticSearchAsync(CancellationToken ct)
         {
-            return RunWithoutCommitAsync(async (unitOfWork)
-                => await unitOfWork.MaterialRepository.PutAllMaterialsToElasticSearchAsync(cancellationToken));
+            return RunWithoutCommitAsync(uow => uow.MaterialRepository.PutAllMaterialsToElasticSearchAsync(ct));
         }
 
-        public Task<List<ElasticBulkResponse>> PutCreatedMaterialsToElasticSearchAsync(IReadOnlyCollection<Guid> materialIds, CancellationToken stoppingToken)
+        public Task<List<ElasticBulkResponse>> PutCreatedMaterialsToElasticSearchAsync(IReadOnlyCollection<Guid> materialIds, CancellationToken ct)
         {
-            return RunWithoutCommitAsync(async (unitOfWork)
-                => await unitOfWork.MaterialRepository.PutCreatedMaterialsToElasticSearchAsync(materialIds, stoppingToken));
+            return RunWithoutCommitAsync(uow => uow.MaterialRepository.PutCreatedMaterialsToElasticSearchAsync(materialIds, ct));
         }
 
         public async Task<Material> ChangeMaterialAccessLevel(Guid materialId, int accessLevel, User user)

@@ -34,5 +34,6 @@ namespace Iis.Services.ExternalUserServices
                 },
             };
         }
+        public bool ValidateCredentials(string username, string password) => password == "123";
     }
 }

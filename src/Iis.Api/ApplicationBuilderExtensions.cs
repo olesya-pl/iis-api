@@ -2,13 +2,16 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Iis.Api.Bootstrap;
 using Iis.DataModel;
 using Iis.Domain;
 using Iis.Interfaces.Elastic;
 using Iis.Interfaces.Ontology.Data;
+using Iis.Services.Contracts.Interfaces;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 
 namespace Iis.Api
@@ -79,6 +82,21 @@ namespace Iis.Api
             }
             catch (Exception e)
             {
+            }
+        }
+
+        public static void SeedExternalUsers(this IApplicationBuilder host)
+        {
+            using IServiceScope scope = host.ApplicationServices.CreateScope();
+            try
+            {
+                var userService = scope.ServiceProvider.GetRequiredService<IUserService>();
+                userService.ImportUsersFromExternalSource();
+            }
+            catch (Exception ex)
+            {
+                var logger = scope.ServiceProvider.GetRequiredService<ILogger<LogHeaderMiddleware>>();
+                logger.LogError($"Cannot import external users: {ex.Message}");
             }
         }
     }

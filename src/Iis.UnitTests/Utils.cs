@@ -107,6 +107,7 @@ namespace Iis.UnitTests
             serviceCollection.AddTransient<IElasticService>(factory => new Mock<IElasticService>().Object);
             serviceCollection.AddTransient<IOntologyService>(factory => new Mock<IOntologyService>().Object);
             serviceCollection.AddTransient<IOntologyNodesData>(factory => new Mock<IOntologyNodesData>().Object);
+            serviceCollection.AddTransient<IMatrixService>(factory => new Mock<IMatrixService>().Object);
 
             return new Utils
             {

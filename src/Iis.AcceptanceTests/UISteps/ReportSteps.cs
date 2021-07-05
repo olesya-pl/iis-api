@@ -17,19 +17,22 @@ namespace AcceptanceTests.UISteps
         private readonly ScenarioContext context;
 
         private ReportPageObjects reportPageObjects;
+        private readonly NavigationSection navigationSection;
 
         public ReportSteps(ScenarioContext injectedContext, IWebDriver driver)
         {
             reportPageObjects = new ReportPageObjects(driver);
+            navigationSection = new NavigationSection(driver);
             context = injectedContext;
             this.driver = driver;
         }
 
-        #region When 
+        #region When
         [When(@"I navigated to Report section")]
         public void INavigatedToReportSection()
         {
-            reportPageObjects.ReportSection.Click();
+            navigationSection.ReportsLink.Click();
+            driver.WaitFor(2);
         }
 
         [When(@"I pressed the Create a new report button")]
@@ -67,6 +70,7 @@ namespace AcceptanceTests.UISteps
         [When(@"I pressed Remove report button")]
         public void WhenIPressedRemoveReportButton()
         {
+            driver.WaitFor(0.5);
             reportPageObjects.ReportCreationAndEdit.RemoveEventFromReport.Click();
         }
 
@@ -109,10 +113,11 @@ namespace AcceptanceTests.UISteps
         [When(@"I clicked two times on the hour and date filter in the report page")]
         public void WhenIClickedTwoTimesOnTheHourAndDateFilterInTheReportPage()
         {
+            driver.WaitFor(3);
             reportPageObjects.HourAndDateColumn.Click();
-            driver.WaitFor(2);
+            driver.WaitFor(3);
             reportPageObjects.HourAndDateColumn.Click();
-            driver.WaitFor(2);
+            driver.WaitFor(3);
         }
         #endregion
 

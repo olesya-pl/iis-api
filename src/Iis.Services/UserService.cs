@@ -17,6 +17,13 @@ using IIS.Repository;
 using IIS.Repository.Factories;
 using Iis.Services.Contracts.Params;
 using Iis.Services.Contracts.Enums;
+using Iis.Domain.Users;
+using Microsoft.Extensions.Configuration;
+using Iis.Utility;
+using System.Security.Authentication;
+using Iis.Interfaces.Users;
+using System.Security.Cryptography;
+using System.Text;
 
 namespace Iis.Services
 {
@@ -26,18 +33,27 @@ namespace Iis.Services
         private readonly MaxMaterialsPerOperatorConfig _maxMaterialsConfig;
         private readonly IMapper _mapper;
         private readonly IUserElasticService _userElasticService;
+        private IConfiguration _configuration;
+        private IExternalUserService _externalUserService;
+        private IMatrixService _matrixService;
 
         public UserService(
             OntologyContext context,
             MaxMaterialsPerOperatorConfig maxMaterialsConfig,
             IUserElasticService userElasticService,
             IMapper mapper,
-            IUnitOfWorkFactory<TUnitOfWork> unitOfWorkFactory) : base(unitOfWorkFactory)
+            IUnitOfWorkFactory<TUnitOfWork> unitOfWorkFactory,
+            IConfiguration configuration,
+            IExternalUserService externalUserService,
+            IMatrixService matrixService) : base(unitOfWorkFactory)
         {
             _context = context;
             _maxMaterialsConfig = maxMaterialsConfig;
             _mapper = mapper;
             _userElasticService = userElasticService;
+            _configuration = configuration;
+            _externalUserService = externalUserService;
+            _matrixService = matrixService;
         }
 
         public async Task<Guid> CreateUserAsync(User newUser)
@@ -66,6 +82,7 @@ namespace Iis.Services
 
             var elasticUser = _mapper.Map<ElasticUserDto>(userEntity);
             await _userElasticService.SaveUserAsync(elasticUser, CancellationToken.None);
+            await _matrixService.CreateUserAsync(userEntity.Username, userEntity.Id.ToString("N"));
 
             return userEntity.Id;
         }
@@ -110,7 +127,8 @@ namespace Iis.Services
                 throw new InvalidOperationException($"Cannot find User with id:'{updatedUser.Id}'.");
             }
 
-            if (string.Equals(userEntity.PasswordHash, updatedUser.PasswordHash, StringComparison.Ordinal))
+            if (userEntity.Source == UserSource.Internal && 
+                string.Equals(userEntity.PasswordHash, updatedUser.PasswordHash, StringComparison.Ordinal))
             {
                 throw new InvalidOperationException($"New password must not match old.");
             }
@@ -159,6 +177,42 @@ namespace Iis.Services
             var userEntity = RunWithoutCommit(uow => uow.UserRepository.GetByUserNameAndHash(userName, passwordHash));
 
             return Map(userEntity);
+        }
+
+        public User GetUserByUserName(string userName)
+        {
+            var userEntity = RunWithoutCommit(uow => uow.UserRepository.GetByUserName(userName));
+
+            return Map(userEntity);
+        }
+
+        public bool ValidateCredentials(string userName, string password)
+        {
+            var hash = GetPasswordHashAsBase64String(password);
+            var userEntity = GetUserByUserName(userName);
+            return userEntity.PasswordHash == hash;
+        }
+
+        public User ValidateAndGetUser(string username, string password)
+        {
+            var user = GetUserByUserName(username);
+
+            if (user == null)
+                throw new InvalidCredentialException($"User {username} does not exists");
+
+            if (user.IsBlocked)
+                throw new InvalidCredentialException($"User {username} is blocked");
+
+            if (user.Source != UserSource.Internal && user.Source != _externalUserService.GetUserSource())
+                throw new InvalidCredentialException($"User {username} has wrong source");
+
+            if (user.Source == UserSource.Internal && !ValidateCredentials(username, password) ||
+                user.Source == _externalUserService.GetUserSource() && !_externalUserService.ValidateCredentials(username, password))
+            {
+                throw new InvalidCredentialException($"Wrong password");
+            }
+
+            return user;
         }
 
         public async Task<(IReadOnlyCollection<User> Users, int TotalCount)> GetUsersByStatusAsync(PaginationParams page, UserStatusType userStatusFilter, CancellationToken ct = default)
@@ -278,6 +332,170 @@ namespace Iis.Services
             var elasticUsers = _mapper.Map<List<ElasticUserDto>>(users);
 
             await _userElasticService.SaveAllUsersAsync(elasticUsers, cancellationToken);
+        }
+
+        private string ComputeHash(string s)
+        {
+            using (var sha1 = new SHA1Managed())
+            {
+                var hash = Encoding.UTF8.GetBytes(s);
+                var generatedHash = sha1.ComputeHash(hash);
+                var generatedHashString = Convert.ToBase64String(generatedHash);
+                return generatedHashString;
+            }
+        }
+
+        public string GetPasswordHashAsBase64String(string password)
+        {
+            var salt = _configuration.GetValue<string>("salt", string.Empty);
+            return ComputeHash(password + salt);
+        }
+
+        public string ImportUsersFromExternalSource(IEnumerable<string> userNames = null)
+        {
+            var externalUsers = _externalUserService.GetUsers()
+                .Where(eu => userNames == null || userNames.Contains(eu.UserName)
+                    && !eu.UserName.Contains('$'));
+
+            var users = _context.Users
+                .Include(u => u.UserRoles)
+                .ThenInclude(ur => ur.Role)
+                .ToList();
+
+            var roles = _context.Roles.ToList();
+
+            var sb = new StringBuilder();
+
+            foreach (var externalUser in externalUsers)
+            {
+                var user = users.FirstOrDefault(u => u.Username == externalUser.UserName);
+
+                if (user == null)
+                {
+                    user = new UserEntity
+                    {
+                        Id = Guid.NewGuid(),
+                        Username = externalUser.UserName,
+                        FirstName = externalUser.FirstName,
+                        Patronymic = externalUser.SecondName,
+                        LastName = externalUser.LastName,
+                        Source = _externalUserService.GetUserSource(),
+                        UserRoles = new List<UserRoleEntity>()
+                    };
+                    _context.Users.Add(user);
+
+                    if (_matrixService?.AutoCreateUsers == true)
+                    {
+                        try
+                        {
+                            var msg = _matrixService.CreateUserAsync(user.Username, user.Id.ToString("N"))
+                                .GetAwaiter().GetResult();
+                            if (msg == null)
+                                sb.AppendLine("... matrix user is successfully created");
+                            else
+                                sb.AppendLine($"... matrix returns error: {msg}");
+                        }
+                        catch (Exception ex)
+                        {
+                            sb.AppendLine($"... matrix returns error: { ex.Message }");
+                        }
+                    }
+
+                    sb.AppendLine($"User {user.Username} is successfully created");
+                }
+                else
+                {
+                    sb.AppendLine($"User {user.Username} already exists");
+                }
+
+                foreach (var externalRole in externalUser.Roles)
+                {
+                    if (!user.UserRoles.Any(ur => ur.Role.Name == externalRole.Name))
+                    {
+                        var role = roles.FirstOrDefault(r => r.Name == externalRole.Name);
+
+                        if (role != null)
+                        {
+                            var userRole = new UserRoleEntity
+                            {
+                                UserId = user.Id,
+                                RoleId = role.Id
+                            };
+                            _context.Add(userRole);
+                            sb.AppendLine($"... {externalRole.Name} is successfully assigned");
+                        }
+                        else
+                        {
+                            sb.AppendLine($"... {externalRole.Name} does not exists and cannot be assigned");
+                        }
+                    }
+                    else
+                    {
+                        sb.AppendLine($"... {externalRole.Name} is already assigned");
+                    }
+                }
+            }
+            _context.SaveChanges();
+
+            return sb.ToString();
+        }
+        
+        public async Task<string> CreateMatrixUserAsync(User user)
+        {
+            try
+            {
+                return await _matrixService.CreateUserAsync(user.UserName, user.Id.ToString("N"));
+            }
+            catch (Exception ex)
+            {
+                return ex.Message;
+            }
+        }
+
+        private List<User> GetActiveUsers() =>
+            _context.Users.Where(u => !u.IsBlocked).Select(u => _mapper.Map<User>(u)).ToList();
+        public async Task<string> GetUserMatrixInfoAsync()
+        {
+            var msg = await _matrixService.CheckMatrixAvailableAsync();
+            if (msg != null) return msg;
+
+            var users = GetActiveUsers();
+            var sb = new StringBuilder();
+
+            foreach (var user in users)
+            {
+                var userExists = await _matrixService.UserExistsAsync(user.UserName, user.Id.ToString("N"));
+                sb.AppendLine($"{user.UserName}\t\t\t{userExists}");
+            }
+            return sb.ToString();
+        }
+
+        public async Task<string> CreateMatrixUsersAsync(List<string> userNames = null)
+        {
+            var serverAvailability = await _matrixService.CheckMatrixAvailableAsync();
+            if (serverAvailability != null) return serverAvailability;
+
+            var users = GetActiveUsers()
+                .Where(u => userNames == null || userNames.Contains(u.UserName));
+
+            var sb = new StringBuilder();
+
+            foreach (var user in users)
+            {
+                var userExists = await _matrixService.UserExistsAsync(user.UserName, user.Id.ToString("N"));
+                if (userExists)
+                {
+                    sb.AppendLine($"{user.UserName}\t\t\t already exists");
+                    continue;
+                }
+                var msg = await _matrixService.CreateUserAsync(user.UserName, user.Id.ToString("N"));
+                if (msg == null)
+                    sb.AppendLine($"{user.UserName}\t\t\tsuccessfully created");
+                else
+                    sb.AppendLine($"{user.UserName}\t\t\t{msg}");
+
+            }
+            return sb.ToString();
         }
     }
 }

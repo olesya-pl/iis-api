@@ -12,18 +12,20 @@ namespace AcceptanceTests.UISteps
         private readonly IWebDriver driver;
 		private readonly ScenarioContext context;
         private AdministrationPageObjects administrationPage;
+        private readonly NavigationSection navigationSection;
 
         public AdministrationSteps(ScenarioContext injectedContext, IWebDriver driver)
         {
             administrationPage = new AdministrationPageObjects(driver);
+            navigationSection = new NavigationSection(driver);
             context = injectedContext;
             this.driver = driver;
         }
 
         [When(@"I navigated to Administration page")]
         public void IWantNavigateToAdministrationPage()
-        {        
-            administrationPage.AdministrationPage.Click();
+        {
+            navigationSection.AdministrationLink.Click();
             driver.WaitFor(5);
         }
 

@@ -2,17 +2,14 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Collections.Generic;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 
 using Iis.DataModel;
 using Iis.DataModel.Themes;
-using Iis.Services.Contracts;
-using Iis.DbLayer.Repositories;
 using Iis.Services.Contracts.Dtos;
-using Iis.Services;
 using Iis.Services.Contracts.Interfaces;
+using Iis.Domain.Users;
 
 namespace Iis.UnitTests.ThemeManagement
 {

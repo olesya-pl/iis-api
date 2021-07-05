@@ -16,6 +16,7 @@ using Iis.DataModel.Materials;
 using Iis.DbLayer.Extensions;
 using Iis.DbLayer.MaterialEnum;
 using Iis.DbLayer.Repositories.Helpers;
+using Iis.DbLayer.MaterialDictionaries;
 using Iis.Interfaces.Elastic;
 using Iis.Interfaces.Ontology.Data;
 using Iis.Interfaces.Ontology.Schema;
@@ -27,8 +28,6 @@ namespace Iis.DbLayer.Repositories
 {
     public class MaterialRepository : RepositoryBase<OntologyContext>, IMaterialRepository
     {
-        private const string ImageVectorMlHandlerCode = "imageVector";
-
         private readonly MaterialIncludeEnum[] _includeAll = new MaterialIncludeEnum[]
         {
             MaterialIncludeEnum.WithChildren,
@@ -71,6 +70,13 @@ namespace Iis.DbLayer.Repositories
             return await GetMaterialsQuery(includes)
                             .ToArrayAsync();
         }
+        
+        public async Task<IEnumerable<MaterialEntity>> GetAllAsync(int limit, params MaterialIncludeEnum[] includes)
+        {
+            return await GetMaterialsQuery(includes)
+                .Take(limit)
+                .ToArrayAsync();
+        }
 
         public async Task<IEnumerable<MaterialEntity>> GetAllForRelatedNodeListAsync(IEnumerable<Guid> nodeIdList)
         {
@@ -106,7 +112,7 @@ namespace Iis.DbLayer.Repositories
                             .ToArrayAsync();
         }
 
-        public async Task<List<ElasticBulkResponse>> PutAllMaterialsToElasticSearchAsync(CancellationToken token = default)
+        public async Task<List<ElasticBulkResponse>> PutAllMaterialsToElasticSearchAsync(CancellationToken ct = default)
         {
             const int batchSize = 50000;
 
@@ -118,42 +124,44 @@ namespace Iis.DbLayer.Repositories
             var responses = new List<ElasticBulkResponse>(materialsCount);
             for (var i = 0; i < (materialsCount / batchSize) + 1; i++)
             {
-                token.ThrowIfCancellationRequested();
+                ct.ThrowIfCancellationRequested();
 
                 var materialEntities = await GetMaterialsQuery(MaterialIncludeEnum.WithChildren, MaterialIncludeEnum.WithFeatures)
                     .OrderBy(p => p.Id)
                     .Skip(i*batchSize)
                     .Take(batchSize)
-                    .ToListAsync();
+                    .ToArrayAsync();
 
-                var mlResponsesList = await Context.MLResponses.AsNoTracking()
-                    .ToListAsync();
-                var mlResponses = mlResponsesList
+                var mlResponsesList = await Context.MLResponses
+                                    .AsNoTracking()
+                                    .ToArrayAsync();
+
+                var mlResponseDictionary = mlResponsesList
                     .GroupBy(p => p.MaterialId)
-                    .ToDictionary(k => k.Key, p => p.ToList());
+                    .ToDictionary(k => k.Key, p => p.ToArray());
+
                 var materialDocuments = materialEntities
                     .Select(p => MapEntityToDocument(p))
                     .Select(p =>
                     {
-                        if (!mlResponses.ContainsKey(p.Id))
-                        {
-                            return p;
-                        }
-                        var mlResponsesByEntity = mlResponses[p.Id];
+                        var materialIdList = p.Children
+                                                .Select(e => e.Id)
+                                                .Union(new []{p.Id})
+                                                .ToArray();
 
-                        p.MLResponses = MapMlResponseEntities(mlResponsesByEntity);
+                        var (mlResponses, mlResponsesCount) = GetResponseJsonWithCounter(p.Id, mlResponseDictionary);
 
-                        p.ProcessedMlHandlersCount = mlResponsesByEntity.Count();
+                        p.MLResponses = mlResponses;
 
-                        p.ImageVectors = GetLatestImageVectorList(mlResponsesByEntity)
-                                            .Select(e => new ImageVector(e))
-                                            .ToArray();
+                        p.ProcessedMlHandlersCount = mlResponsesCount;
+
+                        p.ImageVectors = GetImageVectorList(materialIdList, mlResponseDictionary);
 
                         return p;
                     });
 
                 var json = ConvertToJson(materialDocuments);
-                var response = await _elasticManager.PutDocumentsAsync(MaterialIndexes.FirstOrDefault(), json, token);
+                var response = await _elasticManager.PutDocumentsAsync(MaterialIndexes.FirstOrDefault(), json, ct);
                 responses.AddRange(response);
             }
 
@@ -182,28 +190,39 @@ namespace Iis.DbLayer.Repositories
             return sb.ToString();
         }
 
-        public async Task<bool> PutMaterialToElasticSearchAsync(Guid materialId, 
-            CancellationToken token = default,
-            bool waitForIndexing = false)
+        public async Task<bool> PutMaterialToElasticSearchAsync(Guid materialId, CancellationToken ct = default, bool waitForIndexing = false)
         {
             var material = await GetMaterialsQuery(MaterialIncludeEnum.WithChildren, MaterialIncludeEnum.WithFeatures)
                 .SingleOrDefaultAsync(p => p.Id == materialId);
 
             var materialDocument = MapEntityToDocument(material);
 
-            var (mlResponses, mlResponsesCount, imageVectorList) = await PopulateMLResponses(materialId);
+            var materialIdList = material.Children
+                                .Select(e => e.Id)
+                                .Union(new []{material.Id})
+                                .ToArray();
+
+            var responseList = await _mLResponseRepository.GetAllForMaterialListAsync(materialIdList);
+
+            var responseDictionary = responseList
+                                        .GroupBy(e => e.MaterialId)
+                                        .ToDictionary(group => group.Key, group => group.ToArray());
+
+
+
+            var (mlResponses, mlResponsesCount) = GetResponseJsonWithCounter(materialDocument.Id, responseDictionary);
 
             materialDocument.MLResponses = mlResponses;
 
             materialDocument.ProcessedMlHandlersCount = mlResponsesCount;
 
-            materialDocument.ImageVectors = imageVectorList;
+            materialDocument.ImageVectors = GetImageVectorList(materialIdList, responseDictionary);
 
             return await _elasticManager.PutDocumentAsync(MaterialIndexes.FirstOrDefault(),
                 materialId.ToString("N"),
                 JsonConvert.SerializeObject(materialDocument),
                 waitForIndexing,
-                token);
+                ct);
         }
 
         public void AddMaterialEntity(MaterialEntity materialEntity)
@@ -269,9 +288,9 @@ namespace Iis.DbLayer.Repositories
                 .ToListAsync();
         }
 
-        public List<MaterialEntity> GetMaterialByNodeIdQuery(IList<Guid> nodeIds)
+        public List<MaterialEntity> GetMaterialByNodeIdQuery(IList<Guid> nodeIds, params MaterialIncludeEnum[] includes)
         {
-            return Context.Materials
+            return GetMaterialsQuery(includes)
                 .Join(Context.MaterialInfos, m => m.Id, mi => mi.MaterialId,
                     (Material, MaterialInfo) => new { Material, MaterialInfo })
                 .Join(Context.MaterialFeatures, m => m.MaterialInfo.Id, mf => mf.MaterialInfoId,
@@ -374,6 +393,12 @@ namespace Iis.DbLayer.Repositories
                 await transaction.CommitAsync();
             }
         }
+        public Task<Guid?> GetParentIdByChildIdAsync(Guid materialId)
+        {
+            return Context.Materials
+                .Where(e => e.Id.Equals(materialId))
+                .Select(e => e.ParentId).FirstOrDefaultAsync();
+        }
 
         private MaterialDocument MapEntityToDocument(MaterialEntity material)
         {
@@ -404,18 +429,45 @@ namespace Iis.DbLayer.Repositories
             return nodeList.Count(n => n.NodeType.IsObjectOfStudy);
         }
 
-        private async Task<(JObject mlResponses, int mlResponsesCount, ImageVector[] imageVector)> PopulateMLResponses(Guid materialId)
+        private (JObject responseJObject, int responsesCount) GetResponseJsonWithCounter(Guid materialId, Dictionary<Guid, MLResponseEntity[]> responseDictionary)
+        {
+            if(responseDictionary.TryGetValue(materialId, out MLResponseEntity[] responseList))
+            {
+                return (ConvertMLResponsesToJson(responseList), responseList.Length);
+            }
+
+            return (new JObject(), 0);
+        }
+
+        private ImageVector[] GetImageVectorList(IReadOnlyCollection<Guid> materialIdList, Dictionary<Guid, MLResponseEntity[]> responseDictionary)
+        {
+            var result = new List<ImageVector>();
+
+            foreach (var materialId in materialIdList)
+            {
+                if(responseDictionary.TryGetValue(materialId, out MLResponseEntity[] responseList))
+                {
+                    var imageVectorList = GetLatestImageVectorList(responseList, MlHandlerCodeList.ImageVector)
+                                        .Select(e => new ImageVector(e))
+                                        .ToArray();
+                    result.AddRange(imageVectorList);
+                }
+            }
+            return result.ToArray();
+        }
+
+        private async Task<(JObject mlResponses, int mlResponsesCount, ImageVector[] imageVector)> GetMLResponseData(Guid materialId)
         {
             var mlResponses = await _mLResponseRepository.GetAllForMaterialAsync(materialId);
 
-            var imageVectorList = GetLatestImageVectorList(mlResponses)
+            var imageVectorList = GetLatestImageVectorList(mlResponses, MlHandlerCodeList.ImageVector)
                                     .Select(e => new ImageVector(e))
                                     .ToArray();
 
-            return (MapMlResponseEntities(mlResponses), mlResponses.Count, imageVectorList);
+            return (ConvertMLResponsesToJson(mlResponses), mlResponses.Count, imageVectorList);
         }
 
-        private static JObject MapMlResponseEntities(IEnumerable<MLResponseEntity> mlResponses)
+        private static JObject ConvertMLResponsesToJson(IReadOnlyCollection<MLResponseEntity> mlResponses)
         {
             var mlResponsesContainer = new JObject();
             if (mlResponses.Any())
@@ -526,6 +578,8 @@ namespace Iis.DbLayer.Repositories
                     MaterialIncludeEnum.WithFeatures => resultQuery.WithFeatures(),
                     MaterialIncludeEnum.WithNodes => resultQuery.WithNodes(),
                     MaterialIncludeEnum.WithChildren => resultQuery.WithChildren(),
+                    MaterialIncludeEnum.WithFiles => resultQuery.WithFiles(),
+                    MaterialIncludeEnum.OnlyParent => resultQuery.OnlyParent(),
                     _ => resultQuery
                 };
             }
@@ -533,11 +587,11 @@ namespace Iis.DbLayer.Repositories
             return resultQuery;
         }
 
-        private static IReadOnlyCollection<decimal[]> GetLatestImageVectorList(IReadOnlyCollection<MLResponseEntity> mlResponsesByEntity)
+        private static IReadOnlyCollection<decimal[]> GetLatestImageVectorList(IReadOnlyCollection<MLResponseEntity> mlResponsesByEntity, string handlerCode)
         {
             var response = mlResponsesByEntity
                                     .OrderByDescending(e => e.ProcessingDate)
-                                    .FirstOrDefault(e => e.HandlerCode == ImageVectorMlHandlerCode);
+                                    .FirstOrDefault(e => e.HandlerCode == handlerCode);
 
             return FaceAPIResponseParser.GetFaceVectorList(response?.OriginalResponse);
         }

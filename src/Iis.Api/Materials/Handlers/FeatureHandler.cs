@@ -5,8 +5,6 @@ using System.Text;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using Iis.Api.Configuration;
-using IIS.Core.Materials;
 using IIS.Core.Materials.FeatureProcessors;
 using IIS.Core.Materials.Handlers.Configurations;
 using Iis.DbLayer.Repositories;
@@ -19,6 +17,8 @@ using Newtonsoft.Json.Linq;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using RabbitMQ.Client.Exceptions;
+using Iis.Messages.Materials;
+using Iis.Services.Contracts.Configurations;
 
 namespace Iis.Api.Materials.Handlers
 {

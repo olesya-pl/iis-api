@@ -138,16 +138,16 @@ namespace AcceptanceTests.Features.UI.SanityTests
 #line 15
         testRunner.When("I expanded relation of the Силові структури parent card", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-                TechTalk.SpecFlow.Table table2 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table4 = new TechTalk.SpecFlow.Table(new string[] {
                             "ФСБ РФ"});
-                table2.AddRow(new string[] {
+                table4.AddRow(new string[] {
                             "ЗС РФ"});
-                table2.AddRow(new string[] {
+                table4.AddRow(new string[] {
                             "ФСВНГ РФ"});
-                table2.AddRow(new string[] {
+                table4.AddRow(new string[] {
                             "ЗС РФ"});
 #line 16
-        testRunner.Then("I must see these cards in hierarchy", ((string)(null)), table2, "Then ");
+        testRunner.Then("I must see these cards in hierarchy", ((string)(null)), table4, "Then ");
 #line hidden
             }
             this.ScenarioCleanup();
@@ -196,10 +196,10 @@ namespace AcceptanceTests.Features.UI.SanityTests
 #line 27
         testRunner.And("I searched 3 омсбр data in the Objects of study section", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-                TechTalk.SpecFlow.Table table3 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table5 = new TechTalk.SpecFlow.Table(new string[] {
                             "3 окрема мотострілецька бригада \"Беркут\""});
 #line 28
-        testRunner.Then("I must see the specified result", ((string)(null)), table3, "Then ");
+        testRunner.Then("I must see the specified result", ((string)(null)), table5, "Then ");
 #line hidden
             }
             this.ScenarioCleanup();

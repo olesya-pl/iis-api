@@ -12,14 +12,17 @@ namespace IIS.Core.GraphQL.Entities
         {
             var pagination = ctx.Argument<PaginationInput>("pagination");
             var filter = ctx.Argument<FilterInput>("filter");
-            return new ElasticFilter {Limit = pagination.PageSize, Offset = pagination.Offset(),
-                Suggestion = filter?.Suggestion ?? filter?.SearchQuery};
+            return new ElasticFilter {
+                Limit = pagination.PageSize,
+                Offset = pagination.Offset(),
+                Suggestion = filter?.Suggestion?.Trim() ?? filter?.SearchQuery?.Trim()
+            };
         }
 
         public static ElasticFilter CreateNodeFilter(this IResolverContext ctx, INodeTypeLinked criteriaType)
         {
             var result = ctx.CreateNodeFilter();
             return result;
-        }        
-    }    
+        }
+    }
 }

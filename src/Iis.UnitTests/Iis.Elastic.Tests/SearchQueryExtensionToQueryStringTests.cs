@@ -75,9 +75,17 @@ namespace Iis.UnitTests.Iis.Elastic.Tests
             {
                 new ElasticFilter()
                 {
-                    CherryPickedItems = new List<string>(){"some_id"}
+                    CherryPickedItems = new List<CherryPickedItem>(){ new CherryPickedItem("some_id")}
                 },
                 "(Id:some_id OR parent.Id:some_id~0.95 OR bePartOf.Id:some_id~0.95)"
+            };
+            yield return new object[]
+            {
+                new ElasticFilter()
+                {
+                    CherryPickedItems = new List<CherryPickedItem>(){ new CherryPickedItem("some_id", false)}
+                },
+                "(Id:some_id)"
             };
             yield return new object[]
             {
@@ -91,9 +99,25 @@ namespace Iis.UnitTests.Iis.Elastic.Tests
                         new Property("Чисельність", "Рота"),
                         new Property("Чисельність", "Дивізія"),
                     },
-                    CherryPickedItems = new List<string>(){"some_id"}
+                    CherryPickedItems = new List<CherryPickedItem>(){ new CherryPickedItem("some_id")}
                 },
                 "(((омсбр) AND ((Тип_ОР:\"Особа\" OR Тип_ОР:\"Танк\") AND (Чисельність:\"Рота\" OR Чисельність:\"Дивізія\"))) OR (Id:some_id OR parent.Id:some_id~0.95 OR bePartOf.Id:some_id~0.95))"
+            };
+            yield return new object[]
+            {
+                new ElasticFilter()
+                {
+                    Suggestion = "омсбр",
+                    FilteredItems = new List<Property>()
+                    {
+                        new Property("Тип_ОР", "Особа"),
+                        new Property("Тип_ОР", "Танк"),
+                        new Property("Чисельність", "Рота"),
+                        new Property("Чисельність", "Дивізія"),
+                    },
+                    CherryPickedItems = new List<CherryPickedItem>(){ new CherryPickedItem("some_id", false)}
+                },
+                "(((омсбр) AND ((Тип_ОР:\"Особа\" OR Тип_ОР:\"Танк\") AND (Чисельність:\"Рота\" OR Чисельність:\"Дивізія\"))) OR (Id:some_id))"
             };
         }
 

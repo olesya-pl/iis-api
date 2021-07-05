@@ -18,11 +18,7 @@ namespace AcceptanceTests.PageObjects
             PageFactory.InitElements(driver, this);
         }
 
-        [FindsBy(How = How.CssSelector, Using = "div:nth-of-type(1) > li:nth-of-type(8)")]
-        [CacheLookup]
-        public IWebElement MaterialsSection;
-
-        [FindsBy(How = How.XPath, Using = "//tr[@class='el-table__row expanded']")]
+        [FindsBy(How = How.XPath, Using = "//div[@class='infinity-table materials-table']//tbody[@class='p-datatable-tbody']/tr")]
         public IWebElement FirstMaterialInTheMaterialsList;
 
         [FindsBy(How = How.CssSelector, Using = ".el-button--default")]
@@ -31,7 +27,7 @@ namespace AcceptanceTests.PageObjects
         [FindsBy(How = How.CssSelector, Using = ".el-input.entity-search__input > .el-input__inner")]
         public IWebElement SearchField;
 
-        [FindsBy(How = How.CssSelector, Using = ".is-scrolling-none .el-table__empty-block")]
+        [FindsBy(How = How.CssSelector, Using = ".materials-table .p-datatable-emptymessage .empty-state__message")]
         [CacheLookup]
         public IWebElement EmptySearchField;
 
@@ -51,21 +47,14 @@ namespace AcceptanceTests.PageObjects
         [FindsBy(How = How.XPath, Using = "//span[contains(text(),'PhoneNumber')]/following-sibling::span[1]")]
         public IWebElement PhoneNumberPatternNode;
 
-        [FindsBy(How = How.XPath, Using = "//div/ul/li[@class='el-menu-item action-tab--objects']")]
-        public IWebElement ObjectsTab;
-
-        [FindsBy(How = How.XPath, Using = "//li[contains(text(),'Обробка ML')]")]
+        [FindsBy(How = How.CssSelector, Using = ".material__tabs-menu > .action-tab--ml")]
         public IWebElement MLTab;
 
         [FindsBy(How = How.CssSelector, Using = ".material-events__header .el-input__inner")]
         [CacheLookup]
         public IWebElement EventsSearch;
 
-        [FindsBy(How = How.CssSelector, Using = ".el-menu > .el-menu-item:nth-of-type(2)")]
-        [CacheLookup]
-        public IWebElement MLTabSearch;
-
-		[FindsBy(How = How.XPath, Using = "//div[contains(text(), \"Об'єкти\")]//following::input")]
+		[FindsBy(How = How.CssSelector, Using = ".sidebar__nav li.objects")]
         public IWebElement ObjectsTabSearch;
 
         public MaterialPage MaterialPage => new MaterialPage(driver);
@@ -96,7 +85,7 @@ namespace AcceptanceTests.PageObjects
         [FindsBy(How = How.CssSelector, Using = ".action-button--prev-page span")]
         public IWebElement PreviousMaterialButton;
 
-		[FindsBy(How = How.CssSelector, Using = ".el-table__row.expanded")]
+		[FindsBy(How = How.CssSelector, Using = ".materials-table tbody.p-datatable-tbody > tr")]
 		public IWebElement FirstSearchResult;
 
         [FindsBy(How = How.CssSelector, Using = ".meta-data__list .meta-data__list-item:nth-of-type(3) .el-button--default")]
@@ -117,7 +106,7 @@ namespace AcceptanceTests.PageObjects
         [FindsBy(How = How.CssSelector, Using = ".confirm-message-box__action-confirm")]
         public IWebElement ConfirmDeleteRelationButton;
 
-        [FindsBy(How = How.CssSelector, Using = ".cell > div:nth-of-type(2)")]
+        [FindsBy(How = How.CssSelector, Using = "tbody.p-datatable-tbody .materials-table__title")]
         [CacheLookup]
         public IWebElement FirstSearchResultContentBlock;
 
@@ -127,6 +116,15 @@ namespace AcceptanceTests.PageObjects
 
         [FindsBy(How = How.XPath, Using = "//button[@name='delete']")]
         public IWebElement DeleteRelatedEventButton;
+
+        [FindsBy(How = How.XPath, Using = "//td[@class='materials-table__title']//div")]
+        public IWebElement MaterialTitle;
+
+        [FindsBy(How = How.XPath, Using = "//button[contains(@class, 'search__clear-button')]")]
+        public IWebElement ClearSearchFieldButton;
+
+        [FindsBy(How = How.CssSelector, Using = ".icon-wrapper-close")]
+        public IWebElement CloseMaterialCardButton;
 
         public void ScrollToEnd()
         {

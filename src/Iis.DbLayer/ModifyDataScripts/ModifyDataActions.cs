@@ -8,6 +8,7 @@ using Iis.Interfaces.Ontology.Data;
 using Iis.Interfaces.Ontology.Schema;
 using Iis.Services.Contracts.Interfaces;
 using Iis.OntologySchema.ChangeParameters;
+using Iis.OntologyData;
 
 namespace Iis.DbLayer.ModifyDataScripts
 {
@@ -22,6 +23,7 @@ namespace Iis.DbLayer.ModifyDataScripts
         }
         private void SaveOntologySchema(IOntologySchema schema) =>
             _ontologySchemaService.SaveToDatabase(schema, _connectionStringService.GetIisApiConnectionString());
+
         public void RemoveEventWikiLinks(OntologyContext context, IOntologyNodesData data)
         {
             var list = new List<IRelation>();
@@ -44,13 +46,56 @@ namespace Iis.DbLayer.ModifyDataScripts
             });
         }
 
+        public void AddPhotoType(OntologyContext context, IOntologyNodesData data)
+        {
+            var photoType = data.Schema.GetEntityTypeByName(EntityTypeNames.Photo.ToString());
+            if (photoType == null)
+            {
+                photoType = data.Schema.CreateEntityType(EntityTypeNames.Photo.ToString(), "Зображення", false);
+                data.Schema.CreateAttributeType(photoType.Id, "image", "Фото", ScalarType.File, EmbeddingOptions.Required);
+                data.Schema.CreateAttributeType(photoType.Id, "title", "Заголовок");
+            }
+        }
+
+        public void AddObjectType(OntologyContext context, IOntologyNodesData data)
+        {
+            var objectType = data.Schema.GetEntityTypeByName(EntityTypeNames.Object.ToString());
+            if (objectType == null)
+            {
+                objectType = data.Schema.CreateEntityType(EntityTypeNames.Object.ToString(), "Базовий об'єкт", false);
+                data.Schema.CreateAttributeType(objectType.Id, "title", "Заголовок");
+                data.Schema.CreateAttributeTypeJson(
+                    objectType.Id,
+                    "__title",
+                    "Повна назва",
+                    ScalarType.String,
+                    EmbeddingOptions.Optional,
+                    "{\"Formula\": \"{title};\\\"Об'єкт без назви\\\"\"}"
+                );
+            }
+
+            var objectOfStudyType = data.Schema.GetEntityTypeByName(EntityTypeNames.ObjectOfStudy.ToString());
+            if (!objectOfStudyType.IsInheritedFrom(EntityTypeNames.Object.ToString()))
+            {
+                data.Schema.SetInheritance(objectOfStudyType.Id, objectType.Id);
+            }
+
+            var eventType = data.Schema.GetEntityTypeByName(EntityTypeNames.Event.ToString());
+            if (!eventType.IsInheritedFrom(EntityTypeNames.Object.ToString()))
+            {
+                data.Schema.SetInheritance(eventType.Id, objectType.Id);
+            }
+
+            SaveOntologySchema(data.Schema);
+        }
+
         public void AddAccessLevelAccessObject(OntologyContext context, IOntologyNodesData data)
         {
             var entityId = new Guid("a60af6c5d930476c96218ea5c0147fb7");
 
             var existingEntity = context.AccessObjects.Find(entityId);
 
-            if( existingEntity != null) return;
+            if (existingEntity != null) return;
 
             context.AccessObjects.Add(
                 new AccessObjectEntity
@@ -73,13 +118,13 @@ namespace Iis.DbLayer.ModifyDataScripts
                 .Select(sign => sign.Id)
                 .ToList();
 
-            if(signList.Count == 0) return;
+            if (signList.Count == 0) return;
 
             var entityList = context.LocationHistory
                 .Where(e => e.NodeId != null && e.NodeId != e.EntityId && signList.Contains(e.NodeId.Value))
                 .ToList();
 
-            if(entityList.Count == 0) return;
+            if (entityList.Count == 0) return;
 
             foreach (var entity in entityList)
             {
@@ -92,15 +137,17 @@ namespace Iis.DbLayer.ModifyDataScripts
         }
         public void AddAccessLevels(OntologyContext context, IOntologyNodesData data)
         {
-            if (data.Schema.GetEntityTypeByName(EntityTypeNames.AccessLevel.ToString()) != null) return;
-
             const string NAME = "name";
             const string NUMERIC_INDEX = "numericIndex";
+            var accessLevelType = data.Schema.GetEntityTypeByName(EntityTypeNames.AccessLevel.ToString());
 
-            var enumEntityType = data.Schema.GetEntityTypeByName(EntityTypeNames.Enum.ToString());
-            var accessLevelType = data.Schema.CreateEntityType(EntityTypeNames.AccessLevel.ToString(), "Грифи (рівні доступу)", false, enumEntityType.Id);
-            data.Schema.CreateAttributeType(accessLevelType.Id, NUMERIC_INDEX, "Числовий індекс", ScalarType.Int, EmbeddingOptions.Required);
-            SaveOntologySchema(data.Schema);
+            if (accessLevelType == null)
+            {
+                var enumEntityType = data.Schema.GetEntityTypeByName(EntityTypeNames.Enum.ToString());
+                accessLevelType = data.Schema.CreateEntityType(EntityTypeNames.AccessLevel.ToString(), "Грифи (рівні доступу)", false, enumEntityType.Id);
+                data.Schema.CreateAttributeType(accessLevelType.Id, NUMERIC_INDEX, "Числовий індекс", ScalarType.Int, EmbeddingOptions.Required);
+                SaveOntologySchema(data.Schema);
+            }
 
             data.WriteLock(() =>
             {
@@ -143,9 +190,9 @@ namespace Iis.DbLayer.ModifyDataScripts
 
             data.Schema.CreateRelationTypeJson(
                 objectType.Id,
-                accessLevelType.Id, 
-                ACCESS_LEVEL, 
-                "Гриф (рівень доступу)", 
+                accessLevelType.Id,
+                ACCESS_LEVEL,
+                "Гриф (рівень доступу)",
                 EmbeddingOptions.Optional,
                 jsonMeta);
 
@@ -250,7 +297,7 @@ namespace Iis.DbLayer.ModifyDataScripts
             foreach (var entity in entities)
             {
                 entity.SearchAllowed = entity.CommentingAllowed = entity.AccessLevelUpdateAllowed = true;
-                
+
             }
             context.AccessObjects.UpdateRange(entities);
             context.SaveChanges();
@@ -444,8 +491,8 @@ namespace Iis.DbLayer.ModifyDataScripts
                 }
             });
 
-            data.Schema.UpdateNodeType(new NodeTypeUpdateParameter 
-            { 
+            data.Schema.UpdateNodeType(new NodeTypeUpdateParameter
+            {
                 Id = accessLevelRelationType.Id,
                 EmbeddingOptions = EmbeddingOptions.Required
             });
@@ -489,6 +536,178 @@ namespace Iis.DbLayer.ModifyDataScripts
             }
         }
 
+        private int FetchAndAddCoordinates(IReadOnlyList<INode> signList, OntologyContext context)
+        {
+            const string LocationXPropName = "locationX";
+            const string LocationYPropName = "locationY";
+            int recordAdded = 0;
+
+            foreach (var sign in signList)
+            {
+                var latStringValue = sign.GetSingleProperty(LocationYPropName)?.Value;
+                var lonStringValue = sign.GetSingleProperty(LocationXPropName)?.Value;
+
+                var parseResult = Decimal.TryParse(latStringValue, out decimal latitude)
+                                & Decimal.TryParse(lonStringValue, out decimal longitude);
+
+                if (parseResult)
+                {
+                    var entity = new DataModel.FlightRadar.LocationHistoryEntity
+                    {
+                        Id = Guid.NewGuid(),
+                        EntityId = sign.Id,
+                        NodeId = sign.Id,
+                        Lat = latitude,
+                        Long = longitude,
+                        RegisteredAt = sign.GetSingleProperty(LocationYPropName).CreatedAt
+                    };
+
+                    context.LocationHistory.Add(entity);
+                    recordAdded++;
+                }
+            }
+            return recordAdded;
+        }
+
+        private void UpdateRelationNodeTypeId(IReadOnlyCollection<Guid> relationIdList, Guid newRelationNodeTypeId, OntologyContext context)
+        {
+            foreach (var relationId in relationIdList)
+            {
+                var nodeEntity = context.Nodes.Find(relationId);
+
+                if (nodeEntity is null) continue;
+
+                nodeEntity.NodeTypeId = newRelationNodeTypeId;
+
+                context.Nodes.Update(nodeEntity);
+            }
+        }
+
+        private IReadOnlyCollection<Guid> GetRelationIdList(IReadOnlyList<INode> signList, string relationTypeName)
+        {
+            return signList
+                    .Select(e => e.OutgoingRelations.FirstOrDefault(e => e.RelationTypeName == relationTypeName))
+                    .Where(e => e != null)
+                    .Select(e => e.Id)
+                    .ToArray();
+        }
+        private INodeTypeLinked GetOrCreateSatelliteIridiumPhoneSignType(IOntologyNodesData data)
+        {
+            const string NAME = "SatelliteIridiumPhoneSign";
+            var signType = data.Schema.GetEntityTypeByName(NAME);
+            if (signType == null)
+            {
+                signType = data.Schema.CreateEntityType(NAME, "Супутниковий телефон Iridium", false);
+                data.Schema.CreateAttributeType(signType.Id, "tmsi", "TMSI");
+                data.Schema.CreateAttributeType(signType.Id, "imsi", "IMSI");
+                data.Schema.CreateAttributeType(signType.Id, "imei", "IMEI");
+            }
+            return signType;
+        }
+        public void SetupNewTypesForPhoneSign(OntologyContext context, IOntologyNodesData data)
+        {
+            const string BeamPropName = "beam";
+            const string DbObjectPropName = "dbObject";
+            const string LocationXPropName = "locationX";
+            const string LocationYPropName = "locationY";
+            const string AbstractSatellitePhoneSignName = "AbstractSatellitePhoneSign";
+
+            if (data.Schema.GetEntityTypeByName(AbstractSatellitePhoneSignName) != null) return;
+
+            var objectSignType = data.Schema.GetEntityTypeByName(EntityTypeNames.ObjectSign.ToString());
+            var satIridiumPhoneSignType = GetOrCreateSatelliteIridiumPhoneSignType(data);
+            var satPhoneSignType = data.Schema.GetEntityTypeByName("SatellitePhoneSign");
+
+            var iridiumSignList = data.GetNodesByTypeId(satIridiumPhoneSignType.Id);
+            var satPhoneSignList = data.GetNodesByTypeId(satPhoneSignType.Id);
+
+            var iridiumSingBeamRelationIdList = GetRelationIdList(iridiumSignList, BeamPropName);
+
+            var satPhoneBeamRelationIdList = GetRelationIdList(satPhoneSignList, BeamPropName);
+
+            var satPhoneDbObjectRelationIdList = GetRelationIdList(satPhoneSignList, DbObjectPropName);
+
+            //migrate coordinates for SatelliteIridiumPhoneSign
+            var recordsAdded = 0;
+            recordsAdded += FetchAndAddCoordinates(iridiumSignList, context);
+
+            recordsAdded += FetchAndAddCoordinates(satPhoneSignList, context);
+
+            if (recordsAdded > 0) context.SaveChanges();
+
+            //create and setup new abstract type AbstractSatellitePhoneSign
+            var abstractSatPhoneSignType = data.Schema.CreateEntityType(AbstractSatellitePhoneSignName, "Супутниковий телефон (абстрактний)", true, objectSignType.Id);
+            data.Schema.CreateAttributeType(abstractSatPhoneSignType.Id, BeamPropName, "Луч", ScalarType.String, EmbeddingOptions.Optional);
+            data.Schema.CreateAttributeType(abstractSatPhoneSignType.Id, DbObjectPropName, "Об'єкт (локальний)", ScalarType.String, EmbeddingOptions.Optional);
+
+            //change inheritance for iridium sat phone sign
+            data.Schema.RemoveInheritance(satIridiumPhoneSignType.Id, satPhoneSignType.Id);
+            data.Schema.SetInheritance(satIridiumPhoneSignType.Id, abstractSatPhoneSignType.Id);
+
+            //change inheritance for generic sat phone sign and remove location properties
+            data.Schema.RemoveInheritance(satPhoneSignType.Id, objectSignType.Id);
+            data.Schema.SetInheritance(satPhoneSignType.Id, abstractSatPhoneSignType.Id);
+
+            var locationXRelationType = satPhoneSignType.GetProperty(LocationXPropName);
+            if (locationXRelationType != null)
+            {
+                data.Schema.RemoveRelation(locationXRelationType.Id);
+            }
+
+            var locationYRelationType = satPhoneSignType.GetProperty(LocationYPropName);
+            if (locationYRelationType != null)
+            {
+                data.Schema.RemoveRelation(locationYRelationType.Id);
+            }
+            var beamRelationType = satPhoneSignType.GetProperty(BeamPropName);
+            if (beamRelationType != null)
+            {
+                data.Schema.RemoveRelation(beamRelationType.Id);
+            }
+
+            var dbObjectRelationType = satPhoneSignType.GetProperty(DbObjectPropName);
+            if (dbObjectRelationType != null)
+            {
+                data.Schema.RemoveRelation(dbObjectRelationType.Id);
+            }
+
+
+            SaveOntologySchema(data.Schema);
+
+            //update beam relation node type
+            beamRelationType = abstractSatPhoneSignType.GetProperty(BeamPropName);
+            dbObjectRelationType = abstractSatPhoneSignType.GetProperty(DbObjectPropName);
+
+            using (var transaction = context.Database.BeginTransaction())
+            {
+                try
+                {
+                    UpdateRelationNodeTypeId(iridiumSingBeamRelationIdList, beamRelationType.Id, context);
+
+                    UpdateRelationNodeTypeId(satPhoneBeamRelationIdList, beamRelationType.Id, context);
+
+                    UpdateRelationNodeTypeId(satPhoneDbObjectRelationIdList, dbObjectRelationType.Id, context);
+
+                    var historyToRemoveEntities = context.ChangeHistory
+                                                    .Where(e => e.PropertyName == LocationXPropName || e.PropertyName == LocationYPropName)
+                                                    .ToArray();
+
+                    context.ChangeHistory.RemoveRange(historyToRemoveEntities);
+
+                    context.SaveChanges();
+
+                    transaction.Commit();
+                }
+                catch
+                {
+                    transaction.Rollback();
+                }
+            }
+
+            var rawData = new NodesRawData(context.Nodes, context.Relations, context.Attributes);
+            data.ReloadData(rawData);
+        }
+
         public void AddTitlePhotosToObject(OntologyContext context, IOntologyNodesData data)
         {
             var photoType = data.Schema.GetEntityTypeByName("Photo");
@@ -496,9 +715,27 @@ namespace Iis.DbLayer.ModifyDataScripts
             var imageProperty = photoType.GetRelationByName("image");
 
             var objectType = data.Schema.GetEntityTypeByName(EntityTypeNames.Object.ToString());
-            var titlePhotosProperty = data.Schema.CreateRelationType(objectType.Id, photoType.Id, "titlePhotos", "Фото в заголовку", EmbeddingOptions.Multiple);
+            var titlePhotosProperty = objectType.GetProperty("titlePhotos");
+            if (titlePhotosProperty == null)
+            {
+                var jsonMeta = @"{
+    ""AcceptsEntityOperations"": [0,1,2],
+    ""FormField"": {
+        ""Type"": ""photo""
+    }
+}";
 
-            SaveOntologySchema(data.Schema);
+                titlePhotosProperty = data.Schema.CreateRelationTypeJson(
+                    objectType.Id,
+                    photoType.Id,
+                    "titlePhotos",
+                    "Фото в заголовку",
+                    EmbeddingOptions.Multiple,
+                    jsonMeta
+                );
+
+                SaveOntologySchema(data.Schema);
+            }
 
             var objectNodes = data.GetAllNodes().Where(n => n.NodeType.IsObject);
             foreach (var node in objectNodes)
@@ -520,6 +757,22 @@ namespace Iis.DbLayer.ModifyDataScripts
             var enitiesToRemove = new[] { materialDorLinkId, eventLinkId };
             context.AccessObjects.RemoveRange(context.AccessObjects.Where(p => enitiesToRemove.Contains(p.Id)));
             context.SaveChanges();
+        }
+
+        public void AddEventTitle(OntologyContext context, IOntologyNodesData data)
+        {
+            var eventType = data.Schema.GetEntityTypeByName("Event");
+            if (eventType == null) return;
+            if (eventType.GetRelationByName("__title") != null) return;
+            data.Schema.CreateAttributeTypeJson(
+                eventType.Id,
+                "__title",
+                "Заголовок",
+                ScalarType.String,
+                EmbeddingOptions.Optional,
+                "{\"Formula\": \"{name};\\\"Об'єкт без назви\\\"\"}"
+            );
+            SaveOntologySchema(data.Schema);
         }
     }
 }

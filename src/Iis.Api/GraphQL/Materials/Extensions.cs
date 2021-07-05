@@ -1,15 +1,10 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using Iis.Domain.Materials;
-using Iis.Services.Contracts.Dtos;
-using Newtonsoft.Json.Linq;
 
 namespace IIS.Core.GraphQL.Materials
 {
     public static class Extensions
     {
-        public static Files.FileInfo ToView(this FileDto fileInfo)
+        public static Files.FileInfo ToView(this File fileInfo)
         {
             if (fileInfo == default)
                 return null;

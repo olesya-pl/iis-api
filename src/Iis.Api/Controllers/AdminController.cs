@@ -9,6 +9,7 @@ using Iis.Interfaces.Enums;
 using Iis.Interfaces.Ontology.Schema;
 using Iis.OntologyData;
 using Iis.OntologyData.IisAccessLevels;
+using Iis.Services.Contracts.Csv;
 using Iis.Services.Contracts.Interfaces;
 using Iis.Services.Contracts.Params;
 using IIS.Core;
@@ -20,10 +21,13 @@ using MoreLinq;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Iis.Services;
+using IIS.Services.Contracts.Interfaces;
 
 namespace Iis.Api.Controllers
 {
@@ -44,6 +48,9 @@ namespace Iis.Api.Controllers
         private readonly IOntologyDataService _nodesDataService;
         private readonly IConnectionStringService _connectionStringService;
         private readonly IAccessLevelService _accessLevelService;
+        private readonly ICsvService _csvService;
+        private readonly IMaterialProvider _materialProvider;
+        private readonly NodeMaterialRelationService<IIISUnitOfWork> _nodeMaterialRelationService;
 
         public AdminController(
             IMaterialService materialService,
@@ -56,7 +63,10 @@ namespace Iis.Api.Controllers
             IHost host,
             IConnectionStringService connectionStringService,
             IOntologyDataService nodesDataService,
-            IAccessLevelService accessLevelService)
+            IAccessLevelService accessLevelService,
+            ICsvService csvService,
+            IMaterialProvider materialProvider,
+            NodeMaterialRelationService<IIISUnitOfWork> nodeMaterialRelationService)
         {
             _elasticManager = elasticManager;
             _materialService = materialService;
@@ -69,6 +79,20 @@ namespace Iis.Api.Controllers
             _nodesDataService = nodesDataService;
             _connectionStringService = connectionStringService;
             _accessLevelService = accessLevelService;
+            _csvService = csvService;
+            _materialProvider = materialProvider;
+            _nodeMaterialRelationService = nodeMaterialRelationService;
+        }
+        
+        [HttpGet("CreateBindingNodesToMaterial/{nodeId}/{limit}")]
+        public async Task<string> CreateBindingNodesToMaterial(Guid nodeId, int limit)
+        {
+            var materialsIds = await _materialProvider.GetMaterialsIdsAsync(limit);
+            
+            await _nodeMaterialRelationService.CreateMultipleRelations(
+                new HashSet<Guid>(new[] { nodeId }), new HashSet<Guid>(materialsIds), null);
+            
+            return nodeId.ToString();
         }
 
         [HttpGet("ReInitializeOntologyIndexes/{indexNames}")]
@@ -232,6 +256,7 @@ namespace Iis.Api.Controllers
             return Content(json);
         }
 
+
         [HttpPost("RestartApplication")]
         public async Task RestartApplication()
         {
@@ -260,6 +285,60 @@ namespace Iis.Api.Controllers
         {
             await _materialService.RemoveMaterials();
             return Ok();
+        }
+
+        [HttpGet("ImportExternalUsers/{userNames}")]
+        public async Task<IActionResult> ImportExternalUsers(string userNames, CancellationToken ct)
+        {
+            try
+            {
+                var msg = _userService.ImportUsersFromExternalSource(userNames.Split(','));
+
+                return Content(msg);
+            }
+            catch (Exception ex)
+            {
+                return Content($"Error: {ex.Message}");
+            }
+        }
+
+        [HttpGet("ImportExternalUsers")]
+        public async Task<IActionResult> ImportExternalUsers(CancellationToken ct)
+        {
+            try
+            {
+                var msg = _userService.ImportUsersFromExternalSource();
+
+                return Content(msg);
+            }
+            catch (Exception ex)
+            {
+                return Content($"Error: {ex.Message}");
+            }
+        }
+
+        [HttpGet("CheckMatrixUsers")]
+        public async Task<IActionResult> CheckMatrixUsers()
+        {
+            var result = await _userService.GetUserMatrixInfoAsync();
+            return Content(result);
+        }
+
+        [HttpGet("CreateMatrixUsers")]
+        public async Task<IActionResult> CreateMatrixUsers()
+        {
+            var result = await _userService.CreateMatrixUsersAsync();
+            return Content(result);
+        }
+
+        [HttpGet("GetCsv/{typeName}")]
+        public async Task<IActionResult> GetCsv(string typeName, CancellationToken ct)
+        {
+            var result = _csvService.GetDorCsvByTypeName(typeName);
+            var bytes = Encoding.Unicode.GetBytes(result);
+            var csv = Encoding.Unicode.GetPreamble().Concat(bytes).ToArray();
+
+            return File(csv, "text/csv", $"{typeName}.csv");
         }
 
         private void LogElasticResult(StringBuilder log, IEnumerable<ElasticBulkResponse> response)

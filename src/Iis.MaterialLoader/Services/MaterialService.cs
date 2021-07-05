@@ -9,6 +9,7 @@ using Iis.Domain.Materials;
 using Iis.MaterialLoader.Models;
 using Iis.MaterialLoader.Rabbit;
 using Iis.Messages;
+using Iis.Messages.Materials;
 using Iis.Services.Contracts.Dtos;
 using Iis.Services.Contracts.Interfaces;
 using Microsoft.EntityFrameworkCore;

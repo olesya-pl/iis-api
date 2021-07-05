@@ -174,7 +174,7 @@ object Api_DeployIisDevNomad : BuildType({
         param("env.CONSUL_HTTP_ADDR", "http://is-dev-srv1.contour.net:8500")
         param("JOB_HCl", "iis_core.hcl")
         select("NOMAD_ENV", "dev", label = "NOMAD_ENV", description = "Nomad Environment",
-                options = listOf("dev", "dev2", "dev3", "qa", "demo"))
+                options = listOf("dev", "dev2", "dev3", "qa", "demo", "perf", "od-dev"))
     }
 
     vcs {
@@ -360,7 +360,7 @@ object MaterialLoader_DeployIisDevNomad : BuildType({
         param("env.CONSUL_HTTP_ADDR", "http://is-dev-srv1.contour.net:8500")
         param("JOB_HCl", "iis_material_loader.hcl")
         select("NOMAD_ENV", "dev", label = "NOMAD_ENV", description = "Nomad Environment",
-                options = listOf("dev", "dev2", "dev3", "qa", "demo"))
+                options = listOf("dev", "dev2", "dev3", "qa", "demo", "perf"))
     }
 
     vcs {
@@ -468,6 +468,7 @@ object Tests : Project({
 
     buildType(Tests_IisAcceptanceTestsSanity)
     buildType(Tests_IisAcceptanceTestsRegression)
+    buildType(Tests_PrepareElasticIntegrationTestEnv)
     buildType(Tests_IisAcceptanceTestsSmoke)
     buildType(Tests_IisPerformanceTest)
     buildType(Tests_PrepareTestEnv)
@@ -525,6 +526,11 @@ object Tests_IisAcceptanceTestsSanity : BuildType({
     }
 
     steps {
+        exec {
+            name = "Wait apps to start"
+            path = "sleep"
+            arguments = "180"
+        }
         dotnetTest {
             name = "Run tests"
             projects = "src/Iis.AcceptanceTests/Iis.AcceptanceTests.csproj"
@@ -540,7 +546,6 @@ object Tests_IisAcceptanceTestsSanity : BuildType({
 
     triggers {
         finishBuildTrigger {
-            enabled = false
             buildType = "${Tests_IisAcceptanceTestsSmoke.id}"
         }
     }
@@ -565,6 +570,11 @@ object Tests_IisAcceptanceTestsSmoke : BuildType({
     }
 
     steps {
+        exec {
+            name = "Wait apps to start"
+            path = "sleep"
+            arguments = "180"
+        }
         dotnetTest {
             name = "Run tests"
             projects = "src/Iis.AcceptanceTests/Iis.AcceptanceTests.csproj"
@@ -623,6 +633,104 @@ object Tests_IisPerformanceTest : BuildType({
             param("perfTest.agg.respCode", "true")
             param("perfTest.agg.file", "jmeter_output/kpi.jtl")
             param("perfTest.agg.testFormat", "true")
+        }
+    }
+})
+
+object Tests_PrepareElasticIntegrationTestEnv : BuildType({
+    name = "Prepare_Elastic_Integration_Test_Env"
+
+    params {
+        param("NOMAD_ENV", "elastic-integration")
+        param("env.NOMAD_ADDR", "http://is-dev-srv1.contour.net:4646")
+        param("env.CONSUL_HTTP_ADDR", "http://is-dev-srv1.contour.net:8500")
+    }
+
+    vcs {
+        root(Tests_IisNomad)
+
+        showDependenciesChanges = true
+    }
+
+    steps {
+        script {
+            name = "Nomad plan core"
+            scriptContent = """
+                #!/bin/sh
+                levant plan -ignore-no-changes iis-dev/%NOMAD_ENV%/iis_core.hcl
+            """.trimIndent()
+            dockerImagePlatform = ScriptBuildStep.ImagePlatform.Linux
+            dockerPull = true
+            dockerImage = "docker.contour.net:5000/levant:0.3.0-beta1"
+        }
+        script {
+            name = "Nomad plan ui"
+            scriptContent = """
+                #!/bin/sh
+                levant plan -ignore-no-changes iis-dev/%NOMAD_ENV%/iis_core.hcl
+            """.trimIndent()
+            dockerImagePlatform = ScriptBuildStep.ImagePlatform.Linux
+            dockerPull = true
+            dockerImage = "docker.contour.net:5000/levant:0.3.0-beta1"
+        }
+        script {
+            name = "Nomad run core"
+            scriptContent = """
+                #!/bin/sh
+                levant deploy -force -ignore-no-changes iis-dev/%NOMAD_ENV%/iis_core.hcl
+            """.trimIndent()
+            dockerImagePlatform = ScriptBuildStep.ImagePlatform.Linux
+            dockerPull = true
+            dockerImage = "docker.contour.net:5000/levant:0.3.0-beta1"
+        }
+        script {
+            name = "Nomad run ui"
+            scriptContent = """
+                #!/bin/sh
+                levant deploy -force -ignore-no-changes iis-dev/%NOMAD_ENV%/iis_ui.hcl
+            """.trimIndent()
+            dockerImagePlatform = ScriptBuildStep.ImagePlatform.Linux
+            dockerPull = true
+            dockerImage = "docker.contour.net:5000/levant:0.3.0-beta1"
+        }
+        exec {
+            name = "Wait apps to start"
+            path = "sleep"
+            arguments = "180"
+        }
+    }
+
+    triggers {
+        finishBuildTrigger {
+            buildType = "${Api_BuildDocker.id}"
+        }
+    }
+
+    features {
+        replaceContent {
+            fileRules = "+:iis-dev/%NOMAD_ENV%/iis_core.hcl"
+            pattern = "${Api_BuildDocker.depParamRefs["DOCKER_IMAGE_NAME"]}:latest"
+            replacement = "${Api_BuildDocker.depParamRefs["DOCKER_IMAGE_NAME"]}:${Api_BuildDocker.depParamRefs["gitHashShort"]}"
+        }
+        replaceContent {
+            fileRules = "+:iis-dev/%NOMAD_ENV%/iis_ui.hcl"
+            pattern = "%dep.Iis_Ui_BuildDocker.DOCKER_IMAGE_NAME%:latest"
+            replacement = "%dep.Iis_Ui_BuildDocker.DOCKER_IMAGE_NAME%:%dep.Iis_Ui_BuildDocker.gitHashShort%"
+        }
+    }
+
+    dependencies {
+        snapshot(Api_BuildDocker) {
+            onDependencyFailure = FailureAction.CANCEL
+            onDependencyCancel = FailureAction.CANCEL
+        }
+        snapshot(MaterialLoader_BuildDocker) {
+            onDependencyFailure = FailureAction.CANCEL
+            onDependencyCancel = FailureAction.CANCEL
+        }
+        snapshot(AbsoluteId("Iis_Ui_BuildDocker")) {
+            onDependencyFailure = FailureAction.CANCEL
+            onDependencyCancel = FailureAction.CANCEL
         }
     }
 })

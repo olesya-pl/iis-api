@@ -10,5 +10,6 @@ namespace Iis.Services.Contracts.Interfaces
     {
         UserSource GetUserSource();
         List<ExternalUser> GetUsers();
+        bool ValidateCredentials(string username, string password);
     }
 }

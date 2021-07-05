@@ -1,14 +1,12 @@
 using AutoMapper;
 using Iis.DataModel;
 using Iis.DataModel.Themes;
-using Iis.Domain;
 using Iis.Interfaces.Elastic;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Iis.Services.Contracts;
 using Iis.Services.Contracts.Interfaces;
 using System.Threading;
 using IIS.Repository;
@@ -18,6 +16,9 @@ using Iis.Services.Contracts.Params;
 using Iis.Services.Contracts.Dtos;
 using Newtonsoft.Json.Linq;
 using Iis.Interfaces.Ontology.Schema;
+using Iis.Domain.Users;
+using Newtonsoft.Json;
+using IIS.Services.Contracts.Interfaces;
 
 namespace Iis.Services
 {
@@ -31,6 +32,8 @@ namespace Iis.Services
         private readonly IMaterialElasticService _materialElasticService;
         private readonly IReportElasticService _reportService;
         private readonly IElasticState _elasticState;
+        private readonly IImageVectorizer _imageVectorizer;
+        private readonly IMaterialProvider _materialProvider;
 
         public ThemeService(IUnitOfWorkFactory<TUnitOfWork> unitOfWorkFactory,
             OntologyContext context,
@@ -39,7 +42,9 @@ namespace Iis.Services
             IElasticService elasticService,
             IMaterialElasticService materialElasticService,
             IReportElasticService reportService,
-            IElasticState elasticState) : base(unitOfWorkFactory)
+            IElasticState elasticState,
+            IImageVectorizer imageVectorizer,
+            IMaterialProvider materialProvider) : base(unitOfWorkFactory)
         {
             _context = context;
             _mapper = mapper;
@@ -48,12 +53,14 @@ namespace Iis.Services
             _materialElasticService = materialElasticService;
             _reportService = reportService;
             _elasticState = elasticState;
+            _imageVectorizer = imageVectorizer;
+            _materialProvider = materialProvider;                 
         }
 
         public async Task<Guid> CreateThemeAsync(ThemeDto theme)
         {
             var entity = _mapper.Map<ThemeEntity>(theme);
-            entity.QueryResults = entity.ReadQueryResults = (await GetQueryResultsAsync(entity.UserId, entity.TypeId, GetQuery(entity.QueryRequest))).Count;
+            entity.QueryResults = entity.ReadQueryResults = (await GetQueryResultsAsync(entity.Id, entity.UserId, entity.TypeId, GetQuery(entity.QueryRequest))).Count;
 
             _context.Themes.Add(entity);
 
@@ -82,7 +89,7 @@ namespace Iis.Services
             }
             else
             {
-                entity.QueryResults = entity.ReadQueryResults = (await GetQueryResultsAsync(entity.UserId, entity.TypeId, GetQuery(entity.QueryRequest))).Count;
+                entity.QueryResults = entity.ReadQueryResults = (await GetQueryResultsAsync(entity.Id, entity.UserId, entity.TypeId, GetQuery(entity.QueryRequest))).Count;
             }
         }
 
@@ -193,44 +200,37 @@ namespace Iis.Services
             }
 
             var themesByQuery = themesQuery
-                .ToList()
-                .GroupBy(x => new 
-                {
-                    Query = GetQuery(x.QueryRequest), 
+                .ToDictionary(k => k.Id, x => new {
+                    x.Id,
+                    Query = GetQuery(x.QueryRequest),
                     x.TypeId,
-                    x.UserId
+                    x.UserId,
+                    OriginalEntity = x
                 });
 
             var tasks = new List<Task<QueryResult>>();
 
-            foreach (var groupedTheme in themesByQuery)
+            foreach (var groupedTheme in themesByQuery.Values)
             {
                 ct.ThrowIfCancellationRequested();
-                tasks.Add(GetQueryResultsAsync(groupedTheme.Key.UserId, groupedTheme.Key.TypeId, groupedTheme.Key.Query));
+                tasks.Add(GetQueryResultsAsync(groupedTheme.Id, groupedTheme.UserId, groupedTheme.TypeId, groupedTheme.Query));
             }
 
             var results = await Task.WhenAll(tasks);
 
             foreach (var result in results)
             {
-                var groupedTheme = themesByQuery.FirstOrDefault(p =>
-                    string.Equals(p.Key.Query, result.Query, StringComparison.Ordinal)
-                    && p.Key.TypeId == result.TypeId);
-
-                if (groupedTheme == null)
+                if (!themesByQuery.ContainsKey(result.ThemeId))
                 {
                     continue;
                 }
 
+                var theme = themesByQuery[result.ThemeId];
                 var newCount = result.Count;
-
-                foreach (var theme in groupedTheme)
+                if (theme.OriginalEntity.QueryResults != newCount)
                 {
-                    if (theme.QueryResults != newCount)
-                    {
-                        theme.QueryResults = newCount;
-                        _context.Entry(theme).State = EntityState.Modified;
-                    }
+                    theme.OriginalEntity.QueryResults = newCount;
+                    _context.Entry(theme).State = EntityState.Modified;
                 }
             }
 
@@ -255,13 +255,27 @@ namespace Iis.Services
             };
         }
 
-        private async Task<QueryResult> GetQueryResultsAsync(Guid userId, Guid typeId, string query)
+        private async Task<QueryResult> GetQueryResultsAsync(Guid themeId, Guid userId, Guid typeId, Query query)
         {
+            if (query == null)
+            {
+                return new QueryResult
+                {
+                    Count = 0,
+                    ThemeId = themeId,
+                    TypeId = typeId
+                };
+            }
+            
             var filter = new ElasticFilter
             {
                 Limit = 50,
                 Offset = 0,
-                Suggestion = query
+                Suggestion = query.Suggestion,
+                CherryPickedItems = query
+                    .CherryPickedItems
+                    .ToList(),
+                FilteredItems = query.FilteredItems.ToList()
             };
 
             var indexes = typeId switch
@@ -276,28 +290,76 @@ namespace Iis.Services
             if (indexes is null) return new QueryResult
             {
                 Count = 0,
-                Query = query,
+                ThemeId = themeId,
                 TypeId = typeId
             };
 
             if (typeId == ThemeTypeEntity.EntityEventId)
             {
-                var count = await _elasticService.CountByAllFieldsAsync(indexes, filter);
+                var count = await _elasticService.CountEntitiesByConfiguredFieldsAsync(indexes, filter);
                 return new QueryResult
                 {
                     Count = count,
-                    Query = query,
+                    ThemeId = themeId,
                     TypeId = typeId
                 };
             }
             else if (typeId == ThemeTypeEntity.EntityMaterialId)
             {
+                if (query.SearchByImageInput != null && query.SearchByImageInput.HasConditions)
+                {
+                    var content = Convert.FromBase64String(query.SearchByImageInput.Content);
+                    var imageVectorList = await _imageVectorizer.VectorizeImage(content, query.SearchByImageInput.Name);
+                    if (imageVectorList.Any())
+                    {
+                        var searchResult = await _materialElasticService.SearchByImageVector(userId, imageVectorList, new PaginationParams(1, 50));
+                        return new QueryResult
+                        {
+                            Count = searchResult.Count,
+                            ThemeId = themeId,
+                            TypeId = typeId
+                        };
+                    }
+                    else
+                    {
+                        return new QueryResult
+                        {
+                            Count = 0,
+                            ThemeId = themeId,
+                            TypeId = typeId
+                        };
+                    }
+                }
+                if (query.SearchByRelation != null && query.SearchByRelation.HasConditions) 
+                {
+                    var materialsResults = await _materialProvider.GetMaterialsCommonForEntitiesAsync(
+                        userId,
+                        query.SearchByRelation.NodeIdentityList,
+                        query.SearchByRelation.IncludeDescendants,
+                        query.Suggestion,
+                        new PaginationParams(1,50),
+                        null);
+                    return new QueryResult
+                    {
+                        Count = materialsResults.Count,
+                        ThemeId = themeId,
+                        TypeId = typeId
+                    };
+                }
+                
                 var page = new PaginationParams(1, 50);
-                var count = await _materialElasticService.CountMaterialsByConfiguredFieldsAsync(userId, new SearchParams { Page = page, Suggestion = filter.Suggestion });
+                var count = await _materialElasticService.CountMaterialsByConfiguredFieldsAsync(
+                    userId, 
+                    new SearchParams { 
+                        Page = page, 
+                        Suggestion = filter.Suggestion,
+                        CherryPickedItems = filter.CherryPickedItems,
+                        FilteredItems = filter.FilteredItems
+                    });
                 return new QueryResult
                 {
                     Count = count,
-                    Query = query,
+                    ThemeId = themeId,
                     TypeId = typeId
                 };
             }
@@ -309,7 +371,7 @@ namespace Iis.Services
                 return new QueryResult
                 {
                     Count = count,
-                    Query = query,
+                    ThemeId = themeId,
                     TypeId = typeId
                 };
             }
@@ -326,7 +388,7 @@ namespace Iis.Services
                 return new QueryResult
                 {
                     Count = count,
-                    Query = query,
+                    ThemeId = themeId,
                     TypeId = typeId
                 };
             }
@@ -348,20 +410,126 @@ namespace Iis.Services
         private struct QueryResult
         {
             public int Count { get; set; }
-            public string Query { get; set; }
+            public Guid ThemeId { get; set; }
             public Guid TypeId { get; set; }
         }
 
-        private string GetQuery(string queryRequest) 
+        private Query GetQuery(string queryRequest) 
         {
             try
             {
-                return JObject.Parse(queryRequest)?["suggestion"].Value<string>();
+                var queryResult = JObject.Parse(queryRequest);
+                if (queryRequest == null)
+                {
+                    return null;
+                }
+                var suggestion = string.Empty;
+                if (queryResult.ContainsKey("suggestion"))
+                {
+                    suggestion = queryResult["suggestion"].Value<string>();                    
+                }
+
+                var cherryPickedItems = Enumerable.Empty<CherryPickedItem>().ToList();
+                if (queryResult.ContainsKey("selectedEntities"))
+                {
+                    cherryPickedItems = queryResult.SelectToken("selectedEntities", false)
+                        .AsEnumerable()
+                        .Select(p => new CherryPickedItem(p.Value<string>("id"), p.Value<bool>("includeDescendants")))
+                        .ToList();
+                }
+
+                SearchByImageInput searchByImageInput = null;
+                if (queryResult.ContainsKey("searchByImageInput"))
+                {
+                    var searchByImageInputJson = queryResult["searchByImageInput"] as JObject;
+
+                    if (searchByImageInputJson != null)
+                    {
+                        searchByImageInput = searchByImageInputJson.ToObject<SearchByImageInput>();
+                    }
+                }
+
+                SearchByRelationInput searchByRelation = null;
+                if (queryResult.ContainsKey("searchByRelation"))
+                {
+                    var searchByRelationInputJson = queryResult["searchByRelation"] as JObject;
+
+                    if (searchByRelationInputJson != null)
+                    {
+                        searchByRelation = searchByRelationInputJson.ToObject<SearchByRelationInput>();
+                    }
+                }
+
+                var filteredItems = Array.Empty<FilteredItem>();
+
+                if (queryResult.ContainsKey("filteredItems"))
+                {
+                    var filteredItemsJson = queryResult["filteredItems"] as JArray;
+                    if (filteredItemsJson != null)
+                    {
+                        filteredItems = filteredItemsJson.ToObject<FilteredItem[]>();
+                    }
+                }
+
+                return new Query
+                {
+                    Suggestion = suggestion,
+                    CherryPickedItems = cherryPickedItems,
+                    SearchByImageInput = searchByImageInput,
+                    SearchByRelation = searchByRelation,
+                    FilteredItems = filteredItems
+                        .Select(item =>
+                        {
+                            var properties = new List<Property>();
+                            foreach (var value in item.Value)
+                            {
+                                properties.Add(new Property()
+                                {
+                                    Name = item.Name,
+                                    Value = value
+                                });
+                            }
+                            return properties;
+                        })
+                        .SelectMany(p => p)
+                        .ToList()
+                };
             }
-            catch (Exception)
+            catch (Exception e)
             {
                 return null;
             }
+        }
+
+        private class Query
+        {
+            public string Suggestion { get; set; }
+            public IReadOnlyCollection<CherryPickedItem> CherryPickedItems { get; set; } = new List<CherryPickedItem>();
+            public IReadOnlyCollection<Property> FilteredItems { get; set; } = new List<Property>();
+            public SearchByImageInput SearchByImageInput { get; set; }
+            public SearchByRelationInput SearchByRelation { get; set; }
+        }
+
+        private class SearchByImageInput
+        {
+            public string Name { get; set; }
+            public string Content { get; set; }
+            [JsonIgnore]
+            public bool HasConditions => !string.IsNullOrWhiteSpace(Name) && !string.IsNullOrWhiteSpace(Content);
+        }
+
+        private class SearchByRelationInput
+        {
+            public IEnumerable<Guid> NodeIdentityList { get; set; }
+            public bool IncludeDescendants { get; set; }
+            [JsonIgnore]
+            public bool HasConditions => NodeIdentityList != null && NodeIdentityList.Any();
+        }
+
+        private class FilteredItem
+        {
+            public string Name { get; set; }
+            public string[] Value { get; set; }
         }
     }
 }

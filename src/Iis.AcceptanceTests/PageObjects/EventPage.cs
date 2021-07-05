@@ -73,7 +73,7 @@ namespace AcceptanceTests.PageObjects
             return new Event(driver, title);
         }
 
-        public List<Event> Events => driver.FindElements(By.ClassName("el-table__row"))
+        public List<Event> Events => driver.FindElements(By.CssSelector(".events-table .p-datatable-tbody > tr"))
                     .Select(webElement => new Event(driver, webElement)).ToList();
         public List<EventRelatedItems> MaterialsRelatedToEvent => driver.FindElement(By.CssSelector(".event-card__linked-materials .container")).FindElements(By.CssSelector(".el-tag--mini"))
                     .Select(webElement => new EventRelatedItems(driver, webElement)).ToList();

@@ -9,6 +9,7 @@
         Enum,
         Wiki,
         Object,
-        AccessLevel
+        AccessLevel,
+        Photo
     }
 }

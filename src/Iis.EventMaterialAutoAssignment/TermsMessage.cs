@@ -7,6 +7,6 @@ namespace Iis.EventMaterialAutoAssignment
     {
         public IReadOnlyCollection<string> Terms { get; set; }
         public IReadOnlyCollection<Guid> MaterialIds { get; set; }
-        public string Title { get; set; }
+        public Guid ConfigId { get; set; }
     }
 }

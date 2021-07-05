@@ -31,6 +31,13 @@ namespace Iis.DbLayer.Extensions
                 .ThenInclude(m => m.Node);
         }
 
+        public static IQueryable<MaterialEntity> WithFiles(
+            this IQueryable<MaterialEntity> materialQuery)
+        {
+            return materialQuery
+                .Include(m => m.File);
+        }
+
         public static IQueryable<MaterialEntity> OnlyParent(
             this IQueryable<MaterialEntity> materialQuery)
         {

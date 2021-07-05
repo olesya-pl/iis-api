@@ -14,6 +14,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using IChangeHistoryService = Iis.MaterialLoader.Services.IChangeHistoryService;
+using Microsoft.AspNetCore.Http.Features;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
 
 namespace Iis.MaterialLoader
 {
@@ -51,6 +53,13 @@ namespace Iis.MaterialLoader
             services.AddSingleton(Configuration.GetSection("files").Get<FilesConfiguration>());
             services.AddSingleton<IMaterialEventProducer, MaterialEventProducer>();
             services.AddRabbit(Configuration, out _);
+
+            services.Configure<KestrelServerOptions>(options =>
+            {
+                options.Limits.MaxRequestBodySize = long.MaxValue;
+            });
+
+            services.Configure<FormOptions>(options => options.MultipartBodyLengthLimit = long.MaxValue);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

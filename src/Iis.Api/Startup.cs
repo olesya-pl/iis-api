@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using HealthChecks.Elasticsearch;
 using HotChocolate;
 using HotChocolate.AspNetCore;
 using HotChocolate.AspNetCore.Subscriptions;
@@ -18,7 +17,6 @@ using Iis.Api.FlightRadar;
 using Iis.Api.GraphQL.Access;
 using Iis.Api.Modules;
 using Iis.Api.Ontology;
-using Iis.Core.Tools;
 using Iis.DataModel;
 using Iis.DataModel.Cache;
 using Iis.DbLayer.Common;
@@ -32,6 +30,7 @@ using Iis.Domain;
 using Iis.Domain.Vocabularies;
 using Iis.Elastic;
 using Iis.EventMaterialAutoAssignment;
+using Iis.RabbitMq.DependencyInjection;
 using Iis.FlightRadar.DataModel;
 using Iis.Interfaces.Common;
 using Iis.Interfaces.Elastic;
@@ -42,24 +41,30 @@ using Iis.Interfaces.Roles;
 using Iis.OntologyData;
 using Iis.Services;
 using Iis.Services.Contracts;
+using Iis.Services.Contracts.Configurations;
+using Iis.Services.Contracts.Csv;
 using Iis.Services.Contracts.Interfaces;
+using Iis.Services.Contracts.Matrix;
 using Iis.Services.DI;
 using Iis.Services.ExternalUserServices;
+using Iis.Services.MatrixServices;
 using Iis.Utility;
 using IIS.Core.Analytics.EntityFramework;
+using IIS.Core.GraphQL;
 using IIS.Core.GraphQL.Entities.Resolvers;
 using IIS.Core.Materials;
 using IIS.Core.Materials.EntityFramework;
 using IIS.Core.Materials.EntityFramework.FeatureProcessors;
 using IIS.Core.Materials.FeatureProcessors;
 using IIS.Core.Ontology.EntityFramework;
-using IIS.Core.Tools;
 using IIS.Repository.Factories;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Features;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -107,8 +112,6 @@ namespace IIS.Core
             });
 
             services
-                .RegisterRunUpTools()
-                .RegisterSeederTools()
                 .AddConfigurations(Configuration);
 
             services.AddMemoryCache();
@@ -119,6 +122,8 @@ namespace IIS.Core
             services.AddTransient(provider => new DbContextOptionsBuilder().UseNpgsql(dbConnectionString).Options);
             if (enableContext)
             {
+                MigrateOntologyContext(OntologyContext.GetContext(dbConnectionString));
+
                 services.AddDbContext<OntologyContext>(
                     options => options
                         .UseNpgsql(dbConnectionString)
@@ -176,9 +181,7 @@ namespace IIS.Core
             services.AddTransient<IUnitOfWorkFactory<IIISUnitOfWork>, IISUnitOfWorkFactory>();
             services.AddTransient<IMaterialService, MaterialService<IIISUnitOfWork>>();
             services.AddTransient<IMaterialPutToElasticService, MaterialService<IIISUnitOfWork>>();
-            services.AddTransient<IOntologyService, OntologyServiceWithCache>();
-            services.AddTransient<IMaterialProvider, MaterialProvider<IIISUnitOfWork>>();
-            services.AddHttpClient<MaterialProvider<IIISUnitOfWork>>();
+            services.AddTransient<IOntologyService, OntologyServiceWithCache>();            
 
             services.AddSingleton<IElasticConfiguration, IisElasticConfiguration>();
             services.AddTransient<MutationCreateResolver>();
@@ -202,12 +205,14 @@ namespace IIS.Core
             services.AddTransient<IAccessLevelService, AccessLevelService>();
             services.AddTransient<AccessObjectService>();
             services.AddTransient<IFeatureProcessorFactory, FeatureProcessorFactory>();
-            services.AddTransient<NodeToJObjectMapper>();
+            services.AddTransient<NodeMapper>();
             services.AddSingleton<FileUrlGetter>();
             services.AddSingleton<PropertyTranslator>();
+            services.AddTransient<ICsvService, CsvService>();
 
             services.AddTransient<IChangeHistoryService, ChangeHistoryService<IIISUnitOfWork>>();
-            services.AddTransient<GraphQL.ISchemaProvider, GraphQL.SchemaProvider>();
+            services.AddTransient<ILocationHistoryService, LocationHistoryService<IIISUnitOfWork>>();
+            services.AddSingleton<GraphQL.ISchemaProvider, GraphQL.SchemaProvider>();
             services.AddTransient<GraphQL.Entities.IOntologyFieldPopulator, GraphQL.Entities.OntologyFieldPopulator>();
             services.AddTransient<GraphQL.Entities.Resolvers.IOntologyMutationResolver, GraphQL.Entities.Resolvers.OntologyMutationResolver>();
             services.AddTransient<GraphQL.Entities.Resolvers.IOntologyQueryResolver, GraphQL.Entities.Resolvers.OntologyQueryResolver>();
@@ -310,7 +315,17 @@ namespace IIS.Core
 
             var eusConfiguration = Configuration.GetSection("externalUserService").Get<ExternalUserServiceConfiguration>();
             services.AddTransient<IExternalUserService>(_ => (new ExternalUserServiceFactory()).GetInstance(eusConfiguration));
-            services.AddTransient<ExternalUserSeeder>();
+
+            var matrixConfiguration = Configuration.GetSection("matrix").Get<MatrixServiceConfiguration>();
+            services.AddSingleton(matrixConfiguration);
+            services.AddTransient<IMatrixService, MatrixService>();
+
+            services.Configure<KestrelServerOptions>(options =>
+            {
+                options.Limits.MaxRequestBodySize = long.MaxValue; 
+            });
+
+            services.Configure<FormOptions>(options => options.MultipartBodyLengthLimit = long.MaxValue);
         }
 
         private void _authenticate(IQueryContext context, HashSet<string> publiclyAccesible)
@@ -364,8 +379,7 @@ namespace IIS.Core
                 app.UseDeveloperExceptionPage();
             }
             UpdateDatabase(app);
-            app.SeedUser();
-            app.SeedExternalUsers();
+
             app.UpdateMartialStatus();
             app.ReloadElasticFieldsConfiguration();
 
@@ -386,6 +400,8 @@ namespace IIS.Core
 #endif
             app.UseGraphQL();
             app.UsePlayground();
+            LoadHotChockolateSchema(app);
+            app.SeedExternalUsers();
             app.UseHealthChecks("/api/server-health", new HealthCheckOptions { ResponseWriter = ReportHealthCheck });
 
             app.UseRouting();
@@ -395,19 +411,21 @@ namespace IIS.Core
             });
         }
 
+        private void LoadHotChockolateSchema(IApplicationBuilder app)
+        {
+            using var serviceScope = app.ApplicationServices
+            .GetRequiredService<IServiceScopeFactory>()
+            .CreateScope();
+            var schemaProvider = serviceScope.ServiceProvider.GetRequiredService<ISchemaProvider>();
+            schemaProvider.GetSchema();
+        }
+
         private void UpdateDatabase(IApplicationBuilder app)
         {
             using (var serviceScope = app.ApplicationServices
-            .GetRequiredService<IServiceScopeFactory>()
-            .CreateScope())
+                .GetRequiredService<IServiceScopeFactory>()
+                .CreateScope())
             {
-                using (var context = serviceScope.ServiceProvider.GetService<OntologyContext>())
-                {
-                    var defaultCommandTimeout = context.Database.GetCommandTimeout();
-                    context.Database.SetCommandTimeout(TimeSpan.FromMinutes(10));
-                    context.Database.Migrate();
-                    context.Database.SetCommandTimeout(defaultCommandTimeout);
-                }
                 try
                 {
                     using (var context = serviceScope.ServiceProvider.GetService<FlightsContext>())
@@ -433,6 +451,14 @@ namespace IIS.Core
                     host.StopAsync().Wait();
                 }
             }
+        }
+
+        private void MigrateOntologyContext(OntologyContext context)
+        {
+            var defaultCommandTimeout = context.Database.GetCommandTimeout();
+            context.Database.SetCommandTimeout(TimeSpan.FromMinutes(10));
+            context.Database.Migrate();
+            context.Database.SetCommandTimeout(defaultCommandTimeout);
         }
 
         private static async Task ReportHealthCheck(HttpContext c, HealthReport r)

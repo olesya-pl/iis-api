@@ -13,9 +13,12 @@ namespace Iis.DbLayer.Repositories
     {
         string[] MaterialIndexes { get; }
         Task<MaterialEntity> GetByIdAsync(Guid id, params MaterialIncludeEnum[] includes);
+
         Task<MaterialEntity[]> GetByIdsAsync(ISet<Guid> ids, params MaterialIncludeEnum[] includes);
 
         Task<IEnumerable<MaterialEntity>> GetAllAsync(params MaterialIncludeEnum[] includes);
+        
+        Task<IEnumerable<MaterialEntity>> GetAllAsync(int limit, params MaterialIncludeEnum[] includes);
 
         Task<IEnumerable<MaterialEntity>> GetAllForRelatedNodeListAsync(IEnumerable<Guid> nodeIdList);
 
@@ -27,10 +30,11 @@ namespace Iis.DbLayer.Repositories
 
         Task<IEnumerable<MaterialEntity>> GetAllByAssigneeIdAsync(Guid assigneeId);
 
-        Task<List<ElasticBulkResponse>> PutAllMaterialsToElasticSearchAsync(CancellationToken token = default);
+        Task<List<ElasticBulkResponse>> PutAllMaterialsToElasticSearchAsync(CancellationToken ct = default);
 
         Task<List<ElasticBulkResponse>> PutCreatedMaterialsToElasticSearchAsync(IReadOnlyCollection<Guid> materialIds, CancellationToken token = default);
-        Task<bool> PutMaterialToElasticSearchAsync(Guid materialId, CancellationToken cancellationToken = default, bool waitForIndexing = false);
+
+        Task<bool> PutMaterialToElasticSearchAsync(Guid materialId, CancellationToken ct = default, bool waitForIndexing = false);
 
         void AddMaterialEntity(MaterialEntity materialEntity);
 
@@ -40,7 +44,7 @@ namespace Iis.DbLayer.Repositories
 
         void EditMaterial(MaterialEntity materialEntity);
 
-        List<MaterialEntity> GetMaterialByNodeIdQuery(IList<Guid> nodeIds);
+        List<MaterialEntity> GetMaterialByNodeIdQuery(IList<Guid> nodeIds, params MaterialIncludeEnum[] includes);
 
         Task<List<Guid>> GetNodeIsWithMaterials(IList<Guid> nodeIds);
 
@@ -59,5 +63,7 @@ namespace Iis.DbLayer.Repositories
         Task<bool> CheckMaterialExistsAndHasContent(Guid materialId);
 
         Task RemoveMaterialsAndRelatedData(IReadOnlyCollection<Guid> fileIdList);
+
+        Task<Guid?> GetParentIdByChildIdAsync(Guid materialId);
     }
 }

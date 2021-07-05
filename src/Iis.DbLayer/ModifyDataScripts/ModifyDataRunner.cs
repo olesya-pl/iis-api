@@ -35,6 +35,8 @@ namespace Iis.DbLayer.ModifyDataScripts
             _items.Add("RemoveEventWikiLinks", actions.RemoveEventWikiLinks);
             _items.Add("AddAccessLevelAccessObject", actions.AddAccessLevelAccessObject);
             _items.Add("FixFlightRadarLocationHistory", actions.FixFlightRadarLocationHistory);
+            _items.Add("AddPhotoType", actions.AddPhotoType);
+            _items.Add("AddObjectType", actions.AddObjectType);
             _items.Add("AddAccessLevels", actions.AddAccessLevels);
             _items.Add("AddAccessLevelToObject", actions.AddAccessLevelToObject);
             _items.Add("InitNewColumnsForAccessObjects", actions.InitNewColumnsForAccessObjects);
@@ -42,8 +44,10 @@ namespace Iis.DbLayer.ModifyDataScripts
             _items.Add("DefaultAccessLevelsForDors", actions.DefaultAccessLevelsForDors);
             _items.Add("AddPhotosToObject", actions.AddPhotosToObject);
             _items.Add("AddWikiEntityAccessObject", actions.AddWikiEntityAccessObject);
+            _items.Add("SetupNewTypesForPhoneSign", actions.SetupNewTypesForPhoneSign);
             _items.Add("AddTitlePhotosToObject", actions.AddTitlePhotosToObject);
             _items.Add("RemoveMaterialLinkAccessObjects", actions.RemoveMaterialLinkAccessObjects);
+            _items.Add("AddEventTitle", actions.AddEventTitle);
         }
         public bool Run()
         {

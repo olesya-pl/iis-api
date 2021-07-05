@@ -8,11 +8,11 @@ using IIS.Core.GraphQL.Entities.InputTypes;
 using IIS.Core.GraphQL.Entities.ObjectTypes;
 using IIS.Core.GraphQL.Entities.Resolvers;
 using IIS.Core.GraphQL.Export;
+using Iis.Api.Ontology;
+using Iis.Api.GraphQL.Graph;
+using Iis.Api.GraphQL.CreateMenu;
 using Iis.Domain;
 using Microsoft.Extensions.Configuration;
-using Iis.Api.Ontology;
-using Iis.Api.GraphQL;
-using Iis.Api.GraphQL.CreateMenu;
 using Iis.Interfaces.Ontology.Schema;
 using Microsoft.Extensions.Logging;
 
@@ -82,6 +82,7 @@ namespace IIS.Core.GraphQL
                 d.Include<IncomingEntitiesQuery>();
                 d.Include<RelationsCountQuery>();
                 d.Include<CreateMenuItemsQuery>();
+                d.Include<GraphQuery>();
 
                 if (_configuration.GetValue("reportsAvailable", true))
                 {
@@ -102,7 +103,6 @@ namespace IIS.Core.GraphQL
                 d.Include<NodeMaterialRelation.Mutation>();
                 d.Include<ElasticConfig.Mutation>();
                 d.Include<Themes.Mutation>();
-                d.Include<Files.Mutation>();
                 d.Include<Annotations.Mutation>();
                 d.Include<Iis.Api.GraphQL.Aliases.Mutation>();
 
@@ -176,7 +176,7 @@ namespace IIS.Core.GraphQL
         protected void ConfigureOntologyMutation(IObjectTypeDescriptor descriptor, IOntologySchema schema)
         {
             var typesToPopulate = schema.GetEntityTypes();
-            typesToPopulate = typesToPopulate.Where(t => !t.IsAbstract).ToList();            
+            typesToPopulate = typesToPopulate.Where(t => !t.IsAbstract).ToList();
             _logger.LogInformation($"SchemaProvider. ConfigureOntologyMutation. Fetched {typesToPopulate.Count()} items. These are {string.Join(',', typesToPopulate.Select(p => p.Name))}");
             _populator.PopulateFields(descriptor, typesToPopulate,
                 Operation.Create, Operation.Update, Operation.Delete);

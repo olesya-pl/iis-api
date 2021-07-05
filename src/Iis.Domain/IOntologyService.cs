@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Iis.Interfaces.Ontology.Data;
 using Iis.Interfaces.Elastic;
 using Iis.Interfaces.Ontology.Schema;
-using Iis.Services.Contracts;
+using Iis.Domain.Users;
 
 namespace Iis.Domain
 {

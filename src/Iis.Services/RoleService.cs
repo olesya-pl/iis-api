@@ -5,8 +5,8 @@ using System.Threading.Tasks;
 using AutoMapper;
 using Iis.DataModel;
 using Iis.DataModel.Roles;
+using Iis.Domain.Users;
 using Iis.Interfaces.Roles;
-using Iis.Services.Contracts;
 using Microsoft.EntityFrameworkCore;
 
 namespace Iis.Services

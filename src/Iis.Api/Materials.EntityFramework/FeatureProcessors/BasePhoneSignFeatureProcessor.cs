@@ -4,8 +4,8 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 using Newtonsoft.Json.Linq;
 
-using Iis.Domain;
 using Iis.Interfaces.Elastic;
+using Iis.Services.Contracts.Dtos;
 using Iis.Services.Contracts.Interfaces;
 using IIS.Core.GraphQL.Entities.Resolvers;
 using IIS.Core.Materials.FeatureProcessors;
@@ -30,9 +30,12 @@ namespace IIS.Core.Materials.EntityFramework.FeatureProcessors
         protected readonly IElasticState _elasticState;
         protected readonly MutationCreateResolver _createResolver;
         protected readonly MutationUpdateResolver _updateResolver;
+        protected readonly ILocationHistoryService _locationHistoryService;
         protected abstract string SignTypeName { get; }
         protected abstract IReadOnlyCollection<string> PrioritizedFields { get; }
         protected abstract Dictionary<string, string> SignFieldsMapping { get; }
+        protected virtual string LatitudeFeaturePropertyName => SignFields.Latitude;
+        protected virtual string LongitudeFeaturePropertyName => SignFields.Longitude;
 
         public virtual bool IsDummy => false;
 
@@ -40,13 +43,15 @@ namespace IIS.Core.Materials.EntityFramework.FeatureProcessors
             IOntologySchema ontologySchema,
             MutationCreateResolver createResolver,
             MutationUpdateResolver updateResolver,
-            IElasticState elasticState)
+            IElasticState elasticState,
+            ILocationHistoryService locationHistoryService)
         {
             _elasticService = elasticService;
             _ontologySchema = ontologySchema;
             _createResolver = createResolver;
             _updateResolver = updateResolver;
             _elasticState = elasticState;
+            _locationHistoryService = locationHistoryService;
         }
         public virtual async Task<JObject> ProcessMetadataAsync(JObject metadata, Guid materialId)
         {
@@ -72,21 +77,22 @@ namespace IIS.Core.Materials.EntityFramework.FeatureProcessors
 
                     var updatesResult = ShouldExistingBeUpdated(searchResult.feature, feature);
 
-                    if (!updatesResult.shouldBeUpdate) continue;
-
-                    var properties = GetPropertiesFromFeature(updatesResult.updates);
-
-                    var entity = await _updateResolver.UpdateEntity(signType, searchResult.featureId.Value, properties);
-
-                    originalFeature[FeatureFields.featureId] = entity.Id.ToString();
-
-                    if(searchResult.featureId.Value != entity.Id)
+                    if (updatesResult.shouldBeUpdate)
                     {
-                        var propertiesToAdd = GetPropertiesFromFeature(searchResult.feature)
-                            .Where(pair => !properties.ContainsKey(pair.Key))
-                            .ToDictionary(pair => pair.Key, pair => pair.Value);
+                        var properties = GetPropertiesFromFeature(updatesResult.updates);
 
-                        await _updateResolver.UpdateEntity(signType, entity.Id, propertiesToAdd);
+                        var entity = await _updateResolver.UpdateEntity(signType, searchResult.featureId.Value, properties);
+
+                        originalFeature[FeatureFields.featureId] = entity.Id.ToString();
+
+                        if (searchResult.featureId.Value != entity.Id)
+                        {
+                            var propertiesToAdd = GetPropertiesFromFeature(searchResult.feature)
+                                .Where(pair => !properties.ContainsKey(pair.Key))
+                                .ToDictionary(pair => pair.Key, pair => pair.Value);
+
+                            await _updateResolver.UpdateEntity(signType, entity.Id, propertiesToAdd);
+                        }
                     }
                 }
                 else
@@ -97,11 +103,14 @@ namespace IIS.Core.Materials.EntityFramework.FeatureProcessors
 
                     originalFeature[FeatureFields.featureId] = entity.Id.ToString();
                 }
+
+                await SaveCoordinatesToLocationHistoryAsync(originalFeature);
             }
 
             await PostMetadataProcessingAsync(metadata, materialId);
             return metadata;
         }
+
         protected virtual bool FeaturesSectionExists(JObject metadata) =>
             metadata.ContainsKey(FeatureFields.FeaturesSection) &&
             metadata.SelectToken(FeatureFields.FeaturesSection) is JArray &&
@@ -109,12 +118,13 @@ namespace IIS.Core.Materials.EntityFramework.FeatureProcessors
 
         protected virtual bool FeatureCouldBeProcessed(JObject feature)
         {
-            if(!feature.HasValues) return false;
+            if (!feature.HasValues) return false;
 
             var properties = feature.Properties().Select(p => p.Name);
 
             return PrioritizedFields.Intersect(properties).Any();
         }
+
         protected virtual JObject RemoveFeatureEmptyProperties(JObject feature)
         {
             var emptyPropsList = new List<string>();
@@ -138,6 +148,7 @@ namespace IIS.Core.Materials.EntityFramework.FeatureProcessors
 
             return feature;
         }
+
         protected virtual JObject NormalizeFeatureProperties(JObject feature)
         {
             var result = new JObject();
@@ -146,7 +157,7 @@ namespace IIS.Core.Materials.EntityFramework.FeatureProcessors
             {
                 var property = feature.Property(featureFieldName);
 
-                if(property is null) continue;
+                if (property is null) continue;
 
                 if (featureFieldName == FeatureFields.featureId) continue;
 
@@ -158,6 +169,7 @@ namespace IIS.Core.Materials.EntityFramework.FeatureProcessors
             }
             return result;
         }
+
         protected virtual Dictionary<string, object> GetPropertiesFromFeature(JObject feature)
         {
             var properties = new Dictionary<string, object>();
@@ -173,12 +185,14 @@ namespace IIS.Core.Materials.EntityFramework.FeatureProcessors
 
             return properties;
         }
+
         protected virtual JObject MergeFeatures(JObject existingFeature, JObject newFeature)
         {
             existingFeature.Merge(newFeature, mergeSettings);
 
             return existingFeature;
         }
+
         protected virtual (bool shouldBeUpdate, JObject updates) ShouldExistingBeUpdated(JObject existingFeature, JObject newFeature)
         {
             var updates = new JObject();
@@ -207,6 +221,7 @@ namespace IIS.Core.Materials.EntityFramework.FeatureProcessors
             }
             return (updates.HasValues, updates);
         }
+
         protected virtual async Task<(bool isExist, string fieldName, Guid? featureId, JObject feature)> SearchExistingFeatureAsync(JObject feature)
         {
             foreach (var field in PrioritizedFields)
@@ -221,6 +236,7 @@ namespace IIS.Core.Materials.EntityFramework.FeatureProcessors
             }
             return (false, null, null, null);
         }
+
         protected virtual async Task<(bool isExist, Guid? featureId, JObject feature)> SearchFeatureInElasticSearchAsync(string fieldName, string fieldValue)
         {
             var filter = new ElasticFilter { Limit = 1, Offset = 0, Suggestion = $"({fieldName}:\"{fieldValue}\")" };
@@ -241,6 +257,46 @@ namespace IIS.Core.Materials.EntityFramework.FeatureProcessors
         protected virtual Task PostMetadataProcessingAsync(JObject metadata, Guid materialId)
         {
             return Task.CompletedTask;
+        }
+
+        protected virtual Task SaveCoordinatesToLocationHistoryAsync(JObject feature)
+        {
+            var coordinatesResult = TryFetchCoordinatiesFromFeature(feature);
+
+            var entityIdResult  = TryFetchEntityIdFromFeature(feature);
+
+            if (!coordinatesResult.IsSuccess || !entityIdResult.IsSuccess) return Task.CompletedTask;
+
+            var lhDto = new LocationHistoryDto
+            {
+                EntityId = entityIdResult.FeatureId,
+                NodeId = entityIdResult.FeatureId,
+                Lat = coordinatesResult.Latitude,
+                Long = coordinatesResult.Longitude,
+                RegisteredAt = DateTime.UtcNow
+            };
+
+            return _locationHistoryService.SaveLocationHistoryAsync(lhDto);
+        }
+
+        private (decimal Latitude, decimal Longitude, bool IsSuccess) TryFetchCoordinatiesFromFeature(JObject feature)
+        {
+            var latStringValue = feature.Property(LatitudeFeaturePropertyName)?.Value.Value<string>();
+            var lonStringValue = feature.Property(LongitudeFeaturePropertyName)?.Value.Value<string>();
+
+            var parseResult = Decimal.TryParse(latStringValue, out decimal latitude)
+                           & Decimal.TryParse(lonStringValue, out decimal longitude);
+
+            return (Latitude: latitude, Longitude: longitude, IsSuccess: parseResult);
+        }
+
+        private (Guid FeatureId, bool IsSuccess) TryFetchEntityIdFromFeature(JObject feature)
+        {
+            var featureIdStringValue = feature.Property(FeatureFields.featureId).Value.Value<string>();
+
+            var parseResult = Guid.TryParse(featureIdStringValue, out Guid featureId);
+
+            return (FeatureId: featureId, IsSuccess: parseResult);
         }
     }
 }

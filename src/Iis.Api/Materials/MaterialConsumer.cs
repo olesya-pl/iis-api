@@ -5,6 +5,7 @@ using Iis.Api.BackgroundServices;
 using Iis.Api.Materials.Handlers;
 using IIS.Core.Materials;
 using Iis.Messages;
+using Iis.Messages.Materials;
 using Iis.Utility;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -59,7 +60,6 @@ namespace Iis.Api.Materials
                 autoDelete: false);
 
             _channel.BasicQos(0, PrefetchCount, global: false);
-            
 
             ConfigureConsumer(_channel, ProcessMessage);
 
@@ -83,7 +83,7 @@ namespace Iis.Api.Materials
             {
                 var eventProducer = scope.ServiceProvider.GetService<IMaterialEventProducer>();
                 ThemeCounterBackgroundService.SignalMaterialUpdateNeeded();
-                
+
                 eventProducer.SaveMaterialToElastic(message.MaterialId);
 
                 if (!message.ParentId.HasValue)
@@ -101,17 +101,6 @@ namespace Iis.Api.Materials
                 eventProducer.SendMaterialEvent(materialEvent);
                 eventProducer.SendMaterialFeatureEvent(materialEvent);
 
-                // todo: multiple queues for different material types
-                if (message.FileId.HasValue && message.Type == "cell.voice")
-                {
-                    eventProducer.SendMaterialAddedEventAsync(
-                        new MaterialAddedEvent
-                        {
-                            FileId = message.FileId.Value,
-                            MaterialId = message.MaterialId
-                        });
-                }
-
                 return Task.CompletedTask;
             }
         }
@@ -128,7 +117,7 @@ namespace Iis.Api.Materials
                     {
                         throw new InvalidOperationException("We received empty message.");
                     }
-                    
+
                     await handler(args.Body.FromBytes<MaterialCreatedMessage>());
 
                     channel.BasicAck(args.DeliveryTag, false);

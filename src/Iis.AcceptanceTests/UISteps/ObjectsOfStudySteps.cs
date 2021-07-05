@@ -15,10 +15,12 @@ namespace AcceptanceTests.UISteps
     {
         private readonly IWebDriver driver;
         private readonly ScenarioContext context;
-        private ObjectsOfStudyPageObjects objectsOfStudyPage;
+        private readonly ObjectsOfStudyPageObjects objectsOfStudyPage;
+        private readonly NavigationSection navigationSection;
         public ObjectsOfStudySteps(ScenarioContext injectedContext, IWebDriver driver)
         {
             objectsOfStudyPage = new ObjectsOfStudyPageObjects(driver);
+            navigationSection = new NavigationSection(driver);
             context = injectedContext;
             this.driver = driver;
         }
@@ -28,7 +30,7 @@ namespace AcceptanceTests.UISteps
         [When(@"I clicked on the Objects section")]
         public void WhenIClickedOnTheObjectsSection()
         {
-            objectsOfStudyPage.ObjectOfStudySectionButton.Click();
+            navigationSection.ObjectOfStudyLink.Click();
         }
 
 
@@ -69,9 +71,16 @@ namespace AcceptanceTests.UISteps
         {
             objectsOfStudyPage.SearchField.SendKeys(input);
             objectsOfStudyPage.SearchField.SendKeys(Keys.Enter);
-            driver.WaitFor(4);
-
+            driver.WaitFor(10);
         }
+
+        [When(@"I entered the value (.*) in the search field")]
+        public void WhenIEnteredTheValueInTheSearchField(string input)
+        {
+            objectsOfStudyPage.SearchField.SendKeys(input);
+            driver.WaitFor(2);
+        }
+
 
         [When(@"I clicked on the first search result title in the Objects of study section")]
         public void WhenIClickedOnTheFirstSearchResultTitle()
@@ -361,7 +370,7 @@ namespace AcceptanceTests.UISteps
             objectsOfStudyPage.SaveObjectOfStudyButton.Click();
             driver.WaitFor(2);
             objectsOfStudyPage.ConfirmSaveOfANewObjectOfStudyButton.Click();
-            driver.WaitFor(2);
+            driver.WaitFor(6);
         }
 
         private void ToggleAccordion(IWebElement accordionElement, bool open)
@@ -370,6 +379,15 @@ namespace AcceptanceTests.UISteps
                 (!open && accordionElement.FindElement(By.TagName("i")).HasClass("is-active")))
                 accordionElement.Click();
         }
+
+        [When(@"I clicked on the (.*) autocomplete button")]
+        public void WhenIClickedOnTheAutocompleteButton(string objectOfStudy)
+        {
+            var objectInTheList = driver.FindElement(By.XPath($"//div[contains(@class, 'entity-search__autocomplete')]//div[contains(text(),'{objectOfStudy}')]/following::button[@class='el-button alias-autocomplete__select-entity-button el-button--default']"));
+            objectInTheList.Click();
+            driver.WaitFor(2);
+        }
+
 
         #endregion
 
@@ -411,6 +429,7 @@ namespace AcceptanceTests.UISteps
         [Then(@"I must see the title (.*) in the small card")]
         public void IMustSeeTheTitleInTheSmallCard(string expectedTitle)
         {
+            driver.WaitFor(3);
             var actualTitle = objectsOfStudyPage.ObjectTitleInTheSmallCard.Text;
             Assert.Contains(expectedTitle, actualTitle);
         }
@@ -504,6 +523,7 @@ namespace AcceptanceTests.UISteps
         [Then(@"I must see that the (.*) event related to the object of study")]
         public void WhenIMustSeeAsRelatedToTheObjectOfStudyEvent(string eventName)
         {
+            driver.WaitFor(2);
             var eventUniqueName = context.Get<string>(eventName);
             Assert.Contains(objectsOfStudyPage.Events, _ => _.Name == eventUniqueName);
         }
@@ -521,6 +541,28 @@ namespace AcceptanceTests.UISteps
             var actualTitle = objectsOfStudyPage.RealNameFullBlock.Text;
             Assert.Equal(expectedTitle, actualTitle);
         }
+
+        [Then(@"I must see the (.*) value in the search suggestion list")]
+        public void ThenIMustSeeTheSpecifiedValueInTheSearchSuggestionList(string objectName)
+        {
+            var objectInTheList = driver.FindElement(By.XPath($"//div[contains(@class, 'entity-search__autocomplete')]//div[contains(text(),'{objectName}')]"));
+            Assert.True(objectInTheList.Displayed);
+        }
+
+        [Then(@"I see the (.*) tag in the search field")]
+        public void ThenISeeTheTagInTheSearchField(string expectedTag)
+        {
+            var actualTagValue = objectsOfStudyPage.TagInTheSearchField.Text;
+            Assert.Equal(expectedTag, actualTagValue);
+        }
+
+        [Then(@"I must see sign value (.*) in first search result")]
+        public void ThenIMustSeeSignValueInFirstSearchResult(string expectedSignValue)
+        {
+            var actualsignValue = objectsOfStudyPage.FirstSearchResultSignValue.Text;
+            Assert.Equal(expectedSignValue, actualsignValue);
+        }
+
         #endregion
     }
 }

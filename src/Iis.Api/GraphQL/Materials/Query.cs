@@ -4,13 +4,13 @@ using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using HotChocolate;
-using IIS.Core.Materials;
 using IIS.Core.GraphQL.Common;
 using IIS.Core.GraphQL.Entities.InputTypes;
 using Iis.Interfaces.Elastic;
 using Iis.Api.GraphQL.Common;
 using HotChocolate.Resolvers;
 using Iis.Services.Contracts.Params;
+using IIS.Services.Contracts.Interfaces;
 
 namespace IIS.Core.GraphQL.Materials
 {
@@ -23,16 +23,18 @@ namespace IIS.Core.GraphQL.Materials
             [Service] IMaterialProvider materialProvider,
             [Service] IMapper mapper,
             [GraphQLNonNullType] PaginationInput pagination,
-            FilterInput filter,
+            MaterialsFilterInput filter,
             SortingInput sorting,
             SearchByImageInput searchByImageInput,
             SearchByRelationInput searchByRelation = null)
         {
             var tokenPayload = ctx.GetToken();
 
-            var filterQuery = filter?.Suggestion ?? filter?.SearchQuery;
+            var filterQuery = filter?.Suggestion;
             var sortingParam = mapper.Map<SortingParams>(sorting) ?? SortingParams.Default;
             var pageParam = new PaginationParams(pagination.Page, pagination.PageSize);
+            var filteredItems = filter?.FilteredItems ?? new List<Property>();
+            var cherryPickedItems = filter?.CherryPickedItems ?? new List<string>();
 
             if (searchByImageInput != null && searchByImageInput.HasConditions)
             {
@@ -61,7 +63,7 @@ namespace IIS.Core.GraphQL.Materials
             }
 
             var materialsResult = await materialProvider
-                .GetMaterialsAsync(tokenPayload.UserId, filterQuery, pageParam, sortingParam);
+                .GetMaterialsAsync(tokenPayload.UserId, filterQuery, filteredItems, cherryPickedItems, pageParam, sortingParam);
 
             var materials = materialsResult.Materials.Select(m => mapper.Map<Material>(m)).ToList();
             MapHighlights(materials, materialsResult.Highlights);
