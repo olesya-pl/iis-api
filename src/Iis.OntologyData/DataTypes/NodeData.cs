@@ -253,10 +253,28 @@ namespace Iis.OntologyData.DataTypes
             var result = new List<INode>();
 
             result.AddRange(GetDirectChildNodes(filter));
-            foreach (var relation in _outgoingRelations.Where(r => r.IsLinkToInternalObject 
+            foreach (var relation in _outgoingRelations.Where(r => r.IsLinkToInternalObject
                 && !r.TargetNode.NodeType.IsEnum))
             {
                 result.AddRange(relation.TargetNode.GetDirectChildNodes(filter));
+            }
+
+            return result;
+        }
+        public IReadOnlyList<INode> GetDirectRelationNodes(Func<INode, bool> filter) =>
+            _outgoingRelations
+                .Where(r => filter(r.Node))
+                .Select(r => r.Node)
+                .ToList();
+        public IReadOnlyList<INode> GetAllRelationNodes(Func<INode, bool> filter)
+        {
+            var result = new List<INode>();
+
+            result.AddRange(GetDirectRelationNodes(filter));
+            foreach (var relation in _outgoingRelations.Where(r => r.IsLinkToInternalObject
+                && !r.TargetNode.NodeType.IsEnum && !r.TargetNode.NodeType.IsObjectSign))
+            {
+                result.AddRange(relation.TargetNode.GetDirectRelationNodes(filter));
             }
 
             return result;
@@ -275,20 +293,32 @@ namespace Iis.OntologyData.DataTypes
         }
         public string GetDotName()
         {
-            var node = NodeType.Kind == Kind.Relation ? this.Relation.TargetNode : this;
+            if (this.NodeType.Kind == Kind.Entity) return this.NodeType.Name;
+
+            var node = NodeType.Kind == Kind.Attribute ? this.IncomingRelations.First().Node : this;
             var sb = new StringBuilder();
-            bool isFirst = true;
-
-            while (isFirst || !node.NodeType.IsObject)
+            try
             {
-                isFirst = false;
-                if (sb.Length > 0) sb.Insert(0, ".");
-                sb.Insert(0, node.IncomingRelations.First().Node.NodeType.Name);
+                while (true)
+                {
+                    if (sb.Length > 0) sb.Insert(0, ".");
+                    sb.Insert(0, node.NodeType.Name);
 
-                node = node.IncomingRelations.First().SourceNode;
+                    var sourceNode = node.Relation.SourceNode;
+                    if (sourceNode.NodeType.IsObject)
+                    {
+                        sb.Insert(0, sourceNode.NodeType.Name);
+                        break;
+                    }
+                    node = sourceNode.IncomingRelations.First().Node;
+                }
+
+                return sb.ToString();
             }
-
-            return sb.ToString();
+            catch (Exception ex)
+            {
+                throw;
+            }
         }
         public string GetTitleValue() => GetSingleProperty(NodeType.TitleAttributeName)?.Value;
 

@@ -52,31 +52,45 @@ namespace Iis.Services
             
             }
 
-            foreach (var enumNode in entity.GetAllChildNodes(n => n.NodeType.IsEnum))
+            foreach (var relationNode in entity.GetAllRelationNodes(n => n.NodeType.RelationType.TargetType.IsObjectSign))
             {
-                var dotName = enumNode.GetDotName();
+                var dotName = relationNode.GetDotName();
                 if (string.IsNullOrEmpty(dotName))
                 {
                     var i = 0;
                 }
                 csvData.Add(new CsvDataItem(
                     entity.Id.ToString(),
-                    enumNode.GetDotName(),
-                    enumNode.GetSingleDirectProperty("name").Value
+                    relationNode.GetDotName(),
+                    relationNode.Relation.TargetNode.GetSingleDirectProperty("value").Value
                 ));
             }
 
-            foreach (var externalNode in entity.GetAllChildNodes(n => n.NodeType.IsObject))
+            foreach (var relationNode in entity.GetAllRelationNodes(n => n.NodeType.RelationType.TargetType.IsEnum))
             {
-                var dotName = externalNode.GetDotName();
+                var dotName = relationNode.GetDotName();
                 if (string.IsNullOrEmpty(dotName))
                 {
                     var i = 0;
                 }
                 csvData.Add(new CsvDataItem(
                     entity.Id.ToString(),
-                    externalNode.GetDotName(),
-                    externalNode.GetComputedValue("__title")
+                    relationNode.GetDotName(),
+                    relationNode.Relation.TargetNode.GetSingleDirectProperty("name").Value
+                ));
+            }
+
+            foreach (var relationNode in entity.GetAllRelationNodes(n => n.NodeType.RelationType.TargetType.IsObject))
+            {
+                var dotName = relationNode.GetDotName();
+                if (string.IsNullOrEmpty(dotName))
+                {
+                    var i = 0;
+                }
+                csvData.Add(new CsvDataItem(
+                    entity.Id.ToString(),
+                    relationNode.GetDotName(),
+                    relationNode.Relation.TargetNode.GetComputedValue("__title")
                 ));
             }
             return csvData;
