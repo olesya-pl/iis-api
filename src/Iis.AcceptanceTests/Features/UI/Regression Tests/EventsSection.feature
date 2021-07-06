@@ -24,9 +24,11 @@
         And I created a new Тестова подія event
         When I searched for the Тестова подія created event
         Then I must see the Тестова подія event in the event search results
+        Then I open first event in the events list
         When I pressed the edit event button
-        And I binded a 257 material to the event
+        And I binded a Voice_01-07-2017 21-34-38 (257) material to the event
         When I pressed the save event changes button
+        When I pressed the edit event button
         Then I must see the Voice_01-07-2017 21-34-38 (257) material binded to the event
         When I pressed the delete button to delete the specified Voice_01-07-2017 21-34-38 (257).mp3 material
         Then I must not see the Voice_01-07-2017 21-34-38 (257).mp3 material binded to the event
@@ -37,8 +39,9 @@
         And I created a new Тестова подія event
         When I searched for the Тестова подія created event
         Then I must see the Тестова подія event in the event search results
+        Then I open first event in the events list
         When I pressed the edit event button
-        And I binded a 257 material to the event
+        And I binded a Voice_01-07-2017 21-34-38 (257) material to the event
         When I pressed the save event changes button
         Then I must see the Voice_01-07-2017 21-34-38 (257) material binded to the event
         When I navigated to Materials page
@@ -54,10 +57,12 @@
         And I created a new Тестова подія event
         When I searched for the Тестова подія created event
         Then I must see the Тестова подія event in the event search results
+        Then I open first event in the events list
         When I pressed the edit event button
         And I entered Зміни до події text in the addition data text field
         And I pressed the save event changes button
         And I pressed the confirm save changes in the event
         When I reloaded the event page
+        When I pressed the edit event button
         Then I must see the Зміни до події text in the additional data text field
        
