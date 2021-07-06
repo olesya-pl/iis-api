@@ -167,9 +167,6 @@ namespace AcceptanceTests.Features.UI.SmokeTests
 #line 15
   testRunner.Then("Login and password inputs are highlighted with red", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 16
-  testRunner.Then("I see the error message that login or password is incorrect", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line hidden
             }
             this.ScenarioCleanup();
         }

@@ -27,6 +27,10 @@ namespace AcceptanceTests.PageObjects
 		[CacheLookup]
 		public IWebElement FirstEventInTheEventsList;
 
+		[FindsBy(How = How.CssSelector, Using = ".events-table .p-datatable-tbody > tr button.action-button--full-screen")]
+		[CacheLookup]
+		public IWebElement FirstEventInTheEventsListFullscreenButton;
+
 		[FindsBy(How = How.CssSelector, Using = ".el-tooltip")]
 		public IWebElement SearchButton;
 
