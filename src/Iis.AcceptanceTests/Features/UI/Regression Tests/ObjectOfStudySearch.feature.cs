@@ -395,7 +395,7 @@ this.FeatureBackground();
  testRunner.Then("I must see object of study Бонд as first search result", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
 #line 47
- testRunner.Then("I must see sign value 00997908973 in first search result", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("I must see sign value 0997908973 in first search result", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
             this.ScenarioCleanup();

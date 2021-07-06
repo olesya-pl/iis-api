@@ -18,9 +18,6 @@ namespace AcceptanceTests.PageObjects
             PageFactory.InitElements(driver, this);
         }
 
-        [FindsBy(How = How.XPath, Using = "//div[contains(text(),'Обʼєкти')]")]
-        public IWebElement ObjectOfStudySectionButton;
-
         [FindsBy(How = How.CssSelector, Using = ".entity-search .entity-search__toggle button")]
         [CacheLookup]
         public IWebElement SearchLoopButton;
@@ -143,14 +140,14 @@ namespace AcceptanceTests.PageObjects
         [CacheLookup]
         public IWebElement RussianMilitaryForcesExpandButton;
 
-        [FindsBy(How = How.XPath, Using = "//ul//li[contains(.,\"Зв'язки\")]")]
+        [FindsBy(How = How.CssSelector, Using = ".objects-page .header-nav ul > li.graph")]
         public IWebElement RelationsTab;
 
         [FindsBy(How = How.XPath, Using = "//div[contains(text(),'3 окрема мотострілецька бригада \"Беркут\"')]")]
         [CacheLookup]
         public IWebElement ThirdBrigadeSearchResult;
 
-        [FindsBy(How = How.XPath, Using = "//span[contains(text(),' Створити обʼєкт... ')]")]
+        [FindsBy(How = How.CssSelector, Using = ".quick-access-panel__actions button.add-button")]
         public IWebElement CreateANewObjectOfStudyButton;
 
         [FindsBy(How = How.XPath, Using = "//span[contains(@class, 'el-tree-node__label') and text() = 'Військовий підрозділ']")]
@@ -198,7 +195,7 @@ namespace AcceptanceTests.PageObjects
         [FindsBy(How = How.CssSelector, Using = ".el-collapse-item:nth-of-type(22) .el-input--mini:nth-of-type(2) .el-input__inner")]
         public IWebElement CountryFieldInTheTemporaryDisclocationBlock;
 
-        [FindsBy(How = How.XPath, Using = "//li[contains(text(),'Події')]")]
+        [FindsBy(How = How.CssSelector, Using = ".objects-page .header-nav ul > li.events")]
         public IWebElement EventsTabInTheBigObjectOfStudyCard;
 
         [FindsBy(How = How.XPath, Using = "//div[@name='title']/div[@class='el-form-item__content']")]

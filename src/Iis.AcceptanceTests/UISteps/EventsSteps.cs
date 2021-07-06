@@ -16,12 +16,14 @@ namespace AcceptanceTests.UISteps
 
         private EventPage eventPage;
         private EventsSection eventsSection;
+        private readonly NavigationSection navigationSection;
 
         #region Given/When
         public EventsSteps(ScenarioContext injectedContext, IWebDriver driver)
         {
             eventPage = new EventPage(driver);
             eventsSection = new EventsSection(driver);
+            navigationSection = new NavigationSection(driver);
             context = injectedContext;
             this.driver = driver;
         }
@@ -29,7 +31,7 @@ namespace AcceptanceTests.UISteps
         [When(@"I navigated to Events page")]
         public void IWantNavigateToEventsPage()
         {
-            eventsSection.EventsPage.Click();
+            navigationSection.EventsLink.Click();
             driver.WaitFor(3);
         }
 
@@ -63,7 +65,7 @@ namespace AcceptanceTests.UISteps
             eventPage.ConfirmSaveEventChangesButton.Click();
             driver.WaitFor(2);
             driver.Navigate().Refresh();
-            driver.WaitFor(2);
+            driver.WaitFor(5);
             eventPage.CloseEventCreationWindow.Click();
         }
 
@@ -230,6 +232,13 @@ namespace AcceptanceTests.UISteps
             var additionalText = context.Get<string>("additionalText");
             var actualText = eventPage.AdditionalDataTextField.GetAttribute("value");
             Assert.Contains(additionalText, actualText);
+        }
+
+        [Then(@"I open first event in the events list")]
+        public void ThenIOpenFirstEventInTheEventsList()
+        {
+            var viewEventButton = eventsSection.FirstEventInTheEventsListFullscreenButton;
+            viewEventButton.Click();
         }
 
         #endregion

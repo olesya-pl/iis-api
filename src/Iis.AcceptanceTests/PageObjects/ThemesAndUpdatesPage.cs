@@ -16,15 +16,11 @@ namespace AcceptanceTests.PageObjects
             PageFactory.InitElements(driver, this);
         }
 
-        [FindsBy(How = How.XPath, Using = "//div[@class='sidebar__body']//li[@class='el-menu-item sidebar__nav-item themes']")]
-        [CacheLookup]
-        public IWebElement ThemesAndUpdatesSection;
-
         [FindsBy(How = How.CssSelector, Using = ".themes-table .p-datatable-tbody > tr")]
         [CacheLookup]
         public IWebElement FirstThemeInTheThemeList;
 
-        [FindsBy(How = How.XPath, Using = "//input[@placeholder='Введіть назву теми']")]
+        [FindsBy(How = How.CssSelector, Using = ".create-entity-theme__form .create-entity-theme__form-field input[type=text]")]
         public IWebElement EnterThemeNameField;
         public List<Theme> Themes => driver.FindElements(By.CssSelector(".themes-table tr"))
                     .Select(_ => new Theme(driver, _)).ToList();

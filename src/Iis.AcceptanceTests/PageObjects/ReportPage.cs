@@ -15,10 +15,6 @@ namespace AcceptanceTests.PageObjects
             PageFactory.InitElements(driver, this);
         }
 
-        [FindsBy(How = How.CssSelector, Using = "div:nth-of-type(1) > li:nth-of-type(3)")]
-        [CacheLookup]
-        public IWebElement ReportSection;
-
         [FindsBy(How = How.CssSelector, Using = ".reports-table .p-datatable-tbody > tr")]
         public IWebElement FirstReportInTheReportList;
 

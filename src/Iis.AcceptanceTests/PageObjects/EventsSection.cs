@@ -19,9 +19,6 @@ namespace AcceptanceTests.PageObjects
 			PageFactory.InitElements(driver, this);
 		}
 
-		[FindsBy(How = How.XPath, Using = "//div[contains(text(),'Події')]")]
-		public IWebElement EventsPage;
-
 		[FindsBy(How = How.CssSelector, Using = ".add-button")]
 		[CacheLookup]
 		public IWebElement CreateEventButton;
@@ -29,6 +26,10 @@ namespace AcceptanceTests.PageObjects
 		[FindsBy(How = How.CssSelector, Using = ".events-table .p-datatable-tbody > tr")]
 		[CacheLookup]
 		public IWebElement FirstEventInTheEventsList;
+
+		[FindsBy(How = How.CssSelector, Using = ".events-table .p-datatable-tbody > tr button.action-button--full-screen")]
+		[CacheLookup]
+		public IWebElement FirstEventInTheEventsListFullscreenButton;
 
 		[FindsBy(How = How.CssSelector, Using = ".el-tooltip")]
 		public IWebElement SearchButton;

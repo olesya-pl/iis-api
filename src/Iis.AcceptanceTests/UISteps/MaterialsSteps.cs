@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Linq;
+using System.Threading.Tasks;
 using AcceptanceTests.Helpers;
 using AcceptanceTests.PageObjects;
 using OpenQA.Selenium;
 using TechTalk.SpecFlow;
+using TechTalk.SpecFlow.Assist;
 using Xunit;
 
 namespace AcceptanceTests.UISteps
@@ -13,11 +15,13 @@ namespace AcceptanceTests.UISteps
     {
         private readonly IWebDriver driver;
         private readonly ScenarioContext context;
-        private MaterialsSectionPage materialsSectionPage;
+        private readonly MaterialsSectionPage materialsSectionPage;
+        private readonly NavigationSection navigationSection;
 
         public MaterialsSteps(ScenarioContext injectedContext, IWebDriver driver)
         {
             materialsSectionPage = new MaterialsSectionPage(driver);
+            navigationSection = new NavigationSection(driver);
 
             context = injectedContext;
             this.driver = driver;
@@ -27,7 +31,7 @@ namespace AcceptanceTests.UISteps
         [When(@"I navigated to Materials page")]
         public void IWantNavigateToMaterialsPage()
         {
-            materialsSectionPage.MaterialsSection.Click();
+            navigationSection.MaterialsLink.Click();
             driver.WaitFor(7);
         }
 
@@ -81,6 +85,26 @@ namespace AcceptanceTests.UISteps
             driver.WaitFor(5);
         }
 
+        [When(@"I searched for uploaded material in the materials")]
+        public void WhenISearchedForUploadedMaterialInTheMaterials()
+        {
+            materialsSectionPage.SearchField.SendKeys(context.Get<string>("uploadedMaterial"));
+            driver.WaitFor(2);
+            materialsSectionPage.SearchField.SendKeys(Keys.Enter);
+            driver.WaitFor(5);
+        }
+
+        [Given(@"I upload a new docx material via API")]
+        public async Task GivenIUploadANewDocxMaterialViaAPI(Table table)
+        {
+            var uniqueSuffix = Guid.NewGuid().ToString();
+            var materialModel = table.CreateInstance<MaterialModel>();
+            materialModel.FileName = materialModel.FileName + uniqueSuffix;
+            materialModel.Content = materialModel.Content + uniqueSuffix;
+            context.Set(materialModel.FileName, "uploadedMaterial");
+            await MaterialsHelper.UploadDocxMaterial(materialModel);
+        }
+
         [When(@"I set importance (.*) value")]
         public void WhenIClickedOnTheDropDownMenuInTheMaterials(string value)
         {
@@ -131,7 +155,7 @@ namespace AcceptanceTests.UISteps
         public void WhenIClickedOnTheFirstSearchResultInTheMaterialsSection()
         {
             materialsSectionPage.FirstSearchResult.Click();
-            driver.WaitFor(1);
+            driver.WaitFor(5);
         }
 
         [When(@"I pressed Show button to show Text classifier ML output")]
@@ -222,6 +246,14 @@ namespace AcceptanceTests.UISteps
             materialsSectionPage.ClearSearchFieldButton.Click();
             driver.WaitFor(1);
         }
+
+        [When(@"I close the material card")]
+        public void ThenICloseTheMaterialCard()
+        {
+            materialsSectionPage.CloseMaterialCardButton.Click();
+            driver.WaitFor(5);
+        }
+
 
         #endregion When
 

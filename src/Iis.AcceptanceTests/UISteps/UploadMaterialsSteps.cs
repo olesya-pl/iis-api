@@ -12,20 +12,21 @@ namespace AcceptanceTests.UISteps
         private readonly IWebDriver driver;
         private readonly ScenarioContext context;
         private UploadMaterialsPageObjects uploadMaterialsPage;
+        private readonly NavigationSection navigationSection;
 
         public UploadMaterialsSteps(ScenarioContext injectedContext, IWebDriver driver)
         {
             uploadMaterialsPage = new UploadMaterialsPageObjects(driver);
+            navigationSection = new NavigationSection(driver);
             context = injectedContext;
             this.driver = driver;
-            
         }
 
         #region When
         [When(@"I navigated to the Upload materials page")]
         public void WhenINavigatedToUploadMaterialsPage()
         {
-            uploadMaterialsPage.LoadMaterialsSection.Click();
+            navigationSection.UploaderInputStreamLink.Click();
             //driver.WaitFor(2);
         }
         #endregion

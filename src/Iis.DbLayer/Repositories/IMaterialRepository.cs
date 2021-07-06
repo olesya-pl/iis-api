@@ -13,9 +13,12 @@ namespace Iis.DbLayer.Repositories
     {
         string[] MaterialIndexes { get; }
         Task<MaterialEntity> GetByIdAsync(Guid id, params MaterialIncludeEnum[] includes);
+
         Task<MaterialEntity[]> GetByIdsAsync(ISet<Guid> ids, params MaterialIncludeEnum[] includes);
 
         Task<IEnumerable<MaterialEntity>> GetAllAsync(params MaterialIncludeEnum[] includes);
+        
+        Task<IEnumerable<MaterialEntity>> GetAllAsync(int limit, params MaterialIncludeEnum[] includes);
 
         Task<IEnumerable<MaterialEntity>> GetAllForRelatedNodeListAsync(IEnumerable<Guid> nodeIdList);
 
@@ -60,5 +63,7 @@ namespace Iis.DbLayer.Repositories
         Task<bool> CheckMaterialExistsAndHasContent(Guid materialId);
 
         Task RemoveMaterialsAndRelatedData(IReadOnlyCollection<Guid> fileIdList);
+
+        Task<Guid?> GetParentIdByChildIdAsync(Guid materialId);
     }
 }

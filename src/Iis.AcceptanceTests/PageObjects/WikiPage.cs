@@ -16,9 +16,6 @@ namespace AcceptanceTests.PageObjects
 			PageFactory.InitElements(driver, this);
 		}
 
-		[FindsBy(How = How.XPath, Using = "//div[contains(text(),'Довідник ОіВТ')]")]
-		public IWebElement WikiSection;
-
 		[FindsBy(How = How.XPath, Using = "//div[@class='infinity-table wiki-table']//tbody[@class='p-datatable-tbody']/tr[1]")]
 		// [FindsBy(How = How.CssSelector, Using = ".wiki-table .p-datatable-tbody > tr")]
 		[CacheLookup]

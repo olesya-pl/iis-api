@@ -1,11 +1,7 @@
 ﻿using System;
 
-namespace Iis.Messages
+namespace Iis.Messages.Materials
 {
-    public class MaterialRabbitConsts
-    {
-        public const string QueueName = "material.created";
-    }
 
     public class MaterialCreatedMessage
     {

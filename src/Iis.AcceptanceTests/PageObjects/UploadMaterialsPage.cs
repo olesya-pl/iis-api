@@ -13,10 +13,6 @@ namespace AcceptanceTests.PageObjects
             PageFactory.InitElements(driver, this);
         }
 
-        [FindsBy(How = How.CssSelector, Using = "li:nth-of-type(6) > .sidebar__nav-item-title")]
-        [CacheLookup]
-        public IWebElement LoadMaterialsSection;
-
         [FindsBy(How = How.XPath, Using = "//div[@class='upload']")]
         public IWebElement UploadFunctionalityWindow;
     }

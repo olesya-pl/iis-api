@@ -2,20 +2,17 @@ using System;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using RabbitMQ.Client;
-using Iis.Services.Contracts.Configurations;
 
-namespace Iis.Api.Modules
+namespace Iis.RabbitMq.DependencyInjection
 {
-    internal static class MqRegistrationModule
+    public static class DI
     {
-        private const string mqSectionName = "mq";
-
+        private const string MessageQueueSectionName = "mq";
         public static IServiceCollection RegisterMqFactory(this IServiceCollection services, IConfiguration configuration, out string mqConnectionString)
         {
+            var mqConfig = configuration.GetSection(MessageQueueSectionName).Get<MqFactoryConfiguration>();
 
-            var mqConfig = configuration.GetSection(mqSectionName).Get<MqConfiguration>();
-
-            if (mqConfig == null) throw new InvalidOperationException($"No config was found with name \"{mqSectionName}\"");
+            if (mqConfig == null) throw new InvalidOperationException($"No config was found with name \"{MessageQueueSectionName}\"");
 
             var connectionFactory = new ConnectionFactory
             {
@@ -32,6 +29,7 @@ namespace Iis.Api.Modules
 
             return services
                     .AddTransient<IConnectionFactory>(serviceProvider => connectionFactory);
+
         }
     }
 }

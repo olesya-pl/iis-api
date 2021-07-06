@@ -46,13 +46,56 @@ namespace Iis.DbLayer.ModifyDataScripts
             });
         }
 
+        public void AddPhotoType(OntologyContext context, IOntologyNodesData data)
+        {
+            var photoType = data.Schema.GetEntityTypeByName(EntityTypeNames.Photo.ToString());
+            if (photoType == null)
+            {
+                photoType = data.Schema.CreateEntityType(EntityTypeNames.Photo.ToString(), "Зображення", false);
+                data.Schema.CreateAttributeType(photoType.Id, "image", "Фото", ScalarType.File, EmbeddingOptions.Required);
+                data.Schema.CreateAttributeType(photoType.Id, "title", "Заголовок");
+            }
+        }
+
+        public void AddObjectType(OntologyContext context, IOntologyNodesData data)
+        {
+            var objectType = data.Schema.GetEntityTypeByName(EntityTypeNames.Object.ToString());
+            if (objectType == null)
+            {
+                objectType = data.Schema.CreateEntityType(EntityTypeNames.Object.ToString(), "Базовий об'єкт", false);
+                data.Schema.CreateAttributeType(objectType.Id, "title", "Заголовок");
+                data.Schema.CreateAttributeTypeJson(
+                    objectType.Id,
+                    "__title",
+                    "Повна назва",
+                    ScalarType.String,
+                    EmbeddingOptions.Optional,
+                    "{\"Formula\": \"{title};\\\"Об'єкт без назви\\\"\"}"
+                );
+            }
+
+            var objectOfStudyType = data.Schema.GetEntityTypeByName(EntityTypeNames.ObjectOfStudy.ToString());
+            if (!objectOfStudyType.IsInheritedFrom(EntityTypeNames.Object.ToString()))
+            {
+                data.Schema.SetInheritance(objectOfStudyType.Id, objectType.Id);
+            }
+
+            var eventType = data.Schema.GetEntityTypeByName(EntityTypeNames.Event.ToString());
+            if (!eventType.IsInheritedFrom(EntityTypeNames.Object.ToString()))
+            {
+                data.Schema.SetInheritance(eventType.Id, objectType.Id);
+            }
+
+            SaveOntologySchema(data.Schema);
+        }
+
         public void AddAccessLevelAccessObject(OntologyContext context, IOntologyNodesData data)
         {
             var entityId = new Guid("a60af6c5d930476c96218ea5c0147fb7");
 
             var existingEntity = context.AccessObjects.Find(entityId);
 
-            if( existingEntity != null) return;
+            if (existingEntity != null) return;
 
             context.AccessObjects.Add(
                 new AccessObjectEntity
@@ -75,13 +118,13 @@ namespace Iis.DbLayer.ModifyDataScripts
                 .Select(sign => sign.Id)
                 .ToList();
 
-            if(signList.Count == 0) return;
+            if (signList.Count == 0) return;
 
             var entityList = context.LocationHistory
                 .Where(e => e.NodeId != null && e.NodeId != e.EntityId && signList.Contains(e.NodeId.Value))
                 .ToList();
 
-            if(entityList.Count == 0) return;
+            if (entityList.Count == 0) return;
 
             foreach (var entity in entityList)
             {
@@ -147,9 +190,9 @@ namespace Iis.DbLayer.ModifyDataScripts
 
             data.Schema.CreateRelationTypeJson(
                 objectType.Id,
-                accessLevelType.Id, 
-                ACCESS_LEVEL, 
-                "Гриф (рівень доступу)", 
+                accessLevelType.Id,
+                ACCESS_LEVEL,
+                "Гриф (рівень доступу)",
                 EmbeddingOptions.Optional,
                 jsonMeta);
 
@@ -254,7 +297,7 @@ namespace Iis.DbLayer.ModifyDataScripts
             foreach (var entity in entities)
             {
                 entity.SearchAllowed = entity.CommentingAllowed = entity.AccessLevelUpdateAllowed = true;
-                
+
             }
             context.AccessObjects.UpdateRange(entities);
             context.SaveChanges();
@@ -448,8 +491,8 @@ namespace Iis.DbLayer.ModifyDataScripts
                 }
             });
 
-            data.Schema.UpdateNodeType(new NodeTypeUpdateParameter 
-            { 
+            data.Schema.UpdateNodeType(new NodeTypeUpdateParameter
+            {
                 Id = accessLevelRelationType.Id,
                 EmbeddingOptions = EmbeddingOptions.Required
             });
@@ -507,7 +550,7 @@ namespace Iis.DbLayer.ModifyDataScripts
                 var parseResult = Decimal.TryParse(latStringValue, out decimal latitude)
                                 & Decimal.TryParse(lonStringValue, out decimal longitude);
 
-                if(parseResult)
+                if (parseResult)
                 {
                     var entity = new DataModel.FlightRadar.LocationHistoryEntity
                     {
@@ -532,7 +575,7 @@ namespace Iis.DbLayer.ModifyDataScripts
             {
                 var nodeEntity = context.Nodes.Find(relationId);
 
-                if(nodeEntity is null) continue;
+                if (nodeEntity is null) continue;
 
                 nodeEntity.NodeTypeId = newRelationNodeTypeId;
 
@@ -548,6 +591,19 @@ namespace Iis.DbLayer.ModifyDataScripts
                     .Select(e => e.Id)
                     .ToArray();
         }
+        private INodeTypeLinked GetOrCreateSatelliteIridiumPhoneSignType(IOntologyNodesData data)
+        {
+            const string NAME = "SatelliteIridiumPhoneSign";
+            var signType = data.Schema.GetEntityTypeByName(NAME);
+            if (signType == null)
+            {
+                signType = data.Schema.CreateEntityType(NAME, "Супутниковий телефон Iridium", false);
+                data.Schema.CreateAttributeType(signType.Id, "tmsi", "TMSI");
+                data.Schema.CreateAttributeType(signType.Id, "imsi", "IMSI");
+                data.Schema.CreateAttributeType(signType.Id, "imei", "IMEI");
+            }
+            return signType;
+        }
         public void SetupNewTypesForPhoneSign(OntologyContext context, IOntologyNodesData data)
         {
             const string BeamPropName = "beam";
@@ -559,7 +615,7 @@ namespace Iis.DbLayer.ModifyDataScripts
             if (data.Schema.GetEntityTypeByName(AbstractSatellitePhoneSignName) != null) return;
 
             var objectSignType = data.Schema.GetEntityTypeByName(EntityTypeNames.ObjectSign.ToString());
-            var satIridiumPhoneSignType = data.Schema.GetEntityTypeByName("SatelliteIridiumPhoneSign");
+            var satIridiumPhoneSignType = GetOrCreateSatelliteIridiumPhoneSignType(data);
             var satPhoneSignType = data.Schema.GetEntityTypeByName("SatellitePhoneSign");
 
             var iridiumSignList = data.GetNodesByTypeId(satIridiumPhoneSignType.Id);
@@ -577,7 +633,7 @@ namespace Iis.DbLayer.ModifyDataScripts
 
             recordsAdded += FetchAndAddCoordinates(satPhoneSignList, context);
 
-            if(recordsAdded > 0) context.SaveChanges();
+            if (recordsAdded > 0) context.SaveChanges();
 
             //create and setup new abstract type AbstractSatellitePhoneSign
             var abstractSatPhoneSignType = data.Schema.CreateEntityType(AbstractSatellitePhoneSignName, "Супутниковий телефон (абстрактний)", true, objectSignType.Id);
@@ -593,24 +649,24 @@ namespace Iis.DbLayer.ModifyDataScripts
             data.Schema.SetInheritance(satPhoneSignType.Id, abstractSatPhoneSignType.Id);
 
             var locationXRelationType = satPhoneSignType.GetProperty(LocationXPropName);
-            if(locationXRelationType != null)
+            if (locationXRelationType != null)
             {
                 data.Schema.RemoveRelation(locationXRelationType.Id);
             }
 
             var locationYRelationType = satPhoneSignType.GetProperty(LocationYPropName);
-            if(locationYRelationType != null)
+            if (locationYRelationType != null)
             {
                 data.Schema.RemoveRelation(locationYRelationType.Id);
             }
             var beamRelationType = satPhoneSignType.GetProperty(BeamPropName);
-            if(beamRelationType != null)
+            if (beamRelationType != null)
             {
                 data.Schema.RemoveRelation(beamRelationType.Id);
             }
 
             var dbObjectRelationType = satPhoneSignType.GetProperty(DbObjectPropName);
-            if(dbObjectRelationType != null)
+            if (dbObjectRelationType != null)
             {
                 data.Schema.RemoveRelation(dbObjectRelationType.Id);
             }

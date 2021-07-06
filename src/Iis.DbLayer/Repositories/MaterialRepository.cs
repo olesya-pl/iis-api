@@ -16,6 +16,7 @@ using Iis.DataModel.Materials;
 using Iis.DbLayer.Extensions;
 using Iis.DbLayer.MaterialEnum;
 using Iis.DbLayer.Repositories.Helpers;
+using Iis.DbLayer.MaterialDictionaries;
 using Iis.Interfaces.Elastic;
 using Iis.Interfaces.Ontology.Data;
 using Iis.Interfaces.Ontology.Schema;
@@ -27,8 +28,6 @@ namespace Iis.DbLayer.Repositories
 {
     public class MaterialRepository : RepositoryBase<OntologyContext>, IMaterialRepository
     {
-        private const string ImageVectorMlHandlerCode = "imageVector";
-
         private readonly MaterialIncludeEnum[] _includeAll = new MaterialIncludeEnum[]
         {
             MaterialIncludeEnum.WithChildren,
@@ -70,6 +69,13 @@ namespace Iis.DbLayer.Repositories
         {
             return await GetMaterialsQuery(includes)
                             .ToArrayAsync();
+        }
+        
+        public async Task<IEnumerable<MaterialEntity>> GetAllAsync(int limit, params MaterialIncludeEnum[] includes)
+        {
+            return await GetMaterialsQuery(includes)
+                .Take(limit)
+                .ToArrayAsync();
         }
 
         public async Task<IEnumerable<MaterialEntity>> GetAllForRelatedNodeListAsync(IEnumerable<Guid> nodeIdList)
@@ -387,6 +393,12 @@ namespace Iis.DbLayer.Repositories
                 await transaction.CommitAsync();
             }
         }
+        public Task<Guid?> GetParentIdByChildIdAsync(Guid materialId)
+        {
+            return Context.Materials
+                .Where(e => e.Id.Equals(materialId))
+                .Select(e => e.ParentId).FirstOrDefaultAsync();
+        }
 
         private MaterialDocument MapEntityToDocument(MaterialEntity material)
         {
@@ -435,7 +447,7 @@ namespace Iis.DbLayer.Repositories
             {
                 if(responseDictionary.TryGetValue(materialId, out MLResponseEntity[] responseList))
                 {
-                    var imageVectorList = GetLatestImageVectorList(responseList)
+                    var imageVectorList = GetLatestImageVectorList(responseList, MlHandlerCodeList.ImageVector)
                                         .Select(e => new ImageVector(e))
                                         .ToArray();
                     result.AddRange(imageVectorList);
@@ -448,7 +460,7 @@ namespace Iis.DbLayer.Repositories
         {
             var mlResponses = await _mLResponseRepository.GetAllForMaterialAsync(materialId);
 
-            var imageVectorList = GetLatestImageVectorList(mlResponses)
+            var imageVectorList = GetLatestImageVectorList(mlResponses, MlHandlerCodeList.ImageVector)
                                     .Select(e => new ImageVector(e))
                                     .ToArray();
 
@@ -567,6 +579,7 @@ namespace Iis.DbLayer.Repositories
                     MaterialIncludeEnum.WithNodes => resultQuery.WithNodes(),
                     MaterialIncludeEnum.WithChildren => resultQuery.WithChildren(),
                     MaterialIncludeEnum.WithFiles => resultQuery.WithFiles(),
+                    MaterialIncludeEnum.OnlyParent => resultQuery.OnlyParent(),
                     _ => resultQuery
                 };
             }
@@ -574,11 +587,11 @@ namespace Iis.DbLayer.Repositories
             return resultQuery;
         }
 
-        private static IReadOnlyCollection<decimal[]> GetLatestImageVectorList(IReadOnlyCollection<MLResponseEntity> mlResponsesByEntity)
+        private static IReadOnlyCollection<decimal[]> GetLatestImageVectorList(IReadOnlyCollection<MLResponseEntity> mlResponsesByEntity, string handlerCode)
         {
             var response = mlResponsesByEntity
                                     .OrderByDescending(e => e.ProcessingDate)
-                                    .FirstOrDefault(e => e.HandlerCode == ImageVectorMlHandlerCode);
+                                    .FirstOrDefault(e => e.HandlerCode == handlerCode);
 
             return FaceAPIResponseParser.GetFaceVectorList(response?.OriginalResponse);
         }

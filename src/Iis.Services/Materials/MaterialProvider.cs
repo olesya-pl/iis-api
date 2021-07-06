@@ -161,6 +161,16 @@ namespace IIS.Services.Materials
             return RunWithoutCommitAsync(async (unitOfWork) =>
                 await unitOfWork.MaterialRepository.GetAllAsync());
         }
+        
+        public async Task<IReadOnlyCollection<Guid>> GetMaterialsIdsAsync(int limit)
+        {
+            var materials = await RunWithoutCommitAsync((unitOfWork) =>
+                unitOfWork.MaterialRepository.GetAllAsync(limit, MaterialIncludeEnum.OnlyParent));
+
+            var materialIds = materials.Select((material) => material.Id).ToArray();
+            
+            return materialIds;
+        }
 
         public IReadOnlyCollection<MaterialSignEntity> GetMaterialSigns(string typeName)
         {

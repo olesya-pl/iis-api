@@ -1,104 +1,76 @@
 # Integration Information System API
 
-## Install
+## Руководство по запуску локального окруения в Docker
 
-1. Install dotnet-sdk-2.2.105 on machine.
-2. Run `cd IIS/IIS.Core` and `dotnet publish IIS.Core.csproj -o ../publish/core`. Services will be published to IIS/publish folder.
-3. Configure application by changing `appsettings.${ASPNETCORE_ENVIRONMENT}.json` file, where `ASPNETCORE_ENVIRONMENT` is an env variable (e.g., `export ASPNETCORE_ENVIRONMENT=Staging`)
-4. Go to `cd IIS/publish/core` folder and run `dotnet IIS.Core.dll`
-or `dotnet IIS.Replication.dll server.urls=http://localhost:${PORT}/` where any `PORT` is a variable which contains server port number. By default app starts at `localhost:5000` port
+Неоходимо иметь заранее установленный [Docker](https://docs.docker.com/get-docker/)
 
-To run in detached mode use [supervisor](https://til.secretgeek.net/linux/supervisor.html).
+Для использования хранилища (или registry) contour необходимо модифицировать **daemon.json**, который находится в папке (для WIndows пользователей) - .docker  
+**C:\\{UserName}\\.docker**
+Добавить строчку
 
-## Configuration
+`"insecure-registries": ["docker.contour.net:5000"]`
 
-Thus all configuration can be provided via ENV variables.
+После добавления - сохранить файл и перезапустить docker
 
-Application will not start if required variables are not provided. The list of variables:
+Если вы пользуетесь приложением Docker - зайти в настройки и в разделе **Docker engine** внести указанную выше строчку, после чего нажать внопку **Apply & Restart**
 
-| name                        | default value          | Purpose                              |
-| --------------------------- | ---------------------- | ------------------------------------ |
-| DB_HOST                     | localhost              | databse host                         |
-| DB_NAME                     | Contour                | database name                        |
-| DB_USERNAME                 | postgres               | database user                        |
-| DB_PASSWORD                 | -                      | user password to access database     |
-| DB_LEGACY_HOST              | localhost              | databse host                         |
-| DB_LEGACY_NAME | ContourLegacy | database name |
-| DB_LEGACY_USERNAME | postgres | database user |
-| DB_LEGACY_PASSWORD |-| user password to access database |
-| jwt:issuer | iis | issuer |
-| jwt:signingKey | null | issuer signing key |
-| jwt:lifeTime | 02:00:00 | token life time |
-| mq:host | localhost | MQ hostname |
-| mq:username | guest | MQ user |
-| mq:password | guest | MQ password |
-| gsmWorkerUrl | http://ml.contour.net:8000/transcribe |  |
-| es:host | http://localhost:9200 | URL to elasticsearch node (e.g., http://es.domain.net:9200) |
-| reportsAvailable | true |  |
-| salt | null | password security key |
+Есть следующие docker-compose файлы (версии из оф. хранилищ соответствуют таковым в contour):
 
-When working with hierarchical keys in environment variables, a colon separator (:) may not work on all platforms (for example, Bash). A double underscore (__) is supported by all platforms and is automatically replaced by a colon.
+**work.env.setup.yaml** - здесь используются образы из официальных хранилищ;
 
-## Healthcheck endpoint
+**work.env.setup.xpack.elastic.yaml** - здесь используются  образ Elastic Search из хранилища contour, RabbitMq & PostGres - образы из официальных хранилищ.
 
-Healthcheck is available at `/api/server-health` and returns information about version and service availability. Currently it shows information about database, elasticsearch and RabbitMQ connection status. Is used to monitor server health by monitoring tools.
+При первом запуске yaml-файла будет происходить скачивание образов и необходимо иметь vpn-подключение к сети компании иначе могут возникнуть ошибки.
 
-## CLI utils
 
-There are several CLI actions which help to setup database and ontology:
 
-```sh
-dotnet IIS.Core.dll --iis-actions action1,action2,...,actionN
+Некоторые настройки ElasticSearch (убрано именование кластера и установлено discovery.type=single-node ) изменены для запуска под Windows.
+
+Именованные кластеры вызывают ошибку при инициализации - решение этой проблемы будет описано как только его найдем.
+
+
+Файлы можно переименовать в **Docker-Compose.yaml** и запускать/удалять командами:
+
+`docker-compose up -d` (флаг -d для того чтобы контейнеры запустились в бекграунде)
+
+`docker-compose down` (можно добавить еще флаг -v для того чтобы удалить созданые volumes)
+
+
+
+Если названия не менять то запускать/удалять надо командами
+
+` docker-compose -f work.env.setup.yaml up -d`
+
+`docker-compose -f work.env.setup.yaml down`
+
+где work.env.setup.yaml это имя yaml файла.
+
+
+ППосле запуска контейнеров необходимо установить PgAdmin:
+
+[Для Mac OS] (https://www.pgadmin.org/download/pgadmin-4-macos/) 
+
+[Для Windows] (https://www.pgadmin.org/download/pgadmin-4-windows/)
+
+Дальше необходимо восстановить базу из бекапа (приклад для бд з dev2 для Windows):
+
+`C:\Program Files (x86)\pgAdmin 4\v4\runtime\pg_dump.exe" --file "C:\\Users\\<username>\\<some folder>\\dev2.backup" --host "192.168.88.94" --port "12432" --username "postgres" --verbose --role "postgres" -T "*ower*ocations" --format=c --blobs "contour"`
+
+
+При работе над проектами .net core рекомендуется использовать user-secrets или средство диспетчера секретов. Оно сохраняет конфиденциальные данные во время разработки проекта .NET Core.
+
+https://docs.microsoft.com/en-us/aspnet/core/security/app-secrets?view=aspnetcore-5.0&tabs=linux
+
+Если вы MacOS пользователь и у вас стоит Rider используйте [плагин](https://plugins.jetbrains.com/plugin/10183--net-core-user-secrets) для работы с user secrets
+
+После установки в контекстном меню появится пункт Open project user secrets.
+
+Файл secret.json должен выглядеть так:
+
+```
+{
+  "jwt:signingKey": "L8DD$,m4>N!?N+s6-6Sb*dV~.\\RD%q'9T%s[A}NV'#K5",
+  "salt": "a}~QUUsH&}hewe42{"
+}
 ```
 
-You may specify multiple actions separated with comma, actions will run in the same order they were specified.
-
-If `--iis-actions` option is specified, application server doesn't start. To override this behaviour, you may add `--iis-run-server true`.
-
-### List of actions:
-* `clear-types` Deletes all types from database.
-* `migrate-legacy-types` Migrates types from NodeJS database. Drops all types and entities.
-* `migrate-legacy-entities` Migrates entities from NodeJS database.
-* `migrate-legacy-files` Migrates all Files from NodeJS database with blob content.
-* `fill-odysseus-types` Fills Odysseus ontology. Drops all types and entities.
-* `seed-contour-data` Seeds Contour enums from files.
-* `seed-odysseus-data` Seeds Odysseus enums from files.
-* `apply-ef-migrations` Applies Entity Framework migrations to db, creates if it does not exist.
-* `help` Displays this list in console.
-
-## Migrate entities from Node.js db
-
-1. Inside `appsettings.Staging.json` specify `db-legacy` with parameters to Node.js database
-2. `db` setting should point to destination database (for .NET)
-3. inside `publish/core` (or `publish/web`) run
-   ```sh
-   dotnet IIS.Core.dll --iis-actions apply-ef-migrations,clear-types,migrate-legacy-types,seed-contour-data,migrate-legacy-entities,migrate-legacy-files
-   ```
-
-## Setup for project
-
-Ontology is cached in server's memory, so don't forget to restart server when you change it!
-
-Ontology is stored inside JSON files in [IIS/IIS.Core/data](./IIS/IIS.Core/data) for both contour and odysseus. To setup database for specific project please run one of the following commands:
-
-### Odysseus
-
-```sh
-dotnet Iis.Api.dll --iis-actions apply-ef-migrations,clear-types,fill-odysseus-types,seed-odysseus-data
-```
-
-Set `reportsAvailable` configuration variable to `false`.
-
-### Contour
-
-```sh
-dotnet Iis.Api.dll --iis-actions apply-ef-migrations,clear-types,fill-contour-types,seed-contour-data
-```
-
-### Development
-
-```sh
-dotnet Iis.Api.dll --iis-actions apply-ef-migrations,clear-types,fill-developer-types,seed-developer-data
-```
-
-Set `reportsAvailable` configuration variable to `true`.
