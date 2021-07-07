@@ -8,5 +8,6 @@ namespace Iis.Interfaces.Ontology.Schema
     {
         Guid Id { get; }
         ScalarType ScalarType { get; set; }
+        string GetDefaultValue();
     }
 }

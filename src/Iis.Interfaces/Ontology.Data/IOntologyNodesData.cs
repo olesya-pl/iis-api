@@ -40,5 +40,6 @@ namespace Iis.Interfaces.Ontology.Data
         void SaveAccessLevels(IAccessLevels newAccessLevels);
         event Action OnAccessLevelsChanged;
         void ChangeNodeTypeId(Guid idFrom, Guid idTo);
+        INode GetDefaultEnumNode(Guid enumTypeId);
     }
 }

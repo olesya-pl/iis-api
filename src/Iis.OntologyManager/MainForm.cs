@@ -328,6 +328,10 @@ namespace Iis.OntologyManager
             btnReload.Click += (sender, e) => { menuReload.Show(btnReload, new Point(0, btnReload.Height)); };
             container.Add(btnReload);
 
+            var btnHeal = new Button { Text = "Лікувати Онтологію", MinimumSize = new Size { Height = _style.ButtonHeightDefault } };
+            btnHeal.Click += (sender, e) => { WaitCursorAction(() => HealOntology()); };
+            container.Add(btnHeal);
+
             panelTop.ResumeLayout();
         }
         #endregion
@@ -823,6 +827,15 @@ namespace Iis.OntologyManager
         }
 
         public OntologyNodesData GetOntologyData() => GetOntologyData(SelectedConnectionString);
+
+        public void HealOntology()
+        {
+            if (_ontologyData == null) return;
+
+            var ontologyDoctor = new OntologyDoctor(_ontologyData);
+            var msg = ontologyDoctor.Heal();
+            MessageBox.Show(msg);
+        }
 
         #endregion
     }

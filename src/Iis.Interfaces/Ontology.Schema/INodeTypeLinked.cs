@@ -46,6 +46,7 @@ namespace Iis.Interfaces.Ontology.Schema
         IReadOnlyList<INodeTypeLinked> DirectProperties => GetDirectProperties();
         IReadOnlyList<INodeTypeLinked> GetAllProperties();
         IEnumerable<INodeTypeLinked> AllProperties => GetAllProperties();
+        IEnumerable<IRelationTypeLinked> GetAllOutgoingRelations();
         IRelationTypeLinked GetRelationByName(string relationName);
         bool IsIdentical(INodeTypeLinked nodeType);
         string GetStringCode();

@@ -6,5 +6,10 @@ namespace Iis.DataModel
     {
         public virtual NodeTypeEntity INodeTypeLinked { get; set; }
         public ScalarType ScalarType { get; set; }
+
+        public string GetDefaultValue()
+        {
+            throw new System.NotImplementedException();
+        }
     }
 }

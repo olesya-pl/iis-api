@@ -284,5 +284,16 @@ namespace Iis.OntologyData
         public void ChangeNodeTypeId(Guid idFrom, Guid idTo) =>
             Locker.WriteLock(() => _storage.ChangeNodeTypeId(idFrom, idTo));
 
+        public INode GetDefaultEnumNode(Guid enumTypeId)
+        {
+            var nodes = GetNodesByTypeId(enumTypeId);
+            return nodes.OrderBy(n =>
+                {
+                    var value = n.GetSingleProperty("sortOrder")?.Value;
+                    return value == null ? int.MaxValue : int.Parse(value);
+                })
+                .FirstOrDefault();
+        }
+
     }
 }
