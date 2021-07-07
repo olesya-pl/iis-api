@@ -3,6 +3,7 @@ using Iis.Services.Contracts.Csv;
 using Iis.Utility.Csv;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace Iis.Services
@@ -36,62 +37,9 @@ namespace Iis.Services
         private List<CsvDataItem> GetCsvDataItems(INode entity)
         {
             var csvData = new List<CsvDataItem>();
-
-            foreach (var attributeNode in entity.GetAllAttributeNodes())
+            foreach (var dotNameValue in entity.GetDotNameValues(true).Items.Where(item => item != null))
             {
-                var dotName = attributeNode.GetDotName();
-                if (string.IsNullOrEmpty(dotName))
-                {
-                    var i = 0;
-                }
-                csvData.Add(new CsvDataItem(
-                    entity.Id.ToString(),
-                    attributeNode.GetDotName(),
-                    attributeNode.Value
-                ));
-            
-            }
-
-            foreach (var relationNode in entity.GetAllRelationNodes(n => n.NodeType.RelationType.TargetType.IsObjectSign))
-            {
-                var dotName = relationNode.GetDotName();
-                if (string.IsNullOrEmpty(dotName))
-                {
-                    var i = 0;
-                }
-                csvData.Add(new CsvDataItem(
-                    entity.Id.ToString(),
-                    relationNode.GetDotName(),
-                    relationNode.Relation.TargetNode.GetSingleDirectProperty("value").Value
-                ));
-            }
-
-            foreach (var relationNode in entity.GetAllRelationNodes(n => n.NodeType.RelationType.TargetType.IsEnum))
-            {
-                var dotName = relationNode.GetDotName();
-                if (string.IsNullOrEmpty(dotName))
-                {
-                    var i = 0;
-                }
-                csvData.Add(new CsvDataItem(
-                    entity.Id.ToString(),
-                    relationNode.GetDotName(),
-                    relationNode.Relation.TargetNode.GetSingleDirectProperty("name").Value
-                ));
-            }
-
-            foreach (var relationNode in entity.GetAllRelationNodes(n => n.NodeType.RelationType.TargetType.IsObject))
-            {
-                var dotName = relationNode.GetDotName();
-                if (string.IsNullOrEmpty(dotName))
-                {
-                    var i = 0;
-                }
-                csvData.Add(new CsvDataItem(
-                    entity.Id.ToString(),
-                    relationNode.GetDotName(),
-                    relationNode.Relation.TargetNode.GetComputedValue("__title")
-                ));
+                csvData.Add(new CsvDataItem(entity.Id.ToString("N"), dotNameValue.DotName, dotNameValue.Value));
             }
             return csvData;
         }

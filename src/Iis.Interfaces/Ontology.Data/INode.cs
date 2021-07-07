@@ -17,7 +17,7 @@ namespace Iis.Interfaces.Ontology.Data
         string Value { get; }
         public IReadOnlyList<IRelation> GetDirectRelations();
         public IReadOnlyList<IRelation> GetInversedRelations();
-        IDotNameValues GetDotNameValues();
+        IDotNameValues GetDotNameValues(bool showTitlesForSeparateObjects = false);
         INode GetChildNode(string childTypeName);
         IReadOnlyList<INode> GetChildNodes(string childTypeName);
         bool HasPropertyWithValue(string propertyName, string value);
@@ -31,8 +31,6 @@ namespace Iis.Interfaces.Ontology.Data
         IReadOnlyList<INode> GetDirectAttributeNodes(ScalarType? scalarType = null);
         IReadOnlyList<INode> GetDirectChildNodes(Func<INode, bool> filter);
         IReadOnlyList<INode> GetAllChildNodes(Func<INode, bool> filter);
-        IReadOnlyList<INode> GetDirectRelationNodes(Func<INode, bool> filter);
-        IReadOnlyList<INode> GetAllRelationNodes(Func<INode, bool> filter);
         IReadOnlyList<INode> GetAllAttributeNodes(ScalarType? scalarType = null);
         IReadOnlyList<IRelation> GetIncomingRelations(IEnumerable<string> relationTypeNameList);
         string GetComputedValue(string name);

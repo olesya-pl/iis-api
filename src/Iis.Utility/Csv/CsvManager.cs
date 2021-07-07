@@ -94,7 +94,7 @@ namespace Iis.Utility.Csv
             index == 0 ? columnName : $"{columnName}__{index}";
 
         private string ToCsvFormat(string str) =>
-            "\"" + str.Replace("\"", "\"\"") + "\"";
+            str == null ? null : "\"" + str.Replace("\"", "\"\"") + "\"";
 
         public string GetCsv()
         {

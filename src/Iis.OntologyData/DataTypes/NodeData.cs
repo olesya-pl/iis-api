@@ -69,7 +69,7 @@ namespace Iis.OntologyData.DataTypes
                 return result;
             });
         }
-        public IDotNameValues GetDotNameValues()
+        public IDotNameValues GetDotNameValues(bool showTitlesForSeparateObjects = false)
         {
             return AllData.Locker.ReadLock(() =>
             {
@@ -87,16 +87,18 @@ namespace Iis.OntologyData.DataTypes
                     {
                         list.Add(new DotNameValue(
                             relation.TypeName,
-                            relation.TargetNodeId.ToString(),
+                            showTitlesForSeparateObjects ? 
+                                relation._targetNode.GetTitleValue() : 
+                                relation.TargetNodeId.ToString(),
                             new List<INode> { relation.Node }));
                     }
                     else
                     {
-                        var values = relation._targetNode.GetDotNameValues();
+                        var values = relation._targetNode.GetDotNameValues(showTitlesForSeparateObjects);
                         foreach (var item in values.Items)
                         {
                             list.Add(new DotNameValue(
-                                $"{NodeType.Name}.{item.DotName}",
+                                $"{relation.Node.NodeType.Name}.{item.DotName}",
                                 item.Value,
                                 new List<INode> { relation.Node, relation.TargetNode }
                                     .Concat(item.Nodes)));
@@ -261,24 +263,6 @@ namespace Iis.OntologyData.DataTypes
 
             return result;
         }
-        public IReadOnlyList<INode> GetDirectRelationNodes(Func<INode, bool> filter) =>
-            _outgoingRelations
-                .Where(r => filter(r.Node))
-                .Select(r => r.Node)
-                .ToList();
-        public IReadOnlyList<INode> GetAllRelationNodes(Func<INode, bool> filter)
-        {
-            var result = new List<INode>();
-
-            result.AddRange(GetDirectRelationNodes(filter));
-            foreach (var relation in _outgoingRelations.Where(r => r.IsLinkToInternalObject
-                && !r.TargetNode.NodeType.IsEnum && !r.TargetNode.NodeType.IsObjectSign))
-            {
-                result.AddRange(relation.TargetNode.GetDirectRelationNodes(filter));
-            }
-
-            return result;
-        }
         public IReadOnlyList<INode> GetAllAttributeNodes(ScalarType? scalarType = null) =>
             GetAllChildNodes(n => n.NodeType.Kind == Kind.Attribute
                && (scalarType == null || n.NodeType.AttributeType.ScalarType == scalarType));
@@ -307,7 +291,7 @@ namespace Iis.OntologyData.DataTypes
                     var sourceNode = node.Relation.SourceNode;
                     if (sourceNode.NodeType.IsObject)
                     {
-                        sb.Insert(0, sourceNode.NodeType.Name);
+                        sb.Insert(0, sourceNode.NodeType.Name + ".");
                         break;
                     }
                     node = sourceNode.IncomingRelations.First().Node;
