@@ -9,6 +9,8 @@ using IIS.Core.Materials.FeatureProcessors;
 using IIS.Core.Materials.Handlers.Configurations;
 using Iis.DbLayer.Repositories;
 using Iis.Interfaces.Constants;
+using Iis.RabbitMq.Channels;
+using Iis.RabbitMq.Helpers;
 using IIS.Repository.Factories;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -16,9 +18,7 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
-using RabbitMQ.Client.Exceptions;
 using Iis.Messages.Materials;
-using Iis.Services.Contracts.Configurations;
 
 namespace Iis.Api.Materials.Handlers
 {
@@ -46,20 +46,7 @@ namespace Iis.Api.Materials.Handlers
             _provider = provider;
             _unitOfWorkFactory = unitOfWorkFactory;
 
-            while (true)
-            {
-                try
-                {
-                    _connection = connectionFactory.CreateConnection();
-                    break;
-                }
-                catch (BrokerUnreachableException)
-                {
-                    _logger.LogError($"Attempting to connect again in {ReConnectTimeoutSec} sec.");
-
-                    Thread.Sleep(ReConnectTimeoutSec * 1000);
-                }
-            }
+            _connection = connectionFactory.CreateAndWaitConnection(ReConnectTimeoutSec, logger);
 
             _channel = _connection.CreateModel();
 

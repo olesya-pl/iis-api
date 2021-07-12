@@ -1,8 +1,10 @@
 using System;
+using System.Linq;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using AutoMapper;
-using Iis.DataModel.FlightRadar;
 using Iis.DbLayer.Repositories;
+using Iis.DataModel.FlightRadar;
 using Iis.Services.Contracts.Dtos;
 using Iis.Services.Contracts.Interfaces;
 using IIS.Repository;
@@ -34,6 +36,16 @@ namespace Iis.Services
                 _mapper.Map<LocationHistoryEntity>(locationHistoryDto)
             };
 
+            return RunAsync(uow => uow.LocationHistoryRepository.SaveAsync(entityList));
+        }
+
+        public Task SaveLocationHistoryAsync(IReadOnlyCollection<LocationHistoryDto> locationHistoryList)
+        {
+            if(locationHistoryList is null || !locationHistoryList.Any()) return Task.CompletedTask;
+
+            var entityList = locationHistoryList
+                                .Select(e => _mapper.Map<LocationHistoryEntity>(e))
+                                .ToArray();
             return RunAsync(uow => uow.LocationHistoryRepository.SaveAsync(entityList));
         }
     }

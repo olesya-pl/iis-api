@@ -1,14 +1,14 @@
 using System;
 using System.Text;
-using System.Threading;
 using System.Collections.Generic;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using RabbitMQ.Client;
-using RabbitMQ.Client.Exceptions;
-using Iis.Utility;
 using Iis.Messages;
+using Iis.Utility;
+using Iis.RabbitMq.Channels;
+using Iis.RabbitMq.Helpers;
 using Iis.Messages.Materials;
 using Iis.Services.Contracts.Configurations;
 
@@ -18,6 +18,7 @@ namespace IIS.Core.Materials
     {
         void SendMaterialEvent(MaterialEventMessage eventMessage);
         void SendMaterialFeatureEvent(MaterialEventMessage eventMessage);
+        void SendMaterialCoordinateEvent(MaterialEventMessage eventMessage);
         void SendAvailableForOperatorEvent(Guid materialId);
         void SaveMaterialToElastic(Guid id);
         void SendMaterialSavedToElastic(List<Guid> ids);
@@ -31,6 +32,7 @@ namespace IIS.Core.Materials
         private readonly IModel _channel;
         private readonly ILogger _logger;
         private readonly IModel _materialEventChannel;
+        private readonly IPublishMessageChannel<MaterialEventMessage> _eventPublishChannel;
         private readonly MaterialEventConfiguration _eventConfiguration;
         private readonly MaterialOperatorAssignerConfiguration _assignerConfiguration;
         private readonly MaterialElasticSaverConfiguration _elasticSaverConfiguration;
@@ -48,28 +50,19 @@ namespace IIS.Core.Materials
             _assignerConfiguration = assignerConfiguration;
             _elasticSaverConfiguration = elasticSaverConfiguration;
 
-            while (true)
-            {
-                try
-                {
-                    _connection = _connectionFactory.CreateConnection();
-                    break;
-                }
-                catch (BrokerUnreachableException)
-                {
-                    var timeout = 5000;
-                    _logger.LogError($"Attempting to connect again in {timeout / 1000} sec.");
-                    Thread.Sleep(timeout);
-                }
-            }
+            _connection = _connectionFactory.CreateAndWaitConnection();
+
             _channel = _connection.CreateModel();
 
             _materialEventChannel = ConfigChannel(_connection.CreateModel(), _eventConfiguration.TargetChannel);
+
+            _eventPublishChannel = new PublishMessageChannel<MaterialEventMessage>(_connection, _eventConfiguration.TargetChannel);
         }
 
         public void SendMaterialEvent(MaterialEventMessage eventMessage)
         {
             _logger.LogInformation($"sending material with id {eventMessage.Id} for ML processing");
+
             var routingKey = $"processing.ml.{eventMessage.Type}";
 
             SendMaterialEventMessage(eventMessage, routingKey);
@@ -77,9 +70,18 @@ namespace IIS.Core.Materials
 
         public void SendMaterialFeatureEvent(MaterialEventMessage eventMessage)
         {
+            _logger.LogInformation($"sending material with id {eventMessage.Id} for feature processing");
+
             var routingKey = $"processing.features.{eventMessage.Type}";
 
             SendMaterialEventMessage(eventMessage, routingKey);
+        }
+
+        public void SendMaterialCoordinateEvent(MaterialEventMessage eventMessage)
+        {
+            _logger.LogInformation($"sending material with id {eventMessage.Id} for fetching coordinates");
+
+            _eventPublishChannel.Send(eventMessage, "processing.coordinates");
         }
 
         private void SendMaterialEventMessage(MaterialEventMessage message, string routingKey)
@@ -110,6 +112,7 @@ namespace IIS.Core.Materials
         {
             _channel.Dispose();
             _materialEventChannel.Dispose();
+            _eventPublishChannel.Dispose();
             _connection.Dispose();
         }
         public void SendAvailableForOperatorEvent(Guid materialId)
@@ -153,7 +156,7 @@ namespace IIS.Core.Materials
                 autoDelete: false);
 
             var body = message.ToBytes();
-            
+
             _channel.BasicPublish(exchange: "",
                 routingKey: MaterialRabbitConsts.QueueName,
                 basicProperties: null,

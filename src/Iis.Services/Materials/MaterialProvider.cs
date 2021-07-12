@@ -11,6 +11,7 @@ using Iis.Interfaces.Elastic;
 using Iis.Interfaces.Ontology.Data;
 using Iis.Interfaces.Ontology.Schema;
 using Iis.Services;
+using Iis.Services.Contracts.Dtos;
 using Iis.Services.Contracts.Interfaces;
 using Iis.Services.Contracts.Params;
 using Iis.Utility;
@@ -59,7 +60,7 @@ namespace IIS.Services.Materials
             IMLResponseRepository mLResponseRepository,
             IMaterialSignRepository materialSignRepository,
             IMapper mapper,
-            IUnitOfWorkFactory<TUnitOfWork> unitOfWorkFactory,            
+            IUnitOfWorkFactory<TUnitOfWork> unitOfWorkFactory,
             IImageVectorizer imageVectorizer,
             NodeToJObjectMapper nodeToJObjectMapper) : base(unitOfWorkFactory)
         {
@@ -89,7 +90,7 @@ namespace IIS.Services.Materials
                 FilteredItems = filteredItems,
                 CherryPickedItems = cherryPickedItems.Select(p => new CherryPickedItem(p)).ToList(),
                 Page = page,
-                Sorting = sorting                
+                Sorting = sorting
             };
 
             var searchResult = await _materialElasticService.SearchMaterialsByConfiguredFieldsAsync(userId, searchParams);
@@ -129,8 +130,7 @@ namespace IIS.Services.Materials
 
         public async Task<Material> GetMaterialAsync(Guid id, User user)
         {
-            var entity = await RunWithoutCommitAsync(async (unitOfWork) =>
-                await unitOfWork.MaterialRepository.GetByIdAsync(id, MaterialIncludeEnum.WithChildren, MaterialIncludeEnum.WithFeatures));
+            var entity = await RunWithoutCommitAsync(uow => uow.MaterialRepository.GetByIdAsync(id, MaterialIncludeEnum.WithChildren, MaterialIncludeEnum.WithFeatures));
 
             if (entity is null || !entity.CanBeAccessedBy(user.AccessLevel))
             {
@@ -138,8 +138,21 @@ namespace IIS.Services.Materials
             }
 
             var mapped = Map(entity);
+
             mapped.CanBeEdited = entity.CanBeEdited(user.Id);
+
             return mapped;
+        }
+
+        public async Task<Material> GetMaterialAsync(Guid id)
+        {
+            var entity = await RunWithoutCommitAsync(uow => uow.MaterialRepository.GetByIdAsync(id, MaterialIncludeEnum.WithChildren, MaterialIncludeEnum.WithFeatures));
+
+            if (entity is null)
+            {
+                throw new ArgumentException($"{FrontEndErrorCodes.NotFound}:Матеріал не знайдено");
+            }
+            return Map(entity);
         }
 
         public async Task<Material[]> GetMaterialsByIdsAsync(ISet<Guid> ids, User user)
@@ -161,14 +174,14 @@ namespace IIS.Services.Materials
             return RunWithoutCommitAsync(async (unitOfWork) =>
                 await unitOfWork.MaterialRepository.GetAllAsync());
         }
-        
+
         public async Task<IReadOnlyCollection<Guid>> GetMaterialsIdsAsync(int limit)
         {
             var materials = await RunWithoutCommitAsync((unitOfWork) =>
                 unitOfWork.MaterialRepository.GetAllAsync(limit, MaterialIncludeEnum.OnlyParent));
 
             var materialIds = materials.Select((material) => material.Id).ToArray();
-            
+
             return materialIds;
         }
 
@@ -434,6 +447,7 @@ namespace IIS.Services.Materials
             }
             return result.AsReadOnly();
         }
+
         private bool IsEvent(Node node)
         {
             if (node is null) return false;
@@ -550,6 +564,40 @@ namespace IIS.Services.Materials
             return result;
         }
 
+        public async Task<IReadOnlyCollection<LocationHistoryDto>> GetLocationHistoriesAsync(Guid materialId)
+        {
+            var entity = await RunWithoutCommitAsync(uow => uow.MaterialRepository.GetByIdAsync(materialId, MaterialIncludeEnum.WithFeatures));
+
+            var infoList = MapInfos(entity);
+
+            var nodes = infoList
+                            .SelectMany(p => p.Features.Select(x => x.Node))
+                            .ToArray();
+
+            var featureIdList = nodes
+                                .Where(IsObjectSign)
+                                .Select(e => e.Id)
+                                .ToArray();
+
+            var result = new List<LocationHistoryDto>(featureIdList.Length + 1);
+
+            var featureLocationListTasks = featureIdList
+                .Select(id => RunWithoutCommitAsync(uow => uow.LocationHistoryRepository.GetLatestLocationHistoryEntityAsync(id)));
+
+            var locationEntityList = await Task.WhenAll(featureLocationListTasks);
+
+            var dtoList = locationEntityList.Select(e => _mapper.Map<LocationHistoryDto>(e));
+
+            result.AddRange(dtoList);
+
+            locationEntityList = await RunWithoutCommitAsync(uow => uow.LocationHistoryRepository.GetLocationHistoryEntityListByMaterialIdAsync(entity.Id));
+
+            dtoList = locationEntityList.Select(e => _mapper.Map<LocationHistoryDto>(e));
+
+            result.AddRange(dtoList);
+
+            return result;
+        }
         public async Task<bool> MaterialExists(Guid id)
         {
             var entity = await RunWithoutCommitAsync((unitOfWork) =>

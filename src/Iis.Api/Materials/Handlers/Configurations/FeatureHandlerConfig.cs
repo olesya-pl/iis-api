@@ -1,6 +1,4 @@
-using Iis.Api.Configuration;
-using Iis.Services.Contracts.Configurations;
-
+using Iis.RabbitMq.Channels;
 namespace IIS.Core.Materials.Handlers.Configurations
 {
     public class FeatureHandlerConfig

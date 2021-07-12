@@ -1,4 +1,4 @@
-namespace Iis.DataModel.FlightRadar
+namespace Iis.Interfaces.Enums
 {
     public enum LocationType
     {

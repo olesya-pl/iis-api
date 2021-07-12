@@ -78,6 +78,7 @@
     <ProjectReference Include="..\Iis.Services.Contracts\Iis.Services.Contracts.csproj" />
     <ProjectReference Include="..\Iis.Utility\Iis.Utility.csproj" />
     <ProjectReference Include="..\Iis.RabbitMq\Iis.RabbitMq.csproj" />
+    <ProjectReference Include="..\Iis.CoordinatesHandler\Iis.CoordinatesHandler.csproj" />
   </ItemGroup>
   <ItemGroup>
     <None Update="data\contour\migrations\002\migration-002.ont">

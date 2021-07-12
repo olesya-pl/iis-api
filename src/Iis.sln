@@ -53,6 +53,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Iis.EventMaterialAutoAssign
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Iis.RabbitMq", "Iis.RabbitMq\Iis.RabbitMq.csproj", "{06FB037A-AB0D-40DC-B863-E7950F027756}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Iis.CoordinatesHandler", "Iis.CoordinatesHandler\Iis.CoordinatesHandler.csproj", "{5FB8A8F6-A5D1-407F-B226-344549E40564}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -159,6 +161,10 @@ Global
 		{06FB037A-AB0D-40DC-B863-E7950F027756}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{06FB037A-AB0D-40DC-B863-E7950F027756}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{06FB037A-AB0D-40DC-B863-E7950F027756}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5FB8A8F6-A5D1-407F-B226-344549E40564}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5FB8A8F6-A5D1-407F-B226-344549E40564}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5FB8A8F6-A5D1-407F-B226-344549E40564}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5FB8A8F6-A5D1-407F-B226-344549E40564}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

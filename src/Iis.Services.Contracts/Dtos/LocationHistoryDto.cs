@@ -1,5 +1,5 @@
 using System;
-
+using Iis.Interfaces.Enums;
 namespace Iis.Services.Contracts.Dtos
 {
     public class LocationHistoryDto
@@ -11,5 +11,6 @@ namespace Iis.Services.Contracts.Dtos
         public Guid? NodeId { get; set; }
         public Guid? EntityId { get; set; }
         public Guid? MaterialId { get; set; }
+        public LocationType Type { get; set; } = LocationType.Node;
     }
 }

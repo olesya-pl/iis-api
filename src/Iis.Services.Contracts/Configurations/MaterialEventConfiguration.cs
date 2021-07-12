@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+using Iis.RabbitMq.Channels;
 
 namespace Iis.Services.Contracts.Configurations
 {
