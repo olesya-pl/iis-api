@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using Iis.Domain.Materials;
 using Iis.Domain.MachineLearning;
 using Iis.DataModel.Materials;
+using Iis.Services.Contracts.Dtos;
 using Iis.Services.Contracts.Params;
 using Iis.Domain.Users;
 using IIS.Services.Contracts.Materials;
@@ -16,7 +17,6 @@ namespace IIS.Services.Contracts.Interfaces
     {
         Task<Material> GetMaterialAsync(Guid id, User user);
         Task<Material[]> GetMaterialsByIdsAsync(ISet<Guid> ids, User user);
-
         Task<MaterialsDto> GetMaterialsAsync(Guid userId,
             string filterQuery,
             IReadOnlyCollection<Property> filteredItems,
@@ -44,5 +44,7 @@ namespace IIS.Services.Contracts.Interfaces
         Task<(IEnumerable<Material> Materials,  int Count)> GetMaterialsLikeThisAsync(Guid userId, Guid materialId, PaginationParams page, SortingParams sorting);
         Task<bool> MaterialExists(Guid value);
         Task<IReadOnlyCollection<Guid>> GetMaterialsIdsAsync(int limit);
+        Task<Material> GetMaterialAsync(Guid id);
+        Task<IReadOnlyCollection<LocationHistoryDto>> GetLocationHistoriesAsync(Guid materialId);
     }
 }

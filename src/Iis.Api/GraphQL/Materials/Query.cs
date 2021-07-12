@@ -5,9 +5,9 @@ using System.Threading.Tasks;
 using AutoMapper;
 using HotChocolate;
 using IIS.Core.GraphQL.Common;
-using IIS.Core.GraphQL.Entities.InputTypes;
 using Iis.Interfaces.Elastic;
 using Iis.Api.GraphQL.Common;
+using Iis.Api.GraphQL.Entities;
 using HotChocolate.Resolvers;
 using Iis.Services.Contracts.Params;
 using IIS.Services.Contracts.Interfaces;
@@ -91,6 +91,19 @@ namespace IIS.Core.GraphQL.Materials
             var tokenPayload = ctx.GetToken();
             var material = await materialProvider.GetMaterialAsync(materialId, tokenPayload.User);
             var res = mapper.Map<Material>(material);
+
+            var locationDtoList = await materialProvider.GetLocationHistoriesAsync(materialId);
+
+            res.CoordinateList = locationDtoList.Select(e => 
+                new GeoCoordinate
+                {
+                    Label = "material",
+                    Lat = e.Lat,
+                    Long = e.Long,
+                    PropertyName = "material.location"
+                }
+            ).ToArray();
+
             return res;
         }
 

@@ -7,12 +7,12 @@ using IIS.Core.Materials;
 using Iis.Messages;
 using Iis.Messages.Materials;
 using Iis.Utility;
+using Iis.RabbitMq.Helpers;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
-using RabbitMQ.Client.Exceptions;
 
 namespace Iis.Api.Materials
 {
@@ -33,20 +33,7 @@ namespace Iis.Api.Materials
             _logger = logger;
             _serviceProvider = serviceProvider;
 
-            while (true)
-            {
-                try
-                {
-                    _connection = connectionFactory.CreateConnection();
-                    break;
-                }
-                catch (BrokerUnreachableException)
-                {
-                    _logger.LogError($"Attempting to connect again in {ReConnectTimeoutSec} sec.");
-
-                    Thread.Sleep(ReConnectTimeoutSec * 1000);
-                }
-            }
+            _connection = connectionFactory.CreateAndWaitConnection(ReConnectTimeoutSec, _logger);
 
             _channel = _connection.CreateModel();
         }
@@ -100,6 +87,7 @@ namespace Iis.Api.Materials
 
                 eventProducer.SendMaterialEvent(materialEvent);
                 eventProducer.SendMaterialFeatureEvent(materialEvent);
+                eventProducer.SendMaterialCoordinateEvent(materialEvent);
 
                 return Task.CompletedTask;
             }

@@ -80,6 +80,7 @@ using System.Linq;
 using System.Reflection;
 using System.Security.Authentication;
 using System.Threading.Tasks;
+using Iis.CoordinatesEventHandler.DependencyInjection;
 
 namespace IIS.Core
 {
@@ -312,6 +313,7 @@ namespace IIS.Core
             services.AddMediatR(typeof(ReportEventHandler));
             services.AddTransient<ModifyDataRunner>();
             services.RegisterEventMaterialAutoAssignment(Configuration);
+            services.RegisterCoordinatesMessageHandler(Configuration);
 
             var eusConfiguration = Configuration.GetSection("externalUserService").Get<ExternalUserServiceConfiguration>();
             services.AddTransient<IExternalUserService>(_ => (new ExternalUserServiceFactory()).GetInstance(eusConfiguration));

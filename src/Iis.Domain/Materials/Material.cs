@@ -44,7 +44,6 @@ namespace Iis.Domain.Materials
         public IEnumerable<JObject> Features { get; set; }
         public bool CanBeEdited { get; set; }
         public int AccessLevel { get; set; }
-
         public bool HasAttachedFile() => File != null;
 
         public bool IsParentMaterial() => ParentId == null;
