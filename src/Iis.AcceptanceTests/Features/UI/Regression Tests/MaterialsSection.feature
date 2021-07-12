@@ -28,22 +28,18 @@ Scenario: IIS-6048 - Change a material priority by clicking on the Processed but
 	And I clicked search button in the Materials section
 	And I searched Voice_01-07-2017 21-34-38 (257) data in the materials
 	And I clicked on the first search result in the Materials section
-	And I set the session priority Важливий value
+	And I set the session priority to Important
 	And I pressed Processed button
 	When I pressed the Previous material button
-	Then I must see that the session priority value must be set to the Важливий value
-	When I set the session priority Негайна доповідь value
+	Then I must see that the session priority value must be set to Important
+	When I set the session priority to Immediate Report
 	And I pressed Processed button
 	When I pressed the Previous material button
-	Then I must see that the session priority value must be set to the Негайна доповідь value
-	When I set the session priority Пропустити value
+	Then I must see that the session priority value must be set to Immediate Report
+	When I set the session priority to Translation
 	And I pressed Processed button
 	When I pressed the Previous material button
-	Then I must see that the session priority value must be set to the Пропустити value
-	When I set the session priority Переклад value
-	And I pressed Processed button
-	When I pressed the Previous material button
-	Then I must see that the session priority value must be set to the Переклад value
+	Then I must see that the session priority value must be set to Translation
 
 @regression @UI @Materials
 Scenario: IIS-6045 - Change a material reliability by clicking on the Processed button
@@ -102,7 +98,6 @@ Scenario: IIS-6051 - Ability to connect the material to an event from a material
 	And I clicked search button in the Materials section
 	And I searched Voice_01-07-2017 21-34-38 (257) data in the materials
 	And I clicked on the first search result in the Materials section
-	And I clicked on the relations tab
 	When I binded the Тестова подія event to the material
 	Then I must see Тестова подія as the related event to the material
 	When I clicked on the delete button to destroy relation between the material and the Тестова подія event
