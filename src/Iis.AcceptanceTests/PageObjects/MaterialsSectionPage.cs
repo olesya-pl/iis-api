@@ -126,6 +126,15 @@ namespace AcceptanceTests.PageObjects
         [FindsBy(How = How.CssSelector, Using = ".icon-wrapper-close")]
         public IWebElement CloseMaterialCardButton;
 
+        [FindsBy(How = How.CssSelector, Using = "button.action-button--important")]
+        public IWebElement MaterialImportantButton;
+
+        [FindsBy(How = How.CssSelector, Using = "button.action-button--immediateReport")]
+        public IWebElement MaterialImmediateReportButton;
+
+        [FindsBy(How = How.CssSelector, Using = "button.action-button--translation")]
+        public IWebElement MaterialTranslationButton;
+
         public void ScrollToEnd()
         {
             Actions actions = new Actions(driver);

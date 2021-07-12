@@ -13,7 +13,6 @@ namespace AcceptanceTests.PageObjects
         }
         public DropDown ImportanceDropDown => new DropDown(driver, By.CssSelector(".action-select--importance"));
         public DropDown ReliabilityDropDown => new DropDown(driver, By.CssSelector(".action-select--reliability"));
-        public DropDown SessionPriorityDropDown => new DropDown(driver, By.CssSelector(".action-select--session-priority"));
         public DropDown SourceCredibilityDropDown => new DropDown(driver, By.CssSelector(".action-select--sourcereliability"));
     }
 }
