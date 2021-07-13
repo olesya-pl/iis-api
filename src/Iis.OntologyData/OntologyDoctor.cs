@@ -19,9 +19,36 @@ namespace Iis.OntologyData
         {
             var sb = new StringBuilder();
 
+            sb.AppendLine(RemoveEmptyObjects());
             sb.AppendLine(HealEmptyRequiredProperties());
 
             return sb.ToString();
+        }
+
+        private string RemoveEmptyObjects()
+        {
+            var entities = _ontologyData.Nodes.Where(n => n.NodeType.IsObject).ToList();
+            int cnt = 0;
+            _ontologyData.WriteLock(() =>
+            {
+                foreach (var entity in entities)
+                {
+                    if (EntityIsEmpty(entity))
+                    {
+                        cnt++;
+                        _ontologyData.RemoveNodeAndRelations(entity.Id);
+                    }
+                }
+            });
+            return $"{cnt} пустих об'єктів видалені";
+        }
+
+        private bool EntityIsEmpty(INode entity)
+        {
+            var names = new string[] { "accessLevel", "affiliation", "importance" };
+
+            return entity.OutgoingRelations
+                .All(r => names.Contains(r.Node.NodeType.Name));
         }
 
         private string HealEmptyRequiredProperties()
