@@ -41,7 +41,7 @@ namespace Iis.Services
             ChangeAccessLevelsReports(numericIndexMapping);
             await _context.SaveChangesAsync();
             if (materialIds.Any())
-                await _materialService.PutCreatedMaterialsToElasticSearchAsync(materialIds, ct);
+                await _materialService.PutCreatedMaterialsToElasticSearchAsync(materialIds, false, ct);
         }
 
         private List<Guid> ChangeAccessLevelsMaterials(Dictionary<int, int> mappings)

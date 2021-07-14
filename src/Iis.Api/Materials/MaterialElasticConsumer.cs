@@ -74,7 +74,7 @@ namespace Iis.Api.Materials
                     {
                         if (_materialIds.Any())
                         {
-                            await _materialService.PutCreatedMaterialsToElasticSearchAsync(_materialIds, stoppingToken);
+                            await _materialService.PutCreatedMaterialsToElasticSearchAsync(_materialIds, true, stoppingToken);
                             _materialEventProducer.SendMaterialSavedToElastic(_materialIds);
                             _materialIds.Clear();
                         }                        
@@ -86,7 +86,7 @@ namespace Iis.Api.Materials
                     _materialIds.Add(materialId);
                     if (_materialIds.Count() >= MaxBatchSize)
                     {
-                        await _materialService.PutCreatedMaterialsToElasticSearchAsync(_materialIds, stoppingToken);
+                        await _materialService.PutCreatedMaterialsToElasticSearchAsync(_materialIds, true, stoppingToken);
                         _materialEventProducer.SendMaterialSavedToElastic(_materialIds);
                         _materialIds.Clear();
                     }
