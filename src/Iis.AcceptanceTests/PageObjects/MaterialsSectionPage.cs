@@ -54,7 +54,10 @@ namespace AcceptanceTests.PageObjects
         [CacheLookup]
         public IWebElement EventsSearch;
 
-		[FindsBy(How = How.CssSelector, Using = ".sidebar__nav li.objects")]
+        [FindsBy(How = How.CssSelector, Using = ".material-objects input")]
+        public IWebElement ObjectsSearch;
+
+        [FindsBy(How = How.CssSelector, Using = ".sidebar__nav li.objects")]
         public IWebElement ObjectsTabSearch;
 
         public MaterialPage MaterialPage => new MaterialPage(driver);
