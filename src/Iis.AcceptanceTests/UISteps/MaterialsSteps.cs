@@ -192,11 +192,11 @@ namespace AcceptanceTests.UISteps
         [When(@"I enter (.*) value in the search object field")]
         public void WhenIEnterValueInTheSearchObjectField(string inputValue)
         {
-            materialsSectionPage.ObjectsTabSearch.SendKeys(inputValue);
+            materialsSectionPage.ObjectsSearch.SendKeys(inputValue);            
             driver.WaitFor(2);
-            materialsSectionPage.ObjectsTabSearch.SendKeys(Keys.Down);
-            materialsSectionPage.ObjectsTabSearch.SendKeys(Keys.Enter);
-            materialsSectionPage.ObjectsTabSearch.SendKeys(Keys.Escape);
+            materialsSectionPage.ObjectsSearch.SendKeys(Keys.Down);
+            materialsSectionPage.ObjectsSearch.SendKeys(Keys.Enter);
+            materialsSectionPage.ObjectsSearch.SendKeys(Keys.Escape);
         }
 
         [When(@"I clicked on the connected object")]
