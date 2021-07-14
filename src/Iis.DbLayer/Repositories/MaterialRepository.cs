@@ -114,7 +114,7 @@ namespace Iis.DbLayer.Repositories
 
         public async Task<List<ElasticBulkResponse>> PutAllMaterialsToElasticSearchAsync(CancellationToken ct = default)
         {
-            const int batchSize = 50000;
+            const int batchSize = 5000;
 
             var materialsCount = await GetMaterialsQuery(MaterialIncludeEnum.WithChildren, MaterialIncludeEnum.WithFeatures)
                 .CountAsync();
@@ -161,14 +161,16 @@ namespace Iis.DbLayer.Repositories
                     });
 
                 var json = ConvertToJson(materialDocuments);
-                var response = await _elasticManager.PutDocumentsAsync(MaterialIndexes.FirstOrDefault(), json, ct);
+                var response = await _elasticManager.PutDocumentsAsync(MaterialIndexes.FirstOrDefault(), json, false, ct);
                 responses.AddRange(response);
             }
 
             return responses;
         }
 
-        public async Task<List<ElasticBulkResponse>> PutCreatedMaterialsToElasticSearchAsync(IReadOnlyCollection<Guid> materialIds, CancellationToken token = default)
+        public async Task<List<ElasticBulkResponse>> PutCreatedMaterialsToElasticSearchAsync(IReadOnlyCollection<Guid> materialIds, 
+            bool waitForIndexing = false, 
+            CancellationToken token = default)
         {
             var materials = await GetMaterialsQuery(MaterialIncludeEnum.WithChildren, MaterialIncludeEnum.WithFeatures)
             .Where(p => materialIds.Contains(p.Id))
@@ -177,7 +179,7 @@ namespace Iis.DbLayer.Repositories
             var materialDocuments = materials.Select(p => MapEntityToDocument(p));
             var json = ConvertToJson(materialDocuments);
 
-            return await _elasticManager.PutDocumentsAsync(MaterialIndexes.FirstOrDefault(), json, token);
+            return await _elasticManager.PutDocumentsAsync(MaterialIndexes.FirstOrDefault(), json, waitForIndexing, token);
         }
 
         public string ConvertToJson(IEnumerable<MaterialDocument> materialDocuments)

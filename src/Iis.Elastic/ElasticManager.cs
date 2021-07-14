@@ -72,13 +72,16 @@ namespace Iis.Elastic
             return response.Success;
         }
 
-        public async Task<List<ElasticBulkResponse>> PutDocumentsAsync(string indexName, string documents, CancellationToken ct = default)
+        public async Task<List<ElasticBulkResponse>> PutDocumentsAsync(string indexName, string documents, bool waitForIndexing, CancellationToken ct = default)
         {
             if (string.IsNullOrWhiteSpace(indexName))
                 return null;
 
             var indexUrl = $"{GetRealIndexName(indexName)}/_bulk";
-            var response = await PostAsync(indexUrl, documents, ct);
+            var response = await PostAsync(indexUrl, documents, new IndexRequestParameters
+            {
+                Refresh = waitForIndexing ? Refresh.WaitFor : Refresh.False
+            }, ct);
 
             return ParseBulkBodyResponse(response.Body);
         }
@@ -190,7 +193,7 @@ namespace Iis.Elastic
                 ""scroll"" : ""{ scrollDuration.TotalSeconds }s"",                                                                 
                 ""scroll_id"" : ""{scrollId}""
             }}";
-            var response = await PostAsync(path, postData, CancellationToken.None);
+            var response = await PostAsync(path, postData, cancellationToken: CancellationToken.None);
             return _resultExtractor.GetFromResponse(response);
         }
 
@@ -618,9 +621,9 @@ namespace Iis.Elastic
             return await DoRequestAsync(HttpMethod.GET, path, data, parameters, cancellationToken);
         }
 
-        private async Task<StringResponse> PostAsync(string path, string data, CancellationToken cancellationToken)
+        private async Task<StringResponse> PostAsync(string path, string data, IRequestParameters requestParameters = null, CancellationToken cancellationToken = default)
         {
-            return await DoRequestAsync(HttpMethod.POST, path, data, null, cancellationToken);
+            return await DoRequestAsync(HttpMethod.POST, path, data, requestParameters, cancellationToken);
         }        
     }
 }

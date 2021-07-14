@@ -19,7 +19,7 @@ namespace IIS.Core.Materials
         Task AssignMaterialOperatorAsync(Guid materialId, Guid assigneeId, User user = null);
         Task SetMachineLearningHadnlersCount(Guid materialId, int handlersCount);
         Task<List<ElasticBulkResponse>> PutAllMaterialsToElasticSearchAsync(CancellationToken cancellationToken);
-        Task<List<ElasticBulkResponse>> PutCreatedMaterialsToElasticSearchAsync(IReadOnlyCollection<Guid> materialIds, CancellationToken stoppingToken);
+        Task<List<ElasticBulkResponse>> PutCreatedMaterialsToElasticSearchAsync(IReadOnlyCollection<Guid> materialIds, bool waitForIndexing, CancellationToken stoppingToken);
         Task<Material> ChangeMaterialAccessLevel(Guid materialId, int accessLevel, User user);
         Task RemoveMaterials();
     }
