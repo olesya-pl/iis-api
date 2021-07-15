@@ -126,7 +126,7 @@ namespace Iis.DbLayer.Repositories
                     ct.ThrowIfCancellationRequested();
 
                     var bulkData = GenerateBulkData(nodeBatch, isHistoricalIndex);
-                    var response = await _elasticManager.PutDocumentsAsync(index, bulkData, ct);
+                    var response = await _elasticManager.PutDocumentsAsync(index, bulkData, ct: ct);
 
                     responses.AddRange(response);
                 }
