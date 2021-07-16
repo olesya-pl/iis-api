@@ -24,6 +24,11 @@ namespace Iis.Elastic.SearchResult
 
         public IElasticSearchResult GetFromResponse(StringResponse response)
         {
+            if (!response.Success)
+            {
+                throw response.OriginalException;
+            }
+            
             var json = JObject.Parse(response.Body);
             List<ElasticSearchResultItem> items = null;
             const string NODE_TYPE_NAME = "NodeTypeName";
