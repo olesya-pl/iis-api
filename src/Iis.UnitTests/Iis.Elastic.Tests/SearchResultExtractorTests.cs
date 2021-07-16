@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using AutoFixture.Xunit2;
 using Elasticsearch.Net;
 using Iis.Elastic.SearchResult;
+using Moq;
 using Xunit;
 
 namespace Iis.UnitTests.Iis.Elastic.Tests
@@ -14,6 +16,12 @@ namespace Iis.UnitTests.Iis.Elastic.Tests
         public void GetFromReponse_ResultExists(Guid id1, Guid id2,
             string fileName1, string fileName2)
         {
+            //arrange
+            var apiCallMock = new Mock<IApiCallDetails>(MockBehavior.Strict);
+            apiCallMock.Setup(e => e.HttpStatusCode).Returns(200);
+            apiCallMock.Setup(e => e.Success).Returns(true);
+            apiCallMock.Setup(e => e.AuditTrail).Returns(new List<Audit>());
+
             //act
             var sut = new SearchResultExtractor();
             var res = sut.GetFromResponse(new StringResponse(
@@ -64,7 +72,10 @@ namespace Iis.UnitTests.Iis.Elastic.Tests
       ]
    }}
 }}"
-                ));
+                )
+            {
+                ApiCall = apiCallMock.Object
+            });
 
             //assert
             Assert.Equal(2, res.Count);
@@ -81,12 +92,21 @@ namespace Iis.UnitTests.Iis.Elastic.Tests
         [Fact]
         public void GetFromReponse_BadRequest()
         {
+            //arrange
+            var apiCallMock = new Mock<IApiCallDetails>(MockBehavior.Strict);
+            apiCallMock.Setup(e => e.HttpStatusCode).Returns(500);
+            apiCallMock.Setup(e => e.Success).Returns(false);
+            apiCallMock.Setup(e => e.AuditTrail).Returns(new List<Audit>());
+            apiCallMock.Setup(e => e.OriginalException).Returns(new Exception("hoba"));
+
             //act
             var sut = new SearchResultExtractor();
-            var res = sut.GetFromResponse(new StringResponse("{\"error\":{\"root_cause\":[{\"type\":\"illegal_argument_exception\",\"reason\":\"boost must be a positive float, got -1.0\"}],\"type\":\"search_phase_execution_exception\",\"reason\":\"all shards failed\",\"phase\":\"query\",\"grouped\":true,\"failed_shards\":[{\"shard\":0,\"index\":\"ont_materials\",\"node\":\"_L87vs7ZSlW2XA6AstCxfg\",\"reason\":{\"type\":\"illegal_argument_exception\",\"reason\":\"boost must be a positive float, got -1.0\"}}],\"caused_by\":{\"type\":\"illegal_argument_exception\",\"reason\":\"boost must be a positive float, got -1.0\",\"caused_by\":{\"type\":\"illegal_argument_exception\",\"reason\":\"boost must be a positive float, got -1.0\"}}},\"status\":400}"));
 
             //assert
-            Assert.Equal(0, res.Count);
+            Assert.Throws<Exception>(() => sut.GetFromResponse(new StringResponse("{\"error\":{\"root_cause\":[{\"type\":\"illegal_argument_exception\",\"reason\":\"boost must be a positive float, got -1.0\"}],\"type\":\"search_phase_execution_exception\",\"reason\":\"all shards failed\",\"phase\":\"query\",\"grouped\":true,\"failed_shards\":[{\"shard\":0,\"index\":\"ont_materials\",\"node\":\"_L87vs7ZSlW2XA6AstCxfg\",\"reason\":{\"type\":\"illegal_argument_exception\",\"reason\":\"boost must be a positive float, got -1.0\"}}],\"caused_by\":{\"type\":\"illegal_argument_exception\",\"reason\":\"boost must be a positive float, got -1.0\",\"caused_by\":{\"type\":\"illegal_argument_exception\",\"reason\":\"boost must be a positive float, got -1.0\"}}},\"status\":400}")
+            {
+                ApiCall = apiCallMock.Object
+            }));
         }
     }
 }
