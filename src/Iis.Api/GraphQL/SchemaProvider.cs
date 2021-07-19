@@ -11,6 +11,7 @@ using IIS.Core.GraphQL.Export;
 using Iis.Api.Ontology;
 using Iis.Api.GraphQL.Graph;
 using Iis.Api.GraphQL.CreateMenu;
+using Iis.Api.GraphQL.RadioElectronicSituation;
 using Iis.Domain;
 using Microsoft.Extensions.Configuration;
 using Iis.Interfaces.Ontology.Schema;
@@ -83,6 +84,8 @@ namespace IIS.Core.GraphQL
                 d.Include<RelationsCountQuery>();
                 d.Include<CreateMenuItemsQuery>();
                 d.Include<GraphQuery>();
+                d.Include<SituationQuery>();
+
 
                 if (_configuration.GetValue("reportsAvailable", true))
                 {

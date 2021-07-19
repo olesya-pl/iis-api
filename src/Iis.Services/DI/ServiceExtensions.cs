@@ -24,6 +24,7 @@ namespace Iis.Services.DI
             services.AddTransient<IGraphService, GraphService>();
             services.AddTransient<IImageVectorizer, ImageVectorizer>();
             services.AddTransient<IMaterialProvider, MaterialProvider<IIISUnitOfWork>>();
+            services.AddTransient<IRadioElectronicSituationService, RadioElectronicSituationService<IIISUnitOfWork>>();
             services.AddHttpClient<MaterialProvider<IIISUnitOfWork>>();
             services.AddTransient<NodeToJObjectMapper>();
 
