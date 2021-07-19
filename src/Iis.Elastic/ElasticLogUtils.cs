@@ -6,7 +6,7 @@ using Newtonsoft.Json.Linq;
 
 namespace Iis.Elastic
 {
-    internal class ElasticLogUtils
+    public class ElasticLogUtils
     {
         public ElasticLogUtils()
         {

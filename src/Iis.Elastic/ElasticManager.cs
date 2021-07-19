@@ -19,7 +19,7 @@ using System.Text.RegularExpressions;
 
 namespace Iis.Elastic
 {
-    internal class ElasticManager : IElasticManager
+    public class ElasticManager : IElasticManager
     {
         private ElasticLowLevelClient _lowLevelClient;
         private readonly ElasticConfiguration _configuration;

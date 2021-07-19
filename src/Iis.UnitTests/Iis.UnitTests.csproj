@@ -39,6 +39,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Iis.Api\Iis.Api.csproj" />
     <ProjectReference Include="..\Iis.DbLayer\Iis.DbLayer.csproj" />
+    <ProjectReference Include="..\Iis.Elastic\Iis.Elastic.csproj" />
     <ProjectReference Include="..\Iis.OntologyData\Iis.OntologyData.csproj" />
     <ProjectReference Include="..\Iis.OntologySchema\Iis.OntologySchema.csproj" />
     <ProjectReference Include="..\Iis.Services\Iis.Services.csproj" />

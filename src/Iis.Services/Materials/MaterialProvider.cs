@@ -596,7 +596,7 @@ namespace IIS.Services.Materials
 
             result.AddRange(dtoList);
 
-            return result;
+            return result.Where(x => x != null).ToList();
         }
         public async Task<bool> MaterialExists(Guid id)
         {

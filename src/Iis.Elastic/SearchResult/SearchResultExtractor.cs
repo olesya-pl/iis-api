@@ -9,7 +9,7 @@ using Newtonsoft.Json.Serialization;
 
 namespace Iis.Elastic.SearchResult
 {
-    internal class SearchResultExtractor
+    public class SearchResultExtractor
     {
         private readonly IFieldToAliasMapper _fieldToAliasMapper;
         public SearchResultExtractor(IFieldToAliasMapper fieldToAliasMapper)
