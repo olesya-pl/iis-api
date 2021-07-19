@@ -1,4 +1,4 @@
-namespace Iis.Services.Graph
+namespace Iis.Services.Mappers.Graph
 {
     public static class GraphTypeExtraPropNames
     {

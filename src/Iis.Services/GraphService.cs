@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using Iis.Domain.Graph;
 using Iis.Domain.Materials;
 using Iis.Interfaces.Ontology.Data;
-using Iis.Services.Graph;
+using Iis.Services.Mappers.Graph;
 using Iis.Services.Contracts.Interfaces;
 using IIS.Services.Contracts.Interfaces;
 namespace Iis.Services

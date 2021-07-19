@@ -17,6 +17,7 @@ using Iis.Api.GraphQL.Common;
 using Iis.Api.GraphQL.Roles;
 using Iis.Api.GraphQL.Aliases;
 using GraphQLGraphTypes = Iis.Api.GraphQL.Graph;
+using Iis.Api.GraphQL.RadioElectronicSituation;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
@@ -397,6 +398,10 @@ namespace Iis.Api
 
             CreateMap<DomainGraphTypes.GraphLink, GraphQLGraphTypes.GraphLink>();
             CreateMap<DomainGraphTypes.GraphNode, GraphQLGraphTypes.GraphNode>();
+
+            CreateMap<SituationNodeDto, SituationNode>();
+            CreateMap<GeometryDto, Geometry>();
+            CreateMap<AttributesDto, Attributes>();
         }
     }
 }

@@ -7,7 +7,7 @@ using Iis.Domain.Materials;
 using Iis.Interfaces.Ontology.Data;
 using Iis.Utility;
 
-namespace Iis.Services.Graph
+namespace Iis.Services.Mappers.Graph
 {
     public static class GraphTypeMapper
     {

@@ -18,6 +18,17 @@ namespace Iis.DbLayer.Repositories
                     .FirstOrDefaultAsync(e => e.EntityId == entityId);
         }
 
+        public Task<LocationHistoryEntity[]> GetLatestLocationHistoryListAsync(IReadOnlyCollection<Guid> entityIdList)
+        {
+            var listValue = string.Join(',', entityIdList.Select(e => $"'{e.ToString("N")}'"));
+
+            var query = "select \"Id\", \"Lat\", \"Long\", \"RegisteredAt\", \"NodeId\", \"EntityId\", \"ExternalId\", \"MaterialId\", \"Type\" from public.\"LocationHistory\" lh "+
+                        "join ( select distinct first_value(\"Id\") over (partition by \"EntityId\" order by \"RegisteredAt\" desc) as \"ID\" FROM public.\"LocationHistory\" "+
+                        "where \"EntityId\" in ("+listValue+")) jlh on lh.\"Id\" = jlh.\"ID\"";
+
+            return Context.LocationHistory.FromSqlRaw(query).ToArrayAsync();
+        }
+
         public Task<LocationHistoryEntity[]> GetLocationHistoryEntityListByMaterialIdAsync(Guid materialId)
         {
             return Context.LocationHistory
