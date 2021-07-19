@@ -230,7 +230,8 @@ namespace Iis.Services
                             return new FileResult
                             {
                                 IsDuplicate = true,
-                                FileHash = hash
+                                FileHash = hash,
+                                Id = Guid.Parse(storedFileInfo.Name)
                             };
                         }
                     }
