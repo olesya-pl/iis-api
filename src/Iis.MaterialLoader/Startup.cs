@@ -16,6 +16,7 @@ using Microsoft.Extensions.Hosting;
 using IChangeHistoryService = Iis.MaterialLoader.Services.IChangeHistoryService;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
+using Iis.Utility.Logging;
 
 namespace Iis.MaterialLoader
 {
@@ -70,12 +71,20 @@ namespace Iis.MaterialLoader
                 app.UseDeveloperExceptionPage();
             }
 
+            app.UseMiddleware<LogHeaderMiddleware>();
+
+#if !DEBUG
+            app.UseMiddleware<LoggingMiddleware>();
+#endif
+
             app.UseRouting();
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
                 endpoints.MapHealthChecks("/health");
             });
+
+            
         }
     }
 }
