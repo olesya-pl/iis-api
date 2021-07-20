@@ -19,6 +19,7 @@ using RabbitMQ.Client.Events;
 using RabbitMQ.Client.Exceptions;
 using Iis.Messages.Materials;
 using Iis.Services.Contracts.Configurations;
+using Iis.Interfaces.Ontology.Data;
 
 namespace Iis.Api.Materials.Handlers
 {
@@ -35,6 +36,7 @@ namespace Iis.Api.Materials.Handlers
         private IConnection _connection;
         private IModel _channel;
         private readonly JsonSerializerOptions options;
+
         public FeatureHandler(ILogger<FeatureHandler> logger,
             IConnectionFactory connectionFactory,
             FeatureHandlerConfig configuration,
@@ -97,6 +99,7 @@ namespace Iis.Api.Materials.Handlers
         private async Task ProcessMessage(MaterialEventMessage message)
         {
             var processor = _provider.GetService<IFeatureProcessorFactory>().GetInstance(message.Source, message.Type);
+            var nodesData = _provider.GetService<IOntologyNodesData>();
 
             if(processor.IsDummy) return;
 
@@ -107,11 +110,10 @@ namespace Iis.Api.Materials.Handlers
             JObject metadata = JObject.Parse(material.Metadata);
 
             metadata = await processor.ProcessMetadataAsync(metadata, material.Id);
-
             material.Metadata = metadata.ToString(Newtonsoft.Json.Formatting.None);
 
             var featureIdList = GetNodeIdentitiesFromFeatures(metadata);
-
+            featureIdList = processor.GetValidFeatureIds(featureIdList);
             RunWithCommit(uow => {
                 uow.MaterialRepository.AddFeatureIdList(material.Id, featureIdList);
                 uow.MaterialRepository.EditMaterial(material);
