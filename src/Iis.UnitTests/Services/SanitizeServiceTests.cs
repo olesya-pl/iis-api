@@ -1,7 +1,6 @@
 ﻿using System;
 using FluentAssertions;
-using Iis.DataModel.Reports;
-using Iis.Services;
+using Iis.Utility.Logging;
 using Xunit;
 
 namespace Iis.UnitTests.Services

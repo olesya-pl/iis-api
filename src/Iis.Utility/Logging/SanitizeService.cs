@@ -2,13 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
-using Iis.Services.Contracts;
-using Iis.Services.Contracts.Interfaces;
 
-namespace Iis.Services
+namespace Iis.Utility.Logging
 {
-
-    public class SanitizeService : ISanitizeService
+    internal class SanitizeService
     {
         private readonly List<(Func<string, bool> IsSuitable, Func<string, string> Sanitizer)> _sanitizers;
         private const string RegexTemplate = "({0}):\\s*(\"([^\"]+)\")";
