@@ -71,7 +71,7 @@ namespace Iis.Elastic.SearchQueryExtensions
 
         public static JObject WithAggregation(this JObject jsonQuery,
             IEnumerable<AggregationField> aggregationFields,
-            ElasticFilter filter)
+            JArray shouldSections)
         {
             if (!aggregationFields.Any()) return jsonQuery;
 
@@ -84,7 +84,7 @@ namespace Iis.Elastic.SearchQueryExtensions
                 if (string.IsNullOrWhiteSpace(field.TermFieldName) || string.IsNullOrWhiteSpace(field.Name)) continue;
 
                 var fieldName = GetFieldName(field);
-                var filterSection = CreateAggregationFilter(field, filter);
+                var filterSection = CreateAggregationFilter(shouldSections);
                 var subAggsSection = CreateSubAggs("sub_aggs", field);
 
                 aggregations[fieldName] = new JObject
@@ -112,29 +112,11 @@ namespace Iis.Elastic.SearchQueryExtensions
             };
         }
 
-        private static JObject CreateAggregationFilter(AggregationField field, ElasticFilter filter)
+        private static JObject CreateAggregationFilter(JArray shouldSections)
         {
-            var fieldSpecificFilter = new ElasticFilter
-            {
-                Suggestion = filter.Suggestion,
-                FilteredItems = filter.FilteredItems.Where(x => !(x.Name == field.Name || x.Name == field.Alias)).ToList()
-            };
-
-            var possibleQuery = fieldSpecificFilter.ToQueryString();
-            var query = string.IsNullOrEmpty(possibleQuery) ? Wildcard : possibleQuery;
-
             var boolSection = JObject.FromObject(new
             {
-                should = new[]
-                {
-                    new
-                    {
-                        query_string = new
-                        {
-                            query
-                        }
-                    }
-                }
+                should = shouldSections
             });
 
             return new JObject

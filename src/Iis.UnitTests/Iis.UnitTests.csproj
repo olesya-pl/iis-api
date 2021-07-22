@@ -43,17 +43,5 @@
     <ProjectReference Include="..\Iis.OntologySchema\Iis.OntologySchema.csproj" />
     <ProjectReference Include="..\Iis.Services\Iis.Services.csproj" />
     <ProjectReference Include="..\Iis.Utility\Iis.Utility.csproj" />
-  </ItemGroup>  
-
-  <ItemGroup>
-    <None Update="Iis.Elastic.Tests\SearchQueryExtensionTestJson\WithAggregationWithFilterOnlyFilteredItemsAvailable.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Iis.Elastic.Tests\SearchQueryExtensionTestJson\WithAggregationWithFilterWithSuggestion.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Iis.Elastic.Tests\SearchQueryExtensionTestJson\WithAggregationWithFilterWithOneFilteredItems.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
   </ItemGroup>
 </Project>

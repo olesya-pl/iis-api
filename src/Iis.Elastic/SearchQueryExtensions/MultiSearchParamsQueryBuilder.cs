@@ -11,6 +11,8 @@ namespace Iis.Elastic.SearchQueryExtensions
         private List<(string Query, List<IIisElasticField> Fields)> _searchParams;
         private bool? _isLenient;
 
+        public JArray ShouldSections { get; private set; }
+
         public MultiSearchParamsQueryBuilder(List<(string Query, List<IIisElasticField> Fields)> searchParams) 
         {
             _searchParams = searchParams;
@@ -47,7 +49,7 @@ namespace Iis.Elastic.SearchQueryExtensions
             }
 
             json["query"]["bool"]["should"] = shouldSections;
-
+            ShouldSections = shouldSections;
             return json;
         }
 

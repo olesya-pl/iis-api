@@ -133,10 +133,11 @@ namespace IIS.Core.Ontology.EntityFramework
                                     .Select(e => new AggregationField($"{e.Name}{SearchQueryExtension.AggregateSuffix}", e.Alias, $"{e.Name}{SearchQueryExtension.AggregateSuffix}", e.Name))
                                     .ToArray();
 
-            var multiSearchQuery = new MultiSearchParamsQueryBuilder(multiSearchParams.SearchParams)
+            var multiSearchQueryBuilder = new MultiSearchParamsQueryBuilder(multiSearchParams.SearchParams)
                 .WithLeniency(multiSearchParams.IsLenient)
                 .WithPagination(multiSearchParams.From, multiSearchParams.Size)
-                .WithResultFields(multiSearchParams.ResultFields)
+                .WithResultFields(multiSearchParams.ResultFields);
+            var multiSearchQuery = multiSearchQueryBuilder
                 .BuildSearchQuery()
                 .WithHighlights()
                 .ToString();
@@ -144,7 +145,7 @@ namespace IIS.Core.Ontology.EntityFramework
             var aggregationQuery = new MatchAllQueryBuilder()
                 .WithPagination(0, 0)
                 .BuildSearchQuery()
-                .WithAggregation(aggregationFieldList, filter)
+                .WithAggregation(aggregationFieldList, multiSearchQueryBuilder.ShouldSections)
                 .ToString();
 
             var searchResult = await _elasticManager.WithUserId(userId).SearchAsync(multiSearchQuery, typeNames, ct);
