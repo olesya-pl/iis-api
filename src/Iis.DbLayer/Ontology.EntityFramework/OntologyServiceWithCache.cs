@@ -13,6 +13,7 @@ using Attribute = Iis.Domain.Attribute;
 using Iis.Interfaces.AccessLevels;
 using Iis.Domain.Users;
 using Newtonsoft.Json.Linq;
+using Iis.Domain.TreeResult;
 
 namespace Iis.DbLayer.Ontology.EntityFramework
 {
@@ -491,6 +492,34 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             }
             return res;
         }
+        
+        public TreeResultList GetEventTypes(string suggestion)
+        {
+            const string NAME = "name";
+            const string CHILD = "child";
 
+            var eventTypeType = _data.Schema.GetEntityTypeByName("EventType");
+            if (eventTypeType == null) throw new Exception("EventType type is not found");
+
+            var nodes = _data.GetNodesByTypeId(eventTypeType.Id)
+                .Where(n => (string.IsNullOrEmpty(suggestion) ||
+                    n.GetSingleDirectProperty(NAME)?.Value?.Contains(suggestion, StringComparison.OrdinalIgnoreCase) == true)
+                    && !n.OutgoingRelations.Any(r => r.Node.NodeType.Name == CHILD))
+                .OrderBy(n => n.GetSingleDirectProperty(NAME)?.Value);
+
+            var result = new TreeResultList().Init(
+                    nodes, 
+                    n => n.GetSingleProperty(NAME)?.Value,
+                    n => n.Id.ToString("N"),
+                    n => n.IncomingRelations
+                        .Where(r => r.Node.NodeType.Name == CHILD)
+                        .Select(r => r.SourceNode)
+                        .SingleOrDefault()
+                        ?.GetSingleDirectProperty(NAME)
+                        ?.Value
+                );
+
+            return result;
+        }
     }
 }
