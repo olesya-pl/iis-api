@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Iis.Interfaces.Common
+namespace Iis.Api.Controllers.Dto
 {
     public class SearchParam
     {

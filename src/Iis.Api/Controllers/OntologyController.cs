@@ -1,5 +1,5 @@
-﻿using Iis.Domain;
-using Iis.Interfaces.Common;
+﻿using Iis.Api.Controllers.Dto;
+using Iis.Domain;
 using Iis.Interfaces.Ontology.Data;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
