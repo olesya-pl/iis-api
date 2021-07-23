@@ -14,7 +14,7 @@ namespace IIS.Core.GraphQL.Users
     {
         public string Comment { get; set; }
         [GraphQLNonNullType]
-        [RegularExpression(@"^[a-zA-Z0-9_]+$", ErrorMessage = "Use only latin letters, numbers and symbol '_' please")]
+        [RegularExpression(@"^[a-zA-Z0-9_-]+$", ErrorMessage = "Use only latin letters, numbers and symbols '_', '-' please")]
         public string UserName { get; set; }
         [Obsolete]
         public string UserNameActiveDirectory { get; set; }
