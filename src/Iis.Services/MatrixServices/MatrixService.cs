@@ -48,10 +48,12 @@ namespace Iis.Services.MatrixServices
             using var httpClient = _httpClientFactory.CreateClient();
 
             var response = await httpClient.PostAsync(uri, content);
+            var contentJson = await response.Content.ReadAsStringAsync();
+            var responseBody = contentJson ?? response.ReasonPhrase;
             if (!response.IsSuccessStatusCode)
             {
-                _logger.LogError($"Cannot register user {userName} in matrix: {response.ReasonPhrase}");
-                return response.ReasonPhrase;
+                _logger.LogError($"Cannot register user {userName} in matrix: {responseBody}");
+                return responseBody;
             }
             return null;
         }
@@ -74,15 +76,22 @@ namespace Iis.Services.MatrixServices
             var uri = GetUri("login", false);
             using var httpClient = _httpClientFactory.CreateClient();
 
-            var response = await httpClient.PostAsync(uri, content);
-            if (!response.IsSuccessStatusCode)
+            try
             {
-                _logger.LogError($"Cannot login to matrix: {response.ReasonPhrase}");
-                return new MatrixLoginResponse { ErrorMessage = response.ReasonPhrase};
-            }
+                var response = await httpClient.PostAsync(uri, content);
+                if (!response.IsSuccessStatusCode)
+                {
+                    _logger.LogError($"Cannot login to matrix: {response.ReasonPhrase}");
+                    return new MatrixLoginResponse { ErrorMessage = response.ReasonPhrase };
+                }
 
-            var resultJson = await response.Content.ReadAsStringAsync();
-            return JsonConvert.DeserializeObject<MatrixLoginResponse>(resultJson);
+                var resultJson = await response.Content.ReadAsStringAsync();
+                return JsonConvert.DeserializeObject<MatrixLoginResponse>(resultJson);
+            }
+            catch (Exception ex)
+            {
+                return new MatrixLoginResponse { ErrorMessage = ex.Message };
+            }
         }
 
         private async Task<string> Login()
