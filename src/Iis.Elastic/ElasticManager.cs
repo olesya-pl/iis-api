@@ -492,10 +492,7 @@ namespace Iis.Elastic
             {
                 var query = new JObject();
                 var queryString = new JObject();
-                queryString["query"] = ApplyFuzzinessOperator(
-                    searchParams.Query
-                        .RemoveSymbols(RemoveSymbolsPattern)
-                        .EscapeSymbols(EscapeSymbolsPattern));
+                queryString["query"] = SearchQueryExtension.ApplyFuzzinessOperator(searchParams.Query);
                 queryString["fuzziness"] = searchFieldGroup.Key.Fuzziness;
                 queryString["boost"] = searchFieldGroup.Key.Boost;
                 queryString["lenient"] = searchParams.IsLenient;
@@ -531,31 +528,6 @@ namespace Iis.Elastic
         private string GetRealIndexNames(IEnumerable<string> baseIndexNames)
         {
             return string.Join(',', baseIndexNames.Select(name => GetRealIndexName(name)));
-        }
-
-        public static string ApplyFuzzinessOperator(string input)
-        {
-            if (IsWildCard(input))
-            {
-                return input;
-            }
-
-            if(IsDoubleQuoted(input))
-            {
-                return $"{input} OR {input}~";
-            }
-
-            return $"\"{input}\" OR {input}~";
-        }
-
-        private static bool IsWildCard(string input)
-        {
-            return input.Contains('*');
-        }
-
-        private static bool IsDoubleQuoted(string input)
-        {
-            return input.StartsWith('\"') && input.EndsWith('\"');
         }
 
         private async Task<StringResponse> DoRequestAsync(HttpMethod httpMethod, string path, string data, IRequestParameters requestParameters, CancellationToken cancellationToken)
