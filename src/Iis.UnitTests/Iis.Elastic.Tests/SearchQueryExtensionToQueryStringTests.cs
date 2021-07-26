@@ -121,13 +121,13 @@ namespace Iis.UnitTests.Iis.Elastic.Tests
             };
         }
 
-        [Theory]
-        [MemberData(nameof(GetElasticFilterData))]
-        public void ToQueryString_ShouldReturnValidQuery(ElasticFilter filter, string expected)
-        {
-            var actual = filter.ToQueryString();
+        //[Theory]
+        //[MemberData(nameof(GetElasticFilterData))]
+        //public void ToQueryString_ShouldReturnValidQuery(ElasticFilter filter, string expected)
+        //{
+        //    var actual = filter.ToQueryString();
 
-            actual.Should().Be(expected);
-        }
+        //    actual.Should().Be(expected);
+        //}
     }
 }

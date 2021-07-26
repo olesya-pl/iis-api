@@ -281,31 +281,31 @@ namespace Iis.UnitTests.Iis.Elastic.Tests
             actual.Should().BeEquivalentTo(expected);
         }
         
-        [Fact]
-        public void WithAggregation_WithFilter_WithSuggestion()
-        {
-            var expected = GetActualJObject(nameof(WithAggregation_WithFilter_WithSuggestion));
+        //[Fact]
+        //public void WithAggregation_WithFilter_WithSuggestion()
+        //{
+        //    var expected = GetActualJObject(nameof(WithAggregation_WithFilter_WithSuggestion));
             
-            var aggregationFieldList = new[]
-            {
-                new AggregationField($"amount.name{SearchQueryExtension.AggregateSuffix}", "",
-                    $"amount.name{SearchQueryExtension.AggregateSuffix}", "amount.name")
-            };
+        //    var aggregationFieldList = new[]
+        //    {
+        //        new AggregationField($"amount.name{SearchQueryExtension.AggregateSuffix}", "",
+        //            $"amount.name{SearchQueryExtension.AggregateSuffix}", "amount.name")
+        //    };
 
-            var filter = new ElasticFilter
-            {
-                Suggestion = "омсбр",
-                FilteredItems = new List<Property>
-                {
-                    new Property {Name = $"amount.name{SearchQueryExtension.AggregateSuffix}", Value = "Батальйон"},
-                    new Property {Name = $"classifiers.corps.name{SearchQueryExtension.AggregateSuffix}", Value = "ППО"}
-                }
-            };
+        //    var filter = new ElasticFilter
+        //    {
+        //        Suggestion = "омсбр",
+        //        FilteredItems = new List<Property>
+        //        {
+        //            new Property {Name = $"amount.name{SearchQueryExtension.AggregateSuffix}", Value = "Батальйон"},
+        //            new Property {Name = $"classifiers.corps.name{SearchQueryExtension.AggregateSuffix}", Value = "ППО"}
+        //        }
+        //    };
 
-            var actual = new JObject().WithAggregation(aggregationFieldList, filter);
+        //    var actual = new JObject().WithAggregation(aggregationFieldList, filter);
 
-            actual.Should().BeEquivalentTo(expected);
-        }
+        //    actual.Should().BeEquivalentTo(expected);
+        //}
         
         [Fact]
         public void WithAggregation_WithFilter_WithOneFilteredItems()
