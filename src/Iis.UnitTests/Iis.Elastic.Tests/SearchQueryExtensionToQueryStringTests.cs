@@ -69,7 +69,7 @@ namespace Iis.UnitTests.Iis.Elastic.Tests
                         new Property("Чисельність", "Дивізія"),
                     }
                 },
-                "((омсбр) AND ((Тип_ОР:\"Особа\" OR Тип_ОР:\"Танк\") AND (Чисельність:\"Рота\" OR Чисельність:\"Дивізія\")))"
+                "((\"омсбр\" OR омсбр~) AND ((Тип_ОР:\"Особа\" OR Тип_ОР:\"Танк\") AND (Чисельність:\"Рота\" OR Чисельність:\"Дивізія\")))"
             };
             yield return new object[]
             {
@@ -101,7 +101,7 @@ namespace Iis.UnitTests.Iis.Elastic.Tests
                     },
                     CherryPickedItems = new List<CherryPickedItem>(){ new CherryPickedItem("some_id")}
                 },
-                "(((омсбр) AND ((Тип_ОР:\"Особа\" OR Тип_ОР:\"Танк\") AND (Чисельність:\"Рота\" OR Чисельність:\"Дивізія\"))) OR (Id:some_id OR parent.Id:some_id~0.95 OR bePartOf.Id:some_id~0.95))"
+                "(((\"омсбр\" OR омсбр~) AND ((Тип_ОР:\"Особа\" OR Тип_ОР:\"Танк\") AND (Чисельність:\"Рота\" OR Чисельність:\"Дивізія\"))) OR (Id:some_id OR parent.Id:some_id~0.95 OR bePartOf.Id:some_id~0.95))"
             };
             yield return new object[]
             {
@@ -117,7 +117,7 @@ namespace Iis.UnitTests.Iis.Elastic.Tests
                     },
                     CherryPickedItems = new List<CherryPickedItem>(){ new CherryPickedItem("some_id", false)}
                 },
-                "(((омсбр) AND ((Тип_ОР:\"Особа\" OR Тип_ОР:\"Танк\") AND (Чисельність:\"Рота\" OR Чисельність:\"Дивізія\"))) OR (Id:some_id))"
+                "(((\"омсбр\" OR омсбр~) AND ((Тип_ОР:\"Особа\" OR Тип_ОР:\"Танк\") AND (Чисельність:\"Рота\" OR Чисельність:\"Дивізія\"))) OR (Id:some_id))"
             };
         }
 
