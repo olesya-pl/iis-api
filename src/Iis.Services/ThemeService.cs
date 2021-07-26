@@ -231,7 +231,7 @@ namespace Iis.Services
                 if (theme.OriginalEntity.QueryResults != newCount)
                 {
                     theme.OriginalEntity.QueryResults = newCount;
-                    _context.Entry(theme).State = EntityState.Modified;
+                    _context.Entry(theme.OriginalEntity).State = EntityState.Modified;
                 }
             }
 
