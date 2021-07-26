@@ -1,4 +1,5 @@
-﻿using Iis.Interfaces.Roles;
+﻿using Iis.Interfaces.Elastic;
+using Iis.Interfaces.Roles;
 using IIS.Core.GraphQL.Entities.InputTypes;
 using IIS.Core.GraphQL.Materials;
 using Newtonsoft.Json;
@@ -26,7 +27,9 @@ namespace Iis.Api.GraphQL.Access
                     {
                         return false;
                     }
-                    return !string.IsNullOrEmpty(filter?.Suggestion ?? filter?.SearchQuery) || filter.CherryPickedItems.Any() || filter.FilteredItems.Any();
+                    return !string.IsNullOrEmpty(filter?.Suggestion ?? filter?.SearchQuery) || 
+                        filter.CherryPickedItems.Any() || 
+                        filter.FilteredItems.Where(fi => fi.Name != ElasticConfigConstants.NodeTypeTitleAlias).Any();
                 }, @"getObjects"),
                 new GraphQLAccessItem(AccessKind.Entity, AccessOperation.Update, @"updateEntity(?!Event)"),
                 new GraphQLAccessItem(AccessKind.Entity, AccessOperation.Delete, @"deleteEntity.*"),
