@@ -108,6 +108,11 @@ namespace Iis.Api.BackgroundServices
             {
                 res.Add(ThemeTypeEntity.EntityReportId);
             }
+            _logger.LogInformation("ThemeCounterBackgroundService. Getting types to update Objects: {objects}, Events {events}, Materials {materials}, Reports {reports}", 
+                _objectUpdateNeeded, 
+                _eventUpdateNeeded,
+                _materialUpdateNeeded,
+                _reportUpdateNeeded);
 
             return res.ToArray();
         }
