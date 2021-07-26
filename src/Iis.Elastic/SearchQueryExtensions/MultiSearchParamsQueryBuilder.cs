@@ -71,9 +71,7 @@ namespace Iis.Elastic.SearchQueryExtensions
             {
                 var querySection = new JObject();
                 var queryString = new JObject();
-                queryString["query"] = ElasticManager.ApplyFuzzinessOperator(query
-                    .RemoveSymbols(ElasticManager.RemoveSymbolsPattern)
-                    .EscapeSymbols(ElasticManager.EscapeSymbolsPattern));
+                queryString["query"] = SearchQueryExtension.ApplyFuzzinessOperator(query);
                 queryString["fuzziness"] = searchFieldGroup.Key.Fuzziness;
                 queryString["boost"] = searchFieldGroup.Key.Boost;
                 queryString["lenient"] = _isLenient;

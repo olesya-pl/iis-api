@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Iis.Interfaces.Elastic;
+using Iis.Utility;
 using Newtonsoft.Json.Linq;
 
 namespace Iis.Elastic.SearchQueryExtensions
@@ -186,7 +187,7 @@ namespace Iis.Elastic.SearchQueryExtensions
                 return filter.Suggestion;
             }
 
-            var result = string.IsNullOrEmpty(filter.Suggestion) ? "" : $"({filter.Suggestion})";
+            var result = string.IsNullOrEmpty(filter.Suggestion) ? "" : $"({ApplyFuzzinessOperator(filter.Suggestion)})";
             result = PopulateFilteredItems(filter.FilteredItems, result);
             return PopulateCherryPickedObjectsOfStudy(filter.CherryPickedItems, result);
         }
@@ -294,5 +295,27 @@ namespace Iis.Elastic.SearchQueryExtensions
         {
             return sortOrder == "asc" ?  "_last" : "_first";
         }
+
+        public static string ApplyFuzzinessOperator(string input)
+        {
+            input = input.RemoveSymbols(ElasticManager.RemoveSymbolsPattern)
+                        .EscapeSymbols(ElasticManager.EscapeSymbolsPattern);
+
+            if (IsWildCard(input) || IsInBrackets(input))
+            {
+                return input;
+            }
+
+            if (IsDoubleQuoted(input))
+            {
+                return $"{input} OR {input}~";
+            }
+
+            return $"\"{input}\" OR {input}~";
+        }
+
+        private static bool IsWildCard(string input) => input.Contains('*');
+        private static bool IsDoubleQuoted(string input) => input.StartsWith('\"') && input.EndsWith('\"');
+        private static bool IsInBrackets(string input) => input.StartsWith('(') && input.EndsWith(')');
     }
 }
