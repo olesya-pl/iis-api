@@ -23,7 +23,7 @@ namespace Iis.CoordinatesEventHandler.Handlers
         private IConnection _connection;
         private MessageHandlerConfiguration _handlerConfiguration;
         private IServiceProvider _provider;
-        private IConsumeMessageChannel<MaterialEventMessage> _consumeChannel;
+        private IConsumeMessageChannel<MaterialProcessingEventMessage> _consumeChannel;
 
         public MessageHandler(
             ILogger<MessageHandler> logger,
@@ -59,7 +59,7 @@ namespace Iis.CoordinatesEventHandler.Handlers
         {
             _connection = _connectionFactory.CreateAndWaitConnection(RetryIntervalSec, _logger, _handlerConfiguration.HandlerName);
 
-            _consumeChannel = new ConsumeMessageChannel<MaterialEventMessage>(
+            _consumeChannel = new ConsumeMessageChannel<MaterialProcessingEventMessage>(
                 _connection,
                 _handlerConfiguration.SourceChannel,
                 _logger
@@ -70,7 +70,7 @@ namespace Iis.CoordinatesEventHandler.Handlers
             return Task.CompletedTask;
         }
 
-        private async Task ProcessMessageAsync(MaterialEventMessage message)
+        private async Task ProcessMessageAsync(MaterialProcessingEventMessage message)
         {
             var processor = _provider.GetService<ICoordinatesProcessorsFactory>().GetProcessor(message.Source, message.Type);
 

@@ -81,7 +81,7 @@ namespace Iis.Api.Materials.Handlers
             base.Dispose();
         }
 
-        private async Task ProcessMessage(MaterialEventMessage message)
+        private async Task ProcessMessage(MaterialProcessingEventMessage message)
         {
             var processor = _provider.GetService<IFeatureProcessorFactory>().GetInstance(message.Source, message.Type);
 
@@ -155,7 +155,7 @@ namespace Iis.Api.Materials.Handlers
             }
         }
 
-        private void ConfigureConsumer(IModel channel, ChannelConfig config, Func<MaterialEventMessage, Task> handler)
+        private void ConfigureConsumer(IModel channel, ChannelConfig config, Func<MaterialProcessingEventMessage, Task> handler)
         {
             var channelConsumer = new AsyncEventingBasicConsumer(channel);
 
@@ -174,7 +174,7 @@ namespace Iis.Api.Materials.Handlers
                     }
 
 
-                    var message = BodyToObject<MaterialEventMessage>(args.Body, options);
+                    var message = BodyToObject<MaterialProcessingEventMessage>(args.Body, options);
 
                     await handler(message);
 

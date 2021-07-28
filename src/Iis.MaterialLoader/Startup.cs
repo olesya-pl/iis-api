@@ -4,6 +4,7 @@ using Iis.DbLayer.Repositories;
 using Iis.MaterialLoader.Rabbit;
 using Iis.MaterialLoader.Services;
 using IIS.Repository.Factories;
+using Iis.RabbitMq.DependencyInjection;
 using Iis.Services;
 using Iis.Services.Contracts.Configurations;
 using Iis.Services.Contracts.Interfaces;
@@ -33,9 +34,8 @@ namespace Iis.MaterialLoader
         {
             services.AddControllers();
             services.AddHealthChecks();
-            
+
             var dbConnectionString = Configuration.GetConnectionString("db");
-            // services.AddDbContextPool<OntologyContext>(options => options.UseNpgsql(dbConnectionString));
 
             services.AddDbContext<OntologyContext>(
                 options => options
@@ -51,8 +51,8 @@ namespace Iis.MaterialLoader
             services.AddScoped<IFileService, FileService<IIISUnitOfWork>>();
             services.AddTransient<IFileRepository, FileRepository>();
             services.AddSingleton(Configuration.GetSection("files").Get<FilesConfiguration>());
-            services.AddSingleton<IMaterialEventProducer, MaterialEventProducer>();
-            services.AddRabbit(Configuration, out _);
+            services.RegisterMqFactory(Configuration, out _);
+            services.RegisterMqInstances(Configuration);
 
             services.Configure<KestrelServerOptions>(options =>
             {

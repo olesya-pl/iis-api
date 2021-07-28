@@ -110,7 +110,7 @@ namespace Iis.RabbitMq.Channels
                     throw new InvalidOperationException("No message is received.");
                 }
 
-                logger.LogInformation("Message {@message} has been received from exchange:{Exchange} with key:{RoutingKey}", message, args.Exchange, args.RoutingKey);
+                logger?.LogInformation("Message {@message} has been received from exchange:{Exchange} with key:{RoutingKey}", message, args.Exchange, args.RoutingKey);
 
                 var model = (sender as AsyncEventingBasicConsumer).Model;
 
@@ -127,7 +127,7 @@ namespace Iis.RabbitMq.Channels
                 }
                 catch (Exception ex)
                 {
-                    logger.LogError("Exception during processing message. {ex}", ex);
+                    logger?.LogError("Exception during processing message. {ex}", ex);
                     model.BasicReject(args.DeliveryTag, false);
                 }
             };
