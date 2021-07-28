@@ -1,4 +1,4 @@
-{
+﻿{
   "aggs": {
     "amount.nameAggregate": {
       "filter": {
