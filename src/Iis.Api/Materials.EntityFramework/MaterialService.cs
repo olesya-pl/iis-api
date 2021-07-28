@@ -396,11 +396,11 @@ namespace IIS.Core.Materials.EntityFramework
 
         private void QueueMaterialForMachineLearning(MaterialEntity material)
         {
-            _eventProducer.SendMaterialEvent(new MaterialEventMessage { Id = material.Id, Source = material.Source, Type = material.Type });
+            _eventProducer.SendMaterialEvent(new MaterialProcessingEventMessage { Id = material.Id, Source = material.Source, Type = material.Type });
 
             foreach (var child in material.Children)
             {
-                _eventProducer.SendMaterialEvent(new MaterialEventMessage { Id = child.Id, Source = child.Source, Type = child.Type });
+                _eventProducer.SendMaterialEvent(new MaterialProcessingEventMessage { Id = child.Id, Source = child.Source, Type = child.Type });
             }
         }
 

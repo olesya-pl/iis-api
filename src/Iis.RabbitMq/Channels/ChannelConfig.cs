@@ -1,4 +1,4 @@
-namespace Iis.Services.Contracts.Configurations
+namespace Iis.RabbitMq.Channels
 {
     /// <summary>
     /// Type for RabbitMq channel config (exchange config and routing keys for binding) 
