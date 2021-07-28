@@ -189,7 +189,7 @@ namespace IIS.Core.Ontology.EntityFramework
             {
                 return SearchResultsExtension.EmptyAggregation;
             }
-            return aggregations.ToDictionary(x => x.Key, pair => pair.Value.SubAggs);
+            return aggregations.ToDictionary(x => x.Key, pair => pair.Value.SubAggs ?? pair.Value);
         }
 
         public async Task<SearchEntitiesByConfiguredFieldsResult> FilterNodeCoordinatesAsync(
