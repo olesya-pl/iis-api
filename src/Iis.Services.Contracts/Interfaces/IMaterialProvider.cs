@@ -30,7 +30,7 @@ namespace IIS.Services.Contracts.Interfaces
         MaterialSign GetMaterialSign(Guid id);
         Task<List<MLResponse>> GetMLProcessingResultsAsync(Guid materialId);
         Task<MaterialsDto> GetMaterialsByImageAsync(Guid userId, PaginationParams page, string fileName, byte[] content);
-        Task<(IEnumerable<Material> Materials, int Count)> GetMaterialsByNodeIdQuery(Guid nodeId);
+        Task<(IEnumerable<Material> Materials, int Count)> GetMaterialsByNodeIdQuery(Guid nodeId, bool includeRelatedEntities);
         Task<MaterialsDto> GetMaterialsCommonForEntitiesAsync(Guid userId,
             IEnumerable<Guid> nodeIdList, 
             bool includeDescendants,

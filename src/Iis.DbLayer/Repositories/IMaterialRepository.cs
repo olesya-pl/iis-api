@@ -52,10 +52,6 @@ namespace Iis.DbLayer.Repositories
 
         Task<List<MaterialsCountByType>> GetParentMaterialByNodeIdQueryAsync(IList<Guid> nodeIds);
 
-        List<Guid> GetFeatureIdListThatRelatesToObjectId(Guid nodeId);
-
-        Task<List<ObjectFeatureRelation>> GetFeatureIdListThatRelatesToObjectIdsAsync(IReadOnlyCollection<Guid> nodeIds);
-
         void AddFeatureIdList(Guid materialId, IEnumerable<Guid> featureIdList);
 
         Task<IEnumerable<Guid>> GetChildIdListForMaterialAsync(Guid materialId);

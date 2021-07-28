@@ -65,7 +65,7 @@ namespace IIS.Core.GraphQL.Reports
 
                     var tasks = report.EventIds.Select(async eventId => {
 
-                            var materialsResult = await materialProvider.GetMaterialsByNodeIdQuery(eventId);
+                            var materialsResult = await materialProvider.GetMaterialsByNodeIdQuery(eventId, false);
 
                             var materials = materialsResult.Materials.Select(m => mapper.Map<Material>(m)).ToList();
 

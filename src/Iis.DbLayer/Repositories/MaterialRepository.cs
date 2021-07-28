@@ -247,49 +247,6 @@ namespace Iis.DbLayer.Repositories
             Context.Materials.Update(materialEntity);
         }
 
-        public List<Guid> GetFeatureIdListThatRelatesToObjectId(Guid nodeId)
-        {
-            var type = _ontologySchema.GetEntityTypeByName(EntityTypeNames.ObjectSign.ToString());
-
-            var typeIdList = new List<Guid>();
-
-            if (type != null)
-            {
-                typeIdList = type.IncomingRelations
-                    .Select(p => p.SourceTypeId)
-                    .ToList();
-            }
-            return Context.Nodes
-                .Join(Context.Relations, n => n.Id, r => r.TargetNodeId, (node, relation) => new { Node = node, Relation = relation })
-                .Where(e => (!typeIdList.Any() || typeIdList.Contains(e.Node.NodeTypeId)) && e.Relation.SourceNodeId == nodeId && !e.Relation.Node.IsArchived)
-                .AsNoTracking()
-                .Select(e => e.Node.Id)
-                .ToList();
-        }
-
-        public async Task<List<ObjectFeatureRelation>> GetFeatureIdListThatRelatesToObjectIdsAsync(IReadOnlyCollection<Guid> nodeIds)
-        {
-            var type = _ontologySchema.GetEntityTypeByName(EntityTypeNames.ObjectSign.ToString());
-
-            var typeIdList = new List<Guid>();
-
-            if (type != null)
-            {
-                typeIdList = type.IncomingRelations
-                    .Select(p => p.SourceTypeId)
-                    .ToList();
-            }
-            return await Context.Nodes
-                .Join(Context.Relations, n => n.Id, r => r.TargetNodeId, (node, relation) => new { Node = node, Relation = relation })
-                .Where(e => (!typeIdList.Any() 
-                    || typeIdList.Contains(e.Node.NodeTypeId)) 
-                    && nodeIds.Contains(e.Relation.SourceNodeId)  
-                    && !e.Relation.Node.IsArchived)
-                .AsNoTracking()
-                .Select(e => new ObjectFeatureRelation { ObjectId = e.Relation.SourceNodeId, FeatureId = e.Node.Id })
-                .ToListAsync();
-        }
-
         public List<MaterialEntity> GetMaterialByNodeIdQuery(IList<Guid> nodeIds, params MaterialIncludeEnum[] includes)
         {
             return GetMaterialsQuery(includes)

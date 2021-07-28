@@ -135,7 +135,19 @@ namespace IIS.Core.GraphQL.Materials
            [Service] IMapper mapper,
            Guid nodeId)
         {
-            var materialsResult = await materialProvider.GetMaterialsByNodeIdQuery(nodeId);
+            var materialsResult = await materialProvider.GetMaterialsByNodeIdQuery(nodeId, true);
+
+            var materials = materialsResult.Materials.Select(m => mapper.Map<Material>(m)).ToList();
+            return (materials, materialsResult.Count);
+        }
+
+        [GraphQLType(typeof(MaterialCollection))]
+        public async Task<(IEnumerable<Material> materials, int totalCount)> GetRelatedMaterialsByEventId(
+           [Service] IMaterialProvider materialProvider,
+           [Service] IMapper mapper,
+           Guid nodeId)
+        {
+            var materialsResult = await materialProvider.GetMaterialsByNodeIdQuery(nodeId, false);
 
             var materials = materialsResult.Materials.Select(m => mapper.Map<Material>(m)).ToList();
             return (materials, materialsResult.Count);

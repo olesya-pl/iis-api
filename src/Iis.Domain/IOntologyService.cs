@@ -7,6 +7,7 @@ using Iis.Interfaces.Elastic;
 using Iis.Interfaces.Ontology.Schema;
 using Iis.Domain.Users;
 using Iis.Domain.TreeResult;
+using Iis.Interfaces.Ontology;
 
 namespace Iis.Domain
 {
@@ -33,5 +34,7 @@ namespace Iis.Domain
         Dictionary<Guid, int> GetRelationsCount(HashSet<Guid> entityIds);
         Task<SearchEntitiesByConfiguredFieldsResult> SearchEventsAsync(ElasticFilter filter, User user);
         TreeResultList GetEventTypes(string suggestion);
+        List<Guid> GetFeatureIdListThatRelatesToObjectId(Guid nodeId);
+        List<ObjectFeatureRelation> GetFeatureIdListThatRelatesToObjectIds(IReadOnlyCollection<Guid> nodeIds);
     }
 }
