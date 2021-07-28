@@ -3,7 +3,6 @@ using System.Text;
 using System.Collections.Generic;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using RabbitMQ.Client;
 using Iis.Messages;
 using Iis.Utility;
@@ -16,9 +15,8 @@ namespace IIS.Core.Materials
 {
     public interface IMaterialEventProducer : IDisposable
     {
-        void SendMaterialEvent(MaterialEventMessage eventMessage);
-        void SendMaterialFeatureEvent(MaterialEventMessage eventMessage);
-        void SendMaterialCoordinateEvent(MaterialEventMessage eventMessage);
+        void SendMaterialEvent(MaterialProcessingEventMessage eventMessage);
+        void SendMaterialProcessingEvent(MaterialProcessingEventMessage eventMessage);
         void SendAvailableForOperatorEvent(Guid materialId);
         void SaveMaterialToElastic(Guid id);
         void SendMaterialSavedToElastic(List<Guid> ids);
@@ -32,7 +30,7 @@ namespace IIS.Core.Materials
         private readonly IModel _channel;
         private readonly ILogger _logger;
         private readonly IModel _materialEventChannel;
-        private readonly IPublishMessageChannel<MaterialEventMessage> _eventPublishChannel;
+        private readonly IPublishMessageChannel<MaterialProcessingEventMessage> _eventPublishChannel;
         private readonly MaterialEventConfiguration _eventConfiguration;
         private readonly MaterialOperatorAssignerConfiguration _assignerConfiguration;
         private readonly MaterialElasticSaverConfiguration _elasticSaverConfiguration;
@@ -56,49 +54,32 @@ namespace IIS.Core.Materials
 
             _materialEventChannel = ConfigChannel(_connection.CreateModel(), _eventConfiguration.TargetChannel);
 
-            _eventPublishChannel = new PublishMessageChannel<MaterialEventMessage>(_connection, _eventConfiguration.TargetChannel);
+            _eventPublishChannel = new PublishMessageChannel<MaterialProcessingEventMessage>(_connection, _eventConfiguration.TargetChannel);
         }
 
-        public void SendMaterialEvent(MaterialEventMessage eventMessage)
+        public void SendMaterialEvent(MaterialProcessingEventMessage eventMessage)
         {
-            _logger.LogInformation($"sending material with id {eventMessage.Id} for ML processing");
+            var mlRoutingKey = $"processing.ml.{eventMessage.Type}";
 
-            var routingKey = $"processing.ml.{eventMessage.Type}";
+            _eventPublishChannel.Send(eventMessage, mlRoutingKey);
 
-            SendMaterialEventMessage(eventMessage, routingKey);
+            _logger.LogInformation($"sending material with id {eventMessage.Id} for processing: ML key:[{mlRoutingKey}]");
         }
 
-        public void SendMaterialFeatureEvent(MaterialEventMessage eventMessage)
+        public void SendMaterialProcessingEvent(MaterialProcessingEventMessage eventMessage)
         {
-            _logger.LogInformation($"sending material with id {eventMessage.Id} for feature processing");
 
-            var routingKey = $"processing.features.{eventMessage.Type}";
+            var mlRoutingKey = $"processing.ml.{eventMessage.Type}";
 
-            SendMaterialEventMessage(eventMessage, routingKey);
+            var featuresRoutingKey = $"processing.features.{eventMessage.Type}";
+
+            var coordinatesRoutingKey = "processing.coordinates";
+
+            _eventPublishChannel.Send(eventMessage, mlRoutingKey, featuresRoutingKey, coordinatesRoutingKey);
+
+            _logger.LogInformation($"sending material with id {eventMessage.Id} for processing: ML key:[{mlRoutingKey}], Features key:[{featuresRoutingKey}], Coordinates key:[{coordinatesRoutingKey}]");
         }
 
-        public void SendMaterialCoordinateEvent(MaterialEventMessage eventMessage)
-        {
-            _logger.LogInformation($"sending material with id {eventMessage.Id} for fetching coordinates");
-
-            _eventPublishChannel.Send(eventMessage, "processing.coordinates");
-        }
-
-        private void SendMaterialEventMessage(MaterialEventMessage message, string routingKey)
-        {
-            var json = JObject.FromObject(message).ToString();
-
-            var body = Encoding.UTF8.GetBytes(json);
-
-            var properties = _materialEventChannel.CreateBasicProperties();
-
-            properties.Persistent = true;
-
-            _materialEventChannel.BasicPublish(exchange: _eventConfiguration.TargetChannel.ExchangeName,
-                                routingKey: routingKey,
-                                basicProperties: null,
-                                body: body);
-        }
         private IModel ConfigChannel(IModel channel, ChannelConfig config)
         {
             if(config is null) return channel;

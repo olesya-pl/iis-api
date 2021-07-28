@@ -49,9 +49,15 @@ namespace Iis.RabbitMq.Channels
 
             var body = message.ToMessage(_options);
 
+            var model = GetModel();
+
+            var properties = model.CreateBasicProperties();
+
+            properties.Persistent = true;
+
             foreach(string routingKey in routingKeyList)
             {
-                GetModel().BasicPublish(_config.ExchangeName, routingKey, basicProperties: null, body);
+                model.BasicPublish(_config.ExchangeName, routingKey, basicProperties: properties, body);
             }
         }
 

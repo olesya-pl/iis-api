@@ -24,6 +24,7 @@
       <ProjectReference Include="..\IIS.Repository\IIS.Repository.csproj" />
       <ProjectReference Include="..\Iis.Services\Iis.Services.csproj" />
       <ProjectReference Include="..\Iis.Interfaces\Iis.Interfaces.csproj"/>
+      <ProjectReference Include="..\Iis.RabbitMq\Iis.RabbitMq.csproj" />
     </ItemGroup>
 
 
