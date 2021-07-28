@@ -9,6 +9,7 @@ using IIS.Core.Materials.FeatureProcessors;
 using IIS.Core.Materials.Handlers.Configurations;
 using Iis.DbLayer.Repositories;
 using Iis.Interfaces.Constants;
+using Iis.RabbitMq.Channels;
 using IIS.Repository.Factories;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -18,7 +19,6 @@ using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using RabbitMQ.Client.Exceptions;
 using Iis.Messages.Materials;
-using Iis.Services.Contracts.Configurations;
 using Iis.Interfaces.Ontology.Data;
 
 namespace Iis.Api.Materials.Handlers
@@ -96,7 +96,7 @@ namespace Iis.Api.Materials.Handlers
             base.Dispose();
         }
 
-        private async Task ProcessMessage(MaterialEventMessage message)
+        private async Task ProcessMessage(MaterialProcessingEventMessage message)
         {
             var processor = _provider.GetService<IFeatureProcessorFactory>().GetInstance(message.Source, message.Type);
             var nodesData = _provider.GetService<IOntologyNodesData>();
@@ -170,7 +170,7 @@ namespace Iis.Api.Materials.Handlers
             }
         }
 
-        private void ConfigureConsumer(IModel channel, ChannelConfig config, Func<MaterialEventMessage, Task> handler)
+        private void ConfigureConsumer(IModel channel, ChannelConfig config, Func<MaterialProcessingEventMessage, Task> handler)
         {
             var channelConsumer = new AsyncEventingBasicConsumer(channel);
 
@@ -189,7 +189,7 @@ namespace Iis.Api.Materials.Handlers
                     }
 
 
-                    var message = BodyToObject<MaterialEventMessage>(args.Body, options);
+                    var message = BodyToObject<MaterialProcessingEventMessage>(args.Body, options);
 
                     await handler(message);
 

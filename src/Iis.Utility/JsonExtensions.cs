@@ -9,7 +9,6 @@ namespace Iis.Utility
         {
             var jObject = JObject.Parse(json);
             jObject.SelectToken(path, false).Replace(newValue);
-            
             return jObject.ToString();
         }
 
@@ -23,7 +22,7 @@ namespace Iis.Utility
                 {
                     continue;
                 }
-                
+
                 var jToken = TryGetJToken(jObject, item.Path);
                 if(jToken == null)
                 {
@@ -48,7 +47,6 @@ namespace Iis.Utility
             {
                 return null;
             }
-            
         }
     }
 }
