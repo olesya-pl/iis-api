@@ -76,7 +76,7 @@ namespace Iis.Elastic.SearchQueryExtensions
         {
             if (!aggregationFields.Any()) return jsonQuery;
 
-            var fieldsNotPresentInFilter = aggregationFields.Where(p => filter.FilteredItems.Any(x => !(x.Name == p.Name || x.Name == p.Alias)));
+            var fieldsNotPresentInFilter = aggregationFields.Where(p => !filter.FilteredItems.Any(x => (x.Name == p.Name || x.Name == p.Alias)));
             jsonQuery = jsonQuery.WithAggregation(fieldsNotPresentInFilter.ToList());
 
             var aggregations = jsonQuery["aggs"] as JObject ?? new JObject();
