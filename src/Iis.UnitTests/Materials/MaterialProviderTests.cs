@@ -32,7 +32,7 @@ namespace Iis.UnitTests.Materials
             _serviceProvider.Dispose();
         }
 
-        [Theory, RecursiveAutoData]
+        //[Theory, RecursiveAutoData]
         public async Task CountMaterialsByType_CountOnlyParentMaterials(List<MaterialEntity> data,
             MaterialEntity image1,
             MaterialEntity image2,
