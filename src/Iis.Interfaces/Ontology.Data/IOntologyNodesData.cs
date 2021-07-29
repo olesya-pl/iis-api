@@ -26,6 +26,7 @@ namespace Iis.Interfaces.Ontology.Data
         IReadOnlyList<INode> GetNodesByUniqueValue(Guid nodeTypeId, string value, string valueTypeName);
         void RemoveNodeAndRelations(Guid id);
         void RemoveNode(Guid id);
+        void RemoveNodes(IEnumerable<Guid> ids);
         INode CreateNode(Guid nodeTypeId, Guid? id = null);
         IRelation CreateRelation(Guid sourceNodeId, Guid targetNodeId, Guid nodeTypeId, Guid? id = null);
         IAttribute CreateAttribute(Guid id, string value);

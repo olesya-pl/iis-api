@@ -60,7 +60,7 @@ namespace Iis.OntologyData
 
             return new Mapper(configuration);
         }
-
+            
         public T ReadLock<T>(Func<T> func) => Locker.ReadLock(func);
 
         public T WriteLock<T>(Func<T> func) => Locker.WriteLock(func);
@@ -171,6 +171,9 @@ namespace Iis.OntologyData
 
         public void RemoveNode(Guid id) =>
             Locker.WriteLock(() => _storage.RemoveNode(id));
+
+        public void RemoveNodes(IEnumerable<Guid> ids) =>
+            Locker.WriteLock(() => _storage.RemoveNodes(ids));
 
         public void SetNodesIsArchived(IEnumerable<Guid> nodeIds)
         {
