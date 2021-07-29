@@ -31,7 +31,7 @@ namespace Iis.Services
 
             foreach (INode node in nodeList)
             {
-                var materialResult = await _materialProvider.GetMaterialsByNodeIdQuery(node.Id, true);
+                var materialResult = await _materialProvider.GetMaterialsByNodeIdAndRelatedEntities(node.Id);
 
                 var materialList = materialResult.Materials.ToArray();
 

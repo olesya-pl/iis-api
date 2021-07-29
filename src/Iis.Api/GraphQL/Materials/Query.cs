@@ -135,7 +135,7 @@ namespace IIS.Core.GraphQL.Materials
            [Service] IMapper mapper,
            Guid nodeId)
         {
-            var materialsResult = await materialProvider.GetMaterialsByNodeIdQuery(nodeId, true);
+            var materialsResult = await materialProvider.GetMaterialsByNodeIdAndRelatedEntities(nodeId);
 
             var materials = materialsResult.Materials.Select(m => mapper.Map<Material>(m)).ToList();
             return (materials, materialsResult.Count);
@@ -147,7 +147,7 @@ namespace IIS.Core.GraphQL.Materials
            [Service] IMapper mapper,
            Guid nodeId)
         {
-            var materialsResult = await materialProvider.GetMaterialsByNodeIdQuery(nodeId, false);
+            var materialsResult = await materialProvider.GetMaterialsByNodeId(nodeId);
 
             var materials = materialsResult.Materials.Select(m => mapper.Map<Material>(m)).ToList();
             return (materials, materialsResult.Count);

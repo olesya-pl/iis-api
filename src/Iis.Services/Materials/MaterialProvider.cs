@@ -254,11 +254,16 @@ namespace IIS.Services.Materials
             return RunWithoutCommitAsync(async (unitOfWork) => await unitOfWork.MaterialRepository.GetParentMaterialByNodeIdQueryAsync(nodeIdList));
         }
 
-        public async Task<(IEnumerable<Material> Materials, int Count)> GetMaterialsByNodeIdQuery(Guid nodeId, bool includeRelatedEntities)
+        public async Task<(IEnumerable<Material> Materials, int Count)> GetMaterialsByNodeId(Guid nodeId)
         {
-            var materialsByNode = GetMaterialByNodeIdQuery(nodeId, includeRelatedEntities);
-            //TODO: we need to add logic that provides list of NodeId
-            //var result = _materialRepository.GetAllForRelatedNodeListAsync(nodeIdList).GetAwaiter().GetResult();
+            var materialsByNode = GetMaterialByNodeIdQuery(nodeId, false);
+            var materials = materialsByNode.Select(p => Map(p));
+            return (materials, materials.Count());
+        }
+
+        public async Task<(IEnumerable<Material> Materials, int Count)> GetMaterialsByNodeIdAndRelatedEntities(Guid nodeId)
+        {
+            var materialsByNode = GetMaterialByNodeIdQuery(nodeId, true);
             var materials = materialsByNode.Select(p => Map(p));
             return (materials, materials.Count());
         }
