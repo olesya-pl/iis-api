@@ -76,13 +76,11 @@ namespace Iis.Elastic.SearchQueryExtensions
         {
             if (!aggregationFields.Any()) return jsonQuery;
 
-            var fieldsNotPresentInFilter = aggregationFields.Where(p => !filter.FilteredItems.Any(x => (x.Name == p.Name || x.Name == p.Alias)));
-            jsonQuery = jsonQuery.WithAggregation(fieldsNotPresentInFilter.ToList());
+            var aggregations = new JObject();
 
-            var aggregations = jsonQuery["aggs"] as JObject ?? new JObject();
+            jsonQuery["aggs"] = aggregations;
 
-            var fieldsPresentInFilter = aggregationFields.Where(p => filter.FilteredItems.Any(x => (x.Name == p.Name || x.Name == p.Alias)));
-            foreach (var field in fieldsPresentInFilter)
+            foreach (var field in aggregationFields)
             {
                 if (string.IsNullOrWhiteSpace(field.TermFieldName) || string.IsNullOrWhiteSpace(field.Name)) continue;
 
@@ -96,8 +94,6 @@ namespace Iis.Elastic.SearchQueryExtensions
                     {"aggs", subAggsSection}
                 };
             }
-
-            jsonQuery["aggs"] = aggregations;
 
             return jsonQuery;
         }
