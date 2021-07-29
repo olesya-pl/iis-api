@@ -126,6 +126,8 @@ namespace IIS.Core.Ontology.EntityFramework
                 return results.ToOutputSearchResult();
             }
 
+            const int maxAggregationsCount = 20;
+
             var (multiSearchQuery, multiSearchParams, historicalResult) = await PrepareMultiSearchQuery(typeNames, filter, ct);
 
             var aggregationFieldList = multiSearchParams.SearchParams.SelectMany(p => p.Fields)
@@ -139,16 +141,29 @@ namespace IIS.Core.Ontology.EntityFramework
                 Offset = filter.Offset,
                 Suggestion = filter.Suggestion
             }, ct);
-            var aggregationQuery = multiSearchAggregationQuery
-                .WithAggregation(aggregationFieldList, filter)
-                .ToString();
+
+            var aggregationQueryResults = new List<Dictionary<string, AggregationItem>>();
+
+            var batchCount = aggregationFieldList.Count() / maxAggregationsCount + 1;
+            for (var i = 0; i < batchCount; i++)
+            {
+                var fieldsToAggregate = aggregationFieldList
+                    .Skip(i * maxAggregationsCount)
+                    .Take(maxAggregationsCount);
+
+
+                var aggregationQuery = multiSearchAggregationQuery
+                    .WithAggregation(fieldsToAggregate, filter)
+                    .ToString();
+
+                var aggregationResult = await _elasticManager.WithUserId(userId).SearchAsync(aggregationQuery, typeNames, ct);
+                aggregationQueryResults.Add(aggregationResult.Aggregations);
+            }
 
             var multiSearchQueryString = multiSearchQuery
                 .WithHighlights()
                 .ToString();
             var searchResult = await _elasticManager.WithUserId(userId).SearchAsync(multiSearchQueryString, typeNames, ct);
-            var aggregationResult = await _elasticManager.WithUserId(userId).SearchAsync(aggregationQuery, typeNames, ct);
-
             if (historicalResult != null && historicalResult.Count > 0)
             {
                 var highlightsById = historicalResult.Items
@@ -164,7 +179,8 @@ namespace IIS.Core.Ontology.EntityFramework
                 }
             }
 
-            return searchResult.ToOutputSearchResult(ExtractSubAggregations(aggregationResult.Aggregations));
+            var aggregations = aggregationQueryResults.SelectMany(p => p).ToDictionary(p => p.Key, p => p.Value);
+            return searchResult.ToOutputSearchResult(ExtractSubAggregations(aggregations));
         }
 
         private async Task<(JObject multiSearchQuery, MultiElasticSearchParams multiSearchParams, IElasticSearchResult historicalResult)> PrepareMultiSearchQuery(
