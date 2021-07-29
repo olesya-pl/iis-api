@@ -8,6 +8,7 @@ using Iis.Domain.Materials;
 using Iis.Domain.Users;
 using Iis.Interfaces.Constants;
 using Iis.Interfaces.Elastic;
+using Iis.Interfaces.Ontology;
 using Iis.Interfaces.Ontology.Data;
 using Iis.Interfaces.Ontology.Schema;
 using Iis.Services;
@@ -247,26 +248,29 @@ namespace IIS.Services.Materials
 
         public Task<List<MaterialsCountByType>> CountMaterialsByTypeAndNodeAsync(Guid nodeId)
         {
-            var nodeIdList = RunWithoutCommit((unitOfWork) =>
-                unitOfWork.MaterialRepository.GetFeatureIdListThatRelatesToObjectId(nodeId));
+            var nodeIdList = _ontologyService.GetFeatureIdListThatRelatesToObjectId(nodeId);
 
             nodeIdList.Add(nodeId);
             return RunWithoutCommitAsync(async (unitOfWork) => await unitOfWork.MaterialRepository.GetParentMaterialByNodeIdQueryAsync(nodeIdList));
         }
 
-        public async Task<(IEnumerable<Material> Materials, int Count)> GetMaterialsByNodeIdQuery(Guid nodeId)
+        public async Task<(IEnumerable<Material> Materials, int Count)> GetMaterialsByNodeId(Guid nodeId)
         {
-            var materialsByNode = GetMaterialByNodeIdQuery(nodeId);
-            //TODO: we need to add logic that provides list of NodeId
-            //var result = _materialRepository.GetAllForRelatedNodeListAsync(nodeIdList).GetAwaiter().GetResult();
+            var materialsByNode = GetMaterialByNodeIdQuery(nodeId, false);
+            var materials = materialsByNode.Select(p => Map(p));
+            return (materials, materials.Count());
+        }
+
+        public async Task<(IEnumerable<Material> Materials, int Count)> GetMaterialsByNodeIdAndRelatedEntities(Guid nodeId)
+        {
+            var materialsByNode = GetMaterialByNodeIdQuery(nodeId, true);
             var materials = materialsByNode.Select(p => Map(p));
             return (materials, materials.Count());
         }
 
         public async Task<Dictionary<Guid, int>> CountMaterialsByNodeIds(HashSet<Guid> nodeIds)
         {
-            var nodeFeatureRelationsList = await RunWithoutCommitAsync(async (unitOfWork) =>
-                await unitOfWork.MaterialRepository.GetFeatureIdListThatRelatesToObjectIdsAsync(nodeIds));
+            var nodeFeatureRelationsList = _ontologyService.GetFeatureIdListThatRelatesToObjectIds(nodeIds);
 
             var nodeIdsForCountQuery = new List<Guid>(nodeIds);
             nodeIdsForCountQuery.AddRange(nodeFeatureRelationsList.Select(p => p.FeatureId));
@@ -480,12 +484,12 @@ namespace IIS.Services.Materials
             return materials;
         }
 
-        private List<MaterialEntity> GetMaterialByNodeIdQuery(Guid nodeId)
+        private List<MaterialEntity> GetMaterialByNodeIdQuery(Guid nodeId, bool includeRelatedEntities)
         {
-            var nodeIdList = RunWithoutCommit((unitOfWork) =>
-                unitOfWork.MaterialRepository.GetFeatureIdListThatRelatesToObjectId(nodeId));
-
-            nodeIdList.Add(nodeId);
+            var nodeIdList = new List<Guid> { nodeId };
+            
+            if (includeRelatedEntities)
+                nodeIdList.AddRange(_ontologyService.GetFeatureIdListThatRelatesToObjectId(nodeId));
 
             return RunWithoutCommit((unitOfWork) => unitOfWork.MaterialRepository.GetMaterialByNodeIdQuery(nodeIdList, MaterialIncludeEnum.WithChildren, MaterialIncludeEnum.WithFeatures, MaterialIncludeEnum.WithFiles));
         }
