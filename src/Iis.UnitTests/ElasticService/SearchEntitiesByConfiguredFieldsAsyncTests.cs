@@ -32,7 +32,7 @@ namespace Iis.UnitTests.Iis.Elastic.Tests
             var nodeRepositoryMock = new Mock<INodeRepository>();
 
             var resultMock = new Mock<IElasticSearchResult>();
-            resultMock.Setup(e => e.Aggregations).Returns((Dictionary<string, AggregationItem>)null);
+            resultMock.Setup(e => e.Aggregations).Returns(new Dictionary<string, AggregationItem>());
             resultMock.Setup(e => e.Count).Returns(0);
             resultMock.Setup(e => e.Items).Returns(Array.Empty<ElasticSearchResultItem>());
 
