@@ -810,5 +810,18 @@ namespace Iis.DbLayer.ModifyDataScripts
                 data.RemoveNodes(duplicates);
             });
         }
+        public void ClosePersinMultiple(OntologyContext context, IOntologyNodesData data)
+        {
+            var person = data.Schema.GetEntityTypeByName("Person");
+            var closePerson = person?.GetRelationTypeByName("closePersin");
+            if (closePerson == null) return;
+
+            data.Schema.UpdateNodeType(new NodeTypeUpdateParameter
+            {
+                Id = closePerson.Id,
+                EmbeddingOptions = EmbeddingOptions.Multiple
+            });
+            SaveOntologySchema(data.Schema);
+        }
     }
 }

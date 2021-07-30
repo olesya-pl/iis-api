@@ -49,6 +49,7 @@ namespace Iis.DbLayer.ModifyDataScripts
             _items.Add("RemoveMaterialLinkAccessObjects", actions.RemoveMaterialLinkAccessObjects);
             _items.Add("AddEventTitle", actions.AddEventTitle);
             _items.Add("RemoveDuplicateRelations", actions.RemoveDuplicateRelations);
+            _items.Add("ClosePersinMultiple", actions.ClosePersinMultiple);
         }
         public bool Run()
         {
