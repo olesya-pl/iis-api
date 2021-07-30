@@ -1,15 +1,14 @@
 using System;
 using System.Text;
-using System.Threading;
 using System.Collections.Generic;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using RabbitMQ.Client;
-using RabbitMQ.Client.Exceptions;
-using Iis.Utility;
 using Iis.Messages;
-using Iis.Messages.Materials;
+using Iis.Utility;
 using Iis.RabbitMq.Channels;
+using Iis.RabbitMq.Helpers;
+using Iis.Messages.Materials;
 using Iis.Services.Contracts.Configurations;
 
 namespace IIS.Core.Materials
@@ -30,6 +29,7 @@ namespace IIS.Core.Materials
         private readonly IConnection _connection;
         private readonly IModel _channel;
         private readonly ILogger _logger;
+        private readonly IModel _materialEventChannel;
         private readonly IPublishMessageChannel<MaterialProcessingEventMessage> _eventPublishChannel;
         private readonly MaterialEventConfiguration _eventConfiguration;
         private readonly MaterialOperatorAssignerConfiguration _assignerConfiguration;
@@ -48,21 +48,11 @@ namespace IIS.Core.Materials
             _assignerConfiguration = assignerConfiguration;
             _elasticSaverConfiguration = elasticSaverConfiguration;
 
-            while (true)
-            {
-                try
-                {
-                    _connection = _connectionFactory.CreateConnection();
-                    break;
-                }
-                catch (BrokerUnreachableException)
-                {
-                    var timeout = 5000;
-                    _logger.LogError($"Attempting to connect again in {timeout / 1000} sec.");
-                    Thread.Sleep(timeout);
-                }
-            }
+            _connection = _connectionFactory.CreateAndWaitConnection();
+
             _channel = _connection.CreateModel();
+
+            _materialEventChannel = ConfigChannel(_connection.CreateModel(), _eventConfiguration.TargetChannel);
 
             _eventPublishChannel = new PublishMessageChannel<MaterialProcessingEventMessage>(_connection, _eventConfiguration.TargetChannel);
         }
@@ -83,9 +73,11 @@ namespace IIS.Core.Materials
 
             var featuresRoutingKey = $"processing.features.{eventMessage.Type}";
 
-            _eventPublishChannel.Send(eventMessage, mlRoutingKey, featuresRoutingKey);
+            var coordinatesRoutingKey = "processing.coordinates";
 
-            _logger.LogInformation($"sending material with id {eventMessage.Id} for processing: ML key:[{mlRoutingKey}], Features key:[{featuresRoutingKey}]");
+            _eventPublishChannel.Send(eventMessage, mlRoutingKey, featuresRoutingKey, coordinatesRoutingKey);
+
+            _logger.LogInformation($"sending material with id {eventMessage.Id} for processing: ML key:[{mlRoutingKey}], Features key:[{featuresRoutingKey}], Coordinates key:[{coordinatesRoutingKey}]");
         }
 
         private IModel ConfigChannel(IModel channel, ChannelConfig config)
@@ -100,6 +92,7 @@ namespace IIS.Core.Materials
         public void Dispose()
         {
             _channel.Dispose();
+            _materialEventChannel.Dispose();
             _eventPublishChannel.Dispose();
             _connection.Dispose();
         }
