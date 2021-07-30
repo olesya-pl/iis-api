@@ -60,7 +60,7 @@ namespace IIS.Services.Materials
             IMLResponseRepository mLResponseRepository,
             IMaterialSignRepository materialSignRepository,
             IMapper mapper,
-            IUnitOfWorkFactory<TUnitOfWork> unitOfWorkFactory,            
+            IUnitOfWorkFactory<TUnitOfWork> unitOfWorkFactory,
             IImageVectorizer imageVectorizer,
             NodeToJObjectMapper nodeToJObjectMapper) : base(unitOfWorkFactory)
         {
@@ -84,13 +84,15 @@ namespace IIS.Services.Materials
             SortingParams sorting,
             CancellationToken ct = default)
         {
+            if (_materialElasticService.ShouldReturnNoEntities(filterQuery)) return MaterialsDto.Empty;
+
             var searchParams = new SearchParams
             {
                 Suggestion = string.IsNullOrWhiteSpace(filterQuery) || filterQuery == WildCart ? null : filterQuery,
                 FilteredItems = filteredItems,
                 CherryPickedItems = cherryPickedItems.Select(p => new CherryPickedItem(p)).ToList(),
                 Page = page,
-                Sorting = sorting                
+                Sorting = sorting
             };
 
             var searchResult = await _materialElasticService.SearchMaterialsByConfiguredFieldsAsync(userId, searchParams);

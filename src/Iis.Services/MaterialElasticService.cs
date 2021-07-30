@@ -15,6 +15,7 @@ namespace Iis.Services
 {
     public class MaterialElasticService : IMaterialElasticService
     {
+        private const string ExclamationMark = "!";
         private readonly IElasticManager _elasticManager;
         private readonly IElasticState _elasticState;
         private readonly IElasticResponseManagerFactory _elasticResponseManagerFactory;
@@ -42,6 +43,11 @@ namespace Iis.Services
             _elasticState = elasticState;
             _elasticResponseManagerFactory = elasticResponseManagerFactory;
             _elasticConfiguration = elasticConfiguration;
+        }
+
+        public bool ShouldReturnNoEntities(string queryExpression)
+        {
+            return queryExpression.Trim() == ExclamationMark;
         }
 
         public async Task<SearchResult> SearchMaterialsByConfiguredFieldsAsync(Guid userId, SearchParams searchParams, CancellationToken ct = default)

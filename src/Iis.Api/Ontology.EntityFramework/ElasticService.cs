@@ -23,6 +23,7 @@ namespace IIS.Core.Ontology.EntityFramework
         private readonly INodeRepository _nodeRepository;
         private readonly IElasticState _elasticState;
         private const decimal HistoricalSearchBoost = 0.05m;
+        private const string ExclamationMark = "!";
 
         public ElasticService(
             IElasticManager elasticManager,
@@ -97,6 +98,10 @@ namespace IIS.Core.Ontology.EntityFramework
             return SearchQueryExtension.IsMatchAll(filter.Suggestion) 
                    && !filter.FilteredItems.Any() 
                    && !filter.CherryPickedItems.Any();
+        }
+        public bool ShouldReturnNoEntities(ElasticFilter filter)
+        {
+            return filter.Suggestion.Trim() == ExclamationMark;
         }
 
         public async Task<SearchEntitiesByConfiguredFieldsResult> SearchEntitiesByConfiguredFieldsAsync(

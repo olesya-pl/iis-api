@@ -16,5 +16,6 @@ namespace Iis.Services.Contracts.Interfaces
         Task<SearchResult> SearchByImageVector(Guid userId, IReadOnlyCollection<decimal[]> imageVectorList, PaginationParams page, CancellationToken ct = default);
         Task<int> CountMaterialsByConfiguredFieldsAsync(Guid userId, SearchParams searchParams, CancellationToken ct = default);
         Task<SearchResult> SearchByScroll(Guid userId, string scrollId);
+        bool ShouldReturnNoEntities(string queryExpression);
     }
 }

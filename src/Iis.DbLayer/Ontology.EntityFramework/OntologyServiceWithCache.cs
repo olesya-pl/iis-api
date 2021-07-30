@@ -388,6 +388,8 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             User user, 
             CancellationToken cancellationToken = default)
         {
+            if(_elasticService.ShouldReturnNoEntities(filter)) return SearchEntitiesByConfiguredFieldsResult.Empty;
+
             var entitySearchGranted = _elasticService.ShouldReturnAllEntities(filter) ? user.IsEntityReadGranted() : user.IsEntitySearchGranted();
             var wikiSearchGranted = _elasticService.ShouldReturnAllEntities(filter) ? user.IsWikiReadGranted() : user.IsWikiSearchGranted();
 

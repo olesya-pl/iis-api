@@ -192,8 +192,6 @@ namespace Iis.Elastic.SearchQueryExtensions
             return PopulateCherryPickedObjectsOfStudy(filter.CherryPickedItems, result);
         }
 
-        
-
         public static string CreateMaterialsQueryString(string suggestion,
             IReadOnlyCollection<Property> filteredItems,
             IReadOnlyCollection<CherryPickedItem> cherryPickedItems)
