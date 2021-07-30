@@ -98,26 +98,26 @@ namespace Iis.RabbitMq.Channels
         {
             return async (sender, args) =>
             {
-                if (args.Exchange != config.ExchangeName)
-                {
-                    throw new InvalidOperationException($"We received message from wrong exchange. Expected:{config.ExchangeName}. Received:{args.Exchange}");
-                }
-
-                var message = args.Body.ToObject<T>(options);
-
-                if (message is null)
-                { 
-                    throw new InvalidOperationException("No message is received.");
-                }
-
-                logger?.LogInformation("Message {@message} has been received from exchange:{Exchange} with key:{RoutingKey}", message, args.Exchange, args.RoutingKey);
-
                 var model = (sender as AsyncEventingBasicConsumer).Model;
-
-                var userAction = GetUserActon();
 
                 try
                 {
+                    if (args.Exchange != config.ExchangeName)
+                    {
+                        throw new InvalidOperationException($"We received message from wrong exchange. Expected:{config.ExchangeName}. Received:{args.Exchange}");
+                    }
+
+                    var message = args.Body.ToObject<T>(options);
+
+                    if (message is null)
+                    {
+                        throw new InvalidOperationException("No message is received.");
+                    }
+
+                    logger?.LogInformation("Message {@message} has been received from exchange:{Exchange} with key:{RoutingKey}", message, args.Exchange, args.RoutingKey);
+
+                    var userAction = GetUserActon();
+
                     if (userAction != null)
                     {
                         await userAction(message);
@@ -127,7 +127,10 @@ namespace Iis.RabbitMq.Channels
                 }
                 catch (Exception ex)
                 {
-                    logger?.LogError("Exception during processing message. {ex}", ex);
+                    var messageBodyAsString = args.Body.ToText();
+
+                    logger?.LogError("During processing message body {messageBodyAsString} the exception has been thrown {@ex}", messageBodyAsString, ex);
+
                     model.BasicReject(args.DeliveryTag, false);
                 }
             };

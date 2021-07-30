@@ -22,5 +22,11 @@ namespace Iis.RabbitMq.Helpers
 
             return JsonSerializer.Deserialize<T>(jsonString, options);
         }
+        public static string ToText(this byte[] value)
+        {
+            if (value is null || value.Length == 0) return null;
+
+            return Encoding.UTF8.GetString(value);
+        }
     }
 }
