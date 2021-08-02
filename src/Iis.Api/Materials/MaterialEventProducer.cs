@@ -31,6 +31,7 @@ namespace IIS.Core.Materials
         private readonly ILogger _logger;
         private readonly IModel _materialEventChannel;
         private readonly IPublishMessageChannel<MaterialProcessingEventMessage> _eventPublishChannel;
+        private readonly IPublishMessageChannel<MaterialCreatedMessage> _materialCreatedChannel;
         private readonly MaterialEventConfiguration _eventConfiguration;
         private readonly MaterialOperatorAssignerConfiguration _assignerConfiguration;
         private readonly MaterialElasticSaverConfiguration _elasticSaverConfiguration;
@@ -55,6 +56,7 @@ namespace IIS.Core.Materials
             _materialEventChannel = ConfigChannel(_connection.CreateModel(), _eventConfiguration.TargetChannel);
 
             _eventPublishChannel = new PublishMessageChannel<MaterialProcessingEventMessage>(_connection, _eventConfiguration.TargetChannel);
+            _materialCreatedChannel = new PublishMessageChannel<MaterialCreatedMessage>(_connection, new ChannelConfig { ExchangeName = MaterialRabbitConsts.DefaultExchangeName, RoutingKeys = new[] { MaterialRabbitConsts.QueueName } });
         }
 
         public void SendMaterialEvent(MaterialProcessingEventMessage eventMessage)
@@ -82,7 +84,7 @@ namespace IIS.Core.Materials
 
         private IModel ConfigChannel(IModel channel, ChannelConfig config)
         {
-            if(config is null) return channel;
+            if (config is null) return channel;
 
             channel.ExchangeDeclare(config.ExchangeName, config.ExchangeType ?? ExchangeType.Topic);
 
@@ -94,6 +96,7 @@ namespace IIS.Core.Materials
             _channel.Dispose();
             _materialEventChannel.Dispose();
             _eventPublishChannel.Dispose();
+            _materialCreatedChannel.Dispose();
             _connection.Dispose();
         }
         public void SendAvailableForOperatorEvent(Guid materialId)
@@ -130,18 +133,7 @@ namespace IIS.Core.Materials
 
         public void PublishMaterialCreatedMessage(MaterialCreatedMessage message)
         {
-            _channel.QueueDeclare(
-                queue: MaterialRabbitConsts.QueueName,
-                durable: true,
-                exclusive: false,
-                autoDelete: false);
-
-            var body = message.ToBytes();
-
-            _channel.BasicPublish(exchange: "",
-                routingKey: MaterialRabbitConsts.QueueName,
-                basicProperties: null,
-                body: body);
+            _materialCreatedChannel.Send(message);
         }
 
         public void SendMaterialSavedToElastic(List<Guid> ids)
