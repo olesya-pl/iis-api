@@ -80,6 +80,12 @@ namespace Iis.OntologyData
 
         internal RelationData CreateRelation(Guid sourceNodeId, Guid targetNodeId, Guid nodeTypeId, Guid? id = null)
         {
+            var sourceNode = Nodes[sourceNodeId];
+            var existing = sourceNode._outgoingRelations
+                .FirstOrDefault(r => r.Node.NodeTypeId == nodeTypeId && r.TargetNodeId == targetNodeId);
+
+            if (existing != null) return existing;
+
             var node = CreateNode(nodeTypeId, id);
 
             var relation = new RelationData
@@ -167,7 +173,7 @@ namespace Iis.OntologyData
 
                 if (Attributes.ContainsKey(node.Id))
                 {
-                    Relations.Remove(node.Id);
+                    Attributes.Remove(node.Id);
                 }
                 Nodes.Remove(node.Id);
             }
@@ -226,6 +232,13 @@ namespace Iis.OntologyData
         public void RemoveNode(Guid id)
         {
             SetNodeIsArchived(id);
+            RemoveArchivedItems();
+        }
+
+        public void RemoveNodes(IEnumerable<Guid> ids)
+        {
+            foreach (var id in ids)
+                SetNodeIsArchived(id);
             RemoveArchivedItems();
         }
 

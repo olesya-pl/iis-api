@@ -774,5 +774,41 @@ namespace Iis.DbLayer.ModifyDataScripts
             );
             SaveOntologySchema(data.Schema);
         }
+
+        public void RemoveDuplicateRelations(OntologyContext context, IOntologyNodesData data)
+        {
+            var entityNodes = data.GetAllNodes()
+                    .Where(n => n.NodeType.Kind == Kind.Entity)
+                    .ToList();
+
+            var duplicates = new List<Guid>();
+
+            foreach (var node in entityNodes)
+            {
+                var relations = node.OutgoingRelations
+                    .Where(r => r.RelationKind == RelationKind.Embedding)
+                    .OrderBy(r => r.TargetNodeId)
+                    .ThenBy(r => r.Node.NodeTypeId)
+                    .ToList();
+
+                if (relations.Count <= 1) continue;
+                var prev = relations.First();
+                for (int i = 1; i < relations.Count; i++)
+                {
+                    var current = relations[i];
+                    if (prev.TargetNodeId == current.TargetNodeId
+                        && prev.Node.NodeTypeId == current.Node.NodeTypeId)
+                    {
+                        duplicates.Add(current.Id);
+                        continue;
+                    }
+                    prev = current;
+                }
+            }
+            data.WriteLock(() =>
+            {
+                data.RemoveNodes(duplicates);
+            });
+        }
     }
 }

@@ -14,6 +14,7 @@ using Iis.Interfaces.AccessLevels;
 using Iis.Domain.Users;
 using Newtonsoft.Json.Linq;
 using Iis.Domain.TreeResult;
+using Iis.Interfaces.Ontology;
 
 namespace Iis.DbLayer.Ontology.EntityFramework
 {
@@ -387,6 +388,8 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             User user, 
             CancellationToken cancellationToken = default)
         {
+            if(_elasticService.ShouldReturnNoEntities(filter)) return SearchEntitiesByConfiguredFieldsResult.Empty;
+
             var entitySearchGranted = _elasticService.ShouldReturnAllEntities(filter) ? user.IsEntityReadGranted() : user.IsEntitySearchGranted();
             var wikiSearchGranted = _elasticService.ShouldReturnAllEntities(filter) ? user.IsWikiReadGranted() : user.IsWikiSearchGranted();
 
@@ -520,6 +523,21 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                 );
 
             return result;
+        }
+        public List<Guid> GetFeatureIdListThatRelatesToObjectId(Guid nodeId)
+        {
+            return _data.GetNode(nodeId).OutgoingRelations
+                .Where(r => r.TargetNode.NodeType.IsObject)
+                .Select(r => r.TargetNodeId)
+                .Distinct()
+                .ToList();
+        }
+        public List<ObjectFeatureRelation> GetFeatureIdListThatRelatesToObjectIds(IReadOnlyCollection<Guid> nodeIds)
+        {
+            return _data.GetNodes(nodeIds)
+                .SelectMany(n => n.OutgoingRelations.Where(r => r.TargetNode.NodeType.IsObject))
+                .Select(r => new ObjectFeatureRelation { ObjectId = r.SourceNodeId, FeatureId = r.Id })
+                .ToList();
         }
     }
 }

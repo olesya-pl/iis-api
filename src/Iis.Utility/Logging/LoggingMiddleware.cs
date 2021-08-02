@@ -1,5 +1,4 @@
-﻿using Iis.Services.Contracts.Interfaces;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.IO;
@@ -8,19 +7,19 @@ using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
 
-namespace Iis.Api.Bootstrap
+namespace Iis.Utility.Logging
 {
     public class LoggingMiddleware
     {
         readonly RequestDelegate _next;
         private static ILogger<LogHeaderMiddleware> logger;
         private readonly RecyclableMemoryStreamManager _recyclableMemoryStreamManager;
-        private readonly ISanitizeService _sanitizeService;
+        private readonly SanitizeService _sanitizeService;
 
-        public LoggingMiddleware(RequestDelegate next, ISanitizeService sanitizeService)
+        public LoggingMiddleware(RequestDelegate next)
         {
             _next = next;
-            _sanitizeService = sanitizeService;
+            _sanitizeService = new SanitizeService();
             _recyclableMemoryStreamManager = new RecyclableMemoryStreamManager();
         }
 

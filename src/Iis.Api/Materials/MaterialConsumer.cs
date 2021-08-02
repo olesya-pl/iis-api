@@ -2,11 +2,11 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Iis.Api.BackgroundServices;
-using Iis.Api.Materials.Handlers;
 using IIS.Core.Materials;
-using Iis.Messages;
 using Iis.Messages.Materials;
-using Iis.Utility;
+using Iis.RabbitMq.Helpers;
+using Iis.RabbitMq.Channels;
+using Iis.Services.Contracts.Configurations;
 using Iis.RabbitMq.Helpers;
 using Iis.RabbitMq.Channels;
 using Iis.Services.Contracts.Configurations;
@@ -98,34 +98,6 @@ namespace Iis.Api.Materials
 
                 return Task.CompletedTask;
             }
-        }
-
-        private void ConfigureConsumer(IModel channel, Func<MaterialCreatedMessage, Task> handler)
-        {
-            var channelConsumer = new AsyncEventingBasicConsumer(channel);
-
-            channelConsumer.Received += async (sender, args) =>
-            {
-                try
-                {
-                    if (args.Body.LongLength == 0)
-                    {
-                        throw new InvalidOperationException("We received empty message.");
-                    }
-
-                    await handler(args.Body.FromBytes<MaterialCreatedMessage>());
-
-                    channel.BasicAck(args.DeliveryTag, false);
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError("Exception {ex} during receiving message.", ex);
-
-                    channel.BasicReject(args.DeliveryTag, false);
-                }
-            };
-
-            channel.BasicConsume(queue: MaterialRabbitConsts.QueueName, false, consumer: channelConsumer);
         }
     }
 }

@@ -81,6 +81,7 @@ using System.Reflection;
 using System.Security.Authentication;
 using System.Threading.Tasks;
 using Iis.CoordinatesEventHandler.DependencyInjection;
+using Iis.Utility.Logging;
 
 namespace IIS.Core
 {
@@ -293,7 +294,6 @@ namespace IIS.Core
             services.AddTransient<IAutocompleteService, AutocompleteService>();
             services.AddTransient<IReportService, ReportService<IIISUnitOfWork>>();
             services.AddTransient<IReportElasticService, ReportElasticService>();
-            services.AddTransient<ISanitizeService, SanitizeService>();
             services.AddTransient<IActiveDirectoryClient, ActiveDirectoryClient>(_ =>
                 new ActiveDirectoryClient(
                     Configuration["activeDirectory:server"],

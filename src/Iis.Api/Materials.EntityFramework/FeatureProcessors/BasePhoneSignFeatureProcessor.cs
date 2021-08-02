@@ -111,6 +111,11 @@ namespace IIS.Core.Materials.EntityFramework.FeatureProcessors
             return metadata;
         }
 
+        public IEnumerable<Guid> GetValidFeatureIds(IEnumerable<Guid> featureIdList)
+        {
+            return featureIdList;
+        }
+
         protected virtual bool FeaturesSectionExists(JObject metadata) =>
             metadata.ContainsKey(FeatureFields.FeaturesSection) &&
             metadata.SelectToken(FeatureFields.FeaturesSection) is JArray &&
@@ -297,6 +302,6 @@ namespace IIS.Core.Materials.EntityFramework.FeatureProcessors
             var parseResult = Guid.TryParse(featureIdStringValue, out Guid featureId);
 
             return (FeatureId: featureId, IsSuccess: parseResult);
-        }
+        }        
     }
 }

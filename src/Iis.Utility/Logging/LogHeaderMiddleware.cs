@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
-namespace Iis.Api.Bootstrap
+namespace Iis.Utility.Logging
 {
     public class LogHeaderMiddleware
     {
