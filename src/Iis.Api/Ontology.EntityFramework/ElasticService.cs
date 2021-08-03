@@ -101,7 +101,7 @@ namespace IIS.Core.Ontology.EntityFramework
         }
         public bool ShouldReturnNoEntities(ElasticFilter filter)
         {
-            return filter.Suggestion.Trim() == ExclamationMark;
+            return filter.Suggestion?.Trim() == ExclamationMark;
         }
 
         public async Task<SearchEntitiesByConfiguredFieldsResult> SearchEntitiesByConfiguredFieldsAsync(
