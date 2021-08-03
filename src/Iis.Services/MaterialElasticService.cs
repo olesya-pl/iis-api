@@ -47,7 +47,7 @@ namespace Iis.Services
 
         public bool ShouldReturnNoEntities(string queryExpression)
         {
-            return queryExpression.Trim() == ExclamationMark;
+            return queryExpression?.Trim() == ExclamationMark;
         }
 
         public async Task<SearchResult> SearchMaterialsByConfiguredFieldsAsync(Guid userId, SearchParams searchParams, CancellationToken ct = default)
