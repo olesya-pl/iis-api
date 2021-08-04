@@ -16,6 +16,7 @@ using Iis.Domain;
 using Microsoft.Extensions.Configuration;
 using Iis.Interfaces.Ontology.Schema;
 using Microsoft.Extensions.Logging;
+using Iis.Api.GraphQL.NodeMaterialRelation;
 
 namespace IIS.Core.GraphQL
 {
@@ -85,6 +86,7 @@ namespace IIS.Core.GraphQL
                 d.Include<CreateMenuItemsQuery>();
                 d.Include<GraphQuery>();
                 d.Include<SituationQuery>();
+                d.Include<NodeMaterialRelationQuery>();
 
 
                 if (_configuration.GetValue("reportsAvailable", true))

@@ -565,7 +565,7 @@ namespace IIS.Services.Materials
 
         private MaterialFeature Map(MaterialFeatureEntity feature)
         {
-            var result = new MaterialFeature(feature.Id, feature.Relation, feature.Value);
+            var result = _mapper.Map<MaterialFeature>(feature);
             result.Node = _ontologyService.GetNode(feature.NodeId);
             return result;
         }
@@ -602,7 +602,7 @@ namespace IIS.Services.Materials
 
             result.AddRange(dtoList);
 
-            return result;
+            return result.Where(x => x != null).ToList();
         }
         public async Task<bool> MaterialExists(Guid id)
         {

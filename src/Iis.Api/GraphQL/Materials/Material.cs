@@ -12,6 +12,8 @@ using IIS.Core.GraphQL.Scalars;
 using IIS.Core.GraphQL.Users;
 using Newtonsoft.Json.Linq;
 using FileInfo = IIS.Core.GraphQL.Files.FileInfo;
+using Iis.Api.GraphQL.Common;
+
 namespace IIS.Core.GraphQL.Materials
 {
     public class Material : IMaterialLoadData
@@ -60,6 +62,8 @@ namespace IIS.Core.GraphQL.Materials
         public int ProcessedMlHandlersCount { get; set; }
         public bool CanBeEdited { get; set; }
         public int AccessLevel { get; set; }
+        public IdTitle Caller { get; set; }
+        public IdTitle Receiver { get; set; }
         public IReadOnlyCollection<GeoCoordinate> CoordinateList { get; set; }
         public async Task<FileInfo> GetFile([Service] IFileService fileService)
         {
