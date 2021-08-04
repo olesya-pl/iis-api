@@ -12,21 +12,26 @@ namespace Iis.DbLayer.Repositories
 {
     internal class NodeMaterialRelationRepository : RepositoryBase<OntologyContext>, INodeMaterialRelationRepository
     {
-        public async Task<List<Guid>> GetExistingRelationMaterialIds(Guid nodeId, IReadOnlyCollection<Guid> candidates) 
+        public async Task<List<Guid>> GetExistingRelationMaterialIdsAsync(
+            Guid nodeId, 
+            IReadOnlyCollection<Guid> candidates,
+            MaterialNodeLinkType? linkType) 
         {
             return await Context.MaterialFeatures
                             .Include(p => p.MaterialInfo)
                             .Where(p => p.NodeId == nodeId
-                                        && candidates.Contains(p.MaterialInfo.MaterialId))
+                                        && candidates.Contains(p.MaterialInfo.MaterialId)
+                                        && (linkType == null || linkType == p.NodeLinkType))
                             .Select(p => p.MaterialInfo.MaterialId)
                             .ToListAsync();
         }
 
-        public void CreateRelations(Guid nodeId, IReadOnlyCollection<Guid> newMaterials)
+        public void CreateRelations(Guid nodeId, IReadOnlyCollection<Guid> newMaterials, MaterialNodeLinkType linkType)
         {
             Context.MaterialFeatures.AddRange(newMaterials.Select(p => new MaterialFeatureEntity
             {
                 NodeId = nodeId,
+                NodeLinkType = linkType,
                 MaterialInfo = new MaterialInfoEntity
                 {
                     MaterialId = p

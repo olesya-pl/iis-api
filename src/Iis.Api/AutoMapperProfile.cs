@@ -74,9 +74,13 @@ namespace Iis.Api
                 .AfterMap((src, dest, context) => { context.Mapper.Map(src.LoadData, dest); });
 
             CreateMap<Iis.Domain.Materials.MaterialFeature, MaterialFeatureEntity>();
+            CreateMap<MaterialFeatureEntity, Iis.Domain.Materials.MaterialFeature>()
+                .ForMember(dest => dest.Node, opts => opts.Ignore());
             CreateMap<Iis.Domain.Materials.MaterialInfo, MaterialInfoEntity>()
                 .ForMember(dest => dest.Data, opts => opts.MapFrom(src => src.Data.ToString()))
                 .ForMember(dest => dest.MaterialFeatures, opts => opts.MapFrom(src => src.Features));
+
+            CreateMap<Iis.Interfaces.Common.IdTitleDto, IdTitle>().ReverseMap();
 
             CreateMap<RoleAccessEntity, AccessGranted>()
                 .ForMember(dest => dest.Kind, opts => opts.MapFrom(src => src.AccessObject.Kind))

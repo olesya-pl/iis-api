@@ -304,7 +304,8 @@ namespace Iis.OntologyData.DataTypes
                 throw;
             }
         }
-        public string GetTitleValue() => GetSingleProperty(NodeType.TitleAttributeName)?.Value;
+        public string GetTitleValue() => GetSingleProperty(NodeType.TitleAttributeName)?.Value 
+            ?? GetComputedValue(NodeType.TitleAttributeName);
 
         public IRelation GetAccessLevelRelationId() =>
             GetSingleDirectRelation("accessLevel");
