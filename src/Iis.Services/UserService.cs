@@ -134,6 +134,7 @@ namespace Iis.Services
             }
 
             var updatedEntity = _mapper.Map<UserEntity>(updatedUser);
+            updatedEntity.Source = userEntity.Source;
 
             var newUserRolesEntitiesList = updatedUser.Roles
                                             .Select(role => CreateUserRole(updatedUser.Id, role.Id))
