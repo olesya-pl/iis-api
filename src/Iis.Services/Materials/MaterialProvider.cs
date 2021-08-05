@@ -222,7 +222,7 @@ namespace IIS.Services.Materials
             result.Assignee = _mapper.Map<User>(material.Assignee);
 
             var nodes = result.Infos
-                                .SelectMany(p => p.Features.Select(x => x.Node))
+                                .SelectMany(p => p.Features.Where(e => e.NodeLinkType == MaterialNodeLinkType.None).Select(e => e.Node))
                                 .ToList();
 
             result.Events = nodes

@@ -369,6 +369,7 @@ namespace Iis.DbLayer.Repositories
 
             materialDocument.NodeIds = material.MaterialInfos
                 .SelectMany(p => p.MaterialFeatures)
+                .Where(e => e.NodeLinkType == MaterialNodeLinkType.None)
                 .Select(p => p.NodeId)
                 .ToArray();
 

@@ -51,7 +51,6 @@ namespace Iis.Domain.Materials
         public bool IsParentMaterial() => ParentId == null;
         public IdTitleDto Caller => GetIdTitle(MaterialNodeLinkType.Caller);
         public IdTitleDto Receiver => GetIdTitle(MaterialNodeLinkType.Receiver);
-        
         private MaterialFeature GetFeature(MaterialNodeLinkType linkType) =>
             Infos.SelectMany(i => i.Features)
             .Where(f => f.NodeLinkType == linkType)
