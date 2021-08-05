@@ -454,6 +454,8 @@ namespace Iis.DbLayer.Repositories
 
         private string RemoveImagesFromContent(string content)
         {
+            if(string.IsNullOrWhiteSpace(content)) return null;
+
             return Regex.Replace(content, @"\(data:image.+\)", string.Empty, RegexOptions.Compiled);
         }
 
