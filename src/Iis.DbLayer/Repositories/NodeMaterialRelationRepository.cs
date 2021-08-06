@@ -28,6 +28,17 @@ namespace Iis.DbLayer.Repositories
 
         public void CreateRelations(Guid nodeId, IReadOnlyCollection<Guid> newMaterials, MaterialNodeLinkType linkType)
         {
+            if (linkType == MaterialNodeLinkType.Caller || linkType == MaterialNodeLinkType.Receiver)
+            {
+                var existing = Context.MaterialFeatures
+                .Include(mf => mf.MaterialInfo)
+                .Where(mf => newMaterials.Contains(mf.MaterialInfo.MaterialId)
+                  && mf.NodeLinkType == linkType);
+
+                Context.MaterialInfos.RemoveRange(existing.Select(mf => mf.MaterialInfo));
+                Context.MaterialFeatures.RemoveRange(existing);
+            }
+
             Context.MaterialFeatures.AddRange(newMaterials.Select(p => new MaterialFeatureEntity
             {
                 NodeId = nodeId,
