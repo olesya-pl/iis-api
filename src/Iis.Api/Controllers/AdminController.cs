@@ -88,10 +88,10 @@ namespace Iis.Api.Controllers
         public async Task<string> CreateBindingNodesToMaterial(Guid nodeId, int limit)
         {
             var materialsIds = await _materialProvider.GetMaterialsIdsAsync(limit);
-            
+
             await _nodeMaterialRelationService.CreateMultipleRelations(
                 new HashSet<Guid>(new[] { nodeId }), new HashSet<Guid>(materialsIds), null);
-            
+
             return nodeId.ToString();
         }
 
@@ -267,11 +267,11 @@ namespace Iis.Api.Controllers
         }
 
         [HttpPost("ReloadOntologyData")]
-        public async Task<IActionResult> ReloadOntologyData()
+        public Task<IActionResult> ReloadOntologyData()
         {
             var connectionString = _connectionStringService.GetIisApiConnectionString();
             _nodesDataService.ReloadOntologyData(connectionString);
-            return Content("Success");
+            return Task.FromResult<IActionResult>(Content("Success"));
         }
 
         [HttpPost("ChangeAccessLevels")]
@@ -290,33 +290,34 @@ namespace Iis.Api.Controllers
         }
 
         [HttpGet("ImportExternalUsers/{userNames}")]
-        public async Task<IActionResult> ImportExternalUsers(string userNames, CancellationToken ct)
+        public Task<IActionResult> ImportExternalUsers(string userNames, CancellationToken ct)
         {
+            string message;
             try
             {
-                var msg = _userService.ImportUsersFromExternalSource(userNames.Split(','));
-
-                return Content(msg);
+                message = _userService.ImportUsersFromExternalSource(userNames.Split(','));
             }
             catch (Exception ex)
             {
-                return Content($"Error: {ex.Message}");
+                message = $"Error: {ex.Message}";
             }
+            return Task.FromResult<IActionResult>(Content(message));
         }
 
         [HttpGet("ImportExternalUsers")]
-        public async Task<IActionResult> ImportExternalUsers(CancellationToken ct)
+        public Task<IActionResult> ImportExternalUsers(CancellationToken ct)
         {
+            string message;
             try
             {
-                var msg = _userService.ImportUsersFromExternalSource();
+                message = _userService.ImportUsersFromExternalSource();
 
-                return Content(msg);
             }
             catch (Exception ex)
             {
-                return Content($"Error: {ex.Message}");
+                message = $"Error: {ex.Message}";
             }
+            return Task.FromResult<IActionResult>(Content(message));
         }
 
         [HttpGet("CheckMatrixUsers")]
@@ -334,13 +335,13 @@ namespace Iis.Api.Controllers
         }
 
         [HttpGet("GetCsv/{typeName}")]
-        public async Task<IActionResult> GetCsv(string typeName, CancellationToken ct)
+        public Task<IActionResult> GetCsv(string typeName, CancellationToken ct)
         {
             var result = _csvService.GetDorCsvByTypeName(typeName);
             var bytes = Encoding.Unicode.GetBytes(result);
             var csv = Encoding.Unicode.GetPreamble().Concat(bytes).ToArray();
 
-            return File(csv, "text/csv", $"{typeName}.csv");
+            return Task.FromResult<IActionResult>(File(csv, "text/csv", $"{typeName}.csv"));
         }
 
         private void LogElasticResult(StringBuilder log, IEnumerable<ElasticBulkResponse> response)
