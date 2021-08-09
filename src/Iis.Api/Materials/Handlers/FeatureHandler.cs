@@ -18,6 +18,7 @@ using Newtonsoft.Json.Linq;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using RabbitMQ.Client.Exceptions;
+using Iis.RabbitMq.Helpers;
 using Iis.Messages.Materials;
 using Iis.Interfaces.Ontology.Data;
 
@@ -176,6 +177,7 @@ namespace Iis.Api.Materials.Handlers
 
             channelConsumer.Received += async (sender, args) =>
             {
+                var messageState = args.ToState();
                 try
                 {
                     if (!string.IsNullOrWhiteSpace(config.ExchangeName) && args.Exchange != config.ExchangeName)
@@ -197,7 +199,7 @@ namespace Iis.Api.Materials.Handlers
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError("Exception {ex} during receiving message.", ex);
+                    _logger.LogError("Exception {ex} during receiving message {@messageState}.", ex, messageState);
 
                     channel.BasicReject(args.DeliveryTag, false);
                 }
