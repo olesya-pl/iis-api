@@ -6,10 +6,9 @@ using System.Threading.Tasks;
 using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Wordprocessing;
-using Iis.DbLayer.Repositories;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
-
+using Iis.Services.Contracts.Interfaces;
 namespace Iis.Api.Export
 {
     public class ExportService
@@ -23,11 +22,11 @@ namespace Iis.Api.Export
         };
 
         private readonly ILogger<ExportService> _logger;
-        private readonly INodeRepository _nodeRepository;
+        private readonly INodeSaveService _nodeRepository;
 
         public ExportService(
             ILogger<ExportService> logger,
-            INodeRepository nodeRepository)
+            INodeSaveService nodeRepository)
         {
             _logger = logger;
             _nodeRepository = nodeRepository;

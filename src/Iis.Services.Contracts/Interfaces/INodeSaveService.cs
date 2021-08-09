@@ -7,9 +7,9 @@ using Iis.Interfaces.Ontology.Data;
 
 using Newtonsoft.Json.Linq;
 
-namespace Iis.DbLayer.Repositories
+namespace Iis.Services.Contracts.Interfaces
 {
-    public interface INodeRepository
+    public interface INodeSaveService
     {
         Task<JObject> GetJsonNodeByIdAsync(Guid id, CancellationToken cancellationToken = default);
         Task<bool> PutNodeAsync(Guid id, CancellationToken cancellationToken = default);

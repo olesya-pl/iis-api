@@ -10,13 +10,14 @@ using Iis.Interfaces.Ontology.Schema;
 using Iis.Services.Contracts.Dtos;
 using Iis.Services.Contracts.Interfaces;
 using Iis.Services.Contracts.Params;
+using Iis.Services.Helpers;
 using Iis.Utility;
 using MoreLinq;
 using Newtonsoft.Json.Linq;
 
-namespace Iis.DbLayer.Repositories
+namespace Iis.Services
 {
-    public class NodeRepository : INodeRepository
+    public class NodeSaveService : INodeSaveService
     {
         private readonly IElasticManager _elasticManager;
         private readonly NodeFlattener _nodeFlattener;
@@ -24,7 +25,7 @@ namespace Iis.DbLayer.Repositories
         private const int BulkSize = 50000;
         private static List<string> PropertiesToIgnore = new List<string>() { "photo", "lastConfirmedAt", "attachment" };
 
-        public NodeRepository(IElasticManager elasticManager,
+        public NodeSaveService(IElasticManager elasticManager,
             NodeFlattener nodeFlattener,
             IOntologySchema ontologySchema, IChangeHistoryService changeHistoryService)
         {

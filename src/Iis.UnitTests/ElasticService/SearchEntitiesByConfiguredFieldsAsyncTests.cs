@@ -1,14 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using AutoFixture.Xunit2;
-using Iis.DbLayer.Repositories;
 using Iis.Elastic.SearchResult;
 using Iis.Interfaces.Elastic;
 using Iis.Interfaces.Ontology.Schema;
 using Iis.Services;
+using Iis.Services.Contracts.Interfaces;
 using IIS.Core.Ontology.EntityFramework;
 using Moq;
 using Xunit;
@@ -29,7 +28,7 @@ namespace Iis.UnitTests.Iis.Elastic.Tests
             elasticServiceMock.Setup(e => e.WithUserId(userId)).Returns(elasticServiceMock.Object);
                 
             var ontologySchemaMock = new Mock<IOntologySchema>();
-            var nodeRepositoryMock = new Mock<INodeRepository>();
+            var nodeRepositoryMock = new Mock<INodeSaveService>();
 
             var resultMock = new Mock<IElasticSearchResult>();
             resultMock.Setup(e => e.Aggregations).Returns(new Dictionary<string, AggregationItem>());

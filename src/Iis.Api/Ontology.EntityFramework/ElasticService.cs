@@ -5,10 +5,8 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
-using Iis.DbLayer.Repositories;
 using Iis.Domain.Elastic;
 using Iis.Elastic.SearchQueryExtensions;
-using Iis.Services.Contracts;
 using Iis.Services.Contracts.Interfaces;
 using Iis.Interfaces.Elastic;
 using Iis.Interfaces.Ontology.Data;
@@ -20,7 +18,7 @@ namespace IIS.Core.Ontology.EntityFramework
     {
         private readonly IElasticManager _elasticManager;
         private readonly IElasticConfiguration _elasticConfiguration;
-        private readonly INodeRepository _nodeRepository;
+        private readonly INodeSaveService _nodeRepository;
         private readonly IElasticState _elasticState;
         private const decimal HistoricalSearchBoost = 0.05m;
         private const string ExclamationMark = "!";
@@ -28,7 +26,7 @@ namespace IIS.Core.Ontology.EntityFramework
         public ElasticService(
             IElasticManager elasticManager,
             IElasticConfiguration elasticConfiguration,
-            INodeRepository nodeRepository,
+            INodeSaveService nodeRepository,
             IElasticState elasticState)
         {
             _elasticManager = elasticManager;
