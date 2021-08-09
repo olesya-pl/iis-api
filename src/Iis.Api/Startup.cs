@@ -174,7 +174,7 @@ namespace IIS.Core
                 });
 
                 services.AddTransient<IFieldToAliasMapper>(provider => provider.GetRequiredService<IOntologySchema>());
-                services.AddTransient<INodeRepository, NodeRepository>();
+                services.AddTransient<INodeSaveService, NodeSaveService>();
                 services.AddTransient<ElasticConfiguration>();
             }
 

@@ -21,7 +21,7 @@ namespace Iis.Services
         private readonly IElasticManager _elasticManager;
         private readonly IElasticState _elasticState;
         private readonly IOntologySchema _ontologySchema;
-        private readonly INodeRepository _nodeRepository;
+        private readonly INodeSaveService _nodeRepository;
         private readonly IOntologyNodesData _ontologyNodesData;
         private readonly IReportElasticService _reportElasticService;
         private readonly IReportService _reportService;
@@ -35,7 +35,7 @@ namespace Iis.Services
             IElasticState elasticState,
             IElasticManager elasticManager,
             IOntologySchema ontologySchema,
-            INodeRepository nodeRepository,
+            INodeSaveService nodeRepository,
             IOntologyNodesData ontologyNodesData,
             IReportElasticService reportElasticService,
             IReportService reportService,

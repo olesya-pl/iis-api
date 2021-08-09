@@ -1,6 +1,7 @@
 ﻿using Iis.DbLayer.Repositories;
 using Iis.Services.Contracts.Interfaces;
 using Iis.Services.Contracts.Interfaces.Elastic;
+using Iis.Services.Helpers;
 using Iis.Services.Elastic;
 using IIS.Services.Contracts.Interfaces;
 using IIS.Services.Materials;
@@ -27,6 +28,8 @@ namespace Iis.Services.DI
             services.AddTransient<IRadioElectronicSituationService, RadioElectronicSituationService<IIISUnitOfWork>>();
             services.AddHttpClient<MaterialProvider<IIISUnitOfWork>>();
             services.AddTransient<NodeToJObjectMapper>();
+            services.AddTransient<NodeFlattener>();
+            services.AddTransient<INodeSaveService, NodeSaveService>();
 
             return services;
         }

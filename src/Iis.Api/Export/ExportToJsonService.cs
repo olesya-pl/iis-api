@@ -1,16 +1,15 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Iis.DbLayer.Repositories;
 using Newtonsoft.Json;
-
+using Iis.Services.Contracts.Interfaces;
 namespace Iis.Api.Export
 {
     public class ExportToJsonService
     {
-        private readonly INodeRepository _nodeRepository;
+        private readonly INodeSaveService _nodeRepository;
 
         public ExportToJsonService(
-            INodeRepository nodeRepository)
+            INodeSaveService nodeRepository)
         {
             _nodeRepository = nodeRepository;
         }

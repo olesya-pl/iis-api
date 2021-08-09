@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 
-namespace Iis.DbLayer.Repositories.Helpers
+namespace Iis.Services.Helpers
 {
     public class NodeFlattener
     {

@@ -37,14 +37,13 @@ namespace Iis.Api.Controllers
     {
         private const string AllIndexes = "all";
         private readonly IElasticManager _elasticManager;
-        private readonly INodeRepository _nodeRepository;
+        private readonly INodeSaveService _nodeSaveService;
         private readonly IMaterialService _materialService;
         private readonly IElasticState _elasticState;
         private readonly IUserService _userService;
         private readonly IUserElasticService _userElasticService;
         private readonly IAdminOntologyElasticService _adminElasticService;
         private readonly IHost _host;
-        private readonly IConfiguration _configuration;
         private readonly IOntologyDataService _nodesDataService;
         private readonly IConnectionStringService _connectionStringService;
         private readonly IAccessLevelService _accessLevelService;
@@ -55,7 +54,7 @@ namespace Iis.Api.Controllers
         public AdminController(
             IMaterialService materialService,
             IElasticManager elasticManager,
-            INodeRepository nodeRepository,
+            INodeSaveService nodeSaveService,
             IElasticState elasticState,
             IUserService userService,
             IUserElasticService userElasticService,
@@ -70,7 +69,7 @@ namespace Iis.Api.Controllers
         {
             _elasticManager = elasticManager;
             _materialService = materialService;
-            _nodeRepository = nodeRepository;
+            _nodeSaveService = nodeSaveService;
             _elasticState = elasticState;
             _adminElasticService = adminElasticService;
             _userService = userService;
@@ -249,7 +248,7 @@ namespace Iis.Api.Controllers
         public async Task<IActionResult> GetElasticJson(string id, CancellationToken cancellationToken)
         {
             var uid = new Guid(id);
-            var jObj = await _nodeRepository.GetJsonNodeByIdAsync(uid, cancellationToken);
+            var jObj = await _nodeSaveService.GetJsonNodeByIdAsync(uid, cancellationToken);
             if (jObj == null)
             {
                 return Content($"Entity is not found for id = {uid}");
