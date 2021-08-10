@@ -16,39 +16,39 @@ namespace AcceptanceTests.PageObjects
             PageFactory.InitElements(driver, this);
         }
 
-        [FindsBy(How = How.CssSelector, Using = ".sidebar__nav li.inputStream")]
+        [FindsBy(How = How.CssSelector, Using = ".sidebar__nav .inputStream")]
         [CacheLookup]
         public IWebElement MaterialsLink;
 
-        [FindsBy(How = How.CssSelector, Using = ".sidebar__nav li.objects")]
+        [FindsBy(How = How.CssSelector, Using = ".sidebar__nav .objects")]
         [CacheLookup]
         public IWebElement ObjectOfStudyLink;
 
-        [FindsBy(How = How.CssSelector, Using = ".sidebar__nav li.wiki")]
+        [FindsBy(How = How.CssSelector, Using = ".sidebar__nav .wiki")]
         [CacheLookup]
         public IWebElement WikiLink;
 
-        [FindsBy(How = How.CssSelector, Using = ".sidebar__nav li.admin")]
+        [FindsBy(How = How.CssSelector, Using = ".sidebar__nav .admin")]
         [CacheLookup]
         public IWebElement AdministrationLink;
 
-        [FindsBy(How = How.CssSelector, Using = ".sidebar__nav li.events")]
+        [FindsBy(How = How.CssSelector, Using = ".sidebar__nav .events")]
         [CacheLookup]
         public IWebElement EventsLink;
 
-        [FindsBy(How = How.CssSelector, Using = ".sidebar__nav li.reports")]
+        [FindsBy(How = How.CssSelector, Using = ".sidebar__nav .reports")]
         [CacheLookup]
         public IWebElement ReportsLink;
 
-        [FindsBy(How = How.CssSelector, Using = ".sidebar__nav li.map")]
+        [FindsBy(How = How.CssSelector, Using = ".sidebar__nav .map")]
         [CacheLookup]
         public IWebElement MapLink;
 
-        [FindsBy(How = How.CssSelector, Using = ".sidebar__nav li.themes")]
+        [FindsBy(How = How.CssSelector, Using = ".sidebar__nav .themes")]
         [CacheLookup]
         public IWebElement ThemesLink;
 
-        [FindsBy(How = How.CssSelector, Using = ".sidebar__nav li.uploaderInputStream")]
+        [FindsBy(How = How.CssSelector, Using = ".sidebar__nav .uploaderInputStream")]
         [CacheLookup]
         public IWebElement UploaderInputStreamLink;
     }

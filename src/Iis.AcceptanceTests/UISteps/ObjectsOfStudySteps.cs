@@ -71,7 +71,7 @@ namespace AcceptanceTests.UISteps
         {
             objectsOfStudyPage.SearchField.SendKeys(input);
             objectsOfStudyPage.SearchField.SendKeys(Keys.Enter);
-            driver.WaitFor(10);
+            driver.WaitFor(30);
         }
 
         [When(@"I entered the value (.*) in the search field")]
@@ -429,7 +429,7 @@ namespace AcceptanceTests.UISteps
         [Then(@"I must see the title (.*) in the small card")]
         public void IMustSeeTheTitleInTheSmallCard(string expectedTitle)
         {
-            driver.WaitFor(3);
+            driver.WaitFor(5);
             var actualTitle = objectsOfStudyPage.ObjectTitleInTheSmallCard.Text;
             Assert.Contains(expectedTitle, actualTitle);
         }
