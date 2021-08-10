@@ -43,6 +43,7 @@ namespace Iis.UnitTests.Users
                     RoleId = RoleEntity.OperatorRoleId,
                     User = user
                 });
+                user.IsBlocked = false;
             }
             context.AddRange(data);
             context.SaveChanges();
