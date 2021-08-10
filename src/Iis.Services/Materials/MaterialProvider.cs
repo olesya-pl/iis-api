@@ -164,12 +164,13 @@ namespace IIS.Services.Materials
                 await unitOfWork.MaterialRepository.GetByIdsAsync(ids, MaterialIncludeEnum.WithChildren, MaterialIncludeEnum.WithFeatures));
 
             return entities.Where(p => p.CanBeAccessedBy(user.AccessLevel))
-                .Select(entity => {
+                .Select(entity =>
+                {
                     var mapped = Map(entity);
                     mapped.CanBeEdited = entity.CanBeEdited(user.Id);
                     return mapped;
                 })
-                .ToArray();         
+                .ToArray();
         }
 
         public Task<IEnumerable<MaterialEntity>> GetMaterialEntitiesAsync()
@@ -343,7 +344,7 @@ namespace IIS.Services.Materials
 
         public async Task<(IEnumerable<Material> Materials, int Count)> GetMaterialsLikeThisAsync(
             Guid userId,
-            Guid materialId, 
+            Guid materialId,
             PaginationParams page,
             SortingParams sorting)
         {
@@ -503,7 +504,7 @@ namespace IIS.Services.Materials
         private List<MaterialEntity> GetMaterialByNodeIdQuery(Guid nodeId, bool includeRelatedEntities)
         {
             var nodeIdList = new List<Guid> { nodeId };
-            
+
             if (includeRelatedEntities)
                 nodeIdList.AddRange(_ontologyService.GetFeatureIdListThatRelatesToObjectId(nodeId));
 
@@ -604,12 +605,21 @@ namespace IIS.Services.Materials
 
             return result.Where(x => x != null).ToList();
         }
+
         public async Task<bool> MaterialExists(Guid id)
         {
             var entity = await RunWithoutCommitAsync((unitOfWork) =>
                 unitOfWork.MaterialRepository.GetByIdAsync(id));
 
             return entity != null;
+        }
+
+        public Task<IReadOnlyCollection<Guid>> GetAllUnassignedIdsAsync(PaginationParams page, SortingParams sorting = default, CancellationToken cancellationToken = default)
+        {
+            var (offset, limit) = page.ToEFPage();
+
+            return RunWithoutCommitAsync((unitOfWork) =>
+                   unitOfWork.MaterialRepository.GetAllUnassignedIdsAsync(limit, offset, sorting?.ColumnName, sorting?.Order, cancellationToken));
         }
     }
 }
