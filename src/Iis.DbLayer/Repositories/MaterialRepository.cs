@@ -10,7 +10,6 @@ using Microsoft.EntityFrameworkCore;
 using AutoMapper;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-
 using Iis.DataModel;
 using Iis.DataModel.Materials;
 using Iis.DbLayer.Extensions;
@@ -19,7 +18,6 @@ using Iis.DbLayer.Repositories.Helpers;
 using Iis.DbLayer.MaterialDictionaries;
 using Iis.Interfaces.Elastic;
 using Iis.Interfaces.Ontology.Data;
-using Iis.Interfaces.Ontology.Schema;
 using Iis.Domain.Materials;
 using IIS.Repository;
 using Iis.Utility;
@@ -37,18 +35,17 @@ namespace Iis.DbLayer.Repositories
         private readonly IMLResponseRepository _mLResponseRepository;
         private readonly IElasticManager _elasticManager;
         private readonly IMapper _mapper;
-        private readonly IOntologySchema _ontologySchema;
         private readonly IOntologyNodesData _ontologyData;
         public string[] MaterialIndexes => new[] { "Materials" };
 
         public MaterialRepository(IMLResponseRepository mLResponseRepository,
             IElasticManager elasticManager,
-            IMapper mapper, IOntologySchema ontologySchema, IOntologyNodesData ontologyData)
+            IMapper mapper,
+            IOntologyNodesData ontologyData)
         {
             _mLResponseRepository = mLResponseRepository;
             _elasticManager = elasticManager;
             _mapper = mapper;
-            _ontologySchema = ontologySchema;
             _ontologyData = ontologyData;
         }
 
@@ -70,7 +67,7 @@ namespace Iis.DbLayer.Repositories
             return await GetMaterialsQuery(includes)
                             .ToArrayAsync();
         }
-        
+
         public async Task<IEnumerable<MaterialEntity>> GetAllAsync(int limit, params MaterialIncludeEnum[] includes)
         {
             return await GetMaterialsQuery(includes)
@@ -104,6 +101,29 @@ namespace Iis.DbLayer.Repositories
             return GetAllWithPredicateAsync(limit, offset, e => types.Contains(e.Type), sortColumnName, sortOrder);
         }
 
+        public async Task<IReadOnlyCollection<Guid>> GetAllUnassignedIdsAsync(
+            int limit,
+            int offset,
+            string sortColumnName = null,
+            string sortOrder = null,
+            CancellationToken cancellationToken = default)
+        {
+            var materialQuery = Context.Materials
+                .AsNoTracking()
+                .Where(_ => _.AssigneeId == null)
+                .ApplySorting(sortColumnName, sortOrder);
+            if (limit != default)
+            {
+                materialQuery = materialQuery
+                                    .Skip(offset)
+                                    .Take(limit);
+            }
+
+            return await materialQuery
+                .Select(_ => _.Id)
+                .ToArrayAsync(cancellationToken);
+        }
+
         public async Task<IEnumerable<MaterialEntity>> GetAllByAssigneeIdAsync(Guid assigneeId)
         {
             return await GetMaterialsQuery()
@@ -119,7 +139,7 @@ namespace Iis.DbLayer.Repositories
             var materialsCount = await GetMaterialsQuery(MaterialIncludeEnum.WithChildren, MaterialIncludeEnum.WithFeatures)
                 .CountAsync();
 
-            if(materialsCount == 0) return new List<ElasticBulkResponse>();
+            if (materialsCount == 0) return new List<ElasticBulkResponse>();
 
             var responses = new List<ElasticBulkResponse>(materialsCount);
             for (var i = 0; i < (materialsCount / batchSize) + 1; i++)
@@ -128,7 +148,7 @@ namespace Iis.DbLayer.Repositories
 
                 var materialEntities = await GetMaterialsQuery(MaterialIncludeEnum.WithChildren, MaterialIncludeEnum.WithFeatures)
                     .OrderBy(p => p.Id)
-                    .Skip(i*batchSize)
+                    .Skip(i * batchSize)
                     .Take(batchSize)
                     .ToArrayAsync();
 
@@ -146,7 +166,7 @@ namespace Iis.DbLayer.Repositories
                     {
                         var materialIdList = p.Children
                                                 .Select(e => e.Id)
-                                                .Union(new []{p.Id})
+                                                .Union(new[] { p.Id })
                                                 .ToArray();
 
                         var (mlResponses, mlResponsesCount) = GetResponseJsonWithCounter(p.Id, mlResponseDictionary);
@@ -168,8 +188,8 @@ namespace Iis.DbLayer.Repositories
             return responses;
         }
 
-        public async Task<List<ElasticBulkResponse>> PutCreatedMaterialsToElasticSearchAsync(IReadOnlyCollection<Guid> materialIds, 
-            bool waitForIndexing = false, 
+        public async Task<List<ElasticBulkResponse>> PutCreatedMaterialsToElasticSearchAsync(IReadOnlyCollection<Guid> materialIds,
+            bool waitForIndexing = false,
             CancellationToken token = default)
         {
             var materials = await GetMaterialsQuery(MaterialIncludeEnum.WithChildren, MaterialIncludeEnum.WithFeatures)
@@ -201,7 +221,7 @@ namespace Iis.DbLayer.Repositories
 
             var materialIdList = material.Children
                                 .Select(e => e.Id)
-                                .Union(new []{material.Id})
+                                .Union(new[] { material.Id })
                                 .ToArray();
 
             var responseList = await _mLResponseRepository.GetAllForMaterialListAsync(materialIdList);
@@ -336,7 +356,7 @@ namespace Iis.DbLayer.Repositories
                 .Select(e => $"'{e.ToString("N")}'")
                 .ToArray();
 
-            using(var transaction = await Context.Database.BeginTransactionAsync())
+            using (var transaction = await Context.Database.BeginTransactionAsync())
             {
                 Context.Database.ExecuteSqlRaw("DELETE FROM public.\"LocationHistory\" where \"MaterialId\" is not null");
                 Context.Database.ExecuteSqlRaw("DELETE FROM public.\"MaterialFeatures\"");
@@ -344,7 +364,7 @@ namespace Iis.DbLayer.Repositories
                 Context.Database.ExecuteSqlRaw("DELETE FROM public.\"Materials\"");
                 Context.Database.ExecuteSqlRaw("DELETE FROM public.\"MLResponses\"");
 
-                if(removeFileIdList.Any())
+                if (removeFileIdList.Any())
                 {
                     Context.Database.ExecuteSqlRaw("DELETE FROM public.\"Files\" WHERE \"Id\"::text in ({0})", string.Join(" , ", fileIdList));
                 }
@@ -382,7 +402,7 @@ namespace Iis.DbLayer.Repositories
 
         private int GetObjectOfStudyCount(IReadOnlyCollection<Guid> nodeIdList)
         {
-            if(nodeIdList is null || !nodeIdList.Any()) return 0;
+            if (nodeIdList is null || !nodeIdList.Any()) return 0;
 
             var nodeList = _ontologyData.GetNodes(nodeIdList);
 
@@ -391,7 +411,7 @@ namespace Iis.DbLayer.Repositories
 
         private (JObject responseJObject, int responsesCount) GetResponseJsonWithCounter(Guid materialId, Dictionary<Guid, MLResponseEntity[]> responseDictionary)
         {
-            if(responseDictionary.TryGetValue(materialId, out MLResponseEntity[] responseList))
+            if (responseDictionary.TryGetValue(materialId, out MLResponseEntity[] responseList))
             {
                 return (ConvertMLResponsesToJson(responseList), responseList.Length);
             }
@@ -405,7 +425,7 @@ namespace Iis.DbLayer.Repositories
 
             foreach (var materialId in materialIdList)
             {
-                if(responseDictionary.TryGetValue(materialId, out MLResponseEntity[] responseList))
+                if (responseDictionary.TryGetValue(materialId, out MLResponseEntity[] responseList))
                 {
                     var imageVectorList = GetLatestImageVectorList(responseList, MlHandlerCodeList.ImageVector)
                                         .Select(e => new ImageVector(e))
@@ -454,7 +474,7 @@ namespace Iis.DbLayer.Repositories
 
         private string RemoveImagesFromContent(string content)
         {
-            if(string.IsNullOrWhiteSpace(content)) return null;
+            if (string.IsNullOrWhiteSpace(content)) return null;
 
             return Regex.Replace(content, @"\(data:image.+\)", string.Empty, RegexOptions.Compiled);
         }

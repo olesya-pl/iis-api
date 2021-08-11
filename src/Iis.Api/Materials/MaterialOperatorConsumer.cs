@@ -3,59 +3,35 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using IIS.Core.Materials;
-using Iis.Services;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using RabbitMQ.Client;
-using RabbitMQ.Client.Exceptions;
-using Iis.DbLayer.Repositories;
 using Iis.Services.Contracts.Interfaces;
-using Iis.Services.Contracts.Configurations;
+using Iis.DbLayer.MaterialDictionaries;
+using IIS.Services.Contracts.Interfaces;
+using Iis.Services.Contracts.Params;
 
 namespace Iis.Api.Materials
 {
     public class MaterialOperatorConsumer : BackgroundService
     {
+        private const int MaterialsPage = 1;
+        private const int Timeout = 30;
+
         private readonly IUserService _userService;
         private readonly ILogger<MaterialOperatorConsumer> _logger;
-        private readonly IConnection _connection;
-        private readonly IModel _channel;
         private readonly IMaterialService _materialService;
-        private readonly MaterialOperatorAssignerConfiguration _configuration;
+        private readonly IMaterialProvider _materialProvider;
 
         public MaterialOperatorConsumer(
             ILogger<MaterialOperatorConsumer> logger,
-            IConnectionFactory connectionFactory,
-            MaterialOperatorAssignerConfiguration configuration,
             IMaterialService materialService,
-            IUserService userService)
+            IUserService userService,
+            IMaterialProvider materialProvider)
         {
             _userService = userService;
             _logger = logger;
             _materialService = materialService;
-            _configuration = configuration;
-
-            while (true)
-            {
-                try
-                {
-                    _connection = connectionFactory.CreateConnection();
-                    break;
-                }
-                catch (BrokerUnreachableException)
-                {
-                    var timeout = 5000;
-                    _logger.LogError($"Attempting to connect again in {timeout / 1000} sec.");
-                    Thread.Sleep(timeout);
-                }
-            }
-
-            _channel = _connection.CreateModel();
-            _channel.QueueDeclare(
-                queue: _configuration.QueueName,
-                durable: true,
-                exclusive: false,
-                autoDelete: false);
+            _materialProvider = materialProvider;
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -65,38 +41,29 @@ namespace Iis.Api.Materials
                 try
                 {
                     var availableOperators = await _userService.GetAvailableOperatorIdsAsync();
-
                     if (!availableOperators.Any())
                     {
-                        await Task.Delay(TimeSpan.FromSeconds(30), stoppingToken);
+                        await Task.Delay(TimeSpan.FromSeconds(Timeout), stoppingToken);
                         continue;
                     }
 
-                    foreach (var assignee in availableOperators)
+                    var paginationParams = new PaginationParams(MaterialsPage, availableOperators.Count);
+                    var sortingParams = new SortingParams(MaterialSortingFields.CreatedDate, SortDirections.DESC);
+                    var unassignedMaterials = await _materialProvider.GetAllUnassignedIdsAsync(paginationParams, sortingParams, stoppingToken);
+                    if (!unassignedMaterials.Any())
                     {
-                        var message = _channel.BasicGet(_configuration.QueueName, false);
-                        if (message == null)
-                        {
-                            await Task.Delay(TimeSpan.FromSeconds(30), stoppingToken);
-                            continue;
-                        }
-                        var materialId = new Guid(System.Text.Encoding.UTF8.GetString(message.Body));
-                        await _materialService.AssignMaterialOperatorAsync(materialId, assignee);
-                        _channel.BasicAck(message.DeliveryTag, false);
+                        await Task.Delay(TimeSpan.FromSeconds(Timeout), stoppingToken);
+                        continue;
                     }
+
+                    foreach (var (assignee, materialId) in availableOperators.Zip(unassignedMaterials))
+                        await _materialService.AssignMaterialOperatorAsync(materialId, assignee);
                 }
                 catch (Exception e)
                 {
                     _logger.LogError("MaterialOperatorAssigner. Exception={e}", e);
                 }
             }
-        }
-
-        public override void Dispose()
-        {
-            _channel.Close();
-            _connection.Close();
-            base.Dispose();
         }
     }
 }
