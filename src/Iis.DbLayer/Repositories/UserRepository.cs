@@ -48,7 +48,7 @@ namespace Iis.DbLayer.Repositories
         public Task<UserEntity[]> GetOperatorsAsync(Expression<Func<UserEntity, bool>> predicate, CancellationToken ct)
         {
             return GetUsersQuery()
-                .Where(e => e.UserRoles.Any(r => r.RoleId == RoleEntity.OperatorRoleId))
+                .Where(e => e.UserRoles.Any(r => r.RoleId == RoleEntity.OperatorRoleId) && !e.IsBlocked)
                 .Where(predicate)
                 .ToArrayAsync(ct);
         }
