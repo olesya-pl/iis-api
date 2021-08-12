@@ -76,12 +76,14 @@ namespace Iis.UnitTests.Users
                 RoleId = RoleEntity.OperatorRoleId,
                 User = operator1
             });
+            operator1.IsBlocked = false;
 
             operator2.UserRoles.Add(new UserRoleEntity
             {
                 RoleId = RoleEntity.OperatorRoleId,
                 User = operator2
             });
+            operator2.IsBlocked = false;
 
             context.AddRange(new[] { operator1, operator2 });
 
@@ -151,6 +153,7 @@ namespace Iis.UnitTests.Users
                     RoleId = RoleEntity.OperatorRoleId,
                     User = user
                 });
+                user.IsBlocked = false;
             }
             context.AddRange(operators);
             context.AddRange(materials);
