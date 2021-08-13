@@ -12,6 +12,7 @@ namespace Iis.Elastic
         DateRange,
         IntegerRange,
         FloatRange,
-        Byte
+        Byte,
+        GeoPoint
     }
 }

@@ -3,14 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Iis.DbLayer.Repositories.Helpers;
 using Iis.Interfaces.Elastic;
 using Iis.Interfaces.Ontology.Data;
 using Iis.Interfaces.Ontology.Schema;
+using Iis.Services.Helpers;
 using Iis.Services.Contracts.Dtos;
 using Iis.Services.Contracts.Interfaces;
 using Iis.Services.Contracts.Params;
-using Iis.Services.Helpers;
+using Iis.DbLayer.Repositories;
 using Iis.Utility;
 using MoreLinq;
 using Newtonsoft.Json.Linq;
@@ -20,13 +20,13 @@ namespace Iis.Services
     public class NodeSaveService : INodeSaveService
     {
         private readonly IElasticManager _elasticManager;
-        private readonly NodeFlattener _nodeFlattener;
+        private readonly NodeFlattener<IIISUnitOfWork> _nodeFlattener;
         private readonly IChangeHistoryService _changeHistoryService;
         private const int BulkSize = 50000;
         private static List<string> PropertiesToIgnore = new List<string>() { "photo", "lastConfirmedAt", "attachment" };
 
         public NodeSaveService(IElasticManager elasticManager,
-            NodeFlattener nodeFlattener,
+            NodeFlattener<IIISUnitOfWork> nodeFlattener,
             IOntologySchema ontologySchema, IChangeHistoryService changeHistoryService)
         {
             _elasticManager = elasticManager;
@@ -53,7 +53,7 @@ namespace Iis.Services
 
         public async Task<bool> PutNodeAsync(Guid id, CancellationToken cancellationToken = default)
         {
-            var result = _nodeFlattener.FlattenNode(id);
+            var result = await _nodeFlattener.FlattenNodeAsync(id);
             return await _elasticManager.PutDocumentAsync(
                 result.NodeTypeName,
                 result.Id,
@@ -62,7 +62,7 @@ namespace Iis.Services
 
         public async Task<bool> PutNodeAsync(Guid id, IEnumerable<string> fieldsToExclude, CancellationToken cancellationToken = default)
         {
-            var result = _nodeFlattener.FlattenNode(id);
+            var result = await _nodeFlattener.FlattenNodeAsync(id);
             result.SerializedNode = ExcludeFields(result.SerializedNode, fieldsToExclude);
 
             return await _elasticManager.PutDocumentAsync(
@@ -71,26 +71,27 @@ namespace Iis.Services
                 result.SerializedNode, cancellationToken);
         }
 
-        public Task<List<ElasticBulkResponse>> PutNodesAsync(IReadOnlyCollection<INode> nodes, CancellationToken ct)
+        public async Task<List<ElasticBulkResponse>> PutNodesAsync(IReadOnlyCollection<INode> nodes, CancellationToken ct)
         {
-            var flattenNodes = _nodeFlattener.FlattenNodes(nodes);
-            return PutNodesToElasticAsync(flattenNodes, false, ct);
+            var flattenNodes = await _nodeFlattener.FlattenNodesAsync(nodes);
+
+            return await PutNodesToElasticAsync(flattenNodes, false, ct);
         }
 
-        public Task<List<ElasticBulkResponse>> PutNodesAsync(IReadOnlyCollection<INode> nodes, IEnumerable<string> fieldsToExclude, CancellationToken ct)
+        public async Task<List<ElasticBulkResponse>> PutNodesAsync(IReadOnlyCollection<INode> nodes, IEnumerable<string> fieldsToExclude, CancellationToken ct)
         {
-            var flattenNodes = _nodeFlattener.FlattenNodes(nodes);
+            var flattenNodes = await _nodeFlattener.FlattenNodesAsync(nodes);
             flattenNodes.ForEach(node =>
             {
                 node.SerializedNode = ExcludeFields(node.SerializedNode, fieldsToExclude);
             });
 
-            return PutNodesToElasticAsync(flattenNodes, false, ct);
+            return await PutNodesToElasticAsync(flattenNodes, false, ct);
         }
 
         public async Task<List<ElasticBulkResponse>> PutHistoricalNodesAsync(IReadOnlyCollection<INode> items, CancellationToken ct = default)
         {
-            var nodes = _nodeFlattener.FlattenNodes(items);
+            var nodes = await _nodeFlattener.FlattenNodesAsync(items);
             var changes = await _changeHistoryService.GetChangeHistory(items.Select(x => x.Id).Distinct().ToList());
 
             var historicalNodes = nodes.SelectMany(x => GetHistoricalNodes(x, changes.Where(ch => ch.TargetId.ToString("N") == x.Id)));
@@ -100,7 +101,7 @@ namespace Iis.Services
 
         public async Task<List<ElasticBulkResponse>> PutHistoricalNodesAsync(Guid id, Guid? requestId = null, CancellationToken ct = default)
         {
-            var actualNode = _nodeFlattener.FlattenNode(id);
+            var actualNode = await _nodeFlattener.FlattenNodeAsync(id);
             var entityIdList = new HashSet<Guid>{ id };
             var getNodeChanges = requestId.HasValue ?
                 _changeHistoryService.GetChangeHistoryByRequest(requestId.Value) :

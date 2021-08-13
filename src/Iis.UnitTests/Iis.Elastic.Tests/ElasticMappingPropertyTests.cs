@@ -400,5 +400,18 @@ namespace Iis.UnitTests.Iis.Elastic.Tests
             actual.Should().BeEquivalentTo(expected);
         }
 
+        [Fact]
+        public void GeoPointProperty_SimpleNameProperty()
+        {
+            var actual = GeoPointProperty.Create("propertyName").ToJObject();
+
+            var expected = JObject.Parse(
+                @"{
+                    'type':'geo_point'
+                }"
+            );
+
+            actual.Should().BeEquivalentTo(expected);
+        }
     }
 }

@@ -8,5 +8,6 @@ namespace Iis.Interfaces.Ontology.Schema
     {
         string EntityTypeName { get; }
         IReadOnlyList<IAttributeInfoItem> Items { get; }
+        bool TryAddItem(IAttributeInfoItem item);
     }
 }

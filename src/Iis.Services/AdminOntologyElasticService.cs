@@ -6,6 +6,7 @@ using Iis.Interfaces.Elastic;
 using Iis.Interfaces.Enums;
 using Iis.Interfaces.Ontology.Data;
 using Iis.Interfaces.Ontology.Schema;
+using Iis.OntologySchema.DataTypes;
 using Iis.Services.Contracts.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -18,6 +19,7 @@ namespace Iis.Services
 {
     public class AdminOntologyElasticService : IAdminOntologyElasticService
     {
+        private const string LocationPropertyName = "location";
         private readonly IElasticManager _elasticManager;
         private readonly IElasticState _elasticState;
         private readonly IOntologySchema _ontologySchema;
@@ -71,6 +73,12 @@ namespace Iis.Services
                 var attributesInfo = isHistorical
                     ? _ontologySchema.GetHistoricalAttributesInfo(index, GetHistoricalIndex(index))
                     : _ontologySchema.GetAttributesInfo(index);
+
+                if(_ontologySchema.GetEntityTypeByName(index).IsObjectSign)
+                {
+                    var singLocationAttribute = new AttributeInfoItem(LocationPropertyName, ScalarType.GeoPoint, null, false);
+                    attributesInfo.TryAddItem(singLocationAttribute);
+                }
 
                 var result = await _elasticManager.CreateMapping(attributesInfo, ct);
 

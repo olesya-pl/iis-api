@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Iis.Interfaces.Ontology
+﻿namespace Iis.Interfaces.Ontology
 {
     public class GeoCoordinates
     {
