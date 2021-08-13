@@ -51,7 +51,7 @@ namespace IIS.Core.Materials.EntityFramework.FeatureProcessors
             _gsmLocationService = gsmLocationService;
         }
 
-        protected override Task SaveCoordinatesToLocationHistoryAsync(JObject feature)
+        protected override Task SaveCoordinatesToLocationHistoryAsync(JObject feature, DateTime locationTimeStamp)
         {
             return Task.CompletedTask;
         }
