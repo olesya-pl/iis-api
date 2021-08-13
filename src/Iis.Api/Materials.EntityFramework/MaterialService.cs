@@ -185,11 +185,11 @@ namespace IIS.Core.Materials.EntityFramework
 
             await RunWithoutCommitAsync(uow => uow.MaterialRepository.PutMaterialToElasticSearchAsync(responseEntity.MaterialId));
 
-            if(responseEntity.HandlerCode == MlHandlerCodeList.ImageVector)
+            if (responseEntity.HandlerCode == MlHandlerCodeList.ImageVector)
             {
                 var parentId = await RunWithoutCommitAsync(uow => uow.MaterialRepository.GetParentIdByChildIdAsync(responseEntity.MaterialId));
 
-                if(parentId.HasValue)
+                if (parentId.HasValue)
                 {
                     await RunWithoutCommitAsync(uow => uow.MaterialRepository.PutMaterialToElasticSearchAsync(parentId.Value));
                 }
@@ -438,6 +438,40 @@ namespace IIS.Core.Materials.EntityFramework
                 await unitOfWork.MaterialRepository.PutMaterialToElasticSearchAsync(material.Id));
         }
 
+        public async Task<bool> AssignMaterialEditorAsync(Guid materialId, User user)
+        {
+            var accessLevel = user.AccessLevel;
+            var material = await RunWithoutCommitAsync(_ => _.MaterialRepository.GetByIdAsync(materialId));
+            if (material == null
+                || material.EditorId != null
+                || !material.CanBeAccessedBy(accessLevel))
+                return false;
+
+            material.EditorId = user.Id;
+
+            Run(_ => _.MaterialRepository.EditMaterial(material));
+            await RunWithoutCommitAsync(_ => _.MaterialRepository.PutMaterialToElasticSearchAsync(material.Id));
+
+            return true;
+        }
+
+        public async Task<bool> UnassignMaterialEditorAsync(Guid materialId, User user)
+        {
+            var accessLevel = user.AccessLevel;
+            var material = await RunWithoutCommitAsync(_ => _.MaterialRepository.GetByIdAsync(materialId));
+            if (material == null
+                || material.EditorId != user.Id
+                || !material.CanBeAccessedBy(accessLevel))
+                return false;
+
+            material.EditorId = null;
+
+            Run(_ => _.MaterialRepository.EditMaterial(material));
+            await RunWithoutCommitAsync(_ => _.MaterialRepository.PutMaterialToElasticSearchAsync(material.Id));
+
+            return true;
+        }
+
         public async Task SetMachineLearningHadnlersCount(Guid materialId, int handlersCount)
         {
             var material = await RunWithoutCommitAsync(async unitOfWork =>
@@ -483,7 +517,7 @@ namespace IIS.Core.Materials.EntityFramework
 
             if (!accessLevelValidationResult.IsValid) throw new ArgumentException("Wrong Access level value");
 
-            if( !IsUserAuthorizedForChangeAccessLevel(user) || !_userService.IsAccessLevelAllowedForUser(user.AccessLevel, accessLevelValidationResult.Value))
+            if (!IsUserAuthorizedForChangeAccessLevel(user) || !_userService.IsAccessLevelAllowedForUser(user.AccessLevel, accessLevelValidationResult.Value))
             {
                 throw new InvalidOperationException($"Unable to change AccessLevel by user {user.UserName}");
             }
