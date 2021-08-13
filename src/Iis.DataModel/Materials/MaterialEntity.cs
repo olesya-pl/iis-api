@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using Iis.Interfaces.Enums;
+
 namespace Iis.DataModel.Materials
 {
     public class MaterialEntity : BaseEntity
@@ -142,17 +142,17 @@ namespace Iis.DataModel.Materials
         public int MlHandlersCount { get; set; }
         public int AccessLevel { get; set; }
 
+        public Guid? EditorId { get; set; }
+        public virtual UserEntity Editor { get; set; }
+
         public bool CanBeEdited(Guid userId)
         {
             if (ProcessedStatusSignId == ProcessingStatusProcessingSignId)
-            {
-                return AssigneeId == userId;
-            }
+                return EditorId == userId;
+
             return true;
         }
 
         public bool CanBeAccessedBy(int accessLevel) => accessLevel >= AccessLevel;
-
-
     }
 }

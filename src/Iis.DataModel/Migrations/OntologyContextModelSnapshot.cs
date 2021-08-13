@@ -392,6 +392,9 @@ namespace Iis.DataModel.Migrations
                     b.Property<string>("Data")
                         .HasColumnType("text");
 
+                    b.Property<Guid?>("EditorId")
+                        .HasColumnType("uuid");
+
                     b.Property<Guid?>("FileId")
                         .HasColumnType("uuid");
 
@@ -444,6 +447,8 @@ namespace Iis.DataModel.Migrations
                     b.HasIndex("AssigneeId");
 
                     b.HasIndex("CompletenessSignId");
+
+                    b.HasIndex("EditorId");
 
                     b.HasIndex("FileId");
 
@@ -1409,6 +1414,10 @@ namespace Iis.DataModel.Migrations
                     b.HasOne("Iis.DataModel.Materials.MaterialSignEntity", "Completeness")
                         .WithMany()
                         .HasForeignKey("CompletenessSignId");
+
+                    b.HasOne("Iis.DataModel.UserEntity", "Editor")
+                        .WithMany()
+                        .HasForeignKey("EditorId");
 
                     b.HasOne("Iis.DataModel.Materials.FileEntity", "File")
                         .WithMany("Materials")

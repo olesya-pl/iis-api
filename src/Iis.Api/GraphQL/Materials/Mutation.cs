@@ -27,8 +27,7 @@ namespace IIS.Core.GraphQL.Materials
             [Service] IMaterialService materialService,
             [Service] IMapper mapper,
             [GraphQLType(typeof(NonNullType<IdType>))] Guid materialId,
-            [GraphQLType(typeof(int))] int newAccessLevel
-        )
+            [GraphQLType(typeof(int))] int newAccessLevel)
         {
             var tokenPayload = context.GetToken();
 
@@ -39,14 +38,39 @@ namespace IIS.Core.GraphQL.Materials
 
         public async Task<AssignMaterialsOperatorResult> AssignMaterialsOperator(IResolverContext context,
             [Service] IMaterialService materialService,
-            AssignMaterialsOperatorInput input
-            )
+            AssignMaterialsOperatorInput input)
         {
             var tokenPayload = context.GetToken();
             await materialService.AssignMaterialsOperatorAsync(new HashSet<Guid>(input.MaterialIds), input.AssigneeId, tokenPayload.User);
             return new AssignMaterialsOperatorResult
             {
                 IsSuccess = true
+            };
+        }
+
+        public async Task<ChangeMaterialEditorResult> AssignMaterialEditor(IResolverContext context,
+            [Service] IMaterialService materialService,
+            [GraphQLType(typeof(NonNullType<IdType>))] Guid materialId)
+        {
+            var tokenPayload = context.GetToken();
+            var result = await materialService.AssignMaterialEditorAsync(materialId, tokenPayload.User);
+
+            return new ChangeMaterialEditorResult
+            {
+                IsSuccess = result
+            };
+        }
+
+        public async Task<ChangeMaterialEditorResult> UnassignMaterialEditor(IResolverContext context,
+            [Service] IMaterialService materialService,
+            [GraphQLType(typeof(NonNullType<IdType>))] Guid materialId)
+        {
+            var tokenPayload = context.GetToken();
+            var result = await materialService.UnassignMaterialEditorAsync(materialId, tokenPayload.User);
+
+            return new ChangeMaterialEditorResult
+            {
+                IsSuccess = result
             };
         }
     }

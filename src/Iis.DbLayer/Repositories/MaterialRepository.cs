@@ -530,6 +530,7 @@ namespace Iis.DbLayer.Repositories
                     .Include(m => m.ProcessedStatus)
                     .Include(m => m.SessionPriority)
                     .Include(m => m.Assignee)
+                    .Include(m => m.Editor)
                     .AsNoTracking();
         }
 
