@@ -28,7 +28,7 @@ namespace Iis.Services.DI
             services.AddTransient<IRadioElectronicSituationService, RadioElectronicSituationService<IIISUnitOfWork>>();
             services.AddHttpClient<MaterialProvider<IIISUnitOfWork>>();
             services.AddTransient<NodeToJObjectMapper>();
-            services.AddTransient<NodeFlattener>();
+            services.AddTransient<NodeFlattener<IIISUnitOfWork>>();
             services.AddTransient<INodeSaveService, NodeSaveService>();
 
             return services;

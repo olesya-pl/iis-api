@@ -57,6 +57,8 @@ namespace Iis.Elastic
                 json["__coordinates"] = coords;
             }
 
+            TryAddGeoPointProperty(json, "location", extNode.Location);
+
             foreach (var childGroup in extNode.Children.GroupBy(p => new {p.NodeTypeName, p.EntityTypeName}))
             {
                 var key = childGroup.Key.NodeTypeName;
@@ -130,6 +132,21 @@ namespace Iis.Elastic
             }
 
             return GetJsonObjectByExtNode(extNode, false);
+        }
+
+        private bool TryAddGeoPointProperty(JObject jobject, string propertyName, GeoCoordinates location)
+        {
+            if(jobject is null || string.IsNullOrWhiteSpace(propertyName) || location is null) return false;
+
+            var coordinate = new JObject
+            (
+                new JProperty("lat", location.Latitude),
+                new JProperty("lon", location.Longitude)
+            );
+
+            jobject[propertyName] = coordinate;
+
+            return true;
         }
     }
 }

@@ -41,6 +41,8 @@ namespace Iis.Elastic.ElasticMappingProperties
                         return new List<ElasticMappingProperty> { IntegerRangeProperty.Create(name) };
                     case ElasticMappingPropertyType.FloatRange:
                         return new List<ElasticMappingProperty> { FloatRangeProperty.Create(name) };
+                    case ElasticMappingPropertyType.GeoPoint:
+                        return new List<ElasticMappingProperty> { GeoPointProperty.Create(name) };
                     default:
                         throw new NotSupportedException($"Creating instance of type {propertyType} is not supported");
                 }

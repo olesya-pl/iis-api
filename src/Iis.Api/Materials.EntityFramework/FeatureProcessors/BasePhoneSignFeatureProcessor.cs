@@ -3,7 +3,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using Newtonsoft.Json.Linq;
-
 using Iis.Interfaces.Elastic;
 using Iis.Services.Contracts.Dtos;
 using Iis.Services.Contracts.Interfaces;
@@ -104,10 +103,11 @@ namespace IIS.Core.Materials.EntityFramework.FeatureProcessors
                     originalFeature[FeatureFields.featureId] = entity.Id.ToString();
                 }
 
-                await SaveCoordinatesToLocationHistoryAsync(originalFeature);
+                await SaveCoordinatesToLocationHistoryAsync(originalFeature, DateTime.UtcNow);
             }
 
             await PostMetadataProcessingAsync(metadata, materialId);
+
             return metadata;
         }
 
@@ -264,13 +264,13 @@ namespace IIS.Core.Materials.EntityFramework.FeatureProcessors
             return Task.CompletedTask;
         }
 
-        protected virtual Task SaveCoordinatesToLocationHistoryAsync(JObject feature)
+        protected virtual async Task SaveCoordinatesToLocationHistoryAsync(JObject feature, DateTime locationTimeStamp)
         {
             var coordinatesResult = TryFetchCoordinatiesFromFeature(feature);
 
             var entityIdResult  = TryFetchEntityIdFromFeature(feature);
 
-            if (!coordinatesResult.IsSuccess || !entityIdResult.IsSuccess) return Task.CompletedTask;
+            if (!coordinatesResult.IsSuccess || !entityIdResult.IsSuccess) return;
 
             var lhDto = new LocationHistoryDto
             {
@@ -278,10 +278,12 @@ namespace IIS.Core.Materials.EntityFramework.FeatureProcessors
                 NodeId = entityIdResult.FeatureId,
                 Lat = coordinatesResult.Latitude,
                 Long = coordinatesResult.Longitude,
-                RegisteredAt = DateTime.UtcNow
+                RegisteredAt = locationTimeStamp
             };
 
-            return _locationHistoryService.SaveLocationHistoryAsync(lhDto);
+            await _locationHistoryService.SaveLocationHistoryAsync(lhDto);
+
+            await _elasticService.PutNodeAsync(entityIdResult.FeatureId);
         }
 
         private (decimal Latitude, decimal Longitude, bool IsSuccess) TryFetchCoordinatiesFromFeature(JObject feature)
@@ -302,6 +304,6 @@ namespace IIS.Core.Materials.EntityFramework.FeatureProcessors
             var parseResult = Guid.TryParse(featureIdStringValue, out Guid featureId);
 
             return (FeatureId: featureId, IsSuccess: parseResult);
-        }        
+        }
     }
 }
