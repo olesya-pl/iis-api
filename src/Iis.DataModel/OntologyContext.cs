@@ -8,6 +8,10 @@ using Iis.DataModel.Themes;
 using Iis.DataModel.Annotations;
 using Microsoft.EntityFrameworkCore;
 using Iis.DataModel.FlightRadar;
+using System.Threading.Tasks;
+using System.Threading;
+using System.Linq;
+using System;
 
 namespace Iis.DataModel
 {
@@ -134,5 +138,23 @@ namespace Iis.DataModel
             var context = new OntologyContext(optionsBuilder.Options);
             return context;
         }
+
+        public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = new CancellationToken())
+        {
+            foreach (var history in ChangeTracker.Entries()
+                .Where(e => e.Entity is IAuditable && (e.State == EntityState.Added || e.State == EntityState.Modified))
+                .Select(e => e.Entity as IAuditable)
+            )
+            {
+                history.UpdatedAt = DateTime.UtcNow;
+                
+            }
+            return base.SaveChangesAsync(cancellationToken);
+        }
+    }
+
+    internal interface IAuditable
+    {
+        DateTime UpdatedAt { get; set; }
     }
 }

@@ -3,11 +3,10 @@ using System.Collections.Generic;
 using Iis.DataModel.Materials;
 using Iis.DataModel.Reports;
 using Iis.Interfaces.Ontology.Data;
-using Iis.Interfaces.Ontology.Schema;
 
 namespace Iis.DataModel
 {
-    public class NodeEntity : BaseEntity, INodeBase
+    public class NodeEntity : BaseEntity, INodeBase, IAuditable
     {
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
