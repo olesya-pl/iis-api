@@ -1,13 +1,8 @@
-﻿using Iis.DataModel;
-using Iis.DbLayer.OntologyData;
-using Iis.DbLayer.Repositories;
+﻿using Iis.DbLayer.Repositories;
 using Iis.Elastic;
 using Iis.Elastic.ElasticMappingProperties;
-using Iis.Interfaces.AccessLevels;
 using Iis.Interfaces.Elastic;
 using Iis.Interfaces.Enums;
-using Iis.Interfaces.Ontology.Schema;
-using Iis.OntologyData;
 using Iis.OntologyData.IisAccessLevels;
 using Iis.Services.Contracts.Csv;
 using Iis.Services.Contracts.Interfaces;
@@ -15,13 +10,11 @@ using Iis.Services.Contracts.Params;
 using IIS.Core;
 using IIS.Core.Materials;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using MoreLinq;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -82,7 +75,7 @@ namespace Iis.Api.Controllers
             _materialProvider = materialProvider;
             _nodeMaterialRelationService = nodeMaterialRelationService;
         }
-        
+
         [HttpGet("CreateBindingNodesToMaterial/{nodeId}/{limit}")]
         public async Task<string> CreateBindingNodesToMaterial(Guid nodeId, int limit)
         {
@@ -188,22 +181,30 @@ namespace Iis.Api.Controllers
                 KeywordProperty.Create("ParentId", true),
                 TextProperty.Create("Type", true),
                 TextProperty.Create("Source", true),
+                AliasProperty.Create("Тип", "Type.keyword"),
+                AliasProperty.Create("Джерело", "Source.keyword"),
                 KeywordProperty.Create("ProcessedStatus.Title", false),
+                AliasProperty.Create("Статус", "ProcessedStatus.Title"),
                 ByteProperty.Create("ProcessedStatus.OrderNumber"),
                 KeywordProperty.Create("Completeness.Title", false),
+                AliasProperty.Create("Повнота", "Completeness.Title"),
                 KeywordProperty.Create("Importance.Title", false),
+                AliasProperty.Create("Важливість", "Importance.Title"),
                 ByteProperty.Create("Importance.OrderNumber"),
                 KeywordProperty.Create("Reliability.Title", false),
+                AliasProperty.Create("Достовірність", "Reliability.Title"),
+                AliasProperty.Create("Надійність джерела", "SourceReliability.Title"),
                 KeywordProperty.Create("Relevance.Title", false),
+                AliasProperty.Create("Актуальність", "Relevance.Title"),
                 KeywordProperty.Create("SourceReliability.Title", false),
                 KeywordProperty.Create("SessionPriority.Title", false),
+                AliasProperty.Create("Пріоритет сесії", "SessionPriority.Title"),
                 ByteProperty.Create("SessionPriority.OrderNumber"),
                 IntegerProperty.Create("NodesCount"),
                 DenseVectorProperty.Create("ImageVectors.Vector", MaterialDocument.ImageVectorDimensionsCount),
                 TextProperty.Create("MLResponses.namedEntityRecognition", ElasticConfiguration.DefaultTermVector),
                 TextProperty.Create("MLResponses.textAnnotation", ElasticConfiguration.DefaultTermVector)
             });
-
             await _elasticManager.CreateIndexesAsync(new[] { materialIndex },
                 mappingConfiguration.ToJObject(),
                 cancellationToken);
@@ -373,7 +374,7 @@ namespace Iis.Api.Controllers
                 return Content($"There are not valid index names in list: {string.Join(", ", notValidIndexes)}");
             }
 
-            _adminElasticService.Logger  = new StringBuilder();
+            _adminElasticService.Logger = new StringBuilder();
 
             await _adminElasticService.DeleteIndexesAsync(indexes, isHistorical, ct);
 

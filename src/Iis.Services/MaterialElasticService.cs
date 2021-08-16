@@ -23,15 +23,15 @@ namespace Iis.Services
         private string[] MaterialIndexes = { "Materials" };
         private static IReadOnlyCollection<AggregationField> _aggregationsFieldList = new List<AggregationField>
         {
-            new AggregationField("ProcessedStatus.Title", string.Empty, "ProcessedStatus.Title"),
-            new AggregationField("Completeness.Title", string.Empty, "Completeness.Title"),
-            new AggregationField("Importance.Title", string.Empty, "Importance.Title"),
-            new AggregationField("SessionPriority.Title", string.Empty, "SessionPriority.Title"),
-            new AggregationField("Reliability.Title", string.Empty, "Reliability.Title"),
-            new AggregationField("Relevance.Title", string.Empty, "Relevance.Title"),
-            new AggregationField("SourceReliability.Title", string.Empty, "SourceReliability.Title"),
-            new AggregationField("Type.keyword", string.Empty, "Type.keyword"),
-            new AggregationField("Source.keyword", string.Empty, "Source.keyword"),
+            new AggregationField("ProcessedStatus.Title", "Статус", "ProcessedStatus.Title"),
+            new AggregationField("Completeness.Title", "Повнота", "Completeness.Title"),
+            new AggregationField("Importance.Title", "Важливість", "Importance.Title"),
+            new AggregationField("SessionPriority.Title", "Пріоритет сесії", "SessionPriority.Title"),
+            new AggregationField("Reliability.Title", "Достовірність", "Reliability.Title"),
+            new AggregationField("Relevance.Title", "Актуальність", "Relevance.Title"),
+            new AggregationField("SourceReliability.Title", "Надійність джерела", "SourceReliability.Title"),
+            new AggregationField("Type.keyword", "Тип", "Type.keyword"),
+            new AggregationField("Source.keyword", "Джерело", "Source.keyword"),
         };
 
         public MaterialElasticService(IElasticManager elasticManager,
@@ -55,8 +55,8 @@ namespace Iis.Services
             var (from, size) = searchParams.Page.ToElasticPage();
 
             var queryString = SearchQueryExtension.CreateMaterialsQueryString(
-                searchParams.Suggestion, 
-                searchParams.FilteredItems, 
+                searchParams.Suggestion,
+                searchParams.FilteredItems,
                 searchParams.CherryPickedItems);
 
             var query = new ExactQueryBuilder()
@@ -116,7 +116,7 @@ namespace Iis.Services
 
             var scrollDuration = _elasticConfiguration.ScrollDurationMinutes == default(int)
                 ? ElasticConstants.DefaultScrollDurationMinutes
-                : _elasticConfiguration.ScrollDurationMinutes;            
+                : _elasticConfiguration.ScrollDurationMinutes;
 
             var query = new ExactQueryBuilder()
                 .WithPagination(from, size)
@@ -143,8 +143,8 @@ namespace Iis.Services
         }
 
         public async Task<SearchResult> SearchMaterialsAsync(Guid userId,
-            SearchParams searchParams, 
-            IEnumerable<Guid> materialList, 
+            SearchParams searchParams,
+            IEnumerable<Guid> materialList,
             CancellationToken ct = default)
         {
             var (from, size) = searchParams.Page.ToElasticPage();
@@ -233,7 +233,7 @@ namespace Iis.Services
                 searchParams.CherryPickedItems);
 
             var pagination = searchParams.Page.ToEFPage();
-            
+
             var exactQueryBuilder = new ExactQueryBuilder()
                 .WithQueryString(queryString)
                 .WithLeniency(true)
