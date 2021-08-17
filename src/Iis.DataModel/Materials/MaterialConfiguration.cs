@@ -62,10 +62,11 @@ namespace Iis.DataModel.Materials
                 .IsRequired(true)
                 .HasDefaultValue(MaterialEntity.ProcessingStatusNotProcessedSignId);
 
-            builder.Property(e => e.ParentId)
+            builder
+                .Property(e => e.ParentId)
                 .IsRequired(false);
-
-            builder.Property(e => e.FileId)
+            builder
+                .Property(e => e.FileId)
                 .IsRequired(false);
 
             builder
@@ -88,6 +89,10 @@ namespace Iis.DataModel.Materials
                 .HasOne(e => e.Editor)
                 .WithMany()
                 .HasForeignKey(e => e.EditorId);
+
+            builder
+                .Property(e => e.UpdatedAt)
+                .HasDefaultValueSql("timezone('utc', now())");
         }
     }
 }

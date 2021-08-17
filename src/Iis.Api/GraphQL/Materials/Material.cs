@@ -27,6 +27,7 @@ namespace IIS.Core.GraphQL.Materials
         public string Type { get; set; }
         public string Source { get; set; }
         public string CreatedDate { get; set; }
+        public string UpdatedAt { get; set; }
         public string Content { get; set; }
         public MaterialSign Importance { get; set; }
         public MaterialSign Reliability { get; set; }

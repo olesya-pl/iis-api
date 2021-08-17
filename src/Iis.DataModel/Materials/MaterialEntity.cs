@@ -118,6 +118,7 @@ namespace Iis.DataModel.Materials
         public string Source { get; set; }
         public string Content { get; set; }
         public DateTime CreatedDate { get; set; } = DateTime.Now;
+        public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
         public Guid? ImportanceSignId { get; set; }
         public Guid? ReliabilitySignId { get; set; }
         public Guid? RelevanceSignId { get; set; }

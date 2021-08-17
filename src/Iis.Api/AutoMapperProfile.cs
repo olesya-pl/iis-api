@@ -70,6 +70,7 @@ namespace Iis.Api
                 .ForMember(dest => dest.Children, opts => opts.MapFrom(src => src.Children))
                 .ForMember(dest => dest.Highlight, opts => opts.Ignore())
                 .ForMember(dest => dest.CreatedDate, opts => opts.MapFrom(src => src.CreatedDate.ToString("yyyy-MM-ddTHH:mm:ss.fffZ")))
+                .ForMember(dest => dest.UpdatedAt, opts => opts.MapFrom(src => src.UpdatedAt.ToString("yyyy-MM-ddTHH:mm:ss.fffZ")))
                 .ForMember(dest => dest.AccessLevel, opts => opts.MapFrom(src => src.AccessLevel))
                 .AfterMap((src, dest, context) => { context.Mapper.Map(src.LoadData, dest); });
 
@@ -229,6 +230,7 @@ namespace Iis.Api
             CreateMap<MaterialSignEntity, DbLayer.Repositories.MaterialSign>();
             CreateMap<MaterialEntity, DbLayer.Repositories.MaterialDocument>()
                 .ForMember(dest => dest.CreatedDate, opts => opts.MapFrom(src => src.CreatedDate.ToString(Iso8601DateFormat, CultureInfo.InvariantCulture)))
+                .ForMember(dest => dest.UpdatedAt, opts => opts.MapFrom(src => src.UpdatedAt.ToString(Iso8601DateFormat, CultureInfo.InvariantCulture)))
                 .ForMember(dest => dest.Metadata, opts => opts.MapFrom(src => src.Metadata == null ? null : JObject.Parse(src.Metadata)))
                 .ForMember(dest => dest.FileName, opts => opts.MapFrom(src => src.File == null ? null : src.File.Name))
                 .ForPath(dest => dest.SecurityAttributes.AccessLevel, opts => opts.MapFrom(src => src.AccessLevel))
@@ -256,6 +258,7 @@ namespace Iis.Api
             CreateMap<DbLayer.Repositories.MaterialDocument, Iis.Domain.Materials.Material>()
                 .ForMember(dest => dest.File, opts => opts.MapFrom(src => src.FileId.HasValue ? new File(src.FileId.Value): null))
                 .ForMember(dest => dest.CreatedDate, opts => opts.MapFrom(src => DateTime.ParseExact(src.CreatedDate, Iso8601DateFormat, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind)))
+                .ForMember(dest => dest.UpdatedAt, opts => opts.MapFrom(src => DateTime.ParseExact(src.UpdatedAt, Iso8601DateFormat, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind)))
                 .ForMember(dest => dest.Children, opts => opts.Ignore())
                 .ForMember(dest => dest.Assignee, opts => opts.MapFrom(src => src.Assignee))
                 .ForMember(dest => dest.Editor, opts => opts.MapFrom(src => src.Editor));
@@ -275,7 +278,7 @@ namespace Iis.Api
             //mapping: Roles.User -> GraphQl.User
             CreateMap<Iis.Domain.Users.User, User>();
 
-            //mappring: UserEntity -> Roles.User
+            //mapping: UserEntity -> Roles.User
             CreateMap<UserEntity, Iis.Domain.Users.User>()
                 .ForMember(dest => dest.Roles, opts => opts.MapFrom(src => src.UserRoles.Select(ur => ur.Role)));
 

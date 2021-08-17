@@ -36,6 +36,7 @@ namespace Iis.Domain.Materials
         public Guid? FileId => File?.Id;
         public List<MaterialInfo> Infos { get; } = new List<MaterialInfo>();
         public DateTime CreatedDate { get; set; }
+        public DateTime UpdatedAt { get; set; }
         public string Title { get; set; }
         public MaterialLoadData LoadData { get; set; }
         public User Assignee { get; set; }
