@@ -225,6 +225,7 @@ namespace Iis.Api
                 .ForMember(dest => dest.States, opts => opts.MapFrom(src => src.States));
 
             CreateMap<UserEntity, DbLayer.Repositories.Assignee>();
+            CreateMap<UserEntity, DbLayer.Repositories.Editor>();
             CreateMap<MaterialSignEntity, DbLayer.Repositories.MaterialSign>();
             CreateMap<MaterialEntity, DbLayer.Repositories.MaterialDocument>()
                 .ForMember(dest => dest.CreatedDate, opts => opts.MapFrom(src => src.CreatedDate.ToString(Iso8601DateFormat, CultureInfo.InvariantCulture)))
@@ -249,13 +250,15 @@ namespace Iis.Api
                     opts.MapFrom(src => JsonConvert.DeserializeObject<DbLayer.Repositories.MaterialLoadData>(src.LoadData)));
 
             CreateMap<DbLayer.Repositories.Assignee, Iis.Domain.Users.User>();
+            CreateMap<DbLayer.Repositories.Editor, Iis.Domain.Users.User>();
             CreateMap<DbLayer.Repositories.MaterialLoadData, Iis.Domain.Materials.MaterialLoadData>();
             CreateMap<DbLayer.Repositories.MaterialSign, Iis.Domain.Materials.MaterialSign>();
             CreateMap<DbLayer.Repositories.MaterialDocument, Iis.Domain.Materials.Material>()
                 .ForMember(dest => dest.File, opts => opts.MapFrom(src => src.FileId.HasValue ? new File(src.FileId.Value): null))
                 .ForMember(dest => dest.CreatedDate, opts => opts.MapFrom(src => DateTime.ParseExact(src.CreatedDate, Iso8601DateFormat, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind)))
                 .ForMember(dest => dest.Children, opts => opts.Ignore())
-                .ForMember(dest => dest.Assignee, opts => opts.MapFrom(src => src.Assignee));
+                .ForMember(dest => dest.Assignee, opts => opts.MapFrom(src => src.Assignee))
+                .ForMember(dest => dest.Editor, opts => opts.MapFrom(src => src.Editor));
 
 
             //mapping: GraphQl.UserInput -> Roles.User

@@ -58,6 +58,7 @@ namespace IIS.Core.GraphQL.Materials
         [GraphQLType(typeof(ListType<JsonScalarType>))]
         public IEnumerable<JObject> Features { get; set; }
         public User Assignee { get; set; }
+        public User Editor { get; set; }
         public int MlHandlersCount { get; set; }
         public int ProcessedMlHandlersCount { get; set; }
         public bool CanBeEdited { get; set; }
