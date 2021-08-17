@@ -222,6 +222,8 @@ namespace IIS.Services.Materials
 
             result.Assignee = _mapper.Map<User>(material.Assignee);
 
+            result.Editor = _mapper.Map<User>(material.Editor);
+
             var nodes = result.Infos
                                 .SelectMany(p => p.Features.Where(e => e.NodeLinkType == MaterialNodeLinkType.None).Select(e => e.Node))
                                 .ToList();

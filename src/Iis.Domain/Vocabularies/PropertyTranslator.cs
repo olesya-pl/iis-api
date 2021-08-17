@@ -14,6 +14,7 @@ namespace Iis.Domain.Vocabularies
             { "ProcessedStatus", "Статус обробки" },
             { "SessionPriority", "Прiоритет сеансу" },
             { "Assignee", "Виконавець" },
+            { "Editor", "Редактор" },
             { "Content", "Зміст" },
             { "MaterialFeature.NodeId", "Зв'язок"}
         };

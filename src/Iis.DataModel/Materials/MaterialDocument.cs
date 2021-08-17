@@ -34,6 +34,7 @@ namespace Iis.DbLayer.Repositories
         public int NodesCount { get; set; }
         public int ObjectsOfStudyCount { get; set; }
         public Assignee Assignee { get; set; }
+        public Editor Editor { get; set; }
         public JObject MLResponses { get; set; }
         public string Title { get; set; }
         public ImageVector[] ImageVectors { get; set; }
@@ -49,6 +50,15 @@ namespace Iis.DbLayer.Repositories
     }
 
     public class Assignee
+    {
+        public Guid Id { get; set; }
+        public string UserName { get; set; }
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
+        public string Patronymic { get; set; }
+    }
+
+    public class Editor
     {
         public Guid Id { get; set; }
         public string UserName { get; set; }
