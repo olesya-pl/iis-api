@@ -442,6 +442,11 @@ namespace Iis.DataModel.Migrations
                     b.Property<string>("Type")
                         .HasColumnType("text");
 
+                    b.Property<DateTime>("UpdatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp without time zone")
+                        .HasDefaultValueSql("timezone('utc', now())");
+
                     b.HasKey("Id");
 
                     b.HasIndex("AssigneeId");

@@ -264,6 +264,7 @@ namespace Iis.DbLayer.Repositories
 
         public void EditMaterial(MaterialEntity materialEntity)
         {
+            materialEntity.UpdatedAt = DateTime.UtcNow;
             Context.Materials.Update(materialEntity);
         }
 

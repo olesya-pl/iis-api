@@ -16,6 +16,7 @@ namespace Iis.DbLayer.Repositories
         public string Type { get; set; }
         public string Source { get; set; }
         public string CreatedDate { get; set; }
+        public string UpdatedAt { get; set; }
         public string Content { get; set; }
         public string FileName { get; set; }
         public MaterialLoadData LoadData { get; set; }
