@@ -63,6 +63,8 @@ namespace Iis.DbLayer.Extensions
                 (MaterialSortingFields.Nodes, SortDirections.ASC) => materialsQuery.OrderBy(p => p.MaterialInfos.SelectMany(p => p.MaterialFeatures).Count()),
                 (MaterialSortingFields.Nodes, SortDirections.DESC) => materialsQuery.OrderByDescending(p => p.MaterialInfos.SelectMany(p => p.MaterialFeatures).Count()),
                 (MaterialSortingFields.CreatedDate, SortDirections.ASC) => materialsQuery.OrderBy(p => p.CreatedDate),
+                (MaterialSortingFields.RegistrationDate, SortDirections.ASC) => materialsQuery.OrderBy(p => p.RegistrationDate),
+                (MaterialSortingFields.RegistrationDate, SortDirections.DESC) => materialsQuery.OrderByDescending(p => p.RegistrationDate),
                 (MaterialSortingFields.SessionPriority, SortDirections.ASC) => materialsQuery.OrderBy(p => p.SessionPriorityId),
                 (MaterialSortingFields.SessionPriority, SortDirections.DESC) => materialsQuery.OrderByDescending(p => p.SessionPriorityId),
                 _ => materialsQuery.OrderByDescending(p => p.CreatedDate),

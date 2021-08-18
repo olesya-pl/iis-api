@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using Newtonsoft.Json.Linq;
 using Iis.DataModel;
+
 namespace Iis.DbLayer.Repositories
 {
     public class MaterialDocument
     {
         public const int ImageVectorDimensionsCount = 128;
+
         public Guid Id { get; set; }
         public int AccessLevel { get; set; }
         public Guid? FileId { get; set; }
@@ -39,6 +40,7 @@ namespace Iis.DbLayer.Repositories
         public JObject MLResponses { get; set; }
         public string Title { get; set; }
         public ImageVector[] ImageVectors { get; set; }
+        public string RegistrationDate { get; set; }
         public SecurityAttributes SecurityAttributes { get; set; } = new SecurityAttributes();
     }
 
