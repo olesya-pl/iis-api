@@ -149,7 +149,7 @@ namespace Iis.DataModel.Materials
         public bool CanBeEdited(Guid userId)
         {
             if (ProcessedStatusSignId == ProcessingStatusProcessingSignId)
-                return EditorId == userId;
+                return Editor == null || EditorId == userId;
 
             return true;
         }
