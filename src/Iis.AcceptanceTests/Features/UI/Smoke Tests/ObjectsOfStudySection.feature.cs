@@ -288,8 +288,8 @@ namespace AcceptanceTests.Features.UI.SmokeTests
         testRunner.And("I clicked on search button in the Object of study section", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
 #line 42
-        testRunner.And("I searched Тестове найменування дійсне скорочене data in the Objects of study sec" +
-                        "tion", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+        testRunner.And("I searched Тестове найменування дійсне скорочене data created today in the Object" +
+                        "s of study section", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
 #line 43
         testRunner.When("I clicked on the first search result title in the Objects of study section", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");

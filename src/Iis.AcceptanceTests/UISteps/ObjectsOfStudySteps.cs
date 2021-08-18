@@ -74,6 +74,14 @@ namespace AcceptanceTests.UISteps
             driver.WaitFor(30);
         }
 
+        [When(@"I searched (.*) data created today in the Objects of study section")]
+        public void IEnteredDataCreatedTodayInTheSearchField(string input)
+        {
+            objectsOfStudyPage.SearchField.SendKeys($"{input} AND CreatedAt:{DateTime.Now.ToString("dd.MM.yyyy")}");
+            objectsOfStudyPage.SearchField.SendKeys(Keys.Enter);
+            driver.WaitFor(30);
+        }
+
         [When(@"I entered the value (.*) in the search field")]
         public void WhenIEnteredTheValueInTheSearchField(string input)
         {
