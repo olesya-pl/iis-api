@@ -48,7 +48,7 @@ namespace Iis.Api.Materials
                     }
 
                     var paginationParams = new PaginationParams(MaterialsPage, availableOperators.Count);
-                    var sortingParams = new SortingParams(MaterialSortingFields.CreatedDate, SortDirections.DESC);
+                    var sortingParams = new SortingParams(MaterialSortingFields.RegistrationDate, SortDirections.DESC);
                     var unassignedMaterials = await _materialProvider.GetAllUnassignedIdsAsync(paginationParams, sortingParams, stoppingToken);
                     if (!unassignedMaterials.Any())
                     {
