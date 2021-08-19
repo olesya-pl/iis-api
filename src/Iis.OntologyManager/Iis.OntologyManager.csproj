@@ -7,6 +7,12 @@
     <UserSecretsId>d73ed47d-1c3e-4446-9e0b-9c42aef795aa</UserSecretsId>
   </PropertyGroup>
 
+  <PropertyGroup>
+	<EnableNETAnalyzers>true</EnableNETAnalyzers>
+	<AnalysisMode>AllEnabledByDefault</AnalysisMode>
+	<AnalysisLevel>latest</AnalysisLevel>
+  </PropertyGroup>
+
   <ItemGroup>
     <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="7.0.0" />
     <PackageReference Include="Magick.NET-Q16-AnyCPU" Version="7.23.0" />

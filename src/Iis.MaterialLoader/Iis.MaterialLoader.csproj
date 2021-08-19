@@ -6,6 +6,12 @@
       <UserSecretsId>8e09b9ab-30e6-4677-a102-8de60c3457f2</UserSecretsId>
   </PropertyGroup>
 
+	<PropertyGroup>
+		<EnableNETAnalyzers>true</EnableNETAnalyzers>
+		<AnalysisMode>AllEnabledByDefault</AnalysisMode>
+		<AnalysisLevel>latest</AnalysisLevel>
+	</PropertyGroup>
+
     <ItemGroup>
       <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="7.0.0" />
       <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
