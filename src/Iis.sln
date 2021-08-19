@@ -51,9 +51,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Iis.EventMaterialAutoAssign
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Iis.EventMaterialAutoAssignment.DataModel", "Iis.EventMaterialAutoAssignment.DataModel\Iis.EventMaterialAutoAssignment.DataModel.csproj", "{B136FFE1-4E5A-4654-83AD-462AD280B047}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Iis.RabbitMq", "Iis.RabbitMq\Iis.RabbitMq.csproj", "{06FB037A-AB0D-40DC-B863-E7950F027756}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Iis.RabbitMq", "Iis.RabbitMq\Iis.RabbitMq.csproj", "{06FB037A-AB0D-40DC-B863-E7950F027756}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Iis.CoordinatesHandler", "Iis.CoordinatesHandler\Iis.CoordinatesHandler.csproj", "{5FB8A8F6-A5D1-407F-B226-344549E40564}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Iis.CoordinatesHandler", "Iis.CoordinatesHandler\Iis.CoordinatesHandler.csproj", "{5FB8A8F6-A5D1-407F-B226-344549E40564}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{95B1EA08-0005-4137-B354-848FA2255B4D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

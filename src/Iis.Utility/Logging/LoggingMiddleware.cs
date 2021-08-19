@@ -62,7 +62,7 @@ namespace Iis.Utility.Logging
         private async Task<string> FormatRequest(HttpRequest request)
         {
             request.EnableBuffering();
-            var isFileRequest = request.Path.Value.ToLower().Contains("files");
+            var isFileRequest = request.Path.Value.Contains("files", StringComparison.OrdinalIgnoreCase);
             var requestBodyString = string.Empty;
             if (!isFileRequest)
             {
@@ -79,10 +79,11 @@ namespace Iis.Utility.Logging
         {
             context.Response.Body.Seek(0, SeekOrigin.Begin);
 
-            if (context.Request.Path.Value.ToLower().Contains("files"))
+            if (context.Request.Path.Value.Contains("files", StringComparison.OrdinalIgnoreCase))
                 return $"Response: {context.Response.StatusCode}: file_response Elapsed(ms): {sw.ElapsedMilliseconds}";
 
-            var text = await new StreamReader(context.Response.Body).ReadToEndAsync();
+            using var streamReader = new StreamReader(context.Response.Body);
+            var text = await streamReader.ReadToEndAsync();
             context.Response.Body.Seek(0, SeekOrigin.Begin);
             return $"Response: {context.Response.StatusCode}: {_sanitizeService.SanitizeBody(text)} Elapsed(ms): {sw.ElapsedMilliseconds}";
         }

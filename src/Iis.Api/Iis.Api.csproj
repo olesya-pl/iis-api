@@ -7,7 +7,14 @@
     <UserSecretsId>7fbdec57-37c4-4ac5-bbe0-b67a05e1794d</UserSecretsId>
   </PropertyGroup>
 
-  <ItemGroup>
+  <PropertyGroup>
+	<EnableNETAnalyzers>true</EnableNETAnalyzers>
+	<AnalysisMode>AllEnabledByDefault</AnalysisMode>
+	<AnalysisLevel>latest</AnalysisLevel>
+  </PropertyGroup>
+
+
+	<ItemGroup>
     <Compile Remove="Logs\**" />
     <Content Remove="Logs\**" />
     <EmbeddedResource Remove="Logs\**" />
@@ -20,7 +27,7 @@
     </None>
     <None Include="..\..\scripts\script-update-wrongValue-PropertyName.sql" Link="data\scripts\script-update-wrongValue-PropertyName.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
+    </None>    
   </ItemGroup>
 
   <ItemGroup>

@@ -7,6 +7,12 @@
     <StartupObject />
   </PropertyGroup>
 
+  <PropertyGroup>
+	<EnableNETAnalyzers>true</EnableNETAnalyzers>
+	<AnalysisMode>AllEnabledByDefault</AnalysisMode>
+	<AnalysisLevel>latest</AnalysisLevel>
+  </PropertyGroup>
+
   <ItemGroup>
     <PackageReference Include="Elasticsearch.Net" Version="7.8.0" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
