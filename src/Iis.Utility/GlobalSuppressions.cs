@@ -6,3 +6,4 @@
 using System.Diagnostics.CodeAnalysis;
 
 [assembly: SuppressMessage("Reliability", "CA2007:Consider calling ConfigureAwait on the awaited task", Justification = "", Scope = "module")]
+[assembly: SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope", Justification = "Leads to ObjectDisposedException", Scope = "member", Target = "~M:Iis.Utility.Logging.LoggingMiddleware.FormatResponse(Microsoft.AspNetCore.Http.HttpContext,System.Diagnostics.Stopwatch)~System.Threading.Tasks.Task{System.String}")]
