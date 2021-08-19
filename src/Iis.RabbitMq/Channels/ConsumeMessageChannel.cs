@@ -127,9 +127,9 @@ namespace Iis.RabbitMq.Channels
                 }
                 catch (Exception ex)
                 {
-                    var messageBodyAsString = args.Body.ToText();
+                    var messageState = args.ToState();
 
-                    logger?.LogError("During processing message body {messageBodyAsString} the exception has been thrown {@ex}", messageBodyAsString, ex);
+                    logger?.LogError("During processing message {@messageState} the exception has been thrown {@ex}", messageState, ex);
 
                     model.BasicReject(args.DeliveryTag, false);
                 }

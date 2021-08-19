@@ -163,6 +163,7 @@ namespace Iis.Api.Materials.Handlers
 
             channelConsumer.Received += async (sender, args) =>
             {
+                var messageState = args.ToState();
                 try
                 {
                     if (!string.IsNullOrWhiteSpace(config.ExchangeName) && args.Exchange != config.ExchangeName)
@@ -184,7 +185,7 @@ namespace Iis.Api.Materials.Handlers
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError("Exception {ex} during receiving message.", ex);
+                    _logger.LogError("Exception {ex} during receiving message {@messageState}.", ex, messageState);
 
                     channel.BasicReject(args.DeliveryTag, false);
                 }
