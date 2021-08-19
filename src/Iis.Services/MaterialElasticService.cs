@@ -23,15 +23,15 @@ namespace Iis.Services
         private string[] MaterialIndexes = { "Materials" };
         private static IReadOnlyCollection<AggregationField> _aggregationsFieldList = new List<AggregationField>
         {
-            new AggregationField("ProcessedStatus.Title", "Статус", "ProcessedStatus.Title"),
-            new AggregationField("Completeness.Title", "Повнота", "Completeness.Title"),
-            new AggregationField("Importance.Title", "Важливість", "Importance.Title"),
-            new AggregationField("SessionPriority.Title", "Пріоритет сесії", "SessionPriority.Title"),
-            new AggregationField("Reliability.Title", "Достовірність", "Reliability.Title"),
-            new AggregationField("Relevance.Title", "Актуальність", "Relevance.Title"),
-            new AggregationField("SourceReliability.Title", "Надійність джерела", "SourceReliability.Title"),
-            new AggregationField("Type.keyword", "Тип", "Type.keyword"),
-            new AggregationField("Source.keyword", "Джерело", "Source.keyword"),
+            new AggregationField("ProcessedStatus.Title", "РЎС‚Р°С‚СѓСЃ", "ProcessedStatus.Title"),
+            new AggregationField("Completeness.Title", "РџРѕРІРЅРѕС‚Р°", "Completeness.Title"),
+            new AggregationField("Importance.Title", "Р’Р°Р¶Р»РёРІС–СЃС‚СЊ", "Importance.Title"),
+            new AggregationField("SessionPriority.Title", "РџСЂС–РѕСЂРёС‚РµС‚ СЃРµСЃС–С—", "SessionPriority.Title"),
+            new AggregationField("Reliability.Title", "Р”РѕСЃС‚РѕРІС–СЂРЅС–СЃС‚СЊ", "Reliability.Title"),
+            new AggregationField("Relevance.Title", "РђРєС‚СѓР°Р»СЊРЅС–СЃС‚СЊ", "Relevance.Title"),
+            new AggregationField("SourceReliability.Title", "РќР°РґС–Р№РЅС–СЃС‚СЊ РґР¶РµСЂРµР»Р°", "SourceReliability.Title"),
+            new AggregationField("Type.keyword", "РўРёРї", "Type.keyword"),
+            new AggregationField("Source.keyword", "Р”Р¶РµСЂРµР»Рѕ", "Source.keyword"),
         };
 
         public MaterialElasticService(IElasticManager elasticManager,
