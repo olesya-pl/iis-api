@@ -193,7 +193,7 @@ namespace AcceptanceTests.UISteps
         public void WhenIEnterValueInTheSearchObjectField(string inputValue)
         {
             materialsSectionPage.ObjectsSearch.SendKeys(inputValue);            
-            driver.WaitFor(2);
+            driver.WaitFor(10);
             materialsSectionPage.ObjectsSearch.SendKeys(Keys.Down);
             materialsSectionPage.ObjectsSearch.SendKeys(Keys.Enter);
             materialsSectionPage.ObjectsSearch.SendKeys(Keys.Escape);

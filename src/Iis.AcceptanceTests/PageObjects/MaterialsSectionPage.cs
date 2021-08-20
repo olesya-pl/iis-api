@@ -66,7 +66,7 @@ namespace AcceptanceTests.PageObjects
         [CacheLookup]
         public IWebElement AuthenticityDropDown;
 
-        [FindsBy(How = How.CssSelector, Using = "div:nth-of-type(3) > .el-form-item__content > .el-select.el-tooltip  .el-input__inner")]
+        [FindsBy(How = How.CssSelector, Using = "div:nth-of-type(3) > .el-form-item__content > .el-select.el-tooltip .el-input__inner")]
         [CacheLookup]
         public IWebElement RelevanceDropDown;
 
