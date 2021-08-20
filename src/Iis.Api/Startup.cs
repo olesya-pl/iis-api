@@ -157,7 +157,7 @@ namespace IIS.Core
 
             services.AddTransient<IConnectionFactory>(s => factory);
 
-            string mqString = $"amqp://{factory.UserName}:{factory.Password}@{factory.HostName}";
+            string mqString = $"amqp://{factory.UserName}:{factory.Password}@{factory.HostName}:{factory.Port}";
             
             services.AddHealthChecks()
                 .AddNpgSql(dbConnectionString)
@@ -260,6 +260,7 @@ namespace IIS.Core
         public string Host { get; set; }
         public string Username { get; set; }
         public string Password { get; set; }
+        public int Port { get; set; }
     }
 
     class AppErrorFilter : IErrorFilter
