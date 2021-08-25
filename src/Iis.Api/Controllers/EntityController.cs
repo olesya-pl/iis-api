@@ -1,18 +1,17 @@
 using System;
 using System.Threading.Tasks;
+using System.Security.Authentication;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using MediatR;
+using Newtonsoft.Json;
 
 using Iis.Events.Entities;
 using Iis.Domain;
-using Iis.Api.Filters;
-using System.Security.Authentication;
 using IIS.Core;
-using Iis.Services.Contracts.Interfaces;
-using Microsoft.Extensions.Configuration;
-using Iis.Services.Contracts.Access;
 using Iis.Interfaces.Roles;
-using Newtonsoft.Json;
+using Iis.Services.Contracts.Access;
+using Iis.Services.Contracts.Interfaces;
 
 namespace Iis.Api.Controllers
 {
@@ -50,7 +49,7 @@ namespace Iis.Api.Controllers
             return Ok($"Deleted:{id:N}");
         }
         [HttpGet("GetAccess/{id}")]
-        public async Task<IActionResult> GetAccess(Guid id)
+        public Task<IActionResult> GetAccess(Guid id)
         {
             if (!Request.Headers.TryGetValue("Authorization", out var token))
                 throw new AuthenticationException("Requires \"Authorization\" header to contain a token");
@@ -58,7 +57,7 @@ namespace Iis.Api.Controllers
             var tokenPayload = TokenHelper.ValidateToken(token, _configuration, _userService);
 
             if (_ontologySerivice.GetNode(id) == null)
-                return ValidationProblem("Entity is not found");
+                return Task.FromResult<IActionResult>(ValidationProblem("Entity is not found"));
 
             var objectAccess = new ObjectAccess
             {
@@ -70,7 +69,7 @@ namespace Iis.Api.Controllers
 
             var json = JsonConvert.SerializeObject(objectAccess);
 
-            return Content(json);
+            return Task.FromResult<IActionResult>(Content(json));
         }
     }
 }

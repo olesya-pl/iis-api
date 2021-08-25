@@ -148,7 +148,7 @@ namespace Iis.Api.Controllers
                 _logger.LogInformation("UploadController. Copying file {fileName} to {directory}", input.Name, directory);
                 await fileStream.CopyToAsync(fs);
             }
-            
+
             return UploadResult.Ok;
         }
     }
