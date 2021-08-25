@@ -25,8 +25,10 @@ namespace Iis.Api.Modules
                 Password = mqConfig.Password ?? ConnectionFactory.DefaultPass,
                 VirtualHost = mqConfig.VirtualHost ?? ConnectionFactory.DefaultVHost,
             };
-            
-            mqConnectionString = $"amqp://{connectionFactory.UserName}:{connectionFactory.Password}@{connectionFactory.HostName}";
+
+            var portString = connectionFactory.Port == -1 ? string.Empty :
+                ":" + connectionFactory.Port;
+            mqConnectionString = $"amqp://{connectionFactory.UserName}:{connectionFactory.Password}@{connectionFactory.HostName}{portString}/{connectionFactory.VirtualHost}";
 
             return services
                     .AddTransient<IConnectionFactory>(serviceProvider => connectionFactory);
