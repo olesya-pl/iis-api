@@ -1,15 +1,8 @@
-﻿using Iis.Api.Controllers.Dto;
-using Iis.Domain;
-using Iis.Interfaces.Ontology.Data;
-using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json.Linq;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
-using System.Net.Http.Headers;
-using System.Text;
+﻿using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
+
+using Iis.Domain;
+using Iis.Api.Controllers.Dto;
 
 namespace Iis.Api.Controllers
 {
@@ -24,14 +17,17 @@ namespace Iis.Api.Controllers
         }
 
         [HttpPost("GetEventTypes")]
-        public async Task<IActionResult> GetEventTypes([FromBody] SearchParam param)
+        public Task<IActionResult> GetEventTypes([FromBody] SearchParam param)
         {
             var treeItems = _ontologyService.GetEventTypes(param.Suggestion);
-            return new ContentResult
+
+            var contentResult = new ContentResult
             {
                 Content = treeItems.GetJson(),
                 ContentType = "application/json"
             };
+
+            return Task.FromResult<IActionResult>(contentResult);
         }
     }
 }

@@ -1,12 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Collections.Generic;
 
 namespace Iis.Api.Controllers
 {
@@ -20,11 +17,11 @@ namespace Iis.Api.Controllers
             _configufation = configuration;
         }
         [HttpGet("")]
-        public async Task<IActionResult> Get(CancellationToken token)
+        public Task<IActionResult> Get(CancellationToken token)
         {
             var sb = new StringBuilder();
             Format(sb, _configufation.GetChildren());
-            return Content(sb.ToString());
+            return Task.FromResult<IActionResult>(Content(sb.ToString()));
         }
 
         private static void Format(StringBuilder sb, IEnumerable<IConfigurationSection> sections)
