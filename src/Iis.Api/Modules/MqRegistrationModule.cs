@@ -24,6 +24,7 @@ namespace Iis.Api.Modules
                 UserName = mqConfig.UserName ?? ConnectionFactory.DefaultUser,
                 Password = mqConfig.Password ?? ConnectionFactory.DefaultPass,
                 VirtualHost = mqConfig.VirtualHost ?? ConnectionFactory.DefaultVHost,
+                Port = mqConfig.Port
             };
 
             var portString = connectionFactory.Port == -1 ? string.Empty :
