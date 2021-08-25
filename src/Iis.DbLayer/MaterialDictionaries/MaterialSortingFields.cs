@@ -10,5 +10,6 @@ namespace Iis.DbLayer.MaterialDictionaries
         public const string Nodes = "nodes";
         public const string CreatedDate = "createdDate";
         public const string SessionPriority = "sessionPriority";
+        public const string RegistrationDate = "registrationDate";
     }
 }

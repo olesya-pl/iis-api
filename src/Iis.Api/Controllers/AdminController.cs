@@ -175,6 +175,7 @@ namespace Iis.Api.Controllers
                 KeywordProperty.Create("Metadata.features.PhoneNumber", false),
                 DateProperty.Create("Metadata.RegTime", ElasticConfiguration.DefaultDateFormats),
                 DateProperty.Create("Metadata.RegDate", ElasticConfiguration.DefaultDateFormats),
+                DateProperty.Create("RegistrationDate", ElasticConfiguration.DefaultDateFormats),
                 TextProperty.Create("Metadata.Duration"),
                 DateProperty.Create("CreatedDate", ElasticConfiguration.DefaultDateFormats),
                 DateProperty.Create("UpdatedAt", ElasticConfiguration.DefaultDateFormats),

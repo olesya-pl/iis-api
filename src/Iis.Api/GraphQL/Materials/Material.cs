@@ -66,6 +66,7 @@ namespace IIS.Core.GraphQL.Materials
         public int AccessLevel { get; set; }
         public IdTitle Caller { get; set; }
         public IdTitle Receiver { get; set; }
+        public string RegistrationDate { get; set; }
         public IReadOnlyCollection<GeoCoordinate> CoordinateList { get; set; }
         public async Task<FileInfo> GetFile([Service] IFileService fileService)
         {

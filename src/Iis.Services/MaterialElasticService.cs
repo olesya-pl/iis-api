@@ -10,6 +10,8 @@ using Iis.Services.Contracts.Params;
 using Iis.Services.Contracts.Interfaces;
 using Iis.Services.Contracts.Interfaces.Elastic;
 using Iis.Elastic;
+using Iis.DbLayer.MaterialDictionaries;
+using Iis.Domain.Materials;
 
 namespace Iis.Services
 {
@@ -256,6 +258,7 @@ namespace Iis.Services
                 "sessionPriority" => ("SessionPriority.OrderNumber", sorting.Order),
                 "importance" => ("Importance.OrderNumber", sorting.Order),
                 "nodes" => ("ObjectsOfStudyCount", sorting.Order),
+                "registrationDate" => ("RegistrationDate", sorting.Order),
                 _ => (null, null)
             };
         }
