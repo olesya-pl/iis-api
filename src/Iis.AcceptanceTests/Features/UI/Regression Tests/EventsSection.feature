@@ -21,9 +21,6 @@
     @regression @UI @Events
     Scenario: IIS-5993 - Ability to loose connection between the material to an event from the event section
         When I navigated to Events page
-        And I created a new Тестова подія event
-        When I searched for the Тестова подія created event
-        Then I must see the Тестова подія event in the event search results
         Then I open first event in the events list
         When I pressed the edit event button
         And I binded a Voice_01-07-2017 21-34-38 (257) material to the event
