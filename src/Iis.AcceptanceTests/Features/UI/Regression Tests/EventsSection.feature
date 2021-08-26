@@ -26,11 +26,11 @@
         Then I must see the Тестова подія event in the event search results
         Then I open first event in the events list
         When I pressed the edit event button
-        And I binded a Voice_01-07-2017 21-34-38 (257) material to the event
+        And I binded a Voice_02-05-2017 06-00-55 (78) material to the event
         When I pressed the save event changes button
         When I pressed the edit event button
-        Then I must see the Voice_01-07-2017 21-34-38 (257) material binded to the event
-        When I pressed the delete button to delete the specified Voice_01-07-2017 21-34-38 (257).mp3 material
+        Then I must see the Voice_02-05-2017 06-00-55 (78) material binded to the event
+        When I pressed the delete button to delete the specified Voice_02-05-2017 06-00-55 (78).mp3 material
         Then I must not see the Voice_01-07-2017 21-34-38 (257).mp3 material binded to the event
 
     @regression @UI @Events
@@ -41,12 +41,12 @@
         Then I must see the Тестова подія event in the event search results
         Then I open first event in the events list
         When I pressed the edit event button
-        And I binded a Voice_01-07-2017 21-34-38 (257) material to the event
+        And I binded a Voice_02-05-2017 06-00-55 (78) material to the event
         When I pressed the save event changes button
-        Then I must see the Voice_01-07-2017 21-34-38 (257) material binded to the event
+        Then I must see the Voice_02-05-2017 06-00-55 (78) material binded to the event
         When I navigated to Materials page
         And I clicked search button in the Materials section
-        And I searched Voice_01-07-2017 21-34-38 (257) data in the materials
+        And I searched Voice_02-05-2017 06-00-55 (78) data in the materials
         And I clicked on the first material in the Materials list
         When I clicked on the relations tab in the material card
         Then I must see Тестова подія as the related event to the material
