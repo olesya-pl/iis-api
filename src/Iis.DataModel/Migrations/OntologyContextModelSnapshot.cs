@@ -421,6 +421,9 @@ namespace Iis.DataModel.Migrations
                         .HasColumnType("uuid")
                         .HasDefaultValue(new Guid("0a641312-abb7-4b40-a766-0781308eb077"));
 
+                    b.Property<DateTime?>("RegistrationDate")
+                        .HasColumnType("timestamp without time zone");
+
                     b.Property<Guid?>("RelevanceSignId")
                         .HasColumnType("uuid");
 

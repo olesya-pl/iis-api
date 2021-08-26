@@ -146,6 +146,8 @@ namespace Iis.DataModel.Materials
         public Guid? EditorId { get; set; }
         public virtual UserEntity Editor { get; set; }
 
+        public DateTime? RegistrationDate { get; set; }
+
         public bool CanBeEdited(Guid userId)
         {
             if (ProcessedStatusSignId == ProcessingStatusProcessingSignId)

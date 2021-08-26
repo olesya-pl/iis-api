@@ -76,15 +76,12 @@ namespace Iis.MaterialLoader
 #if !DEBUG
             app.UseMiddleware<LoggingMiddleware>();
 #endif
-
             app.UseRouting();
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
                 endpoints.MapHealthChecks("/health");
             });
-
-            
         }
     }
 }

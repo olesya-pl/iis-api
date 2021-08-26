@@ -26,6 +26,7 @@ namespace Iis.DbLayer.Repositories
 {
     public class MaterialRepository : RepositoryBase<OntologyContext>, IMaterialRepository
     {
+        private static readonly string NoneLinkTypeValue = MaterialNodeLinkType.None.ToString();
         private readonly MaterialIncludeEnum[] _includeAll = new MaterialIncludeEnum[]
         {
             MaterialIncludeEnum.WithChildren,
@@ -136,12 +137,13 @@ namespace Iis.DbLayer.Repositories
         {
             const int batchSize = 5000;
 
-            var materialsCount = await GetMaterialsQuery(MaterialIncludeEnum.WithChildren, MaterialIncludeEnum.WithFeatures)
+            var materialsCount = await GetMaterialsQuery(_includeAll)
                 .CountAsync();
 
             if (materialsCount == 0) return new List<ElasticBulkResponse>();
 
             var responses = new List<ElasticBulkResponse>(materialsCount);
+
             for (var i = 0; i < (materialsCount / batchSize) + 1; i++)
             {
                 ct.ThrowIfCancellationRequested();
@@ -388,26 +390,31 @@ namespace Iis.DbLayer.Repositories
 
             materialDocument.Children = material.Children.Select(p => _mapper.Map<MaterialDocument>(p)).ToArray();
 
-            materialDocument.NodeIds = material.MaterialInfos
+            var featureCollection = material.MaterialInfos
                 .SelectMany(p => p.MaterialFeatures)
+                .ToArray();
+            materialDocument.NodeIds = featureCollection
                 .Where(e => e.NodeLinkType == MaterialNodeLinkType.None)
                 .Select(p => p.NodeId)
                 .ToArray();
 
-            materialDocument.ObjectsOfStudyCount = GetObjectOfStudyCount(materialDocument.NodeIds);
-
             materialDocument.NodesCount = materialDocument.NodeIds.Count();
 
+            var nodeDictionary = MaterialDocumentHelper.MapFeatureCollectionToNodeDictionary(featureCollection, _ontologyData);
+
+            var nodeFromSingsDictionary = MaterialDocumentHelper.GetObjectsLinkedBySign(nodeDictionary, _ontologyData);
+
+            nodeDictionary.TryAddRange(nodeFromSingsDictionary);
+
+            materialDocument.RelatedObjectCollection = MaterialDocumentHelper.MapObjectOfStudyCollection(nodeDictionary);
+
+            materialDocument.RelatedEventCollection = MaterialDocumentHelper.MapEventCollection(nodeDictionary);
+
+            materialDocument.RelatedSignCollection = MaterialDocumentHelper.MapSingCollection(nodeDictionary);
+
+            materialDocument.ObjectsOfStudyCount = materialDocument.RelatedObjectCollection.Count(e => e.RelationType == NoneLinkTypeValue);
+
             return materialDocument;
-        }
-
-        private int GetObjectOfStudyCount(IReadOnlyCollection<Guid> nodeIdList)
-        {
-            if (nodeIdList is null || !nodeIdList.Any()) return 0;
-
-            var nodeList = _ontologyData.GetNodes(nodeIdList);
-
-            return nodeList.Count(n => n.NodeType.IsObjectOfStudy);
         }
 
         private (JObject responseJObject, int responsesCount) GetResponseJsonWithCounter(Guid materialId, Dictionary<Guid, MLResponseEntity[]> responseDictionary)
