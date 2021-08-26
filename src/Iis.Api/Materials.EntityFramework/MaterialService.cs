@@ -92,7 +92,8 @@ namespace IIS.Core.Materials.EntityFramework
                 ParentId = material.ParentId,
                 CreatedDate = material.CreatedDate,
                 Type = material.Type,
-                Source = material.Source
+                Source = material.Source,
+                Channel = material.Channel
             };
         }
 
@@ -114,6 +115,14 @@ namespace IIS.Core.Materials.EntityFramework
                     Date = timeSpan,
                     NewValue = material.Source,
                     PropertyName = nameof(material.Source),
+                    RequestId = changeRequestId,
+                    TargetId = material.Id,
+                },
+                new ChangeHistoryDto
+                {
+                    Date = timeSpan,
+                    NewValue = material.Channel,
+                    PropertyName = nameof(material.Channel),
                     RequestId = changeRequestId,
                     TargetId = material.Id,
                 },

@@ -9,6 +9,7 @@ using Iis.Interfaces.Ontology.Schema;
 using Iis.Services.Contracts.Interfaces;
 using Iis.OntologySchema.ChangeParameters;
 using Iis.OntologyData;
+using Iis.Domain.Materials;
 
 namespace Iis.DbLayer.ModifyDataScripts
 {
@@ -822,6 +823,24 @@ namespace Iis.DbLayer.ModifyDataScripts
                 EmbeddingOptions = EmbeddingOptions.Multiple
             });
             SaveOntologySchema(data.Schema);
+        }
+        public void MaterialChannel(OntologyContext context, IOntologyNodesData data)
+        {
+            var materials = context.Materials
+                .Where(m => (m.Source.StartsWith("sat.") || m.Source.StartsWith("cell."))
+                  && m.Channel == null)
+                .ToList();
+
+            foreach (var material in materials)
+            {
+                var extractor = new MaterialMetadataExtractor(material.Metadata);
+                var channel = extractor.Channel;
+                if (channel != null)
+                {
+                    material.Channel = channel;
+                }
+            }
+            context.SaveChanges();
         }
     }
 }
