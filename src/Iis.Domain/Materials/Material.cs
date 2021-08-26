@@ -55,11 +55,13 @@ namespace Iis.Domain.Materials
         public bool IsParentMaterial() => ParentId == null;
         public IdTitleDto Caller => GetIdTitle(MaterialNodeLinkType.Caller);
         public IdTitleDto Receiver => GetIdTitle(MaterialNodeLinkType.Receiver);
+        public IReadOnlyCollection<RelatedObject> RelatedObjectCollection { get; set; } = Array.Empty<RelatedObject>();
+        public IReadOnlyCollection<RelatedObject> RelatedEventCollection { get; set; } = Array.Empty<RelatedObject>();
+        public IReadOnlyCollection<RelatedObject> RelatedSignCollection { get; set; } = Array.Empty<RelatedObject>();
         private MaterialFeature GetFeature(MaterialNodeLinkType linkType) =>
             Infos.SelectMany(i => i.Features)
             .Where(f => f.NodeLinkType == linkType)
             .SingleOrDefault();
-
         private IdTitleDto GetIdTitle(MaterialNodeLinkType linkType)
         {
             var node = GetFeature(linkType)?.Node.OriginalNode;
