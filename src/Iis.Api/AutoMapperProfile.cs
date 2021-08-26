@@ -66,6 +66,7 @@ namespace Iis.Api
                 .ForMember(dest => dest.Name, opts => opts.MapFrom(src => src.Type.Name))
                 .ForMember(dest => dest.Title, opts => opts.MapFrom(src => src.Type.Title));
 
+            CreateMap<Iis.Domain.Materials.RelatedObject, IIS.Core.GraphQL.Materials.RelatedObject>();
             CreateMap<Iis.Domain.Materials.Material, IIS.Core.GraphQL.Materials.Material>()
                 .ForMember(dest => dest.Data, opts => opts.MapFrom(src => src.Data.ToObject<IEnumerable<IIS.Core.GraphQL.Materials.Data>>()))
                 .ForMember(dest => dest.FileId, opts => opts.MapFrom(src => src.File == null ? (Guid?)null : src.File.Id))
@@ -262,6 +263,7 @@ namespace Iis.Api
             CreateMap<DbLayer.Repositories.Editor, Iis.Domain.Users.User>();
             CreateMap<DbLayer.Repositories.MaterialLoadData, Iis.Domain.Materials.MaterialLoadData>();
             CreateMap<DbLayer.Repositories.MaterialSign, Iis.Domain.Materials.MaterialSign>();
+            CreateMap<DbLayer.Repositories.RelatedObject, Iis.Domain.Materials.RelatedObject>();
             CreateMap<DbLayer.Repositories.MaterialDocument, Iis.Domain.Materials.Material>()
                 .ForMember(dest => dest.File, opts => opts.MapFrom(src => src.FileId.HasValue ? new File(src.FileId.Value) : null))
                 .ForMember(dest => dest.CreatedDate, opts => opts.MapFrom(src => DateTime.ParseExact(src.CreatedDate, Iso8601DateFormat, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind)))

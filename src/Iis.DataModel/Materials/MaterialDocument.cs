@@ -40,6 +40,9 @@ namespace Iis.DbLayer.Repositories
         public JObject MLResponses { get; set; }
         public string Title { get; set; }
         public ImageVector[] ImageVectors { get; set; }
+        public IReadOnlyCollection<RelatedObject> RelatedObjectCollection { get; set; } = Array.Empty<RelatedObject>();
+        public IReadOnlyCollection<RelatedObject> RelatedEventCollection { get; set; } = Array.Empty<RelatedObject>();
+        public IReadOnlyCollection<RelatedObject> RelatedSignCollection { get; set; } = Array.Empty<RelatedObject>();
         public string RegistrationDate { get; set; }
         public SecurityAttributes SecurityAttributes { get; set; } = new SecurityAttributes();
     }
@@ -89,6 +92,23 @@ namespace Iis.DbLayer.Repositories
         public ImageVector(decimal[] imageVector)
         {
             Vector = imageVector;
+        }
+    }
+
+    public class RelatedObject
+    {
+        public Guid Id { get; }
+        public string Title { get; }
+        public string NodeType { get; }
+        public string RelationType { get; }
+        public string RelationCreatingType { get; }
+        public RelatedObject(Guid id, string title, string nodeType, string relationType, string relationCreatingType)
+        {
+            Id = id;
+            Title = title;
+            NodeType = nodeType;
+            RelationType = relationType;
+            RelationCreatingType = relationCreatingType;
         }
     }
 }

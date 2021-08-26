@@ -68,6 +68,9 @@ namespace IIS.Core.GraphQL.Materials
         public IdTitle Receiver { get; set; }
         public string RegistrationDate { get; set; }
         public IReadOnlyCollection<GeoCoordinate> CoordinateList { get; set; }
+        public IReadOnlyCollection<RelatedObject> RelatedObjectCollection { get; set; } = Array.Empty<RelatedObject>();
+        public IReadOnlyCollection<RelatedObject> RelatedEventCollection { get; set; } = Array.Empty<RelatedObject>();
+        public IReadOnlyCollection<RelatedObject> RelatedSignCollection { get; set; } = Array.Empty<RelatedObject>();
         public async Task<FileInfo> GetFile([Service] IFileService fileService)
         {
             if (FileId == null) return null;
