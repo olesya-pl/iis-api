@@ -38,7 +38,9 @@ Feature: MaterialsSectionUI - Smoke
     Scenario: IIS-6188 - Ensure that the material card can be opened
         When I navigated to Materials page
         And I clicked search button in the Materials section
+        And Loading icon is not displayed
         And I searched 20201015_Resilience_Application_Form.docx data in the materials
+        And Loading icon is not displayed
         And I clicked on the first material in the Materials list
         Then I must see relevance drop down in the materials card
         When I close the material card
@@ -46,7 +48,7 @@ Feature: MaterialsSectionUI - Smoke
     @smoke @UI @MaterialsCardEventsTabUI
     Scenario: IIS-6192 - Open relations tab in the materials card and ensure that events search is present
         When I navigated to Materials page
-        And I clicked search button in the Materials section
+        And I clicked search button in the Materials section        
         And I searched 20201015_Resilience_Application_Form.docx data in the materials
         And I clicked on the first material in the Materials list
         And I clicked on the relations tab in the material card
