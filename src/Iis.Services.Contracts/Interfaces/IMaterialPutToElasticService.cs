@@ -9,6 +9,7 @@ namespace Iis.Services.Contracts.Interfaces
     public interface IMaterialPutToElasticService
     {
         Task<List<ElasticBulkResponse>> PutAllMaterialsToElasticSearchAsync(CancellationToken cancellationToken);
+        Task<List<ElasticBulkResponse>> PutAllMaterialChangesToElasticSearchAsync(CancellationToken cancellationToken = default);
         Task<List<ElasticBulkResponse>> PutCreatedMaterialsToElasticSearchAsync(IReadOnlyCollection<Guid> materialIds, bool waitForIndexing, CancellationToken stoppingToken);
     }
 }

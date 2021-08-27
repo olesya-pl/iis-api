@@ -1,5 +1,4 @@
 using System;
-using System.Text;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading;
@@ -21,12 +20,20 @@ using Iis.Interfaces.Ontology.Data;
 using Iis.Domain.Materials;
 using IIS.Repository;
 using Iis.Utility;
+using Iis.Services.Contracts.Interfaces;
+using Iis.DataModel.ChangeHistory;
+using Iis.Utility.Elasticsearch.Documents;
 
 namespace Iis.DbLayer.Repositories
 {
     public class MaterialRepository : RepositoryBase<OntologyContext>, IMaterialRepository
     {
+        public const int MaterialsBatchSize = 5000;
+        public const int MaterialChangesBatchSize = 5000;
+
+        private static readonly string[] IgnoreDocumentPropertyNames = new[] { "Content" };
         private static readonly string NoneLinkTypeValue = MaterialNodeLinkType.None.ToString();
+
         private readonly MaterialIncludeEnum[] _includeAll = new MaterialIncludeEnum[]
         {
             MaterialIncludeEnum.WithChildren,
@@ -37,17 +44,19 @@ namespace Iis.DbLayer.Repositories
         private readonly IElasticManager _elasticManager;
         private readonly IMapper _mapper;
         private readonly IOntologyNodesData _ontologyData;
-        public string[] MaterialIndexes => new[] { "Materials" };
+        private readonly IElasticState _elasticState;
 
         public MaterialRepository(IMLResponseRepository mLResponseRepository,
             IElasticManager elasticManager,
             IMapper mapper,
-            IOntologyNodesData ontologyData)
+            IOntologyNodesData ontologyData,
+            IElasticState elasticState)
         {
             _mLResponseRepository = mLResponseRepository;
             _elasticManager = elasticManager;
             _mapper = mapper;
             _ontologyData = ontologyData;
+            _elasticState = elasticState;
         }
 
         public Task<MaterialEntity> GetByIdAsync(Guid id, params MaterialIncludeEnum[] includes)
@@ -133,30 +142,28 @@ namespace Iis.DbLayer.Repositories
                             .ToArrayAsync();
         }
 
-        public async Task<List<ElasticBulkResponse>> PutAllMaterialsToElasticSearchAsync(CancellationToken ct = default)
+        public async Task<List<ElasticBulkResponse>> PutAllMaterialsToElasticSearchAsync(CancellationToken cancellationToken = default)
         {
-            const int batchSize = 5000;
-
             var materialsCount = await GetMaterialsQuery(_includeAll)
-                .CountAsync();
+                .CountAsync(cancellationToken);
 
             if (materialsCount == 0) return new List<ElasticBulkResponse>();
 
             var responses = new List<ElasticBulkResponse>(materialsCount);
 
-            for (var i = 0; i < (materialsCount / batchSize) + 1; i++)
+            for (var i = 0; i < (materialsCount / MaterialsBatchSize) + 1; i++)
             {
-                ct.ThrowIfCancellationRequested();
+                cancellationToken.ThrowIfCancellationRequested();
 
                 var materialEntities = await GetMaterialsQuery(MaterialIncludeEnum.WithChildren, MaterialIncludeEnum.WithFeatures)
                     .OrderBy(p => p.Id)
-                    .Skip(i * batchSize)
-                    .Take(batchSize)
-                    .ToArrayAsync();
+                    .Skip(i * MaterialsBatchSize)
+                    .Take(MaterialsBatchSize)
+                    .ToArrayAsync(cancellationToken);
 
                 var mlResponsesList = await Context.MLResponses
                                     .AsNoTracking()
-                                    .ToArrayAsync();
+                                    .ToArrayAsync(cancellationToken);
 
                 var mlResponseDictionary = mlResponsesList
                     .GroupBy(p => p.MaterialId)
@@ -180,38 +187,103 @@ namespace Iis.DbLayer.Repositories
                         p.ImageVectors = GetImageVectorList(materialIdList, mlResponseDictionary);
 
                         return p;
-                    });
-
-                var json = ConvertToJson(materialDocuments);
-                var response = await _elasticManager.PutDocumentsAsync(MaterialIndexes.FirstOrDefault(), json, false, ct);
+                    })
+                    .ToDictionary(_ => _.Id);
+                string json = materialDocuments.ConvertToJson();
+                var response = await _elasticManager.PutDocumentsAsync(_elasticState.MaterialIndexes.FirstOrDefault(), json, false, cancellationToken);
                 responses.AddRange(response);
             }
 
             return responses;
         }
 
+        public async Task<List<ElasticBulkResponse>> PutAllMaterialChangesToElasticSearchAsync(CancellationToken cancellationToken = default)
+        {
+            var query = Context.ChangeHistory
+                .AsNoTracking()
+                .Where(_ => _.Type == ChangeHistoryEntityType.Material
+                    || _.Type == ChangeHistoryEntityType.Node && _.PropertyName == ChangeHistoryDocument.MaterialLinkPropertyName);
+            var count = await query.CountAsync(cancellationToken);
+            if (count == 0)
+                return new List<ElasticBulkResponse>();
+
+            var responses = new List<ElasticBulkResponse>(count);
+
+            for (var batchIndex = 0; batchIndex < (count / MaterialChangesBatchSize) + 1; batchIndex++)
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+
+                var entities = await query
+                    .OrderBy(p => p.Id)
+                    .Skip(batchIndex * MaterialChangesBatchSize)
+                    .Take(MaterialChangesBatchSize)
+                    .ToArrayAsync(cancellationToken);
+                var response = await PutMaterialChangesToElasticSearchAsync(entities, false, cancellationToken);
+
+                responses.AddRange(response);
+            }
+
+            return responses;
+        }
+
+        public async Task<List<ElasticBulkResponse>> PutMaterialChangesToElasticSearchAsync(
+            IReadOnlyCollection<ChangeHistoryEntity> changes,
+            bool waitForIndexing = false,
+            CancellationToken cancellationToken = default)
+        {
+            var userNames = changes
+                .Select(_ => _.UserName)
+                .Distinct()
+                .ToArray();
+            var userRolesDictionary = await Context.Users
+                .AsNoTracking()
+                .Include(_ => _.UserRoles)
+                    .ThenInclude(_ => _.Role)
+                .Where(_ => userNames.Contains(_.Username))
+                .Select(_ => new
+                {
+                    UserName = _.Username,
+                    Roles = _.UserRoles.Select(_ => new Role { Id = _.Id, Name = _.Role.Name })
+                })
+                .ToDictionaryAsync(_ => _.UserName, _ => _.Roles, cancellationToken);
+            var documents = changes
+                .Select(_ => _mapper.Map<ChangeHistoryDocument>(_))
+                .Select(_ =>
+                {
+                    if (IgnoreDocumentPropertyNames.Contains(_.PropertyName))
+                    {
+                        _.OldValue = null;
+                        _.NewValue = null;
+                    }
+
+                    if (string.IsNullOrWhiteSpace(_.UserName)
+                        || !userRolesDictionary.TryGetValue(_.UserName, out var roles))
+                        return _;
+
+                    _.Roles = roles.ToArray();
+
+                    return _;
+                })
+                .ToDictionary(_ => _.Id);
+            string json = documents.ConvertToJson();
+            var response = await _elasticManager.PutDocumentsAsync(_elasticState.ChangeHistoryIndexes.FirstOrDefault(), json, waitForIndexing, cancellationToken);
+
+            return response;
+        }
+
         public async Task<List<ElasticBulkResponse>> PutCreatedMaterialsToElasticSearchAsync(IReadOnlyCollection<Guid> materialIds,
             bool waitForIndexing = false,
-            CancellationToken token = default)
+            CancellationToken cancellationToken = default)
         {
             var materials = await GetMaterialsQuery(MaterialIncludeEnum.WithChildren, MaterialIncludeEnum.WithFeatures)
             .Where(p => materialIds.Contains(p.Id))
-            .ToListAsync();
+            .ToListAsync(cancellationToken);
+            var materialDocuments = materials
+                .Select(p => MapEntityToDocument(p))
+                .ToDictionary(_ => _.Id);
+            string json = materialDocuments.ConvertToJson();
 
-            var materialDocuments = materials.Select(p => MapEntityToDocument(p));
-            var json = ConvertToJson(materialDocuments);
-
-            return await _elasticManager.PutDocumentsAsync(MaterialIndexes.FirstOrDefault(), json, waitForIndexing, token);
-        }
-
-        public string ConvertToJson(IEnumerable<MaterialDocument> materialDocuments)
-        {
-            var sb = new StringBuilder();
-            foreach (var materialDocument in materialDocuments)
-            {
-                sb.AppendLine($"{{ \"index\":{{ \"_id\": \"{materialDocument.Id:N}\" }} }}\n{JsonConvert.SerializeObject(materialDocument)}");
-            }
-            return sb.ToString();
+            return await _elasticManager.PutDocumentsAsync(_elasticState.MaterialIndexes.FirstOrDefault(), json, waitForIndexing, cancellationToken);
         }
 
         public async Task<bool> PutMaterialToElasticSearchAsync(Guid materialId, CancellationToken ct = default, bool waitForIndexing = false)
@@ -242,7 +314,7 @@ namespace Iis.DbLayer.Repositories
 
             materialDocument.ImageVectors = GetImageVectorList(materialIdList, responseDictionary);
 
-            return await _elasticManager.PutDocumentAsync(MaterialIndexes.FirstOrDefault(),
+            return await _elasticManager.PutDocumentAsync(_elasticState.MaterialIndexes.FirstOrDefault(),
                 materialId.ToString("N"),
                 JsonConvert.SerializeObject(materialDocument),
                 waitForIndexing,

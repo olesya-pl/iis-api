@@ -401,6 +401,10 @@ namespace Iis.Api
                 .ForMember(dest => dest.EntityId, opts => opts.MapFrom(src => src.TargetId))
                 .ForMember(dest => dest.OldValue, opts => opts.MapFrom(src => src.OldTitle ?? src.OldValue))
                 .ForMember(dest => dest.NewValue, opts => opts.MapFrom(src => src.NewTitle ?? src.NewValue));
+            CreateMap<ChangeHistoryDocument, ChangeHistoryDto>()
+                .ForMember(dest => dest.Date, opts => opts.MapFrom(src => DateTime.ParseExact(src.Date, Iso8601DateFormat, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind)));
+            CreateMap<ChangeHistoryEntity, ChangeHistoryDocument>()
+                .ForMember(dest => dest.Date, opts => opts.MapFrom(src => src.Date.ToString(Iso8601DateFormat, CultureInfo.InvariantCulture)));
 
             CreateMap<Iis.Interfaces.Elastic.AggregationBucket, IIS.Core.GraphQL.Entities.AggregationBucket>();
             CreateMap<Iis.Interfaces.Elastic.AggregationItem, IIS.Core.GraphQL.Entities.AggregationItem>();

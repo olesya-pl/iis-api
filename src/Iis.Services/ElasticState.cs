@@ -16,7 +16,8 @@ namespace Iis.Services
                     .Where(nt => !nt.IsAbstract)
                     .Select(nt => nt.Name)
                     .ToArray();
-            } else OntologyIndexes = Array.Empty<string>();
+            }
+            else OntologyIndexes = Array.Empty<string>();
 
             var wikiType = ontologySchema.GetEntityTypeByName(EntityTypeNames.Wiki.ToString());
             if (wikiType != null)
@@ -25,14 +26,16 @@ namespace Iis.Services
                     .Where(nt => !nt.IsAbstract)
                     .Select(nt => nt.Name)
                     .ToArray();
-            } else WikiIndexes = Array.Empty<string>();
+            }
+            else WikiIndexes = Array.Empty<string>();
 
             ObjectIndexes = OntologyIndexes.Concat(WikiIndexes).ToArray();
 
-            EventIndexes = new [] { "Event" };
-            MaterialIndexes = new [] { "Materials" };
+            EventIndexes = new[] { "Event" };
+            MaterialIndexes = new[] { "Materials" };
             ReportIndex = "Reports";
-            SignIndexes = new [] { "CellphoneSign", "SatellitePhoneSign", "SatelliteIridiumPhoneSign"};
+            SignIndexes = new[] { "CellphoneSign", "SatellitePhoneSign", "SatelliteIridiumPhoneSign" };
+            ChangeHistoryIndexes = new[] { "ChangeHistory" };
             FieldsToExcludeByIndex = new Dictionary<string, IEnumerable<string>>()
             {
                 { "Event", new [] { "associatedWithEvent" } }
@@ -46,6 +49,7 @@ namespace Iis.Services
         public IReadOnlyCollection<string> ObjectIndexes { get; }
         public IReadOnlyCollection<string> EventIndexes { get; }
         public IReadOnlyCollection<string> SignIndexes { get; }
+        public IReadOnlyCollection<string> ChangeHistoryIndexes { get; }
         public Dictionary<string, IEnumerable<string>> FieldsToExcludeByIndex { get; }
     }
 }
