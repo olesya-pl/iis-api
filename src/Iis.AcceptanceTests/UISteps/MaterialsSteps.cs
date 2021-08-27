@@ -32,7 +32,7 @@ namespace AcceptanceTests.UISteps
         public void IWantNavigateToMaterialsPage()
         {
             navigationSection.MaterialsLink.Click();
-            driver.WaitFor(7);
+            driver.WaitFor(2);
         }
 
         [When(@"I clicked on the first material in the Materials list")]
