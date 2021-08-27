@@ -6,12 +6,12 @@ using Iis.DbLayer.MaterialEnum;
 using System.Threading;
 using Iis.Domain.Materials;
 using Iis.Interfaces.Elastic;
+using Iis.DataModel.ChangeHistory;
 
 namespace Iis.DbLayer.Repositories
 {
     public interface IMaterialRepository
     {
-        IReadOnlyCollection<string> MaterialIndexes { get; }
         Task<MaterialEntity> GetByIdAsync(Guid id, params MaterialIncludeEnum[] includes);
 
         Task<MaterialEntity[]> GetByIdsAsync(ISet<Guid> ids, params MaterialIncludeEnum[] includes);
@@ -34,9 +34,14 @@ namespace Iis.DbLayer.Repositories
 
         Task<List<ElasticBulkResponse>> PutAllMaterialsToElasticSearchAsync(CancellationToken ct = default);
 
+        Task<List<ElasticBulkResponse>> PutAllMaterialChangesToElasticSearchAsync(CancellationToken cancellationToken = default);
+        
+        Task<List<ElasticBulkResponse>> PutMaterialChangesToElasticSearchAsync(IReadOnlyCollection<ChangeHistoryEntity> changes, bool waitForIndexing = false, CancellationToken cancellationToken = default);
+
         Task<List<ElasticBulkResponse>> PutCreatedMaterialsToElasticSearchAsync(IReadOnlyCollection<Guid> materialIds, bool waitForIndexing = false, CancellationToken token = default);
 
         Task<bool> PutMaterialToElasticSearchAsync(Guid materialId, CancellationToken ct = default, bool waitForIndexing = false);
+
 
         void AddMaterialEntity(MaterialEntity materialEntity);
 

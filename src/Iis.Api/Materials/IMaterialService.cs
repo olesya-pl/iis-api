@@ -21,6 +21,7 @@ namespace IIS.Core.Materials
         Task<bool> UnassignMaterialEditorAsync(Guid materialId, User user);
         Task SetMachineLearningHadnlersCount(Guid materialId, int handlersCount);
         Task<List<ElasticBulkResponse>> PutAllMaterialsToElasticSearchAsync(CancellationToken cancellationToken);
+        Task<List<ElasticBulkResponse>> PutAllMaterialChangesToElasticSearchAsync(CancellationToken cancellationToken = default);
         Task<List<ElasticBulkResponse>> PutCreatedMaterialsToElasticSearchAsync(IReadOnlyCollection<Guid> materialIds, bool waitForIndexing, CancellationToken stoppingToken);
         Task<Material> ChangeMaterialAccessLevel(Guid materialId, int accessLevel, User user);
         Task RemoveMaterials();

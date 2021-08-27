@@ -130,7 +130,9 @@ namespace Iis.Services
                 }
             }
             entities.AddRange(mirrorEntities);
+
             await RunAsync(uow => uow.ChangeHistoryRepository.AddRange(entities));
+            await RunWithoutCommitAsync(_ => _.MaterialRepository.PutMaterialChangesToElasticSearchAsync(entities, waitForIndexing: true));
         }
 
         private ChangeHistoryEntity GetMirrorChangeHistoryEntity(ChangeHistoryEntity entity, string materialTitle)
@@ -140,7 +142,7 @@ namespace Iis.Services
                 Id = Guid.NewGuid(),
                 TargetId = Guid.Parse(entity.OldValue ?? entity.NewValue),
                 UserName = entity.UserName,
-                PropertyName = "MaterialLink",
+                PropertyName = ChangeHistoryDocument.MaterialLinkPropertyName,
                 Date = entity.Date,
                 OldValue = entity.OldValue == null ? null : entity.TargetId.ToString("N"),
                 NewValue = entity.NewValue == null ? null : entity.TargetId.ToString("N"),

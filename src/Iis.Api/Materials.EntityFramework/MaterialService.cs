@@ -517,6 +517,11 @@ namespace IIS.Core.Materials.EntityFramework
             return RunWithoutCommitAsync(uow => uow.MaterialRepository.PutAllMaterialsToElasticSearchAsync(ct));
         }
 
+        public Task<List<ElasticBulkResponse>> PutAllMaterialChangesToElasticSearchAsync(CancellationToken cancellationToken = default)
+        {
+            return RunWithoutCommitAsync(_ => _.MaterialRepository.PutAllMaterialChangesToElasticSearchAsync(cancellationToken));
+        }
+
         public Task<List<ElasticBulkResponse>> PutCreatedMaterialsToElasticSearchAsync(IReadOnlyCollection<Guid> materialIds, bool waitForIndexing, CancellationToken ct)
         {
             return RunWithoutCommitAsync(uow => uow.MaterialRepository.PutCreatedMaterialsToElasticSearchAsync(materialIds, waitForIndexing, ct));

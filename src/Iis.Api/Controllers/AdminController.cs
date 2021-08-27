@@ -221,6 +221,48 @@ namespace Iis.Api.Controllers
             return Content(log.ToString());
         }
 
+        [HttpGet("RecreateElasticChangeHistoryIndexes")]
+        public async Task<IActionResult> RecreateElasticChangeHistoryIndexes(CancellationToken cancellationToken)
+        {
+            var log = new StringBuilder();
+            _adminElasticService.Logger = log;
+
+            var index = _elasticState.ChangeHistoryIndexes.First();
+
+            await _elasticManager.DeleteIndexAsync(index, cancellationToken);
+
+            var mappingConfiguration = new ElasticMappingConfiguration(new List<ElasticMappingProperty>
+            {
+                KeywordProperty.Create("TargetId", false),
+                KeywordProperty.Create("RequestId", false),
+                KeywordProperty.Create("UserName", true),
+                KeywordProperty.Create("PropertyName", true),
+                DateProperty.Create("Date", ElasticConfiguration.DefaultDateFormats),
+                TextProperty.Create("OldValue", true),
+                TextProperty.Create("NewValue", true),
+                IntegerProperty.Create("Type"),
+                TextProperty.Create("ParentTypeName", true),
+                TextProperty.Create("OldTitle", true),
+                TextProperty.Create("NewTitle", true),
+                KeywordProperty.Create("Roles.Id", false),
+                KeywordProperty.Create("Roles.Name", false),
+                AliasProperty.Create("Користувач", "UserName"),
+                AliasProperty.Create("Назва поля", "PropertyName"),
+                AliasProperty.Create("Дата зміни", "Date"),
+                AliasProperty.Create("Було", "OldValue"),
+                AliasProperty.Create("Стало", "NewValue")
+            });
+            await _elasticManager.CreateIndexesAsync(new[] { index },
+                mappingConfiguration.ToJObject(),
+                cancellationToken);
+
+            var response = await _materialService.PutAllMaterialChangesToElasticSearchAsync(cancellationToken);
+
+            LogElasticResult(log, response);
+
+            return Content(log.ToString());
+        }
+
         [HttpGet("RecreateElasticUserIndexes")]
         public async Task<IActionResult> RecreateElasticUserIndexes(CancellationToken cancellationToken)
         {
