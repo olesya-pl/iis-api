@@ -117,12 +117,6 @@ namespace AcceptanceTests.UISteps
             materialsSectionPage.MaterialPage.ReliabilityDropDown.Select(priority);
         }
 
-        //[When(@"I set the session priority (.*) value")]
-        //public void WhenISetTheSessionPriorityValue(string sessionPriority)
-        //{
-        //    materialsSectionPage.MaterialPage.SessionPriorityDropDown.Select(sessionPriority);
-        //}
-
         [When(@"I set the session priority to Important")]
         public void WhenISetTheSessionPriorityValueImportant()
         {
