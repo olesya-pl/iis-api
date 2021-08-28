@@ -9,6 +9,9 @@ using Iis.Services.Contracts.Interfaces;
 using Iis.DbLayer.MaterialDictionaries;
 using IIS.Services.Contracts.Interfaces;
 using Iis.Services.Contracts.Params;
+using System.Collections.Generic;
+using Iis.DataModel.Materials;
+using Iis.Services.Contracts.Materials.Distribution;
 
 namespace Iis.Api.Materials
 {
@@ -21,6 +24,13 @@ namespace Iis.Api.Materials
         private readonly ILogger<MaterialOperatorConsumer> _logger;
         private readonly IMaterialService _materialService;
         private readonly IMaterialProvider _materialProvider;
+
+        private readonly IReadOnlyList<Func<MaterialEntity, MaterialDistributionDto>> Rules = new List<Func<MaterialEntity, MaterialDistributionDto>>
+        {
+
+        };
+            
+
 
         public MaterialOperatorConsumer(
             ILogger<MaterialOperatorConsumer> logger,

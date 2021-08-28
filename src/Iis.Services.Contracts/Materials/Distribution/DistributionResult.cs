@@ -1,17 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace Iis.Services.Contracts.Materials.Distribution
 {
     public class DistributionResult
     {
-        public Guid MaterialId { get; }
-        public Guid UserId { get; }
-        public DistributionResult(Guid materialId, Guid userId)
+        public IReadOnlyList<DistributionResultItem> Items { get; }
+        public DistributionResult()
         {
-            MaterialId = materialId;
-            UserId = userId;
+            Items = new List<DistributionResultItem>();
+        }
+        public DistributionResult(IEnumerable<DistributionResultItem> items)
+        {
+            Items = items.ToList();
         }
     }
 }
