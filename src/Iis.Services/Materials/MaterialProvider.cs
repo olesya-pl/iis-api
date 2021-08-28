@@ -632,5 +632,17 @@ namespace IIS.Services.Materials
             return RunWithoutCommitAsync((unitOfWork) =>
                    unitOfWork.MaterialRepository.GetAllUnassignedIdsAsync(limit, offset, sorting?.ColumnName, sorting?.Order, cancellationToken));
         }
+
+        public Task<IEnumerable<MaterialEntity>> GetCellSatWithChannel(int limit) =>
+            RunWithoutCommitAsync((unitOfWork) =>
+                   unitOfWork.MaterialRepository.GetCellSatWithChannel(limit));
+
+        public Task<IEnumerable<MaterialEntity>> GetCellSatWithoutChannel(int limit) =>
+            RunWithoutCommitAsync((unitOfWork) =>
+                   unitOfWork.MaterialRepository.GetCellSatWithoutChannel(limit));
+
+        public Task<IEnumerable<MaterialEntity>> GetNotCellSat(int limit) =>
+            RunWithoutCommitAsync((unitOfWork) =>
+                   unitOfWork.MaterialRepository.GetNotCellSat(limit));
     }
 }

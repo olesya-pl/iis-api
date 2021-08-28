@@ -82,6 +82,7 @@ using System.Security.Authentication;
 using System.Threading.Tasks;
 using Iis.CoordinatesEventHandler.DependencyInjection;
 using Iis.Utility.Logging;
+using Iis.Services.Materials;
 
 namespace IIS.Core
 {
@@ -314,7 +315,7 @@ namespace IIS.Core
             services.AddTransient<ModifyDataRunner>();
             services.RegisterEventMaterialAutoAssignment(Configuration);
             services.RegisterCoordinatesMessageHandler(Configuration);
-            services.AddTransient<IMaterialDistributionService, IMaterialDistributionService>();
+            services.AddTransient<IMaterialDistributionService, MaterialDistributionService>();
 
             var eusConfiguration = Configuration.GetSection("externalUserService").Get<ExternalUserServiceConfiguration>();
             services.AddTransient<IExternalUserService>(_ => (new ExternalUserServiceFactory()).GetInstance(eusConfiguration));

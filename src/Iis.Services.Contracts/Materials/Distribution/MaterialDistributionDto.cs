@@ -7,13 +7,13 @@ namespace Iis.Services.Contracts.Materials.Distribution
     public class MaterialDistributionDto
     {
         public Guid Id { get; }
-        public string Source { get; }
+        public int Priority { get; }
         public string RoleName { get; }
         public MaterialDistributionDto() { }
-        public MaterialDistributionDto(Guid id, string source, string roleName)
+        public MaterialDistributionDto(Guid id, int priority, string roleName)
         {
             Id = id;
-            Source = source;
+            Priority = priority;
             RoleName = roleName;
         }
     }

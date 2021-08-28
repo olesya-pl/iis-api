@@ -69,6 +69,38 @@ namespace Iis.DbLayer.Repositories
                             .ToArrayAsync();
         }
 
+        public async Task<IEnumerable<MaterialEntity>> GetAllAsync(
+            Func<MaterialEntity, bool> filter, 
+            int limit,
+            params MaterialIncludeEnum[] includes)
+        {
+            return await GetMaterialsQuery(includes).Where(filter).AsQueryable().ToArrayAsync();
+        }
+
+        public async Task<IEnumerable<MaterialEntity>> GetCellSatWithChannel(int limit)
+        {
+            return await GetMaterialsQuery()
+                .Where(m => (m.Source.StartsWith("sat.") || m.Source.StartsWith("cell.")) && m.Channel != null)
+                .Take(limit)
+                .ToArrayAsync();
+        }
+
+        public async Task<IEnumerable<MaterialEntity>> GetCellSatWithoutChannel(int limit)
+        {
+            return await GetMaterialsQuery()
+                .Where(m => (m.Source.StartsWith("sat.") || m.Source.StartsWith("cell.")) && m.Channel == null)
+                .Take(limit)
+                .ToArrayAsync();
+        }
+
+        public async Task<IEnumerable<MaterialEntity>> GetNotCellSat(int limit)
+        {
+            return await GetMaterialsQuery()
+                .Where(m => !(m.Source.StartsWith("sat.") || m.Source.StartsWith("cell.")))
+                .Take(limit)
+                .ToArrayAsync();
+        }
+
         public async Task<IEnumerable<MaterialEntity>> GetAllAsync(int limit, params MaterialIncludeEnum[] includes)
         {
             return await GetMaterialsQuery(includes)

@@ -123,7 +123,7 @@ namespace Iis.Services
             userEntity.UserRoles.Select(ur => ur.Role.Name).ToList();
         public async Task<UserDistributionList> GetOperatorsForMaterialsAsync()
         {
-            var maxMaterialsCount = _maxMaterialsConfig.Value;
+            var maxMaterialsCount = 100; //_maxMaterialsConfig.Value;
 
             var chargedInfo = _context.Materials
                 .AsNoTracking()
@@ -132,11 +132,10 @@ namespace Iis.Services
                     && p.ParentId == null
                     && p.AssigneeId != null)
                 .GroupBy(p => p.AssigneeId)
-                .Where(group => group.Count() >= maxMaterialsCount)
                 .Select(group => new 
                     { 
                         UserId = group.Key,
-                        AssignedCount = group.Count()
+                        FreeSlots = maxMaterialsCount - group.Count()
                     })
                 .ToList();
 
@@ -145,11 +144,12 @@ namespace Iis.Services
                 (from op in allOperators
                 join ci in chargedInfo
                     on op.Id equals ci.UserId
-                select new UserDistributionDto(op.Id, ci.AssignedCount, GetRoleNames(op))).ToList();
+                where ci.FreeSlots > 0
+                select new UserDistributionDto(op.Id, ci.FreeSlots, GetRoleNames(op))).ToList();
 
             list.AddRange(allOperators
                 .Where(op => !chargedInfo.Any(ci => ci.UserId == op.Id))
-                .Select(op => new UserDistributionDto(op.Id, 0, GetRoleNames(op))));
+                .Select(op => new UserDistributionDto(op.Id, maxMaterialsCount, GetRoleNames(op))));
 
             return new UserDistributionList(list);
         }

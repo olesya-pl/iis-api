@@ -19,6 +19,9 @@ namespace Iis.DbLayer.Repositories
         Task<IEnumerable<MaterialEntity>> GetAllAsync(params MaterialIncludeEnum[] includes);
 
         Task<IEnumerable<MaterialEntity>> GetAllAsync(int limit, params MaterialIncludeEnum[] includes);
+        Task<IEnumerable<MaterialEntity>> GetCellSatWithChannel(int limit);
+        Task<IEnumerable<MaterialEntity>> GetCellSatWithoutChannel(int limit);
+        Task<IEnumerable<MaterialEntity>> GetNotCellSat(int limit);
 
         Task<IEnumerable<MaterialEntity>> GetAllForRelatedNodeListAsync(IEnumerable<Guid> nodeIdList);
 

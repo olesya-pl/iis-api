@@ -27,7 +27,7 @@ namespace Iis.UnitTests.Materials.Distribution
         {
             var materials = new MaterialDistributionList(new List<MaterialDistributionDto>
             {
-                new MaterialDistributionDto(Guid.NewGuid(), null, null)
+                new MaterialDistributionDto(Guid.NewGuid(), 1, null)
             });
             var users = new UserDistributionList();
             var options = new MaterialDistributionOptions { Strategy = DistributionStrategy.InSuccession };

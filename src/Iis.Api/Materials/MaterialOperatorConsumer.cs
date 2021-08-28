@@ -26,16 +26,7 @@ namespace Iis.Api.Materials
         private readonly IMaterialProvider _materialProvider;
         private readonly IMaterialDistributionService _materialDistributionService;
 
-        private readonly IReadOnlyList<MaterialDistributionRule> Rules = new List<MaterialDistributionRule>
-        {
-            //new MaterialDistributionRule
-            //{
-            //    Filter = m => (m.Source.StartsWith("sat.") || m.Source.StartsWith("cell.")) && m.Channel != null
-            //}
-        };
-            
-
-
+        private readonly IReadOnlyList<MaterialDistributionRule> Rules;
         public MaterialOperatorConsumer(
             ILogger<MaterialOperatorConsumer> logger,
             IMaterialService materialService,
@@ -48,6 +39,25 @@ namespace Iis.Api.Materials
             _materialService = materialService;
             _materialProvider = materialProvider;
             _materialDistributionService = materialDistributionService;
+
+            Rules = new List<MaterialDistributionRule>
+            {
+                new MaterialDistributionRule
+                {
+                    Getter = limit => _materialProvider.GetCellSatWithChannel(limit),
+                    Priority = 2
+                },
+                new MaterialDistributionRule
+                {
+                    Getter = limit => _materialProvider.GetCellSatWithoutChannel(limit),
+                    Priority = 1
+                },
+                new MaterialDistributionRule
+                {
+                    Getter = limit => _materialProvider.GetNotCellSat(limit),
+                    Priority = 10
+                }
+            };
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -56,7 +66,7 @@ namespace Iis.Api.Materials
             {
                 try
                 {
-                    
+                    await Distribute();
                 }
                 catch (Exception e)
                 {
@@ -87,15 +97,25 @@ namespace Iis.Api.Materials
                 await _materialService.AssignMaterialOperatorAsync(materialId, assignee);
         }
 
-        private async Task<MaterialDistributionList> GetMaterials()
+        private async Task<MaterialDistributionList> GetMaterials(int limit)
         {
-            return new MaterialDistributionList();
+            var list = new List<MaterialDistributionDto>();
+            foreach (var rule in Rules)
+            {
+                var materials = (await rule.Getter(limit))
+                    .Select(m => new MaterialDistributionDto(m.Id, rule.Priority, null)); //TODO
+                list.AddRange(materials);
+            }
+            return new MaterialDistributionList(list);
         }
 
         private async Task Distribute()
         {
-            var materials = await GetMaterials();
             var users = await _userService.GetOperatorsForMaterialsAsync();
+            var totalLimit = users.Items.Sum(u => u.FreeSlots);
+
+            var materials = await GetMaterials(totalLimit);
+
             var options = new MaterialDistributionOptions { Strategy = DistributionStrategy.InSuccession };
             _materialDistributionService.Distribute(materials, users, options);
         }
