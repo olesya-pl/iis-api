@@ -270,15 +270,16 @@ namespace Iis.DbLayer.Repositories
             Context.Materials.Update(materialEntity);
         }
 
-        public List<MaterialEntity> GetMaterialByNodeIdQuery(IList<Guid> nodeIds, params MaterialIncludeEnum[] includes)
+        public async Task<IReadOnlyCollection<MaterialEntity>> GetMaterialCollectionByNodeIdAsync(IReadOnlyCollection<Guid> nodeIds, params MaterialIncludeEnum[] includes)
         {
-            return GetMaterialsQuery(includes)
+            return await GetMaterialsQuery(includes)
                 .Join(Context.MaterialInfos, m => m.Id, mi => mi.MaterialId,
                     (Material, MaterialInfo) => new { Material, MaterialInfo })
                 .Join(Context.MaterialFeatures, m => m.MaterialInfo.Id, mf => mf.MaterialInfoId,
                     (MaterialInfoJoined, MaterialFeature) => new { MaterialInfoJoined, MaterialFeature })
                 .Where(m => nodeIds.Contains(m.MaterialFeature.NodeId))
-                .Select(m => m.MaterialInfoJoined.Material).ToList();
+                .Select(m => m.MaterialInfoJoined.Material)
+                .ToArrayAsync();
         }
 
         public async Task<List<Guid>> GetNodeIsWithMaterials(IList<Guid> nodeIds)

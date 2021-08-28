@@ -46,9 +46,9 @@ namespace Iis.DbLayer.Repositories
 
         void EditMaterial(MaterialEntity materialEntity);
 
-        List<MaterialEntity> GetMaterialByNodeIdQuery(IList<Guid> nodeIds, params MaterialIncludeEnum[] includes);
-
         Task<List<Guid>> GetNodeIsWithMaterials(IList<Guid> nodeIds);
+
+        Task<IReadOnlyCollection<MaterialEntity>> GetMaterialCollectionByNodeIdAsync(IReadOnlyCollection<Guid> nodeIds, params MaterialIncludeEnum[] includes);
 
         Task<List<MaterialEntity>> GetMaterialByNodeIdQueryAsync(IEnumerable<Guid> nodeIds);
 
