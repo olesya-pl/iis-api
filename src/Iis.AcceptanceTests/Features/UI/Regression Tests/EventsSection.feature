@@ -31,7 +31,7 @@
         When I pressed the edit event button
         Then I must see the Voice_02-05-2017 06-00-55 (78) material binded to the event
         When I pressed the delete button to delete the specified Voice_02-05-2017 06-00-55 (78).mp3 material
-        Then I must not see the Voice_01-07-2017 21-34-38 (257).mp3 material binded to the event
+        Then I must not see the Voice_02-05-2017 06-00-55 (78).mp3 material binded to the event
 
     @regression @UI @Events
     Scenario: IIS-5992 - Ability to connect the event and a material
