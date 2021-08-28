@@ -154,6 +154,7 @@ namespace IIS.Core
             {
                 factory.Password = mq.Password;
             }
+            factory.Port = mq.Port;
 
             services.AddTransient<IConnectionFactory>(s => factory);
 
