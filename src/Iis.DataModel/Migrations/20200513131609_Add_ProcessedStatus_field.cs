@@ -50,6 +50,10 @@ namespace IIS.Core.Migrations
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropForeignKey(
+                name: "FK_Materials_MaterialSigns_ProcessedStatusSignId",
+                table: "Materials");
+
             migrationBuilder.DeleteData(
                 table: "MaterialSigns",
                 keyColumn: "Id",
@@ -64,10 +68,6 @@ namespace IIS.Core.Migrations
                 table: "MaterialSignTypes",
                 keyColumn: "Id",
                 keyValue: new Guid("214ceeee-67d5-4692-a3b4-316007fa5d34"));
-
-            migrationBuilder.DropForeignKey(
-                name: "FK_Materials_MaterialSigns_ProcessedStatusSignId",
-                table: "Materials");
 
             migrationBuilder.DropIndex(
                 name: "IX_Materials_ProcessedStatusSignId",
