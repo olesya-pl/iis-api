@@ -24,7 +24,7 @@ namespace Iis.Api.GraphQL.RadioElectronicSituation
         public string Title { get; set; }
         public string TypeTitle { get; set; }
         public string TypeName { get; set; }
-        public string Sidc { get; }
-        public DateTime LastConfirmedAt { get; }
+        public string Sidc { get; set; }
+        public DateTime LastConfirmedAt { get; set; }
     }
 }
