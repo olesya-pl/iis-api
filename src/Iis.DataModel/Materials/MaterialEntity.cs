@@ -116,6 +116,7 @@ namespace Iis.DataModel.Materials
         public string Data { get; set; }
         public string Type { get; set; }
         public string Source { get; set; }
+        public string Channel { get; set; }
         public string Content { get; set; }
         public DateTime CreatedDate { get; set; } = DateTime.Now;
         public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;

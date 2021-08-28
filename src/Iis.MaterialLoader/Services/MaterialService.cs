@@ -65,7 +65,8 @@ namespace Iis.MaterialLoader.Services
                 ParentId = material.ParentId,
                 CreatedDate = material.CreatedDate,
                 Type = material.Type,
-                Source = material.Source
+                Source = material.Source,
+                Channel = material.Channel
             };
         }
 
