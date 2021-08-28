@@ -9,8 +9,8 @@ namespace Iis.Services.Materials
     public class MaterialDistributionService: IMaterialDistributionService
     {
         public DistributionResult Distribute(
-            IEnumerable<MaterialDistributionDto> materials, 
-            IEnumerable<UserDistributionDto> users,
+            MaterialDistributionList materials, 
+            UserDistributionList users,
             MaterialDistributionOptions options)
         {
             return new DistributionResult();

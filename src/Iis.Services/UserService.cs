@@ -24,6 +24,7 @@ using System.Security.Authentication;
 using Iis.Interfaces.Users;
 using System.Security.Cryptography;
 using System.Text;
+using Iis.Services.Contracts.Materials.Distribution;
 
 namespace Iis.Services
 {
@@ -113,9 +114,44 @@ namespace Iis.Services
                 .Select(key => key)
                 .ToArray();
 
-            var userList = await RunWithoutCommitAsync(uow => uow.UserRepository.GetOperatorsAsync(e => !unavailableOperators.Contains(e.Id), CancellationToken.None));
+            var userList = await RunWithoutCommitAsync(uow => uow.UserRepository.GetOperatorsAsync(e => !unavailableOperators.Contains(e.Id)));
 
             return userList.Select(e => e.Id).ToList();
+        }
+
+        private List<string> GetRoleNames(UserEntity userEntity) =>
+            userEntity.UserRoles.Select(ur => ur.Role.Name).ToList();
+        public async Task<UserDistributionList> GetOperatorsForMaterialsAsync()
+        {
+            var maxMaterialsCount = _maxMaterialsConfig.Value;
+
+            var chargedInfo = _context.Materials
+                .AsNoTracking()
+                .Where(p => (p.ProcessedStatusSignId == null
+                    || p.ProcessedStatusSignId == MaterialEntity.ProcessingStatusNotProcessedSignId)
+                    && p.ParentId == null
+                    && p.AssigneeId != null)
+                .GroupBy(p => p.AssigneeId)
+                .Where(group => group.Count() >= maxMaterialsCount)
+                .Select(group => new 
+                    { 
+                        UserId = group.Key,
+                        AssignedCount = group.Count()
+                    })
+                .ToList();
+
+            var allOperators = (await RunWithoutCommitAsync(uow => uow.UserRepository.GetOperatorsAsync())).ToList();
+            var list =
+                (from op in allOperators
+                join ci in chargedInfo
+                    on op.Id equals ci.UserId
+                select new UserDistributionDto(op.Id, ci.AssignedCount, GetRoleNames(op))).ToList();
+
+            list.AddRange(allOperators
+                .Where(op => !chargedInfo.Any(ci => ci.UserId == op.Id))
+                .Select(op => new UserDistributionDto(op.Id, 0, GetRoleNames(op))));
+
+            return new UserDistributionList(list);
         }
 
         public async Task<Guid> UpdateUserAsync(User updatedUser, CancellationToken cancellation = default)

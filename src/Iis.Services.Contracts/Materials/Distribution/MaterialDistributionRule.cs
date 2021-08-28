@@ -8,7 +8,7 @@ namespace Iis.Services.Contracts.Materials.Distribution
     public class MaterialDistributionRule
     {
         public int Priority { get; set; }
-        public int GroupId { get; set; }
+        //public int GroupId { get; set; }
         public Func<MaterialEntity, MaterialDistributionDto> Filter { get; set; }
     }
 }

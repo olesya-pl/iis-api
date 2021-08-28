@@ -38,14 +38,14 @@ namespace Iis.DbLayer.Repositories
                 .ToListAsync(ct);
         }
 
-        public Task<UserEntity[]> GetOperatorsAsync(CancellationToken ct)
+        public Task<UserEntity[]> GetOperatorsAsync(CancellationToken ct = default)
         {
             return GetUsersQuery()
                 .Where(e => e.UserRoles.Any(r => r.RoleId == RoleEntity.OperatorRoleId) && !e.IsBlocked)
                 .ToArrayAsync(ct);
         }
 
-        public Task<UserEntity[]> GetOperatorsAsync(Expression<Func<UserEntity, bool>> predicate, CancellationToken ct)
+        public Task<UserEntity[]> GetOperatorsAsync(Expression<Func<UserEntity, bool>> predicate, CancellationToken ct = default)
         {
             return GetUsersQuery()
                 .Where(e => e.UserRoles.Any(r => r.RoleId == RoleEntity.OperatorRoleId) && !e.IsBlocked)

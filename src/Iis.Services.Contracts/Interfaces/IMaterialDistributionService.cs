@@ -8,8 +8,8 @@ namespace Iis.Services.Contracts.Interfaces
     public interface IMaterialDistributionService
     {
         DistributionResult Distribute(
-            IEnumerable<MaterialDistributionDto> materials,
-            IEnumerable<UserDistributionDto> users,
+            MaterialDistributionList materials,
+            UserDistributionList users,
             MaterialDistributionOptions options);
     }
 }
