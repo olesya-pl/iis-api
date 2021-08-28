@@ -34,7 +34,6 @@ namespace Iis.Domain
         Dictionary<Guid, int> GetRelationsCount(HashSet<Guid> entityIds);
         Task<SearchEntitiesByConfiguredFieldsResult> SearchEventsAsync(ElasticFilter filter, User user);
         TreeResultList GetEventTypes(string suggestion);
-        List<Guid> GetFeatureIdListThatRelatesToObjectId(Guid nodeId);
-        List<ObjectFeatureRelation> GetFeatureIdListThatRelatesToObjectIds(IReadOnlyCollection<Guid> nodeIds);
+        IReadOnlyCollection<ObjectFeatureRelation> GetObjectFeatureRelationCollection(IReadOnlyCollection<Guid> nodeIdCollection);
     }
 }

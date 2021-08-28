@@ -266,29 +266,34 @@ namespace IIS.Services.Materials
 
         public Task<List<MaterialsCountByType>> CountMaterialsByTypeAndNodeAsync(Guid nodeId)
         {
-            var nodeIdList = _ontologyService.GetFeatureIdListThatRelatesToObjectId(nodeId);
+            var nodeIdList = new List<Guid> { nodeId };
 
-            nodeIdList.Add(nodeId);
-            return RunWithoutCommitAsync(async (unitOfWork) => await unitOfWork.MaterialRepository.GetParentMaterialByNodeIdQueryAsync(nodeIdList));
+            var featureIdCollection = _ontologyService.GetObjectFeatureRelationCollection(nodeIdList)
+                                        .Select(e => e.FeatureId)
+                                        .ToArray();
+
+            nodeIdList.AddRange(featureIdCollection);
+
+            return RunWithoutCommitAsync(uow => uow.MaterialRepository.GetParentMaterialByNodeIdQueryAsync(nodeIdList));
         }
 
         public async Task<(IEnumerable<Material> Materials, int Count)> GetMaterialsByNodeId(Guid nodeId)
         {
-            var materialsByNode = GetMaterialByNodeIdQuery(nodeId, false);
+            var materialsByNode = await GetMaterialCollectionByNodeIdAsync(nodeId, false);
             var materials = materialsByNode.Select(p => Map(p));
             return (materials, materials.Count());
         }
 
         public async Task<(IEnumerable<Material> Materials, int Count)> GetMaterialsByNodeIdAndRelatedEntities(Guid nodeId)
         {
-            var materialsByNode = GetMaterialByNodeIdQuery(nodeId, true);
+            var materialsByNode = await GetMaterialCollectionByNodeIdAsync(nodeId, true);
             var materials = materialsByNode.Select(p => Map(p));
             return (materials, materials.Count());
         }
 
         public async Task<Dictionary<Guid, int>> CountMaterialsByNodeIds(HashSet<Guid> nodeIds)
         {
-            var nodeFeatureRelationsList = _ontologyService.GetFeatureIdListThatRelatesToObjectIds(nodeIds);
+            var nodeFeatureRelationsList = _ontologyService.GetObjectFeatureRelationCollection(nodeIds);
 
             var nodeIdsForCountQuery = new List<Guid>(nodeIds);
             nodeIdsForCountQuery.AddRange(nodeFeatureRelationsList.Select(p => p.FeatureId));
@@ -325,7 +330,7 @@ namespace IIS.Services.Materials
             return res;
         }
 
-        private static Dictionary<Guid, List<Guid>> PrepareNodesMap(HashSet<Guid> nodeIds, List<ObjectFeatureRelation> nodeFeatureRelationsList)
+        private static Dictionary<Guid, List<Guid>> PrepareNodesMap(HashSet<Guid> nodeIds, IReadOnlyCollection<ObjectFeatureRelation> nodeFeatureRelationsList)
         {
             var parentNodesMap = nodeIds.ToDictionary(k => k, v => new List<Guid> { v });
 
@@ -503,14 +508,20 @@ namespace IIS.Services.Materials
             return materials;
         }
 
-        private List<MaterialEntity> GetMaterialByNodeIdQuery(Guid nodeId, bool includeRelatedEntities)
+        private Task<IReadOnlyCollection<MaterialEntity>> GetMaterialCollectionByNodeIdAsync(Guid nodeId, bool includeRelatedEntities)
         {
             var nodeIdList = new List<Guid> { nodeId };
 
             if (includeRelatedEntities)
-                nodeIdList.AddRange(_ontologyService.GetFeatureIdListThatRelatesToObjectId(nodeId));
+            {
+                var featureIdCollection = _ontologyService.GetObjectFeatureRelationCollection(nodeIdList)
+                                            .Select(e => e.FeatureId)
+                                            .ToArray();
 
-            return RunWithoutCommit((unitOfWork) => unitOfWork.MaterialRepository.GetMaterialByNodeIdQuery(nodeIdList, MaterialIncludeEnum.WithChildren, MaterialIncludeEnum.WithFeatures, MaterialIncludeEnum.WithFiles));
+                nodeIdList.AddRange(featureIdCollection);
+            }
+
+            return RunWithoutCommitAsync(uow => uow.MaterialRepository.GetMaterialCollectionByNodeIdAsync(nodeIdList, MaterialIncludeEnum.WithChildren, MaterialIncludeEnum.WithFeatures, MaterialIncludeEnum.WithFiles));
         }
 
         private JObject GetObjectOfStudyListForMaterial(IEnumerable<Node> nodeList)
