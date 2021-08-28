@@ -37,7 +37,7 @@ namespace Iis.DbLayer.Repositories
         private readonly IElasticManager _elasticManager;
         private readonly IMapper _mapper;
         private readonly IOntologyNodesData _ontologyData;
-        public string[] MaterialIndexes => new[] { "Materials" };
+        public IReadOnlyCollection<string> MaterialIndexes => new[] { "Materials" };
 
         public MaterialRepository(IMLResponseRepository mLResponseRepository,
             IElasticManager elasticManager,
@@ -270,51 +270,38 @@ namespace Iis.DbLayer.Repositories
             Context.Materials.Update(materialEntity);
         }
 
-        public async Task<IReadOnlyCollection<MaterialEntity>> GetMaterialCollectionByNodeIdAsync(IReadOnlyCollection<Guid> nodeIds, params MaterialIncludeEnum[] includes)
+        public Task<List<Guid>> GetNodeIsWithMaterialsAsync(IReadOnlyCollection<Guid> nodeIdCollection)
         {
-            return await GetMaterialsQuery(includes)
-                .Join(Context.MaterialInfos, m => m.Id, mi => mi.MaterialId,
-                    (Material, MaterialInfo) => new { Material, MaterialInfo })
-                .Join(Context.MaterialFeatures, m => m.MaterialInfo.Id, mf => mf.MaterialInfoId,
-                    (MaterialInfoJoined, MaterialFeature) => new { MaterialInfoJoined, MaterialFeature })
-                .Where(m => nodeIds.Contains(m.MaterialFeature.NodeId))
-                .Select(m => m.MaterialInfoJoined.Material)
-                .ToArrayAsync();
-        }
-
-        public async Task<List<Guid>> GetNodeIsWithMaterials(IList<Guid> nodeIds)
-        {
-            return await Context.Materials
-                .Join(Context.MaterialInfos, m => m.Id, mi => mi.MaterialId,
-                    (Material, MaterialInfo) => new { Material, MaterialInfo })
-                .Join(Context.MaterialFeatures, m => m.MaterialInfo.Id, mf => mf.MaterialInfoId,
-                    (MaterialInfoJoined, MaterialFeature) => new { MaterialInfoJoined, MaterialFeature })
-                .Where(m => nodeIds.Contains(m.MaterialFeature.NodeId))
+            return Context.Materials
+                .JoinMaterialFeaturesAsNoTracking(Context)
+                .Where(m => nodeIdCollection.Contains(m.MaterialFeature.NodeId))
                 .Select(m => m.MaterialFeature.NodeId)
                 .ToListAsync();
         }
 
-        public Task<List<MaterialEntity>> GetMaterialByNodeIdQueryAsync(IEnumerable<Guid> nodeIds)
+        public async Task<IReadOnlyCollection<MaterialEntity>> GetMaterialCollectionByNodeIdAsync(IReadOnlyCollection<Guid> nodeIdCollection, params MaterialIncludeEnum[] includes)
         {
-            return Context.Materials
-                .Join(Context.MaterialInfos, m => m.Id, mi => mi.MaterialId,
-                    (Material, MaterialInfo) => new { Material, MaterialInfo })
-                .Join(Context.MaterialFeatures, m => m.MaterialInfo.Id, mf => mf.MaterialInfoId,
-                    (MaterialInfoJoined, MaterialFeature) => new { MaterialInfoJoined, MaterialFeature })
-                .Where(m => nodeIds.Contains(m.MaterialFeature.NodeId))
-                .AsNoTracking()
+            return await GetMaterialsQuery(includes)
+                .JoinMaterialFeaturesAsNoTracking(Context)
+                .Where(m => nodeIdCollection.Contains(m.MaterialFeature.NodeId))
                 .Select(m => m.MaterialInfoJoined.Material)
-                .ToListAsync();
+                .ToArrayAsync();
         }
 
-        public Task<List<MaterialsCountByType>> GetParentMaterialByNodeIdQueryAsync(IList<Guid> nodeIds)
+        public async Task<IReadOnlyCollection<Guid>> GetMaterialIdCollectionByNodeIdCollectionAsync(IReadOnlyCollection<Guid> nodeIdCollection)
+        {
+            return await Context.Materials
+                .JoinMaterialFeaturesAsNoTracking(Context)
+                .Where(m => nodeIdCollection.Contains(m.MaterialFeature.NodeId))
+                .Select(m => m.MaterialInfoJoined.Material.Id)
+                .ToArrayAsync();
+        }
+
+        public Task<List<MaterialsCountByType>> GetParentMaterialByNodeIdQueryAsync(IReadOnlyCollection<Guid> nodeIdCollection)
         {
             return Context.Materials
-                .Join(Context.MaterialInfos, m => m.Id, mi => mi.MaterialId,
-                    (Material, MaterialInfo) => new { Material, MaterialInfo })
-                .Join(Context.MaterialFeatures, m => m.MaterialInfo.Id, mf => mf.MaterialInfoId,
-                    (MaterialInfoJoined, MaterialFeature) => new { MaterialInfoJoined, MaterialFeature })
-                .Where(m => nodeIds.Contains(m.MaterialFeature.NodeId))
+                .JoinMaterialFeaturesAsNoTracking(Context)
+                .Where(m => nodeIdCollection.Contains(m.MaterialFeature.NodeId))
                 .Select(m => m.MaterialInfoJoined.Material).Where(_ => _.ParentId == null)
                 .GroupBy(p => p.Type)
                 .Select(group => new MaterialsCountByType
