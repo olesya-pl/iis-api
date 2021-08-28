@@ -160,8 +160,8 @@ namespace IIS.Services.Materials
 
         public async Task<Material[]> GetMaterialsByIdsAsync(ISet<Guid> ids, User user)
         {
-            var entities = await RunWithoutCommitAsync(async (unitOfWork) =>
-                await unitOfWork.MaterialRepository.GetByIdsAsync(ids, MaterialIncludeEnum.WithChildren, MaterialIncludeEnum.WithFeatures));
+            var entities = await RunWithoutCommitAsync(uow =>
+                uow.MaterialRepository.GetByIdsAsync(ids, MaterialIncludeEnum.WithChildren, MaterialIncludeEnum.WithFeatures));
 
             return entities.Where(p => p.CanBeAccessedBy(user.AccessLevel))
                 .Select(entity =>
@@ -175,14 +175,13 @@ namespace IIS.Services.Materials
 
         public Task<IEnumerable<MaterialEntity>> GetMaterialEntitiesAsync()
         {
-            return RunWithoutCommitAsync(async (unitOfWork) =>
-                await unitOfWork.MaterialRepository.GetAllAsync());
+            return RunWithoutCommitAsync(uow => uow.MaterialRepository.GetAllAsync());
         }
 
         public async Task<IReadOnlyCollection<Guid>> GetMaterialsIdsAsync(int limit)
         {
-            var materials = await RunWithoutCommitAsync((unitOfWork) =>
-                unitOfWork.MaterialRepository.GetAllAsync(limit, MaterialIncludeEnum.OnlyParent));
+            var materials = await RunWithoutCommitAsync(uow =>
+                uow.MaterialRepository.GetAllAsync(limit, MaterialIncludeEnum.OnlyParent));
 
             var materialIds = materials.Select((material) => material.Id).ToArray();
 
@@ -256,8 +255,8 @@ namespace IIS.Services.Materials
 
         public async Task<(List<Material> Materials, int Count)> GetMaterialsByAssigneeIdAsync(Guid assigneeId)
         {
-            var entities = await RunWithoutCommitAsync(async (unitOfWork) =>
-                await unitOfWork.MaterialRepository.GetAllByAssigneeIdAsync(assigneeId));
+            var entities = await RunWithoutCommitAsync(uow =>
+                uow.MaterialRepository.GetAllByAssigneeIdAsync(assigneeId));
 
             var materials = _mapper.Map<List<Material>>(entities);
 
@@ -266,36 +265,40 @@ namespace IIS.Services.Materials
 
         public Task<List<MaterialsCountByType>> CountMaterialsByTypeAndNodeAsync(Guid nodeId)
         {
-            var nodeIdList = _ontologyService.GetFeatureIdListThatRelatesToObjectId(nodeId);
+            var nodeIdList = new List<Guid> { nodeId };
 
-            nodeIdList.Add(nodeId);
-            return RunWithoutCommitAsync(async (unitOfWork) => await unitOfWork.MaterialRepository.GetParentMaterialByNodeIdQueryAsync(nodeIdList));
+            var featureIdCollection = _ontologyService.GetObjectFeatureRelationCollection(nodeIdList)
+                                        .Select(e => e.FeatureId)
+                                        .ToArray();
+
+            nodeIdList.AddRange(featureIdCollection);
+
+            return RunWithoutCommitAsync(uow => uow.MaterialRepository.GetParentMaterialByNodeIdQueryAsync(nodeIdList));
         }
 
         public async Task<(IEnumerable<Material> Materials, int Count)> GetMaterialsByNodeId(Guid nodeId)
         {
-            var materialsByNode = GetMaterialByNodeIdQuery(nodeId, false);
+            var materialsByNode = await GetMaterialCollectionByNodeIdAsync(nodeId, false);
             var materials = materialsByNode.Select(p => Map(p));
             return (materials, materials.Count());
         }
 
         public async Task<(IEnumerable<Material> Materials, int Count)> GetMaterialsByNodeIdAndRelatedEntities(Guid nodeId)
         {
-            var materialsByNode = GetMaterialByNodeIdQuery(nodeId, true);
+            var materialsByNode = await GetMaterialCollectionByNodeIdAsync(nodeId, true);
             var materials = materialsByNode.Select(p => Map(p));
             return (materials, materials.Count());
         }
 
         public async Task<Dictionary<Guid, int>> CountMaterialsByNodeIds(HashSet<Guid> nodeIds)
         {
-            var nodeFeatureRelationsList = _ontologyService.GetFeatureIdListThatRelatesToObjectIds(nodeIds);
+            var nodeFeatureRelationsList = _ontologyService.GetObjectFeatureRelationCollection(nodeIds);
 
             var nodeIdsForCountQuery = new List<Guid>(nodeIds);
             nodeIdsForCountQuery.AddRange(nodeFeatureRelationsList.Select(p => p.FeatureId));
 
             var nodesWithMaterials = await RunWithoutCommitAsync(
-                    async (unitOfWork) =>
-                    await unitOfWork.MaterialRepository.GetNodeIsWithMaterials(nodeIdsForCountQuery));
+                    uow => uow.MaterialRepository.GetNodeIsWithMaterialsAsync(nodeIdsForCountQuery));
 
             var parentNodesMap = PrepareNodesMap(nodeIds, nodeFeatureRelationsList);
 
@@ -325,7 +328,7 @@ namespace IIS.Services.Materials
             return res;
         }
 
-        private static Dictionary<Guid, List<Guid>> PrepareNodesMap(HashSet<Guid> nodeIds, List<ObjectFeatureRelation> nodeFeatureRelationsList)
+        private static Dictionary<Guid, List<Guid>> PrepareNodesMap(HashSet<Guid> nodeIds, IReadOnlyCollection<ObjectFeatureRelation> nodeFeatureRelationsList)
         {
             var parentNodesMap = nodeIds.ToDictionary(k => k, v => new List<Guid> { v });
 
@@ -350,7 +353,7 @@ namespace IIS.Services.Materials
             PaginationParams page,
             SortingParams sorting)
         {
-            var isEligible = await RunWithoutCommitAsync(async (unitOfWork) => await unitOfWork.MaterialRepository.CheckMaterialExistsAndHasContent(materialId));
+            var isEligible = await RunWithoutCommitAsync(uow => uow.MaterialRepository.CheckMaterialExistsAndHasContent(materialId));
 
             if (!isEligible) return (EmptyMaterialCollection, 0);
 
@@ -401,7 +404,7 @@ namespace IIS.Services.Materials
             SortingParams sorting,
             CancellationToken ct = default)
         {
-            var materialEntityList = new List<MaterialEntity>();
+            var materialEntityIdCollection = new List<Guid>();
 
             foreach (var nodeId in nodeIdList)
             {
@@ -409,19 +412,19 @@ namespace IIS.Services.Materials
 
                 if (includeDescendants) objectIdList.AddRange(GetDescendantsByGivenRelationTypeNameList(objectIdList, RelationTypeNameList));
 
-                var materialEntities = await RunWithoutCommitAsync((unitOfWork) => unitOfWork.MaterialRepository.GetMaterialByNodeIdQueryAsync(objectIdList));
+                var queryResult = await RunWithoutCommitAsync((unitOfWork) => unitOfWork.MaterialRepository.GetMaterialIdCollectionByNodeIdCollectionAsync(objectIdList));
 
-                materialEntities = materialEntities.GroupBy(e => e.Id).Select(gr => gr.FirstOrDefault()).ToList();
+                queryResult = queryResult.Distinct().ToArray();
 
-                materialEntityList.AddRange(materialEntities);
+                materialEntityIdCollection.AddRange(queryResult);
             }
 
-            if (!materialEntityList.Any()) return MaterialsDto.Empty;
+            if (!materialEntityIdCollection.Any()) return MaterialsDto.Empty;
 
-            var materialEntitiesIdList = materialEntityList
-                .GroupBy(e => e.Id)
+            var materialEntitiesIdList = materialEntityIdCollection
+                .GroupBy(e => e)
                 .Where(gr => gr.Count() == nodeIdList.Count())
-                .Select(gr => gr.Select(e => e.Id).FirstOrDefault())
+                .Select(gr => gr.FirstOrDefault())
                 .ToArray();
 
             if (!materialEntitiesIdList.Any()) return MaterialsDto.Empty;
@@ -503,14 +506,20 @@ namespace IIS.Services.Materials
             return materials;
         }
 
-        private List<MaterialEntity> GetMaterialByNodeIdQuery(Guid nodeId, bool includeRelatedEntities)
+        private Task<IReadOnlyCollection<MaterialEntity>> GetMaterialCollectionByNodeIdAsync(Guid nodeId, bool includeRelatedEntities)
         {
             var nodeIdList = new List<Guid> { nodeId };
 
             if (includeRelatedEntities)
-                nodeIdList.AddRange(_ontologyService.GetFeatureIdListThatRelatesToObjectId(nodeId));
+            {
+                var featureIdCollection = _ontologyService.GetObjectFeatureRelationCollection(nodeIdList)
+                                            .Select(e => e.FeatureId)
+                                            .ToArray();
 
-            return RunWithoutCommit((unitOfWork) => unitOfWork.MaterialRepository.GetMaterialByNodeIdQuery(nodeIdList, MaterialIncludeEnum.WithChildren, MaterialIncludeEnum.WithFeatures, MaterialIncludeEnum.WithFiles));
+                nodeIdList.AddRange(featureIdCollection);
+            }
+
+            return RunWithoutCommitAsync(uow => uow.MaterialRepository.GetMaterialCollectionByNodeIdAsync(nodeIdList, MaterialIncludeEnum.WithChildren, MaterialIncludeEnum.WithFeatures, MaterialIncludeEnum.WithFiles));
         }
 
         private JObject GetObjectOfStudyListForMaterial(IEnumerable<Node> nodeList)

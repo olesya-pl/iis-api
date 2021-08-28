@@ -495,7 +495,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             }
             return res;
         }
-        
+
         public TreeResultList GetEventTypes(string suggestion)
         {
             const string NAME = "name";
@@ -524,20 +524,13 @@ namespace Iis.DbLayer.Ontology.EntityFramework
 
             return result;
         }
-        public List<Guid> GetFeatureIdListThatRelatesToObjectId(Guid nodeId)
+
+        public IReadOnlyCollection<ObjectFeatureRelation> GetObjectFeatureRelationCollection(IReadOnlyCollection<Guid> nodeIdCollection)
         {
-            return _data.GetNode(nodeId).OutgoingRelations
-                .Where(r => r.TargetNode.NodeType.IsObject)
-                .Select(r => r.TargetNodeId)
-                .Distinct()
-                .ToList();
-        }
-        public List<ObjectFeatureRelation> GetFeatureIdListThatRelatesToObjectIds(IReadOnlyCollection<Guid> nodeIds)
-        {
-            return _data.GetNodes(nodeIds)
-                .SelectMany(n => n.OutgoingRelations.Where(r => r.TargetNode.NodeType.IsObject))
-                .Select(r => new ObjectFeatureRelation { ObjectId = r.SourceNodeId, FeatureId = r.Id })
-                .ToList();
+            return _data.GetNodes(nodeIdCollection)
+                .SelectMany(n => n.OutgoingRelations.Where(r => r.TargetNode.NodeType.IsObjectSign))
+                .Select(r => new ObjectFeatureRelation(r.SourceNodeId, r.TargetNodeId))
+                .ToArray();
         }
     }
 }

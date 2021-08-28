@@ -1,4 +1,5 @@
 ﻿using System;
+using AcceptanceTests.Helpers;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Support.UI;
 using TechTalk.SpecFlow;
@@ -22,6 +23,7 @@ namespace AcceptanceTests.UISteps
         {
             var wait = new WebDriverWait(_driver, TimeSpan.FromSeconds(180));
             wait.Until(driver => !_driver.FindElement(By.CssSelector(".el-loading-mask")).Displayed);
+            _driver.WaitFor(0.5);
         }
 
 

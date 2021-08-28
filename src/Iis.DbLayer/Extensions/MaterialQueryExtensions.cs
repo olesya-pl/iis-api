@@ -1,6 +1,7 @@
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
 
+using Iis.DataModel;
 using Iis.DataModel.Materials;
 using Iis.DbLayer.MaterialDictionaries;
 
@@ -8,6 +9,18 @@ namespace Iis.DbLayer.Extensions
 {
     internal static class MaterialQueryExtensions
     {
+        internal class MaterialInfoJoined
+        {
+            public MaterialEntity Material {get;set;}
+            public MaterialInfoEntity MaterialInfo {get;set;}
+        }
+
+        internal class MaterialFeatureJoined
+        {
+            public MaterialInfoJoined MaterialInfoJoined {get;set;}
+            public MaterialFeatureEntity MaterialFeature {get;set;}
+        }
+
         public static IQueryable<MaterialEntity> WithChildren(
             this IQueryable<MaterialEntity> materialQuery)
         {
@@ -72,5 +85,16 @@ namespace Iis.DbLayer.Extensions
             return orderedQueryable.ThenBy(p => p.Id);
         }
 
+        public static IQueryable<MaterialFeatureJoined> JoinMaterialFeaturesAsNoTracking(
+            this IQueryable<MaterialEntity> materialsQuery,
+            OntologyContext context)
+        {
+            return materialsQuery
+                .Join(context.MaterialInfos, m => m.Id, mi => mi.MaterialId,
+                    (Material, MaterialInfo) => new MaterialInfoJoined{ Material =  Material, MaterialInfo = MaterialInfo })
+                .Join(context.MaterialFeatures, m => m.MaterialInfo.Id, mf => mf.MaterialInfoId,
+                    (MaterialInfoJoined, MaterialFeature) => new MaterialFeatureJoined {MaterialInfoJoined = MaterialInfoJoined, MaterialFeature = MaterialFeature })
+                .AsNoTracking();
+        }
     }
 }
