@@ -69,6 +69,7 @@ namespace Iis.DataModel
         public DbSet<TowerLocationEntity> TowerLocations { get; set;}
 
         public DbSet<ModifyDataLogEntity> ModifyDataLogs { get; set; }
+        public DbSet<MaterialChannelMapping> MaterialChannelMappings { get; set; }
 
         public OntologyContext(DbContextOptions<OntologyContext> options)
             : base(options)

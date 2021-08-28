@@ -117,7 +117,18 @@ namespace Iis.Api.Materials
             var materials = await GetMaterials(totalLimit);
 
             var options = new MaterialDistributionOptions { Strategy = DistributionStrategy.InSuccession };
-            _materialDistributionService.Distribute(materials, users, options);
+            var result = _materialDistributionService.Distribute(materials, users, options);
+
+            foreach (var item in result.Items)
+            {
+                await _materialService.AssignMaterialOperatorAsync(item.MaterialId, item.UserId);
+            }
+
+            if (materials.Items.Count > 0)
+            {
+                await Task.Delay(TimeSpan.FromSeconds(Timeout));
+                return;
+            }
         }
     }
 }
