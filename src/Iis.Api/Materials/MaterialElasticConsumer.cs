@@ -5,11 +5,10 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Iis.Services.Contracts.Configurations;
+using Iis.Services.Contracts.Interfaces;
 using IIS.Core.Materials;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Exceptions;
 
@@ -18,23 +17,21 @@ namespace Iis.Api.Materials
     public class MaterialElasticConsumer : BackgroundService
     {
         private readonly ILogger<MaterialElasticConsumer> _logger;
-        private readonly IMaterialService _materialService;
+        private readonly IMaterialElasticService _materialElasticService;
         private readonly MaterialElasticSaverConfiguration _configuration;
         private readonly IMaterialEventProducer _materialEventProducer;
         private readonly IConnection _connection;
         private readonly IModel _channel;
-
         private readonly List<Guid> _materialIds = new List<Guid>();
-        private readonly IModel _outgoingChannel;
 
         public MaterialElasticConsumer(ILogger<MaterialElasticConsumer> logger,
             IConnectionFactory connectionFactory,
-            IMaterialService materialService,
+            IMaterialElasticService materialElasticService,
             IMaterialEventProducer materialEventProducer,
             MaterialElasticSaverConfiguration configuration)
         {
             _logger = logger;
-            _materialService = materialService;
+            _materialElasticService = materialElasticService;
             _configuration = configuration;
             _materialEventProducer = materialEventProducer;
 
@@ -74,7 +71,7 @@ namespace Iis.Api.Materials
                     {
                         if (_materialIds.Any())
                         {
-                            await _materialService.PutCreatedMaterialsToElasticSearchAsync(_materialIds, true, stoppingToken);
+                            await _materialElasticService.PutCreatedMaterialsToElasticSearchAsync(_materialIds, true, stoppingToken);
                             _materialEventProducer.SendMaterialSavedToElastic(_materialIds);
                             _materialIds.Clear();
                         }                        
@@ -86,7 +83,7 @@ namespace Iis.Api.Materials
                     _materialIds.Add(materialId);
                     if (_materialIds.Count() >= MaxBatchSize)
                     {
-                        await _materialService.PutCreatedMaterialsToElasticSearchAsync(_materialIds, true, stoppingToken);
+                        await _materialElasticService.PutCreatedMaterialsToElasticSearchAsync(_materialIds, true, stoppingToken);
                         _materialEventProducer.SendMaterialSavedToElastic(_materialIds);
                         _materialIds.Clear();
                     }

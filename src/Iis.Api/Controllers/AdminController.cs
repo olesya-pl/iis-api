@@ -29,9 +29,10 @@ namespace Iis.Api.Controllers
     public class AdminController : Controller
     {
         private const string AllIndexes = "all";
+        private readonly IMaterialService _materialService;
+        private readonly IMaterialElasticService _materialElasticService;
         private readonly IElasticManager _elasticManager;
         private readonly INodeSaveService _nodeSaveService;
-        private readonly IMaterialService _materialService;
         private readonly IElasticState _elasticState;
         private readonly IUserService _userService;
         private readonly IUserElasticService _userElasticService;
@@ -46,6 +47,7 @@ namespace Iis.Api.Controllers
 
         public AdminController(
             IMaterialService materialService,
+            IMaterialElasticService materialElasticService,
             IElasticManager elasticManager,
             INodeSaveService nodeSaveService,
             IElasticState elasticState,
@@ -60,8 +62,9 @@ namespace Iis.Api.Controllers
             IMaterialProvider materialProvider,
             NodeMaterialRelationService<IIISUnitOfWork> nodeMaterialRelationService)
         {
-            _elasticManager = elasticManager;
             _materialService = materialService;
+            _materialElasticService = materialElasticService;
+            _elasticManager = elasticManager;
             _nodeSaveService = nodeSaveService;
             _elasticState = elasticState;
             _adminElasticService = adminElasticService;
@@ -211,7 +214,7 @@ namespace Iis.Api.Controllers
                 mappingConfiguration.ToJObject(),
                 cancellationToken);
 
-            var response = await _materialService.PutAllMaterialsToElasticSearchAsync(cancellationToken);
+            var response = await _materialElasticService.PutAllMaterialsToElasticSearchAsync(cancellationToken);
 
             await _adminElasticService.AddAliasesToIndexAsync(AliasType.Material, cancellationToken);
 
@@ -255,7 +258,7 @@ namespace Iis.Api.Controllers
                 mappingConfiguration.ToJObject(),
                 cancellationToken);
 
-            var response = await _materialService.PutAllMaterialChangesToElasticSearchAsync(cancellationToken);
+            var response = await _materialElasticService.PutAllMaterialChangesToElasticSearchAsync(cancellationToken);
 
             LogElasticResult(log, response);
 

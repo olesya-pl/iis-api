@@ -19,12 +19,19 @@ namespace Iis.Services
     public class ChangeHistoryService<TUnitOfWork> : BaseService<TUnitOfWork>, IChangeHistoryService where TUnitOfWork : IIISUnitOfWork
     {
         private const string DefaultSignLocationPropName = "sign.location";
-        private readonly IOntologyNodesData _ontologyNodesData;
         private readonly IMapper _mapper;
-        public ChangeHistoryService(IUnitOfWorkFactory<TUnitOfWork> unitOfWorkFactory, IMapper mapper, IOntologyNodesData ontologyNodesData) : base(unitOfWorkFactory)
+        private readonly IOntologyNodesData _ontologyNodesData;
+        private readonly IMaterialElasticService _materialElasticService;
+
+        public ChangeHistoryService(IUnitOfWorkFactory<TUnitOfWork> unitOfWorkFactory,
+            IMapper mapper,
+            IOntologyNodesData ontologyNodesData,
+            IMaterialElasticService materialElasticService)
+            : base(unitOfWorkFactory)
         {
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
             _ontologyNodesData = ontologyNodesData ?? throw new ArgumentNullException(nameof(ontologyNodesData));
+            _materialElasticService = materialElasticService ?? throw new ArgumentNullException(nameof(materialElasticService));
         }
 
         public async Task SaveNodeChange(
@@ -132,7 +139,7 @@ namespace Iis.Services
             entities.AddRange(mirrorEntities);
 
             await RunAsync(uow => uow.ChangeHistoryRepository.AddRange(entities));
-            await RunWithoutCommitAsync(_ => _.MaterialRepository.PutMaterialChangesToElasticSearchAsync(entities, waitForIndexing: true));
+            await _materialElasticService.PutMaterialChangesToElasticSearchAsync(entities, waitForIndexing: true);
         }
 
         private ChangeHistoryEntity GetMirrorChangeHistoryEntity(ChangeHistoryEntity entity, string materialTitle)
