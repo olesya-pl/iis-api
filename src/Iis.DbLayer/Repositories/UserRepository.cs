@@ -68,6 +68,21 @@ namespace Iis.DbLayer.Repositories
                     .CountAsync(predicate, ct);
         }
 
+        public Task<Dictionary<string, IEnumerable<RoleEntity>>> GetRolesByUserNamesDictionaryAsync(ISet<string> userNames, CancellationToken cancellationToken = default)
+        {
+            return Context.Users
+                .AsNoTracking()
+                .Include(_ => _.UserRoles)
+                    .ThenInclude(_ => _.Role)
+                .Where(_ => userNames.Contains(_.Username))
+                .Select(_ => new
+                {
+                    UserName = _.Username,
+                    Roles = _.UserRoles.Select(_ => _.Role)
+                })
+                .ToDictionaryAsync(_ => _.UserName, _ => _.Roles, cancellationToken);
+        }
+
         private IQueryable<UserEntity> GetUsersQuery()
         {
             return Context.Users

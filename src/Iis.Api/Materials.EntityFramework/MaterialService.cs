@@ -14,7 +14,6 @@ using Iis.DbLayer.MaterialEnum;
 using Iis.DbLayer.MaterialDictionaries;
 using Iis.DataModel.Materials;
 using Iis.Interfaces.Roles;
-using Iis.Interfaces.Elastic;
 using Iis.Interfaces.Materials;
 using IIS.Repository;
 using IIS.Repository.Factories;
@@ -28,7 +27,7 @@ using IIS.Services.Contracts.Interfaces;
 
 namespace IIS.Core.Materials.EntityFramework
 {
-    public class MaterialService<TUnitOfWork> : BaseService<TUnitOfWork>, IMaterialService, IMaterialPutToElasticService where TUnitOfWork : IIISUnitOfWork
+    public class MaterialService<TUnitOfWork> : BaseService<TUnitOfWork>, IMaterialService where TUnitOfWork : IIISUnitOfWork
     {
         private readonly IMapper _mapper;
         private readonly IFileService _fileService;
@@ -40,6 +39,7 @@ namespace IIS.Core.Materials.EntityFramework
         private readonly IUserService _userService;
         private readonly ICommonData _commonData;
         private readonly ILogger<MaterialService<TUnitOfWork>> _logger;
+        private readonly IMaterialElasticService _materialElasticService;
 
         public MaterialService(IFileService fileService,
             IMapper mapper,
@@ -52,7 +52,8 @@ namespace IIS.Core.Materials.EntityFramework
             IMaterialSignRepository materialSignRepository,
             IUnitOfWorkFactory<TUnitOfWork> unitOfWorkFactory,
             ICommonData commonData,
-            ILogger<MaterialService<TUnitOfWork>> logger) : base(unitOfWorkFactory)
+            ILogger<MaterialService<TUnitOfWork>> logger,
+            IMaterialElasticService materialElasticService) : base(unitOfWorkFactory)
         {
             _fileService = fileService;
             _mapper = mapper;
@@ -64,6 +65,7 @@ namespace IIS.Core.Materials.EntityFramework
             _materialSignRepository = materialSignRepository;
             _commonData = commonData;
             _logger = logger;
+            _materialElasticService = materialElasticService;
         }
 
         public async Task SaveAsync(Material material, Guid? changeRequestId = null)
@@ -192,16 +194,13 @@ namespace IIS.Core.Materials.EntityFramework
 
             responseEntity = await _mLResponseRepository.SaveAsync(responseEntity);
 
-            await RunWithoutCommitAsync(uow => uow.MaterialRepository.PutMaterialToElasticSearchAsync(responseEntity.MaterialId));
+            await _materialElasticService.PutMaterialToElasticSearchAsync(responseEntity.MaterialId);
 
             if (responseEntity.HandlerCode == MlHandlerCodeList.ImageVector)
             {
                 var parentId = await RunWithoutCommitAsync(uow => uow.MaterialRepository.GetParentIdByChildIdAsync(responseEntity.MaterialId));
-
                 if (parentId.HasValue)
-                {
-                    await RunWithoutCommitAsync(uow => uow.MaterialRepository.PutMaterialToElasticSearchAsync(parentId.Value));
-                }
+                    await _materialElasticService.PutMaterialToElasticSearchAsync(parentId.Value);
             }
 
             return _mapper.Map<MLResponse>(responseEntity);
@@ -352,7 +351,7 @@ namespace IIS.Core.Materials.EntityFramework
 
                 Run((unitOfWork) => { unitOfWork.MaterialRepository.EditMaterial(material); });
 
-                var fillElasticTask = RunWithoutCommitAsync(unitOfWork => unitOfWork.MaterialRepository.PutMaterialToElasticSearchAsync(material.Id, waitForIndexing: true));
+                var fillElasticTask = _materialElasticService.PutMaterialToElasticSearchAsync(material.Id, waitForIndexing: true);
 
                 var addHistoryTask = _changeHistoryService.SaveMaterialChanges(changesList);
 
@@ -443,8 +442,7 @@ namespace IIS.Core.Materials.EntityFramework
             material.AssigneeId = assigneeId;
             material.Assignee = null;
             Run(unitOfWork => unitOfWork.MaterialRepository.EditMaterial(material));
-            await RunWithoutCommitAsync(async unitOfWork =>
-                await unitOfWork.MaterialRepository.PutMaterialToElasticSearchAsync(material.Id));
+            await _materialElasticService.PutMaterialToElasticSearchAsync(material.Id);
         }
 
         public async Task<bool> AssignMaterialEditorAsync(Guid materialId, User user)
@@ -460,7 +458,7 @@ namespace IIS.Core.Materials.EntityFramework
             material.Editor = null;
 
             Run(_ => _.MaterialRepository.EditMaterial(material));
-            await RunWithoutCommitAsync(_ => _.MaterialRepository.PutMaterialToElasticSearchAsync(material.Id));
+            await _materialElasticService.PutMaterialToElasticSearchAsync(material.Id);
 
             return true;
         }
@@ -478,7 +476,7 @@ namespace IIS.Core.Materials.EntityFramework
             material.Editor = null;
 
             Run(_ => _.MaterialRepository.EditMaterial(material));
-            await RunWithoutCommitAsync(_ => _.MaterialRepository.PutMaterialToElasticSearchAsync(material.Id));
+            await _materialElasticService.PutMaterialToElasticSearchAsync(material.Id);
 
             return true;
         }
@@ -495,8 +493,7 @@ namespace IIS.Core.Materials.EntityFramework
 
             material.MlHandlersCount += handlersCount;
             Run(unitOfWork => unitOfWork.MaterialRepository.EditMaterial(material));
-            await RunWithoutCommitAsync(async unitOfWork =>
-                await unitOfWork.MaterialRepository.PutMaterialToElasticSearchAsync(material.Id));
+            await _materialElasticService.PutMaterialToElasticSearchAsync(material.Id);
         }
 
         private MaterialInfoEntity Map(MaterialInfo info, Guid materialId)
@@ -510,21 +507,6 @@ namespace IIS.Core.Materials.EntityFramework
                 SourceType = info.SourceType,
                 SourceVersion = info.SourceVersion,
             };
-        }
-
-        public Task<List<ElasticBulkResponse>> PutAllMaterialsToElasticSearchAsync(CancellationToken ct)
-        {
-            return RunWithoutCommitAsync(uow => uow.MaterialRepository.PutAllMaterialsToElasticSearchAsync(ct));
-        }
-
-        public Task<List<ElasticBulkResponse>> PutAllMaterialChangesToElasticSearchAsync(CancellationToken cancellationToken = default)
-        {
-            return RunWithoutCommitAsync(_ => _.MaterialRepository.PutAllMaterialChangesToElasticSearchAsync(cancellationToken));
-        }
-
-        public Task<List<ElasticBulkResponse>> PutCreatedMaterialsToElasticSearchAsync(IReadOnlyCollection<Guid> materialIds, bool waitForIndexing, CancellationToken ct)
-        {
-            return RunWithoutCommitAsync(uow => uow.MaterialRepository.PutCreatedMaterialsToElasticSearchAsync(materialIds, waitForIndexing, ct));
         }
 
         public async Task<Material> ChangeMaterialAccessLevel(Guid materialId, int accessLevel, User user)
@@ -555,7 +537,7 @@ namespace IIS.Core.Materials.EntityFramework
 
             Run(uow => uow.MaterialRepository.EditMaterial(material));
 
-            var elasticTask = RunWithoutCommitAsync(unitOfWork => unitOfWork.MaterialRepository.PutMaterialToElasticSearchAsync(material.Id, waitForIndexing: true));
+            var elasticTask = _materialElasticService.PutMaterialToElasticSearchAsync(material.Id, waitForIndexing: true);
 
             var changeHistoryTask = _changeHistoryService.SaveMaterialChanges(new[] { changeHistory });
 
