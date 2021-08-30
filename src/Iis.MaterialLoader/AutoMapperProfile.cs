@@ -50,6 +50,8 @@ namespace Iis.MaterialLoader
 
                     dest.Type = dest.Metadata.GetValue("type", StringComparison.InvariantCultureIgnoreCase)?.Value<string>();
                     dest.Source = dest.Metadata.GetValue("source", StringComparison.InvariantCultureIgnoreCase)?.Value<string>();
+                    var extractor = new MaterialMetadataExtractor(dest.Metadata);
+                    dest.Channel = extractor.Channel;
                 });
 
             CreateMap<MaterialInput, Iis.Domain.Materials.MaterialLoadData>()
