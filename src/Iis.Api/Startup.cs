@@ -182,7 +182,6 @@ namespace IIS.Core
 
             services.AddTransient<IUnitOfWorkFactory<IIISUnitOfWork>, IISUnitOfWorkFactory>();
             services.AddTransient<IMaterialService, MaterialService<IIISUnitOfWork>>();
-            services.AddTransient<IMaterialPutToElasticService, MaterialService<IIISUnitOfWork>>();
             services.AddTransient<IOntologyService, OntologyServiceWithCache>();            
 
             services.AddSingleton<IElasticConfiguration, IisElasticConfiguration>();

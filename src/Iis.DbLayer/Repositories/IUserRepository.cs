@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Iis.DataModel;
+using Iis.DataModel.Roles;
 
 namespace Iis.DbLayer.Repositories
 {
@@ -17,5 +18,6 @@ namespace Iis.DbLayer.Repositories
         Task<UserEntity[]> GetOperatorsAsync(Expression<Func<UserEntity, bool>> predicate, CancellationToken ct);
         Task<UserEntity[]> GetUsersAsync(int skip, int take, Expression<Func<UserEntity, bool>> predicate, CancellationToken ct);
         Task<int> GetUserCountAsync(Expression<Func<UserEntity, bool>> predicate, CancellationToken ct);
+        Task<Dictionary<string, IEnumerable<RoleEntity>>> GetRolesByUserNamesDictionaryAsync(ISet<string> userNames, CancellationToken cancellationToken = default);
     }
 }

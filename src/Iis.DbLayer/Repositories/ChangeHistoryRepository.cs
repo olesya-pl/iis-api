@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
+using System.Threading;
 using System.Threading.Tasks;
 using Iis.DataModel;
 using Iis.DataModel.ChangeHistory;
@@ -24,6 +26,7 @@ namespace Iis.DbLayer.Repositories
 
             return query.OrderByDescending(ch => ch.Date).ToListAsync();
         }
+
         public Task<List<ChangeHistoryEntity>> GetManyAsync(IReadOnlyCollection<Guid> targetIdList, string propertyName, DateTime? dateFrom = null, DateTime? dateTo = null)
         {
             var query = Context.ChangeHistory.AsNoTracking().Where(ch => targetIdList.Contains(ch.TargetId));
@@ -54,6 +57,31 @@ namespace Iis.DbLayer.Repositories
                 .ToListAsync();
         }
 
+        public async Task<IReadOnlyCollection<ChangeHistoryEntity>> GetAllAsync(
+            int limit,
+            int offset,
+            Expression<Func<ChangeHistoryEntity, bool>> predicate = null,
+            CancellationToken cancellationToken = default)
+        {
+            var query = Context.ChangeHistory.AsNoTracking();
+            if (predicate != null)
+                query = query.Where(predicate);
+
+            return await query.OrderBy(_ => _.Id)
+                .Skip(offset)
+                .Take(limit)
+                .ToArrayAsync(cancellationToken);
+        }
+
+        public Task<int> GetTotalCountAsync(Expression<Func<ChangeHistoryEntity, bool>> predicate = null, CancellationToken cancellationToken = default)
+        {
+            var query = Context.ChangeHistory.AsNoTracking();
+            if (predicate != null)
+                query = query.Where(predicate);
+
+            return query.CountAsync(cancellationToken);
+        }
+
         public void Add(ChangeHistoryEntity entity)
         {
             Context.Add(entity);
@@ -66,12 +94,12 @@ namespace Iis.DbLayer.Repositories
 
         private static IQueryable<ChangeHistoryEntity> AddDatePeriod(IQueryable<ChangeHistoryEntity> query, DateTime? dateFrom, DateTime? dateTo)
         {
-            if(dateFrom.HasValue)
+            if (dateFrom.HasValue)
             {
                 query = query.Where(e => e.Date >= dateFrom);
             }
 
-            if(dateTo.HasValue)
+            if (dateTo.HasValue)
             {
                 query = query.Where(e => e.Date <= dateTo);
             }

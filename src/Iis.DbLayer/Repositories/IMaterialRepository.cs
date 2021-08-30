@@ -5,8 +5,6 @@ using Iis.DataModel.Materials;
 using Iis.DbLayer.MaterialEnum;
 using System.Threading;
 using Iis.Domain.Materials;
-using Iis.Interfaces.Elastic;
-using Iis.DataModel.ChangeHistory;
 
 namespace Iis.DbLayer.Repositories
 {
@@ -20,6 +18,8 @@ namespace Iis.DbLayer.Repositories
 
         Task<IEnumerable<MaterialEntity>> GetAllAsync(int limit, params MaterialIncludeEnum[] includes);
 
+        Task<IEnumerable<MaterialEntity>> GetAllAsync(int limit, int offset, params MaterialIncludeEnum[] includes);
+
         Task<IEnumerable<MaterialEntity>> GetAllForRelatedNodeListAsync(IEnumerable<Guid> nodeIdList);
 
         Task<(IEnumerable<MaterialEntity> Entities, int TotalCount)> GetAllAsync(int limit, int offset, string sortColumnName = null, string sortOrder = null);
@@ -31,17 +31,6 @@ namespace Iis.DbLayer.Repositories
         Task<IReadOnlyCollection<Guid>> GetAllUnassignedIdsAsync(int limit, int offset, string sortColumnName = null, string sortOrder = null, CancellationToken cancellationToken = default);
 
         Task<IEnumerable<MaterialEntity>> GetAllByAssigneeIdAsync(Guid assigneeId);
-
-        Task<List<ElasticBulkResponse>> PutAllMaterialsToElasticSearchAsync(CancellationToken ct = default);
-
-        Task<List<ElasticBulkResponse>> PutAllMaterialChangesToElasticSearchAsync(CancellationToken cancellationToken = default);
-        
-        Task<List<ElasticBulkResponse>> PutMaterialChangesToElasticSearchAsync(IReadOnlyCollection<ChangeHistoryEntity> changes, bool waitForIndexing = false, CancellationToken cancellationToken = default);
-
-        Task<List<ElasticBulkResponse>> PutCreatedMaterialsToElasticSearchAsync(IReadOnlyCollection<Guid> materialIds, bool waitForIndexing = false, CancellationToken token = default);
-
-        Task<bool> PutMaterialToElasticSearchAsync(Guid materialId, CancellationToken ct = default, bool waitForIndexing = false);
-
 
         void AddMaterialEntity(MaterialEntity materialEntity);
 
@@ -68,5 +57,7 @@ namespace Iis.DbLayer.Repositories
         Task RemoveMaterialsAndRelatedData(IReadOnlyCollection<Guid> fileIdList);
 
         Task<Guid?> GetParentIdByChildIdAsync(Guid materialId);
+
+        Task<int> GetTotalCountAsync(CancellationToken cancellationToken);
     }
 }
