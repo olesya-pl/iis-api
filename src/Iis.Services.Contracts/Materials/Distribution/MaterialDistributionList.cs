@@ -13,5 +13,9 @@ namespace Iis.Services.Contracts.Materials.Distribution
         {
             Items = items.ToList();
         }
+
+        public bool TotallyDistributed(DistributionResult distributionResult) =>
+            Items.All(_ => distributionResult.Contains(_.Id));
+        
     }
 }

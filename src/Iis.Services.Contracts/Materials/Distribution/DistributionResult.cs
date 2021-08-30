@@ -7,7 +7,7 @@ namespace Iis.Services.Contracts.Materials.Distribution
 {
     public class DistributionResult
     {
-        public IReadOnlyList<DistributionResultItem> Items { get; }
+        public List<DistributionResultItem> Items { get; }
         public DistributionResult()
         {
             Items = new List<DistributionResultItem>();
@@ -16,5 +16,8 @@ namespace Iis.Services.Contracts.Materials.Distribution
         {
             Items = items.ToList();
         }
+
+        public bool Contains(Guid materialId) =>
+            Items.Any(_ => _.MaterialId == materialId);
     }
 }

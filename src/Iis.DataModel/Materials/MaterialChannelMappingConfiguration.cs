@@ -6,9 +6,9 @@ using System.Text;
 
 namespace Iis.DataModel.Materials
 {
-    public class MaterialChannelMappingConfiguration: IEntityTypeConfiguration<MaterialChannelMapping>
+    public class MaterialChannelMappingConfiguration: IEntityTypeConfiguration<MaterialChannelMappingEntity>
     {
-        public void Configure(EntityTypeBuilder<MaterialChannelMapping> builder)
+        public void Configure(EntityTypeBuilder<MaterialChannelMappingEntity> builder)
         {
             builder
                 .Property(p => p.Id)

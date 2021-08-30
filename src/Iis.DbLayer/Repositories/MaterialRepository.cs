@@ -77,30 +77,6 @@ namespace Iis.DbLayer.Repositories
             return await GetMaterialsQuery(includes).Where(filter).AsQueryable().ToArrayAsync();
         }
 
-        public async Task<IEnumerable<MaterialEntity>> GetCellSatWithChannel(int limit)
-        {
-            return await GetMaterialsQuery()
-                .Where(m => (m.Source.StartsWith("sat.") || m.Source.StartsWith("cell.")) && m.Channel != null)
-                .Take(limit)
-                .ToArrayAsync();
-        }
-
-        public async Task<IEnumerable<MaterialEntity>> GetCellSatWithoutChannel(int limit)
-        {
-            return await GetMaterialsQuery()
-                .Where(m => (m.Source.StartsWith("sat.") || m.Source.StartsWith("cell.")) && m.Channel == null)
-                .Take(limit)
-                .ToArrayAsync();
-        }
-
-        public async Task<IEnumerable<MaterialEntity>> GetNotCellSat(int limit)
-        {
-            return await GetMaterialsQuery()
-                .Where(m => !(m.Source.StartsWith("sat.") || m.Source.StartsWith("cell.")))
-                .Take(limit)
-                .ToArrayAsync();
-        }
-
         public async Task<IEnumerable<MaterialEntity>> GetAllAsync(int limit, params MaterialIncludeEnum[] includes)
         {
             return await GetMaterialsQuery(includes)
@@ -605,6 +581,35 @@ namespace Iis.DbLayer.Repositories
                                     .FirstOrDefault(e => e.HandlerCode == handlerCode);
 
             return FaceAPIResponseParser.GetFaceVectorList(response?.OriginalResponse);
+        }
+
+        public async Task<IEnumerable<MaterialEntity>> GetCellSatWithChannel(int limit)
+        {
+            return await GetMaterialsQuery()
+                .Where(m => (m.Source.StartsWith("sat.") || m.Source.StartsWith("cell.")) && m.Channel != null)
+                .Take(limit)
+                .ToArrayAsync();
+        }
+
+        public async Task<IEnumerable<MaterialEntity>> GetCellSatWithoutChannel(int limit)
+        {
+            return await GetMaterialsQuery()
+                .Where(m => (m.Source.StartsWith("sat.") || m.Source.StartsWith("cell.")) && m.Channel == null)
+                .Take(limit)
+                .ToArrayAsync();
+        }
+
+        public async Task<IEnumerable<MaterialEntity>> GetNotCellSat(int limit)
+        {
+            return await GetMaterialsQuery()
+                .Where(m => !(m.Source.StartsWith("sat.") || m.Source.StartsWith("cell.")))
+                .Take(limit)
+                .ToArrayAsync();
+        }
+
+        public async Task<IEnumerable<MaterialChannelMappingEntity>> GetChannelMappingsAsync()
+        {
+            return await Context.MaterialChannelMappings.ToArrayAsync();
         }
     }
 }

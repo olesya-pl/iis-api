@@ -17,5 +17,13 @@ namespace Iis.Services.Contracts.Materials.Distribution
             FreeSlots = freeSlots;
             RoleNames = roleNames?.ToList() ?? new List<string>();
         }
+
+        public int GetPriority(string roleName)
+        {
+            if (RoleNames.Count == 0) return 0;
+            if (!RoleNames.Contains(roleName)) return -1;
+            if (RoleNames.Count == 1) return 2;
+            return 1;
+        }
     }
 }

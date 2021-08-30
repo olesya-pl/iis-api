@@ -633,16 +633,20 @@ namespace IIS.Services.Materials
                    unitOfWork.MaterialRepository.GetAllUnassignedIdsAsync(limit, offset, sorting?.ColumnName, sorting?.Order, cancellationToken));
         }
 
-        public Task<IEnumerable<MaterialEntity>> GetCellSatWithChannel(int limit) =>
-            RunWithoutCommitAsync((unitOfWork) =>
+        public async Task<IEnumerable<MaterialEntity>> GetCellSatWithChannelAsync(int limit) =>
+            await RunWithoutCommitAsync((unitOfWork) =>
                    unitOfWork.MaterialRepository.GetCellSatWithChannel(limit));
 
-        public Task<IEnumerable<MaterialEntity>> GetCellSatWithoutChannel(int limit) =>
-            RunWithoutCommitAsync((unitOfWork) =>
+        public async Task<IEnumerable<MaterialEntity>> GetCellSatWithoutChannelAsync(int limit) =>
+            await RunWithoutCommitAsync((unitOfWork) =>
                    unitOfWork.MaterialRepository.GetCellSatWithoutChannel(limit));
 
-        public Task<IEnumerable<MaterialEntity>> GetNotCellSat(int limit) =>
-            RunWithoutCommitAsync((unitOfWork) =>
+        public async Task<IEnumerable<MaterialEntity>> GetNotCellSatAsync(int limit) =>
+            await RunWithoutCommitAsync((unitOfWork) =>
                    unitOfWork.MaterialRepository.GetNotCellSat(limit));
+
+        public async Task<IEnumerable<MaterialChannelMappingEntity>> GetChannelMappingsAsync() =>
+            await RunWithoutCommitAsync((unitOfWork) =>
+                   unitOfWork.MaterialRepository.GetChannelMappingsAsync());
     }
 }

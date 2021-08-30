@@ -19,10 +19,7 @@ namespace Iis.DbLayer.Repositories
         Task<IEnumerable<MaterialEntity>> GetAllAsync(params MaterialIncludeEnum[] includes);
 
         Task<IEnumerable<MaterialEntity>> GetAllAsync(int limit, params MaterialIncludeEnum[] includes);
-        Task<IEnumerable<MaterialEntity>> GetCellSatWithChannel(int limit);
-        Task<IEnumerable<MaterialEntity>> GetCellSatWithoutChannel(int limit);
-        Task<IEnumerable<MaterialEntity>> GetNotCellSat(int limit);
-
+        
         Task<IEnumerable<MaterialEntity>> GetAllForRelatedNodeListAsync(IEnumerable<Guid> nodeIdList);
 
         Task<(IEnumerable<MaterialEntity> Entities, int TotalCount)> GetAllAsync(int limit, int offset, string sortColumnName = null, string sortOrder = null);
@@ -66,5 +63,10 @@ namespace Iis.DbLayer.Repositories
         Task RemoveMaterialsAndRelatedData(IReadOnlyCollection<Guid> fileIdList);
 
         Task<Guid?> GetParentIdByChildIdAsync(Guid materialId);
+        Task<IEnumerable<MaterialChannelMappingEntity>> GetChannelMappingsAsync();
+        Task<IEnumerable<MaterialEntity>> GetCellSatWithChannel(int limit);
+        Task<IEnumerable<MaterialEntity>> GetCellSatWithoutChannel(int limit);
+        Task<IEnumerable<MaterialEntity>> GetNotCellSat(int limit);
+
     }
 }

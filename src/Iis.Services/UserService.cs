@@ -119,11 +119,13 @@ namespace Iis.Services
             return userList.Select(e => e.Id).ToList();
         }
 
-        private List<string> GetRoleNames(UserEntity userEntity) =>
-            userEntity.UserRoles.Select(ur => ur.Role.Name).ToList();
+        private List<string> GetRoles(UserEntity userEntity, IEnumerable<Guid> mappingRoleIds) =>
+            userEntity.UserRoles
+                .Where(_ => mappingRoleIds.Contains(_.RoleId))
+                .Select(_ => _.Role.Id.ToString("N")).ToList();
         public async Task<UserDistributionList> GetOperatorsForMaterialsAsync()
         {
-            var maxMaterialsCount = 100; //_maxMaterialsConfig.Value;
+            var maxMaterialsCount = _maxMaterialsConfig.Value;
 
             var chargedInfo = _context.Materials
                 .AsNoTracking()
@@ -139,17 +141,19 @@ namespace Iis.Services
                     })
                 .ToList();
 
+            var mappingRoleIds = await _context.MaterialChannelMappings.Select(_ => _.RoleId).ToArrayAsync();
+
             var allOperators = (await RunWithoutCommitAsync(uow => uow.UserRepository.GetOperatorsAsync())).ToList();
             var list =
                 (from op in allOperators
                 join ci in chargedInfo
                     on op.Id equals ci.UserId
                 where ci.FreeSlots > 0
-                select new UserDistributionDto(op.Id, ci.FreeSlots, GetRoleNames(op))).ToList();
+                select new UserDistributionDto(op.Id, ci.FreeSlots, GetRoles(op, mappingRoleIds))).ToList();
 
             list.AddRange(allOperators
                 .Where(op => !chargedInfo.Any(ci => ci.UserId == op.Id))
-                .Select(op => new UserDistributionDto(op.Id, maxMaterialsCount, GetRoleNames(op))));
+                .Select(op => new UserDistributionDto(op.Id, maxMaterialsCount, GetRoles(op, mappingRoleIds))));
 
             return new UserDistributionList(list);
         }

@@ -13,5 +13,16 @@ namespace Iis.Services.Contracts.Materials.Distribution
         {
             Items = items.ToList();
         }
+
+        public UserDistributionDto GetUser(string roleName)
+        {
+            var user = Items
+                .Where(_ => _.FreeSlots > 0)
+                .OrderByDescending(_ => _.GetPriority(roleName))
+                .ThenBy(_ => _.FreeSlots)
+                .FirstOrDefault();
+
+            return user.GetPriority(roleName) == -1 ? null : user;
+        }
     }
 }

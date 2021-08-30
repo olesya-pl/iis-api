@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Iis.DataModel.Materials
 {
-    public class MaterialChannelMapping: BaseEntity
+    public class MaterialChannelMappingEntity: BaseEntity
     {
         public string ChannelName { get; set; }
         public Guid RoleId { get; set; }
