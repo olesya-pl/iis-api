@@ -4,14 +4,13 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 using Newtonsoft.Json;
 using Iis.Interfaces.Elastic;
-using Iis.Elastic.SearchQueryExtensions;
 using Iis.Services.Contracts.Enums;
 using Iis.Services.Contracts.Params;
 using Iis.Services.Contracts.Interfaces;
 using Iis.Services.Contracts.Interfaces.Elastic;
 using Iis.Elastic;
-using Iis.DbLayer.MaterialDictionaries;
-using Iis.Domain.Materials;
+using Iis.Elastic.Dictionaries;
+using Iis.Elastic.SearchQueryExtensions;
 
 namespace Iis.Services
 {
@@ -25,15 +24,15 @@ namespace Iis.Services
         private string[] MaterialIndexes = { "Materials" };
         private static IReadOnlyCollection<AggregationField> _aggregationsFieldList = new List<AggregationField>
         {
-            new AggregationField("ProcessedStatus.Title", "Статус", "ProcessedStatus.Title"),
-            new AggregationField("Completeness.Title", "Повнота", "Completeness.Title"),
-            new AggregationField("Importance.Title", "Важливість", "Importance.Title"),
-            new AggregationField("SessionPriority.Title", "Пріоритет сесії", "SessionPriority.Title"),
-            new AggregationField("Reliability.Title", "Достовірність", "Reliability.Title"),
-            new AggregationField("Relevance.Title", "Актуальність", "Relevance.Title"),
-            new AggregationField("SourceReliability.Title", "Надійність джерела", "SourceReliability.Title"),
-            new AggregationField("Type.keyword", "Тип", "Type.keyword"),
-            new AggregationField("Source.keyword", "Джерело", "Source.keyword"),
+            new AggregationField(MaterialAliases.ProcessedStatus.Path, MaterialAliases.ProcessedStatus.Alias, MaterialAliases.ProcessedStatus.Path),
+            new AggregationField(MaterialAliases.Completeness.Path, MaterialAliases.Completeness.Alias, MaterialAliases.Completeness.Path),
+            new AggregationField(MaterialAliases.Importance.Path, MaterialAliases.Importance.Alias, MaterialAliases.Importance.Path),
+            new AggregationField(MaterialAliases.SessionPriority.Path, MaterialAliases.SessionPriority.Alias, MaterialAliases.SessionPriority.Path),
+            new AggregationField(MaterialAliases.Reliability.Path, MaterialAliases.Reliability.Alias, MaterialAliases.Reliability.Path),
+            new AggregationField(MaterialAliases.Relevance.Path, MaterialAliases.Relevance.Alias, MaterialAliases.Relevance.Path),
+            new AggregationField(MaterialAliases.SourceReliability.Path, MaterialAliases.SourceReliability.Alias, MaterialAliases.SourceReliability.Path),
+            new AggregationField(MaterialAliases.Type.Path, MaterialAliases.Type.Alias, MaterialAliases.Type.Path),
+            new AggregationField(MaterialAliases.Source.Path, MaterialAliases.Source.Alias, MaterialAliases.Source.Path),
         };
 
         public MaterialElasticService(IElasticManager elasticManager,
