@@ -7,15 +7,15 @@ namespace Iis.Services.Contracts.Materials.Distribution
 {
     public class UserDistributionList
     {
-        public List<UserDistributionDto> Items { get; set; } = new List<UserDistributionDto>();
-        public UserDistributionDto this[int index] => Items[index];
+        public List<UserDistributionItem> Items { get; set; } = new List<UserDistributionItem>();
+        public UserDistributionItem this[int index] => Items[index];
         public UserDistributionList() { }
-        public UserDistributionList(IEnumerable<UserDistributionDto> items)
+        public UserDistributionList(IEnumerable<UserDistributionItem> items)
         {
             Items = items.ToList();
         }
 
-        public UserDistributionDto GetUser(string roleName)
+        public UserDistributionItem GetUser(string roleName)
         {
             var user = Items
                 .Where(_ => _.FreeSlots > 0)
@@ -25,5 +25,10 @@ namespace Iis.Services.Contracts.Materials.Distribution
 
             return user == null || user.GetPriority(roleName) == -1 ? null : user;
         }
+
+        public int TotalFreeSlots() => Items.Sum(_ => _.FreeSlots);
+
+        public override string ToString() =>
+            $"Count: {Items.Count}";
     }
 }

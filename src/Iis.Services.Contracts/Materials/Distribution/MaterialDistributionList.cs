@@ -7,12 +7,15 @@ namespace Iis.Services.Contracts.Materials.Distribution
 {
     public class MaterialDistributionList
     {
-        public List<MaterialDistributionDto> Items { get; set; } = new List<MaterialDistributionDto>();
-        public MaterialDistributionDto this[int index] => Items[index];
+        public List<MaterialDistributionItem> Items { get; set; } = new List<MaterialDistributionItem>();
+        public MaterialDistributionItem this[int index] => Items[index];
         public MaterialDistributionList() { }
-        public MaterialDistributionList(IEnumerable<MaterialDistributionDto> items)
+        public MaterialDistributionList(IEnumerable<MaterialDistributionItem> items)
         {
             Items = items.ToList();
         }
+
+        public override string ToString() =>
+            $"Count: {Items.Count}";
     }
 }

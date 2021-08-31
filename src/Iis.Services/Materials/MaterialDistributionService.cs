@@ -30,7 +30,7 @@ namespace Iis.Services.Materials
         }
 
         private DistributionResultItem DistributeOne(
-            MaterialDistributionDto material,
+            MaterialDistributionItem material,
             UserDistributionList users)
         {
             var user = users.GetUser(material.RoleName);
@@ -39,10 +39,10 @@ namespace Iis.Services.Materials
             return new DistributionResultItem(material.Id, user.Id);
         }
 
-        private List<MaterialDistributionDto> ShuffleEvenly(List<MaterialDistributionDto> baseItems)
+        private List<MaterialDistributionItem> ShuffleEvenly(List<MaterialDistributionItem> baseItems)
         {
             if (baseItems.Count <= 1) return baseItems;
-            var result = new List<MaterialDistributionDto>();
+            var result = new List<MaterialDistributionItem>();
             var priorityGroups = baseItems.GroupBy(_ => _.Priority).OrderByDescending(g => g.Key);
 
             var maxCount = priorityGroups.Select(_ => _.Count()).Max();

@@ -16,9 +16,9 @@ namespace Iis.UnitTests.Materials.Distribution
         public void Distribute_NoMaterials()
         {
             var materials = new MaterialDistributionList();
-            var users = new UserDistributionList(new List<UserDistributionDto>
+            var users = new UserDistributionList(new List<UserDistributionItem>
             {
-                new UserDistributionDto(Guid.NewGuid(), 10, null)
+                new UserDistributionItem(Guid.NewGuid(), 10, null)
             });
             var options = new MaterialDistributionOptions { Strategy = DistributionStrategy.Evenly };
             var actual = GetService().Distribute(materials, users, options);
@@ -27,9 +27,9 @@ namespace Iis.UnitTests.Materials.Distribution
         [Fact]
         public void Distribute_NoUsers()
         {
-            var materials = new MaterialDistributionList(new List<MaterialDistributionDto>
+            var materials = new MaterialDistributionList(new List<MaterialDistributionItem>
             {
-                new MaterialDistributionDto(Guid.NewGuid(), 1, null, null)
+                new MaterialDistributionItem(Guid.NewGuid(), 1, null, null)
             });
             var users = new UserDistributionList();
             var options = new MaterialDistributionOptions { Strategy = DistributionStrategy.Evenly };
@@ -39,13 +39,13 @@ namespace Iis.UnitTests.Materials.Distribution
         [Fact]
         public void Distribute_OneWithoutRole_OneUser_1()
         {
-            var materials = new MaterialDistributionList(new List<MaterialDistributionDto>
+            var materials = new MaterialDistributionList(new List<MaterialDistributionItem>
             {
-                new MaterialDistributionDto(Guid.NewGuid(), 1, null, null)
+                new MaterialDistributionItem(Guid.NewGuid(), 1, null, null)
             });
-            var users = new UserDistributionList(new List<UserDistributionDto>
+            var users = new UserDistributionList(new List<UserDistributionItem>
             {
-                new UserDistributionDto(Guid.NewGuid(), 10, null)
+                new UserDistributionItem(Guid.NewGuid(), 10, null)
             });
             var options = new MaterialDistributionOptions { Strategy = DistributionStrategy.Evenly };
             var actual = GetService().Distribute(materials, users, options);
@@ -56,13 +56,13 @@ namespace Iis.UnitTests.Materials.Distribution
         [Fact]
         public void Distribute_OneWithoutRole_OneUser_2()
         {
-            var materials = new MaterialDistributionList(new List<MaterialDistributionDto>
+            var materials = new MaterialDistributionList(new List<MaterialDistributionItem>
             {
-                new MaterialDistributionDto(Guid.NewGuid(), 1, null, null)
+                new MaterialDistributionItem(Guid.NewGuid(), 1, null, null)
             });
-            var users = new UserDistributionList(new List<UserDistributionDto>
+            var users = new UserDistributionList(new List<UserDistributionItem>
             {
-                new UserDistributionDto(Guid.NewGuid(), 10, new List<string> { "Role1", "Role2" })
+                new UserDistributionItem(Guid.NewGuid(), 10, new List<string> { "Role1", "Role2" })
             });
             var options = new MaterialDistributionOptions { Strategy = DistributionStrategy.Evenly };
             var actual = GetService().Distribute(materials, users, options);
@@ -73,13 +73,13 @@ namespace Iis.UnitTests.Materials.Distribution
         [Fact]
         public void Distribute_OneWithRole_OneUser_1()
         {
-            var materials = new MaterialDistributionList(new List<MaterialDistributionDto>
+            var materials = new MaterialDistributionList(new List<MaterialDistributionItem>
             {
-                new MaterialDistributionDto(Guid.NewGuid(), 1, "Role1", null)
+                new MaterialDistributionItem(Guid.NewGuid(), 1, "Role1", null)
             });
-            var users = new UserDistributionList(new List<UserDistributionDto>
+            var users = new UserDistributionList(new List<UserDistributionItem>
             {
-                new UserDistributionDto(Guid.NewGuid(), 10, null)
+                new UserDistributionItem(Guid.NewGuid(), 10, null)
             });
             var options = new MaterialDistributionOptions { Strategy = DistributionStrategy.Evenly };
             var actual = GetService().Distribute(materials, users, options);
@@ -90,13 +90,13 @@ namespace Iis.UnitTests.Materials.Distribution
         [Fact]
         public void Distribute_OneWithRole_OneUser_2()
         {
-            var materials = new MaterialDistributionList(new List<MaterialDistributionDto>
+            var materials = new MaterialDistributionList(new List<MaterialDistributionItem>
             {
-                new MaterialDistributionDto(Guid.NewGuid(), 1, "Role1", null)
+                new MaterialDistributionItem(Guid.NewGuid(), 1, "Role1", null)
             });
-            var users = new UserDistributionList(new List<UserDistributionDto>
+            var users = new UserDistributionList(new List<UserDistributionItem>
             {
-                new UserDistributionDto(Guid.NewGuid(), 10, new List<string>{ "Role1" })
+                new UserDistributionItem(Guid.NewGuid(), 10, new List<string>{ "Role1" })
             });
             var options = new MaterialDistributionOptions { Strategy = DistributionStrategy.Evenly };
             var actual = GetService().Distribute(materials, users, options);
@@ -107,13 +107,13 @@ namespace Iis.UnitTests.Materials.Distribution
         [Fact]
         public void Distribute_OneWithRole_OneUser_3()
         {
-            var materials = new MaterialDistributionList(new List<MaterialDistributionDto>
+            var materials = new MaterialDistributionList(new List<MaterialDistributionItem>
             {
-                new MaterialDistributionDto(Guid.NewGuid(), 1, "Role1", null)
+                new MaterialDistributionItem(Guid.NewGuid(), 1, "Role1", null)
             });
-            var users = new UserDistributionList(new List<UserDistributionDto>
+            var users = new UserDistributionList(new List<UserDistributionItem>
             {
-                new UserDistributionDto(Guid.NewGuid(), 10, new List<string>{ "Role2" })
+                new UserDistributionItem(Guid.NewGuid(), 10, new List<string>{ "Role2" })
             });
             var options = new MaterialDistributionOptions { Strategy = DistributionStrategy.Evenly };
             var actual = GetService().Distribute(materials, users, options);
@@ -122,13 +122,13 @@ namespace Iis.UnitTests.Materials.Distribution
         [Fact]
         public void Distribute_OneWithRole_OneUser_4()
         {
-            var materials = new MaterialDistributionList(new List<MaterialDistributionDto>
+            var materials = new MaterialDistributionList(new List<MaterialDistributionItem>
             {
-                new MaterialDistributionDto(Guid.NewGuid(), 1, "Role1", null)
+                new MaterialDistributionItem(Guid.NewGuid(), 1, "Role1", null)
             });
-            var users = new UserDistributionList(new List<UserDistributionDto>
+            var users = new UserDistributionList(new List<UserDistributionItem>
             {
-                new UserDistributionDto(Guid.NewGuid(), 10, new List<string>{ "Role2", "Role3", "Role1" })
+                new UserDistributionItem(Guid.NewGuid(), 10, new List<string>{ "Role2", "Role3", "Role1" })
             });
             var options = new MaterialDistributionOptions { Strategy = DistributionStrategy.Evenly };
             var actual = GetService().Distribute(materials, users, options);
@@ -139,15 +139,15 @@ namespace Iis.UnitTests.Materials.Distribution
         [Fact]
         public void Distribute_OneWithRole_ManyUsers_1()
         {
-            var materials = new MaterialDistributionList(new List<MaterialDistributionDto>
+            var materials = new MaterialDistributionList(new List<MaterialDistributionItem>
             {
-                new MaterialDistributionDto(Guid.NewGuid(), 1, "Role1", null)
+                new MaterialDistributionItem(Guid.NewGuid(), 1, "Role1", null)
             });
-            var users = new UserDistributionList(new List<UserDistributionDto>
+            var users = new UserDistributionList(new List<UserDistributionItem>
             {
-                new UserDistributionDto(Guid.NewGuid(), 10, null),
-                new UserDistributionDto(Guid.NewGuid(), 10, new List<string>{ "Role2", "Role3" }),
-                new UserDistributionDto(Guid.NewGuid(), 10, new List<string>{ "Role2", "Role3", "Role1" })
+                new UserDistributionItem(Guid.NewGuid(), 10, null),
+                new UserDistributionItem(Guid.NewGuid(), 10, new List<string>{ "Role2", "Role3" }),
+                new UserDistributionItem(Guid.NewGuid(), 10, new List<string>{ "Role2", "Role3", "Role1" })
             });
             var options = new MaterialDistributionOptions { Strategy = DistributionStrategy.Evenly };
             var actual = GetService().Distribute(materials, users, options);
@@ -158,15 +158,15 @@ namespace Iis.UnitTests.Materials.Distribution
         [Fact]
         public void Distribute_OneWithRole_ManyUsers_2()
         {
-            var materials = new MaterialDistributionList(new List<MaterialDistributionDto>
+            var materials = new MaterialDistributionList(new List<MaterialDistributionItem>
             {
-                new MaterialDistributionDto(Guid.NewGuid(), 1, "Role1", null)
+                new MaterialDistributionItem(Guid.NewGuid(), 1, "Role1", null)
             });
-            var users = new UserDistributionList(new List<UserDistributionDto>
+            var users = new UserDistributionList(new List<UserDistributionItem>
             {
-                new UserDistributionDto(Guid.NewGuid(), 10, null),
-                new UserDistributionDto(Guid.NewGuid(), 10, new List<string>{ "Role2", "Role3" }),
-                new UserDistributionDto(Guid.NewGuid(), 10, new List<string>{ "Role2", "Role3", "Role4" })
+                new UserDistributionItem(Guid.NewGuid(), 10, null),
+                new UserDistributionItem(Guid.NewGuid(), 10, new List<string>{ "Role2", "Role3" }),
+                new UserDistributionItem(Guid.NewGuid(), 10, new List<string>{ "Role2", "Role3", "Role4" })
             });
             var options = new MaterialDistributionOptions { Strategy = DistributionStrategy.Evenly };
             var actual = GetService().Distribute(materials, users, options);
@@ -177,18 +177,18 @@ namespace Iis.UnitTests.Materials.Distribution
         [Fact]
         public void Distribute_Many_FreeSlots_1()
         {
-            var materials = new MaterialDistributionList(new List<MaterialDistributionDto>
+            var materials = new MaterialDistributionList(new List<MaterialDistributionItem>
             {
-                new MaterialDistributionDto(Guid.NewGuid(), 1, "Role1", null),
-                new MaterialDistributionDto(Guid.NewGuid(), 1, "Role1", null),
-                new MaterialDistributionDto(Guid.NewGuid(), 1, "Role1", null),
-                new MaterialDistributionDto(Guid.NewGuid(), 1, "Role1", null)
+                new MaterialDistributionItem(Guid.NewGuid(), 1, "Role1", null),
+                new MaterialDistributionItem(Guid.NewGuid(), 1, "Role1", null),
+                new MaterialDistributionItem(Guid.NewGuid(), 1, "Role1", null),
+                new MaterialDistributionItem(Guid.NewGuid(), 1, "Role1", null)
             });
-            var users = new UserDistributionList(new List<UserDistributionDto>
+            var users = new UserDistributionList(new List<UserDistributionItem>
             {
-                new UserDistributionDto(Guid.NewGuid(), 1, new List<string> { "Role1" }),
-                new UserDistributionDto(Guid.NewGuid(), 10, new List<string>{ "Role1" }),
-                new UserDistributionDto(Guid.NewGuid(), 10, new List<string>{ "Role2" })
+                new UserDistributionItem(Guid.NewGuid(), 1, new List<string> { "Role1" }),
+                new UserDistributionItem(Guid.NewGuid(), 10, new List<string>{ "Role1" }),
+                new UserDistributionItem(Guid.NewGuid(), 10, new List<string>{ "Role2" })
             });
             var options = new MaterialDistributionOptions { Strategy = DistributionStrategy.Evenly };
             var actual = GetService().Distribute(materials, users, options);
@@ -206,19 +206,19 @@ namespace Iis.UnitTests.Materials.Distribution
         [Fact]
         public void Distribute_Many_FreeSlots_2()
         {
-            var materials = new MaterialDistributionList(new List<MaterialDistributionDto>
+            var materials = new MaterialDistributionList(new List<MaterialDistributionItem>
             {
-                new MaterialDistributionDto(Guid.NewGuid(), 1, "Role1", null),
-                new MaterialDistributionDto(Guid.NewGuid(), 1, "Role3", null),
-                new MaterialDistributionDto(Guid.NewGuid(), 1, "Role1", null),
-                new MaterialDistributionDto(Guid.NewGuid(), 1, "Role2", null),
-                new MaterialDistributionDto(Guid.NewGuid(), 1, "Role2", null)
+                new MaterialDistributionItem(Guid.NewGuid(), 1, "Role1", null),
+                new MaterialDistributionItem(Guid.NewGuid(), 1, "Role3", null),
+                new MaterialDistributionItem(Guid.NewGuid(), 1, "Role1", null),
+                new MaterialDistributionItem(Guid.NewGuid(), 1, "Role2", null),
+                new MaterialDistributionItem(Guid.NewGuid(), 1, "Role2", null)
             });
-            var users = new UserDistributionList(new List<UserDistributionDto>
+            var users = new UserDistributionList(new List<UserDistributionItem>
             {
-                new UserDistributionDto(Guid.NewGuid(), 10, new List<string>{ }),
-                new UserDistributionDto(Guid.NewGuid(), 1, new List<string> { "Role1" }),
-                new UserDistributionDto(Guid.NewGuid(), 1, new List<string>{ "Role2" }),
+                new UserDistributionItem(Guid.NewGuid(), 10, new List<string>{ }),
+                new UserDistributionItem(Guid.NewGuid(), 1, new List<string> { "Role1" }),
+                new UserDistributionItem(Guid.NewGuid(), 1, new List<string>{ "Role2" }),
             });
             var options = new MaterialDistributionOptions { Strategy = DistributionStrategy.Evenly };
             var actual = GetService().Distribute(materials, users, options);
@@ -236,19 +236,19 @@ namespace Iis.UnitTests.Materials.Distribution
         [Fact]
         public void Distribute_Many_Priority_1()
         {
-            var materials = new MaterialDistributionList(new List<MaterialDistributionDto>
+            var materials = new MaterialDistributionList(new List<MaterialDistributionItem>
             {
-                new MaterialDistributionDto(Guid.NewGuid(), 1, "Role1", null),
-                new MaterialDistributionDto(Guid.NewGuid(), 1, "Role1", null),
-                new MaterialDistributionDto(Guid.NewGuid(), 2, "Role1", null),
-                new MaterialDistributionDto(Guid.NewGuid(), 3, "Role1", null),
-                new MaterialDistributionDto(Guid.NewGuid(), 1, "Role1", null)
+                new MaterialDistributionItem(Guid.NewGuid(), 1, "Role1", null),
+                new MaterialDistributionItem(Guid.NewGuid(), 1, "Role1", null),
+                new MaterialDistributionItem(Guid.NewGuid(), 2, "Role1", null),
+                new MaterialDistributionItem(Guid.NewGuid(), 3, "Role1", null),
+                new MaterialDistributionItem(Guid.NewGuid(), 1, "Role1", null)
             });
-            var users = new UserDistributionList(new List<UserDistributionDto>
+            var users = new UserDistributionList(new List<UserDistributionItem>
             {
-                new UserDistributionDto(Guid.NewGuid(), 10, new List<string>{ }),
-                new UserDistributionDto(Guid.NewGuid(), 2, new List<string> { "Role1" }),
-                new UserDistributionDto(Guid.NewGuid(), 1, new List<string>{ "Role2" }),
+                new UserDistributionItem(Guid.NewGuid(), 10, new List<string>{ }),
+                new UserDistributionItem(Guid.NewGuid(), 2, new List<string> { "Role1" }),
+                new UserDistributionItem(Guid.NewGuid(), 1, new List<string>{ "Role2" }),
             });
             var options = new MaterialDistributionOptions { Strategy = DistributionStrategy.Evenly };
             var actual = GetService().Distribute(materials, users, options);
@@ -266,18 +266,18 @@ namespace Iis.UnitTests.Materials.Distribution
         [Fact]
         public void Distribute_Many_Channels_1()
         {
-            var materials = new MaterialDistributionList(new List<MaterialDistributionDto>
+            var materials = new MaterialDistributionList(new List<MaterialDistributionItem>
             {
-                new MaterialDistributionDto(Guid.NewGuid(), 1, "Role1", "Channel1"),
-                new MaterialDistributionDto(Guid.NewGuid(), 1, "Role1", "Channel1"),
-                new MaterialDistributionDto(Guid.NewGuid(), 1, "Role1", "Channel1"),
-                new MaterialDistributionDto(Guid.NewGuid(), 1, "Role1", "Channel1"),
-                new MaterialDistributionDto(Guid.NewGuid(), 1, "Role2", "Channel2")
+                new MaterialDistributionItem(Guid.NewGuid(), 1, "Role1", "Channel1"),
+                new MaterialDistributionItem(Guid.NewGuid(), 1, "Role1", "Channel1"),
+                new MaterialDistributionItem(Guid.NewGuid(), 1, "Role1", "Channel1"),
+                new MaterialDistributionItem(Guid.NewGuid(), 1, "Role1", "Channel1"),
+                new MaterialDistributionItem(Guid.NewGuid(), 1, "Role2", "Channel2")
             });
-            var users = new UserDistributionList(new List<UserDistributionDto>
+            var users = new UserDistributionList(new List<UserDistributionItem>
             {
-                new UserDistributionDto(Guid.NewGuid(), 1, new List<string>{ }),
-                new UserDistributionDto(Guid.NewGuid(), 1, new List<string> { "Role1" })
+                new UserDistributionItem(Guid.NewGuid(), 1, new List<string>{ }),
+                new UserDistributionItem(Guid.NewGuid(), 1, new List<string> { "Role1" })
             });
             var options = new MaterialDistributionOptions { Strategy = DistributionStrategy.Evenly };
             var actual = GetService().Distribute(materials, users, options);
@@ -292,23 +292,23 @@ namespace Iis.UnitTests.Materials.Distribution
         [Fact]
         public void Distribute_Many_Channels_2()
         {
-            var materials = new MaterialDistributionList(new List<MaterialDistributionDto>
+            var materials = new MaterialDistributionList(new List<MaterialDistributionItem>
             {
-                new MaterialDistributionDto(Guid.NewGuid(), 1, "Role1", "Channel1"), // 0
-                new MaterialDistributionDto(Guid.NewGuid(), 1, "Role1", "Channel1"), // 1
-                new MaterialDistributionDto(Guid.NewGuid(), 1, "Role1", "Channel1"), // 2
-                new MaterialDistributionDto(Guid.NewGuid(), 1, "Role2", "Channel2"), // 3
-                new MaterialDistributionDto(Guid.NewGuid(), 1, "Role2", "Channel2"), // 4
-                new MaterialDistributionDto(Guid.NewGuid(), 1, "Role2", "Channel2"), // 5
-                new MaterialDistributionDto(Guid.NewGuid(), 1, "Role3", "Channel3"), // 6
-                new MaterialDistributionDto(Guid.NewGuid(), 1, "Role3", "Channel3"), // 7
-                new MaterialDistributionDto(Guid.NewGuid(), 1, "Role3", "Channel3"), // 8
+                new MaterialDistributionItem(Guid.NewGuid(), 1, "Role1", "Channel1"), // 0
+                new MaterialDistributionItem(Guid.NewGuid(), 1, "Role1", "Channel1"), // 1
+                new MaterialDistributionItem(Guid.NewGuid(), 1, "Role1", "Channel1"), // 2
+                new MaterialDistributionItem(Guid.NewGuid(), 1, "Role2", "Channel2"), // 3
+                new MaterialDistributionItem(Guid.NewGuid(), 1, "Role2", "Channel2"), // 4
+                new MaterialDistributionItem(Guid.NewGuid(), 1, "Role2", "Channel2"), // 5
+                new MaterialDistributionItem(Guid.NewGuid(), 1, "Role3", "Channel3"), // 6
+                new MaterialDistributionItem(Guid.NewGuid(), 1, "Role3", "Channel3"), // 7
+                new MaterialDistributionItem(Guid.NewGuid(), 1, "Role3", "Channel3"), // 8
             });
-            var users = new UserDistributionList(new List<UserDistributionDto>
+            var users = new UserDistributionList(new List<UserDistributionItem>
             {
-                new UserDistributionDto(Guid.NewGuid(), 2, new List<string> { "Role1" }),
-                new UserDistributionDto(Guid.NewGuid(), 2, new List<string> { "Role2" }),
-                new UserDistributionDto(Guid.NewGuid(), 3, new List<string> {  })
+                new UserDistributionItem(Guid.NewGuid(), 2, new List<string> { "Role1" }),
+                new UserDistributionItem(Guid.NewGuid(), 2, new List<string> { "Role2" }),
+                new UserDistributionItem(Guid.NewGuid(), 3, new List<string> {  })
             });
             var options = new MaterialDistributionOptions { Strategy = DistributionStrategy.Evenly };
             var actual = GetService().Distribute(materials, users, options);

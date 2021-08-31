@@ -12,6 +12,8 @@ using Iis.Services.Contracts.Params;
 using System.Collections.Generic;
 using Iis.DataModel.Materials;
 using Iis.Services.Contracts.Materials.Distribution;
+using System.Diagnostics;
+using System.Text;
 
 namespace Iis.Api.Materials
 {
@@ -81,7 +83,7 @@ namespace Iis.Api.Materials
                 }
                 catch (Exception e)
                 {
-                    _logger.LogError("MaterialOperatorAssigner. Exception={e}", e);
+                    _logger.LogError("MaterialOperatorConsumer. Exception={e}", e);
                 }
             }
         }
@@ -94,18 +96,18 @@ namespace Iis.Api.Materials
                 null;
         }
 
-        private async Task<IEnumerable<MaterialDistributionDto>> GetMaterialsByRule(int limit, MaterialDistributionRule rule)
+        private async Task<IEnumerable<MaterialDistributionItem>> GetMaterialsByRule(int limit, MaterialDistributionRule rule)
         {
             if (rule.GetMaterials != null)
                 return (await rule.GetMaterials(limit))
-                    .Select(_ => new MaterialDistributionDto(_.Id, rule.Priority, GetRoleByChannel(_.Channel), _.Channel));
+                    .Select(_ => new MaterialDistributionItem(_.Id, rule.Priority, GetRoleByChannel(_.Channel), _.Channel));
 
             var channels = await rule.GetChannels();
-            var list = new List<MaterialDistributionDto>();
+            var list = new List<MaterialDistributionItem>();
             foreach (var channel in channels)
             {
                 var materials = (await rule.GetMaterialsByChannel(limit, channel))
-                    .Select(_ => new MaterialDistributionDto(_.Id, rule.Priority, GetRoleByChannel(_.Channel), channel));
+                    .Select(_ => new MaterialDistributionItem(_.Id, rule.Priority, GetRoleByChannel(_.Channel), channel));
                 list.AddRange(materials);
             }
             return list;
@@ -113,7 +115,7 @@ namespace Iis.Api.Materials
 
         private async Task<MaterialDistributionList> GetMaterials(int limit)
         {
-            var list = new List<MaterialDistributionDto>();
+            var list = new List<MaterialDistributionItem>();
             foreach (var rule in Rules)
             {
                 var materials = await GetMaterialsByRule(limit, rule);
@@ -124,8 +126,11 @@ namespace Iis.Api.Materials
 
         private async Task Distribute()
         {
+            var sw = new Stopwatch();
+            sw.Start();
+
             var users = await _userService.GetOperatorsForMaterialsAsync();
-            var totalLimit = users.Items.Sum(u => u.FreeSlots);
+            var totalLimit = users.TotalFreeSlots();
 
             var materials = await GetMaterials(totalLimit);
 
@@ -137,11 +142,30 @@ namespace Iis.Api.Materials
                 await _materialService.AssignMaterialOperatorAsync(item.MaterialId, item.UserId);
             }
 
-            if (users.Items.Sum(_ => _.FreeSlots) == 0)
+            var freeSlotsRemains = users.TotalFreeSlots();
+
+            sw.Stop();
+            _logger.LogInformation(GetLogMessage(result, freeSlotsRemains, sw.Elapsed));
+
+            if (freeSlotsRemains == 0)
             {
                 await Task.Delay(TimeSpan.FromSeconds(Timeout));
                 return;
             }
+        }
+
+        private string GetLogMessage(DistributionResult distributionResult, int freeSlotsRemains, TimeSpan timeElapsed)
+        {
+            var sb = new StringBuilder();
+
+            foreach (var item in distributionResult.Items)
+            {
+                sb.AppendLine($"{item.MaterialId} => {item.UserId}");
+            }
+            sb.AppendLine($"Free Slots Remains: {freeSlotsRemains}");
+            sb.AppendLine($"Time Elapsed: {(int)timeElapsed.TotalMilliseconds} ms");
+
+            return sb.ToString();
         }
     }
 }

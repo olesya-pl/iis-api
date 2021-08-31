@@ -149,11 +149,11 @@ namespace Iis.Services
                 join ci in chargedInfo
                     on op.Id equals ci.UserId
                 where ci.FreeSlots > 0
-                select new UserDistributionDto(op.Id, ci.FreeSlots, GetRoles(op, mappingRoleIds))).ToList();
+                select new UserDistributionItem(op.Id, ci.FreeSlots, GetRoles(op, mappingRoleIds))).ToList();
 
             list.AddRange(allOperators
                 .Where(op => !chargedInfo.Any(ci => ci.UserId == op.Id))
-                .Select(op => new UserDistributionDto(op.Id, maxMaterialsCount, GetRoles(op, mappingRoleIds))));
+                .Select(op => new UserDistributionItem(op.Id, maxMaterialsCount, GetRoles(op, mappingRoleIds))));
 
             return new UserDistributionList(list);
         }
