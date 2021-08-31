@@ -633,9 +633,12 @@ namespace IIS.Services.Materials
                    unitOfWork.MaterialRepository.GetAllUnassignedIdsAsync(limit, offset, sorting?.ColumnName, sorting?.Order, cancellationToken));
         }
 
-        public async Task<IEnumerable<MaterialEntity>> GetCellSatWithChannelAsync(int limit) =>
+        public async Task<IEnumerable<string>> GetCellSatChannelsAsync() =>
             await RunWithoutCommitAsync((unitOfWork) =>
-                   unitOfWork.MaterialRepository.GetCellSatWithChannel(limit));
+                   unitOfWork.MaterialRepository.GetCellSatChannelsAsync());
+        public async Task<IEnumerable<MaterialEntity>> GetCellSatWithChannelAsync(int limit, string channel) =>
+            await RunWithoutCommitAsync((unitOfWork) =>
+                   unitOfWork.MaterialRepository.GetCellSatWithChannel(limit, channel));
 
         public async Task<IEnumerable<MaterialEntity>> GetCellSatWithoutChannelAsync(int limit) =>
             await RunWithoutCommitAsync((unitOfWork) =>

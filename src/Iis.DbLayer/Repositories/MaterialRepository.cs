@@ -583,17 +583,33 @@ namespace Iis.DbLayer.Repositories
             return FaceAPIResponseParser.GetFaceVectorList(response?.OriginalResponse);
         }
 
-        public async Task<IEnumerable<MaterialEntity>> GetCellSatWithChannel(int limit)
+        public async Task<IEnumerable<MaterialEntity>> GetCellSatWithChannel(int limit, string channel)
         {
             return await GetMaterialsQuery()
-                .Where(m => (m.Source.StartsWith("sat.") || m.Source.StartsWith("cell.")) && m.Channel != null)
+                .Where(m => (m.Source.StartsWith("sat.") || m.Source.StartsWith("cell."))
+                    && m.Channel == channel)
                 .Take(limit)
                 .ToArrayAsync();
         }
 
+        private IQueryable<MaterialEntity> GetMaterialsForDistributionQuery() =>
+            GetMaterialsQuery()
+                .Where(_ => (_.ProcessedStatusSignId == null
+                        || _.ProcessedStatusSignId == MaterialEntity.ProcessingStatusNotProcessedSignId)
+                    && _.ParentId == null);
+
+        public async Task<IEnumerable<string>> GetCellSatChannelsAsync()
+        {
+            return await GetMaterialsForDistributionQuery()
+                .Where(_ => _.Channel != null)
+                .Select(_ => _.Channel)
+                .Distinct()
+                .ToListAsync();
+        }
+
         public async Task<IEnumerable<MaterialEntity>> GetCellSatWithoutChannel(int limit)
         {
-            return await GetMaterialsQuery()
+            return await GetMaterialsForDistributionQuery()
                 .Where(m => (m.Source.StartsWith("sat.") || m.Source.StartsWith("cell.")) && m.Channel == null)
                 .Take(limit)
                 .ToArrayAsync();
@@ -601,7 +617,7 @@ namespace Iis.DbLayer.Repositories
 
         public async Task<IEnumerable<MaterialEntity>> GetNotCellSat(int limit)
         {
-            return await GetMaterialsQuery()
+            return await GetMaterialsForDistributionQuery()
                 .Where(m => !(m.Source.StartsWith("sat.") || m.Source.StartsWith("cell.")))
                 .Take(limit)
                 .ToArrayAsync();

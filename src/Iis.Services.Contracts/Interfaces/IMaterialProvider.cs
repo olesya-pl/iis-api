@@ -48,9 +48,10 @@ namespace IIS.Services.Contracts.Interfaces
         Task<Material> GetMaterialAsync(Guid id);
         Task<IReadOnlyCollection<LocationHistoryDto>> GetLocationHistoriesAsync(Guid materialId);
         Task<IReadOnlyCollection<Guid>> GetAllUnassignedIdsAsync(PaginationParams page, SortingParams sorting, CancellationToken cancellationToken = default);
-        Task<IEnumerable<MaterialEntity>> GetCellSatWithChannelAsync(int limit);
+        Task<IEnumerable<MaterialChannelMappingEntity>> GetChannelMappingsAsync();
+        Task<IEnumerable<string>> GetCellSatChannelsAsync();
+        Task<IEnumerable<MaterialEntity>> GetCellSatWithChannelAsync(int limit, string channel);
         Task<IEnumerable<MaterialEntity>> GetCellSatWithoutChannelAsync(int limit);
         Task<IEnumerable<MaterialEntity>> GetNotCellSatAsync(int limit);
-        Task<IEnumerable<MaterialChannelMappingEntity>> GetChannelMappingsAsync();
     }
 }

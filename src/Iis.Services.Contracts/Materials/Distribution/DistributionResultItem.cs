@@ -13,5 +13,11 @@ namespace Iis.Services.Contracts.Materials.Distribution
             MaterialId = materialId;
             UserId = userId;
         }
+        public bool IsEqual(DistributionResultItem item) =>
+            MaterialId == item.MaterialId &&
+            UserId == item.UserId;
+
+        public override string ToString() =>
+            $"MaterialId: {MaterialId}; UserId: {UserId}";
     }
 }

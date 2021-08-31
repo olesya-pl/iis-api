@@ -8,6 +8,7 @@ namespace Iis.Services.Contracts.Materials.Distribution
     public class UserDistributionList
     {
         public List<UserDistributionDto> Items { get; set; } = new List<UserDistributionDto>();
+        public UserDistributionDto this[int index] => Items[index];
         public UserDistributionList() { }
         public UserDistributionList(IEnumerable<UserDistributionDto> items)
         {
@@ -22,7 +23,7 @@ namespace Iis.Services.Contracts.Materials.Distribution
                 .ThenBy(_ => _.FreeSlots)
                 .FirstOrDefault();
 
-            return user.GetPriority(roleName) == -1 ? null : user;
+            return user == null || user.GetPriority(roleName) == -1 ? null : user;
         }
     }
 }

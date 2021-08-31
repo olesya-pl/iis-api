@@ -8,6 +8,7 @@ namespace Iis.Services.Contracts.Materials.Distribution
     public class DistributionResult
     {
         public List<DistributionResultItem> Items { get; }
+        public DistributionResultItem this[int index] => Items[index];
         public DistributionResult()
         {
             Items = new List<DistributionResultItem>();

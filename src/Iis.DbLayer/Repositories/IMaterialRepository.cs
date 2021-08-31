@@ -64,7 +64,8 @@ namespace Iis.DbLayer.Repositories
 
         Task<Guid?> GetParentIdByChildIdAsync(Guid materialId);
         Task<IEnumerable<MaterialChannelMappingEntity>> GetChannelMappingsAsync();
-        Task<IEnumerable<MaterialEntity>> GetCellSatWithChannel(int limit);
+        Task<IEnumerable<string>> GetCellSatChannelsAsync();
+        Task<IEnumerable<MaterialEntity>> GetCellSatWithChannel(int limit, string channel);
         Task<IEnumerable<MaterialEntity>> GetCellSatWithoutChannel(int limit);
         Task<IEnumerable<MaterialEntity>> GetNotCellSat(int limit);
 
