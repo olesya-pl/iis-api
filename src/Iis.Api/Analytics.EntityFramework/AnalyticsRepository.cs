@@ -31,11 +31,11 @@ namespace IIS.Core.Analytics.EntityFramework
                 .FromSqlRaw(@"
                     WITH RECURSIVE children AS (
                         SELECT *
-                        FROM ""AnalyticsIndicators""
+                        FROM ""AnalyticIndicators""
                         WHERE ""ParentId"" = {0}
                         UNION
                         SELECT i.*
-                        FROM ""AnalyticsIndicators"" i
+                        FROM ""AnalyticIndicators"" i
                           INNER JOIN children c ON c.""Id"" = i.""ParentId""
                     )
                     SELECT * FROM children
@@ -51,11 +51,11 @@ namespace IIS.Core.Analytics.EntityFramework
                 .FromSqlRaw(@"
                     WITH RECURSIVE children AS (
                         SELECT *, 0 as level
-                        FROM ""AnalyticsIndicators""
+                        FROM ""AnalyticIndicators""
                         WHERE ""Id"" = {0}
                         UNION
                         SELECT i.*, level + 1 as level
-                        FROM ""AnalyticsIndicators"" i
+                        FROM ""AnalyticIndicators"" i
                           INNER JOIN children c
                                   ON c.""ParentId"" = i.""Id""
                     )
