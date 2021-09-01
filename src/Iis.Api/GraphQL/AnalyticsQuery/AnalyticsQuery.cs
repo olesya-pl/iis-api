@@ -71,7 +71,7 @@ namespace IIS.Core.GraphQL.AnalyticsQuery
             if (queryIndicator == null)
                 return null;
 
-            var rootIndicator = await repository.getRootAsync(queryIndicator.IndicatorId);
+            var rootIndicator = repository.getRootAsync(queryIndicator.IndicatorId);
 
             return new AnalyticsIndicator.AnalyticsIndicator(rootIndicator);
         }
