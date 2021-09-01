@@ -8,8 +8,8 @@ namespace IIS.Core.Analytics.EntityFramework
 {
     public interface IAnalyticsRepository
     {
-        Task<AnalyticIndicatorEntity> getRootAsync(Guid childId);
-        Task<IEnumerable<AnalyticIndicatorEntity>> GetAllChildrenAsync(Guid parentId);
+        AnalyticIndicatorEntity getRootAsync(Guid childId);
+        IEnumerable<AnalyticIndicatorEntity> GetAllChildrenAsync(Guid parentId);
         Task<IEnumerable<AnalyticsQueryIndicatorResult>> calcAsync(AnalyticsQueryBuilder query);
         Task<IEnumerable<AnalyticsQueryIndicatorResult>> calcAsync(AnalyticIndicatorEntity indicator, DateTime? fromDate, DateTime? toDate);
         Task<AnalyticsQueryBuilder> BuildQuery(AnalyticIndicatorEntity indicator, DateTime? from, DateTime? to);

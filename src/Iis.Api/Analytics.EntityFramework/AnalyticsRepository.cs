@@ -8,6 +8,7 @@ using Iis.DataModel.Analytics;
 using Newtonsoft.Json;
 using IIS.Domain;
 using Iis.DbLayer.Ontology.EntityFramework;
+using System.Linq;
 
 namespace IIS.Core.Analytics.EntityFramework
 {
@@ -24,10 +25,10 @@ namespace IIS.Core.Analytics.EntityFramework
             _ontologyProvider = ontologyProvider;
         }
 
-        public async Task<IEnumerable<AnalyticIndicatorEntity>> GetAllChildrenAsync(Guid parentId)
+        public IEnumerable<AnalyticIndicatorEntity> GetAllChildrenAsync(Guid parentId)
         {
             // TODO: better to use QueryBuilder because escaping is Postgres specific
-            return await _dbCtx.AnalyticIndicators
+            return _dbCtx.AnalyticIndicators
                 .FromSqlRaw(@"
                     WITH RECURSIVE children AS (
                         SELECT *
@@ -41,13 +42,14 @@ namespace IIS.Core.Analytics.EntityFramework
                     SELECT * FROM children
                 ", parentId)
                 .AsNoTracking()
-                .ToListAsync();
+                .AsEnumerable()
+                .ToList();
         }
 
-        public async Task<AnalyticIndicatorEntity> getRootAsync(Guid childId)
+        public AnalyticIndicatorEntity getRootAsync(Guid childId)
         {
             // TODO: better to use QueryBuilder because escaping is Postgres specific
-            return await _dbCtx.AnalyticIndicators
+            return _dbCtx.AnalyticIndicators
                 .FromSqlRaw(@"
                     WITH RECURSIVE children AS (
                         SELECT *, 0 as level
@@ -61,9 +63,10 @@ namespace IIS.Core.Analytics.EntityFramework
                     )
                     SELECT * FROM children
                     ORDER BY level DESC
-                ", childId)
+                ", childId)                
                 .AsNoTracking()
-                .FirstOrDefaultAsync();
+                .AsEnumerable()
+                .FirstOrDefault();
         }
 
         public async Task<IEnumerable<AnalyticsQueryIndicatorResult>> calcAsync(AnalyticsQueryBuilder query)
