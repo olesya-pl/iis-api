@@ -33,12 +33,20 @@ namespace IIS.Core.GraphQL.AnalyticsQuery
         public async Task<IEnumerable<AnalyticsIndicatorDateRangeValue>> GetQueryValues([Service] IAnalyticsRepository repository, IResolverContext ctx)
         {
             var (query, indicator) = (_queryIndicator.Query, _queryIndicator.Indicator);
+            if (query == null)
+            {
+                throw new Exception($"query null. queryIndicator id {_queryIndicator.Id}");
+            }
             var list = new List<AnalyticsIndicatorDateRangeValue>();
 
             // TODO: improve analytics query builder to support "OR" conditions, so then everything can be made in single db hop
             foreach (var dateRange in query.DateRanges)
             {
                 var valuesForDateRange = await repository.calcAsync(indicator, dateRange.StartDate, dateRange.EndDate);
+                if (valuesForDateRange == null)
+                {
+                    throw new Exception($"values for date range null. daterange id {dateRange.Id}");
+                }
                 var item = new AnalyticsIndicatorDateRangeValue {
                     DateRange = new IIS.Core.GraphQL.AnalyticsQuery.DateRange(dateRange),
                     Values = valuesForDateRange.Select(value => new AnalyticsIndicatorValue(value))
