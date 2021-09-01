@@ -39,15 +39,7 @@ namespace Iis.DbLayer.Repositories
                 Context.MaterialFeatures.RemoveRange(existing);
             }
 
-            Context.MaterialFeatures.AddRange(newMaterials.Select(p => new MaterialFeatureEntity
-            {
-                NodeId = nodeId,
-                NodeLinkType = linkType,
-                MaterialInfo = new MaterialInfoEntity
-                {
-                    MaterialId = p
-                }
-            }));
+            Context.MaterialFeatures.AddRange(newMaterials.Select(p => MaterialFeatureEntity.CreateFrom(p, nodeId, linkType)));
         }
     }
 }

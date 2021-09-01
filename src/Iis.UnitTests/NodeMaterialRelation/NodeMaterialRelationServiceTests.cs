@@ -45,14 +45,7 @@ namespace Iis.UnitTests.NodeMaterialRelationTests
             var context = _serviceProvider.GetRequiredService<OntologyContext>();
             context.Nodes.Add(node);
             context.Materials.Add(material);
-            context.MaterialFeatures.Add(new MaterialFeatureEntity
-            {
-                NodeId = node.Id,
-                MaterialInfo = new MaterialInfoEntity
-                {
-                    MaterialId = material.Id
-                }
-            });
+            context.MaterialFeatures.Add(MaterialFeatureEntity.CreateFrom(material.Id, node.Id));
             context.SaveChanges();
 
             //act
@@ -77,31 +70,9 @@ namespace Iis.UnitTests.NodeMaterialRelationTests
             context.Nodes.AddRange(node, node2);
             context.Materials.AddRange(material, material2);
             context.MaterialFeatures.AddRange(
-                new MaterialFeatureEntity
-                {
-                    NodeId = node.Id,
-                    MaterialInfo = new MaterialInfoEntity
-                    {
-                        MaterialId = material.Id
-                    }
-                },
-                new MaterialFeatureEntity
-                {
-                    NodeId = node2.Id,
-                    MaterialInfo = new MaterialInfoEntity
-                    {
-                        MaterialId = material.Id
-                    }
-                },
-                new MaterialFeatureEntity
-                {
-                    NodeId = node.Id,
-                    MaterialInfo = new MaterialInfoEntity
-                    {
-                        MaterialId = material2.Id
-                    }
-                }
-            );
+                MaterialFeatureEntity.CreateFrom(material.Id, node.Id),
+                MaterialFeatureEntity.CreateFrom(material.Id, node2.Id),
+                MaterialFeatureEntity.CreateFrom(material2.Id, node.Id));
             context.SaveChanges();
             //act
             var sut = _serviceProvider.GetRequiredService<NodeMaterialRelationService<IIISUnitOfWork>>();
