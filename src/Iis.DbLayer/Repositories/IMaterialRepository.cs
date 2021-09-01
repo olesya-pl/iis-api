@@ -6,6 +6,7 @@ using Iis.DbLayer.MaterialEnum;
 using System.Threading;
 using Iis.Domain.Materials;
 using Iis.Interfaces.Elastic;
+using Iis.Services.Contracts.Materials.Distribution;
 
 namespace Iis.DbLayer.Repositories
 {
@@ -37,6 +38,7 @@ namespace Iis.DbLayer.Repositories
         Task<List<ElasticBulkResponse>> PutCreatedMaterialsToElasticSearchAsync(IReadOnlyCollection<Guid> materialIds, bool waitForIndexing = false, CancellationToken token = default);
 
         Task<bool> PutMaterialToElasticSearchAsync(Guid materialId, CancellationToken ct = default, bool waitForIndexing = false);
+        Task PutMaterialsToElasticSearchAsync(IEnumerable<Guid> materialIds, CancellationToken ct = default, bool waitForIndexing = false);
 
         void AddMaterialEntity(MaterialEntity materialEntity);
 
@@ -68,6 +70,6 @@ namespace Iis.DbLayer.Repositories
         Task<IEnumerable<MaterialEntity>> GetCellSatWithChannel(int limit, string channel);
         Task<IEnumerable<MaterialEntity>> GetCellSatWithoutChannel(int limit);
         Task<IEnumerable<MaterialEntity>> GetNotCellSat(int limit);
-
+        Task SaveDistributionResult(DistributionResult distributionResult);
     }
 }

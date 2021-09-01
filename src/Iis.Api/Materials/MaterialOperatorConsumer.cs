@@ -135,17 +135,14 @@ namespace Iis.Api.Materials
             var materials = await GetMaterials(totalLimit);
 
             var options = new MaterialDistributionOptions { Strategy = DistributionStrategy.Evenly };
-            var result = _materialDistributionService.Distribute(materials, users, options);
+            var distributionResult = _materialDistributionService.Distribute(materials, users, options);
 
-            foreach (var item in result.Items)
-            {
-                await _materialService.AssignMaterialOperatorAsync(item.MaterialId, item.UserId);
-            }
+            await _materialService.SaveDistributionResult(distributionResult);
 
             var freeSlotsRemains = users.TotalFreeSlots();
 
             sw.Stop();
-            _logger.LogInformation(GetLogMessage(result, freeSlotsRemains, sw.Elapsed));
+            _logger.LogInformation(GetLogMessage(distributionResult, freeSlotsRemains, sw.Elapsed));
 
             if (freeSlotsRemains == 0)
             {

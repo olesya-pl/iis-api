@@ -21,6 +21,7 @@ using Iis.Interfaces.Ontology.Data;
 using Iis.Domain.Materials;
 using IIS.Repository;
 using Iis.Utility;
+using Iis.Services.Contracts.Materials.Distribution;
 
 namespace Iis.DbLayer.Repositories
 {
@@ -226,7 +227,23 @@ namespace Iis.DbLayer.Repositories
         {
             var material = await GetMaterialsQuery(MaterialIncludeEnum.WithChildren, MaterialIncludeEnum.WithFeatures)
                 .SingleOrDefaultAsync(p => p.Id == materialId);
+            return await PutMaterialToElasticSearchAsync(material, ct, waitForIndexing);
+        }
 
+        public async Task PutMaterialsToElasticSearchAsync(IEnumerable<Guid> materialIds, CancellationToken ct = default, bool waitForIndexing = false)
+        {
+            var materials = await GetMaterialsQuery(MaterialIncludeEnum.WithChildren, MaterialIncludeEnum.WithFeatures)
+                .Where(_ => materialIds.Contains(_.Id))
+                .ToArrayAsync();
+
+            foreach (var material in materials)
+            {
+                await PutMaterialToElasticSearchAsync(material, ct, waitForIndexing);
+            }
+        }
+
+        private async Task<bool> PutMaterialToElasticSearchAsync(MaterialEntity material, CancellationToken ct = default, bool waitForIndexing = false)
+        {
             var materialDocument = MapEntityToDocument(material);
 
             var materialIdList = material.Children
@@ -251,7 +268,7 @@ namespace Iis.DbLayer.Repositories
             materialDocument.ImageVectors = GetImageVectorList(materialIdList, responseDictionary);
 
             return await _elasticManager.PutDocumentAsync(MaterialIndexes.FirstOrDefault(),
-                materialId.ToString("N"),
+                material.Id.ToString("N"),
                 JsonConvert.SerializeObject(materialDocument),
                 waitForIndexing,
                 ct);
@@ -626,6 +643,19 @@ namespace Iis.DbLayer.Repositories
         public async Task<IEnumerable<MaterialChannelMappingEntity>> GetChannelMappingsAsync()
         {
             return await Context.MaterialChannelMappings.ToArrayAsync();
+        }
+
+        public async Task SaveDistributionResult(DistributionResult distributionResult)
+        {
+            var materialIds = distributionResult.Items.Select(_ => _.MaterialId).ToList();
+            var materials = await Context.Materials
+                .Where(_ => materialIds.Contains(_.Id)).ToArrayAsync();
+
+            foreach (var material in materials)
+            {
+                var userId = distributionResult.GetUserId(material.Id);
+                material.AssigneeId = userId;
+            }
         }
     }
 }

@@ -21,6 +21,9 @@ namespace Iis.Services.Contracts.Materials.Distribution
         public bool Contains(Guid materialId) =>
             Items.Any(_ => _.MaterialId == materialId);
 
+        public Guid? GetUserId(Guid materialId) =>
+            Items.SingleOrDefault(_ => _.MaterialId == materialId)?.UserId;
+
         public override string ToString() =>
             $"Count: {Items.Count}";
     }

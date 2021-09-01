@@ -25,6 +25,7 @@ using Iis.Interfaces.Common;
 using Microsoft.Extensions.Logging;
 using Iis.Domain.Users;
 using IIS.Services.Contracts.Interfaces;
+using Iis.Services.Contracts.Materials.Distribution;
 
 namespace IIS.Core.Materials.EntityFramework
 {
@@ -428,6 +429,16 @@ namespace IIS.Core.Materials.EntityFramework
             }
 
             return Task.WhenAll(tasks);
+        }
+
+        public async Task SaveDistributionResult(DistributionResult distributionResult)
+        {
+            await RunAsync(async unitOfWork =>
+                await unitOfWork.MaterialRepository.SaveDistributionResult(distributionResult));
+
+            var materialIds = distributionResult.Items.Select(_ => _.MaterialId).ToList();
+            await RunWithoutCommitAsync(async unitOfWork =>
+                await unitOfWork.MaterialRepository.PutMaterialsToElasticSearchAsync(materialIds));
         }
 
         public async Task AssignMaterialOperatorAsync(Guid materialId, Guid assigneeId, User user = null)
