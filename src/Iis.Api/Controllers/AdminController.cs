@@ -30,9 +30,10 @@ namespace Iis.Api.Controllers
     public class AdminController : Controller
     {
         private const string AllIndexes = "all";
+        private readonly IMaterialService _materialService;
+        private readonly IMaterialElasticService _materialElasticService;
         private readonly IElasticManager _elasticManager;
         private readonly INodeSaveService _nodeSaveService;
-        private readonly IMaterialService _materialService;
         private readonly IElasticState _elasticState;
         private readonly IUserService _userService;
         private readonly IUserElasticService _userElasticService;
@@ -47,6 +48,7 @@ namespace Iis.Api.Controllers
 
         public AdminController(
             IMaterialService materialService,
+            IMaterialElasticService materialElasticService,
             IElasticManager elasticManager,
             INodeSaveService nodeSaveService,
             IElasticState elasticState,
@@ -61,8 +63,9 @@ namespace Iis.Api.Controllers
             IMaterialProvider materialProvider,
             NodeMaterialRelationService<IIISUnitOfWork> nodeMaterialRelationService)
         {
-            _elasticManager = elasticManager;
             _materialService = materialService;
+            _materialElasticService = materialElasticService;
+            _elasticManager = elasticManager;
             _nodeSaveService = nodeSaveService;
             _elasticState = elasticState;
             _adminElasticService = adminElasticService;
@@ -212,9 +215,51 @@ namespace Iis.Api.Controllers
                 mappingConfiguration.ToJObject(),
                 cancellationToken);
 
-            var response = await _materialService.PutAllMaterialsToElasticSearchAsync(cancellationToken);
+            var response = await _materialElasticService.PutAllMaterialsToElasticSearchAsync(cancellationToken);
 
             await _adminElasticService.AddAliasesToIndexAsync(AliasType.Material, cancellationToken);
+
+            LogElasticResult(log, response);
+
+            return Content(log.ToString());
+        }
+
+        [HttpGet("RecreateElasticChangeHistoryIndexes")]
+        public async Task<IActionResult> RecreateElasticChangeHistoryIndexes(CancellationToken cancellationToken)
+        {
+            var log = new StringBuilder();
+            _adminElasticService.Logger = log;
+
+            var index = _elasticState.ChangeHistoryIndexes.First();
+
+            await _elasticManager.DeleteIndexAsync(index, cancellationToken);
+
+            var mappingConfiguration = new ElasticMappingConfiguration(new List<ElasticMappingProperty>
+            {
+                KeywordProperty.Create("TargetId", false),
+                KeywordProperty.Create("RequestId", false),
+                KeywordProperty.Create("UserName", true),
+                KeywordProperty.Create("PropertyName", true),
+                DateProperty.Create("Date", ElasticConfiguration.DefaultDateFormats),
+                TextProperty.Create("OldValue", true),
+                TextProperty.Create("NewValue", true),
+                IntegerProperty.Create("Type"),
+                TextProperty.Create("ParentTypeName", true),
+                TextProperty.Create("OldTitle", true),
+                TextProperty.Create("NewTitle", true),
+                KeywordProperty.Create("Roles.Id", false),
+                KeywordProperty.Create("Roles.Name", false),
+                AliasProperty.Create("Користувач", "UserName"),
+                AliasProperty.Create("Назва поля", "PropertyName"),
+                AliasProperty.Create("Дата зміни", "Date"),
+                AliasProperty.Create("Було", "OldValue"),
+                AliasProperty.Create("Стало", "NewValue")
+            });
+            await _elasticManager.CreateIndexesAsync(new[] { index },
+                mappingConfiguration.ToJObject(),
+                cancellationToken);
+
+            var response = await _materialElasticService.PutAllMaterialChangesToElasticSearchAsync(cancellationToken);
 
             LogElasticResult(log, response);
 

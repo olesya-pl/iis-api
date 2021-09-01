@@ -5,13 +5,11 @@ using Iis.DataModel.Materials;
 using Iis.DbLayer.MaterialEnum;
 using System.Threading;
 using Iis.Domain.Materials;
-using Iis.Interfaces.Elastic;
 
 namespace Iis.DbLayer.Repositories
 {
     public interface IMaterialRepository
     {
-        IReadOnlyCollection<string> MaterialIndexes { get; }
         Task<MaterialEntity> GetByIdAsync(Guid id, params MaterialIncludeEnum[] includes);
 
         Task<MaterialEntity[]> GetByIdsAsync(ISet<Guid> ids, params MaterialIncludeEnum[] includes);
@@ -19,6 +17,8 @@ namespace Iis.DbLayer.Repositories
         Task<IEnumerable<MaterialEntity>> GetAllAsync(params MaterialIncludeEnum[] includes);
 
         Task<IEnumerable<MaterialEntity>> GetAllAsync(int limit, params MaterialIncludeEnum[] includes);
+
+        Task<IEnumerable<MaterialEntity>> GetAllAsync(int limit, int offset, params MaterialIncludeEnum[] includes);
 
         Task<IEnumerable<MaterialEntity>> GetAllForRelatedNodeListAsync(IEnumerable<Guid> nodeIdList);
 
@@ -31,12 +31,6 @@ namespace Iis.DbLayer.Repositories
         Task<IReadOnlyCollection<Guid>> GetAllUnassignedIdsAsync(int limit, int offset, string sortColumnName = null, string sortOrder = null, CancellationToken cancellationToken = default);
 
         Task<IEnumerable<MaterialEntity>> GetAllByAssigneeIdAsync(Guid assigneeId);
-
-        Task<List<ElasticBulkResponse>> PutAllMaterialsToElasticSearchAsync(CancellationToken ct = default);
-
-        Task<List<ElasticBulkResponse>> PutCreatedMaterialsToElasticSearchAsync(IReadOnlyCollection<Guid> materialIds, bool waitForIndexing = false, CancellationToken token = default);
-
-        Task<bool> PutMaterialToElasticSearchAsync(Guid materialId, CancellationToken ct = default, bool waitForIndexing = false);
 
         void AddMaterialEntity(MaterialEntity materialEntity);
 
@@ -63,5 +57,7 @@ namespace Iis.DbLayer.Repositories
         Task RemoveMaterialsAndRelatedData(IReadOnlyCollection<Guid> fileIdList);
 
         Task<Guid?> GetParentIdByChildIdAsync(Guid materialId);
+
+        Task<int> GetTotalCountAsync(CancellationToken cancellationToken);
     }
 }

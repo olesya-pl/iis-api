@@ -6,7 +6,7 @@ using Iis.DataModel.Materials;
 using Iis.Interfaces.Ontology.Data;
 namespace Iis.DbLayer.Repositories.Helpers
 {
-    internal static class MaterialDocumentHelper
+    public static class MaterialDocumentHelper
     {
         private const string TitlePropertyName = "__title";
         private const string ValuePropertyName = "value";

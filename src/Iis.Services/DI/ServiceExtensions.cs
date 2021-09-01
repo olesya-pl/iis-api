@@ -17,7 +17,7 @@ namespace Iis.Services.DI
             services.AddScoped<OntologyElasticResponseManager>();
             services.AddScoped<MaterialElasticResponseManager>();
             services.AddTransient<IElasticResponseManagerFactory, ElasticResponseManagerFactory>();
-            services.AddTransient<IMaterialElasticService, MaterialElasticService>();
+            services.AddTransient<IMaterialElasticService, MaterialElasticService<IIISUnitOfWork>>();
             services.AddTransient<IGsmLocationService, GsmLocationService<IIISUnitOfWork>>();
             services.AddTransient<IUserElasticService, UserElasticService>();
             services.AddTransient<CreateEntityService>();
