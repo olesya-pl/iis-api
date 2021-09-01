@@ -315,16 +315,9 @@ namespace Iis.DbLayer.Repositories
         public void AddFeatureIdList(Guid materialId, IEnumerable<Guid> featureIdList)
         {
             foreach (var featureId in featureIdList)
-            {
-                Context.MaterialFeatures.Add(new MaterialFeatureEntity
-                {
-                    NodeId = featureId,
-                    MaterialInfo = new MaterialInfoEntity
-                    {
-                        MaterialId = materialId
-                    }
-                });
-            }
+                Context.MaterialFeatures.AddRange(
+                    MaterialFeatureEntity.CreateFrom(materialId, featureId),
+                    MaterialFeatureEntity.CreateFrom(materialId, featureId, MaterialNodeLinkType.Caller));
         }
 
         public async Task<IEnumerable<Guid>> GetChildIdListForMaterialAsync(Guid materialId)

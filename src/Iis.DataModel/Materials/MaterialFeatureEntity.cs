@@ -19,5 +19,18 @@ namespace Iis.DataModel.Materials
         public string Relation { get; set; }
         public string Value { get; set; }
         public MaterialNodeLinkType NodeLinkType { get; set; }
+
+        public static MaterialFeatureEntity CreateFrom(Guid materialId, Guid featureId, MaterialNodeLinkType type = default)
+        {
+            return new MaterialFeatureEntity
+            {
+                NodeLinkType = type,
+                NodeId = featureId,
+                MaterialInfo = new MaterialInfoEntity
+                {
+                    MaterialId = materialId
+                }
+            };
+        }
     }
 }
