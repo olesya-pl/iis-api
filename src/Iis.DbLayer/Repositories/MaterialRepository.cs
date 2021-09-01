@@ -28,6 +28,9 @@ namespace Iis.DbLayer.Repositories
     public class MaterialRepository : RepositoryBase<OntologyContext>, IMaterialRepository
     {
         private static readonly string NoneLinkTypeValue = MaterialNodeLinkType.None.ToString();
+        private const string SAT_PREFFIX = "sat.";
+        private const string CELL_PREFFIX = "cell.";
+
         private readonly MaterialIncludeEnum[] _includeAll = new MaterialIncludeEnum[]
         {
             MaterialIncludeEnum.WithChildren,
@@ -68,14 +71,6 @@ namespace Iis.DbLayer.Repositories
         {
             return await GetMaterialsQuery(includes)
                             .ToArrayAsync();
-        }
-
-        public async Task<IEnumerable<MaterialEntity>> GetAllAsync(
-            Func<MaterialEntity, bool> filter, 
-            int limit,
-            params MaterialIncludeEnum[] includes)
-        {
-            return await GetMaterialsQuery(includes).Where(filter).AsQueryable().ToArrayAsync();
         }
 
         public async Task<IEnumerable<MaterialEntity>> GetAllAsync(int limit, params MaterialIncludeEnum[] includes)
@@ -257,8 +252,6 @@ namespace Iis.DbLayer.Repositories
                                         .GroupBy(e => e.MaterialId)
                                         .ToDictionary(group => group.Key, group => group.ToArray());
 
-
-
             var (mlResponses, mlResponsesCount) = GetResponseJsonWithCounter(materialDocument.Id, responseDictionary);
 
             materialDocument.MLResponses = mlResponses;
@@ -393,6 +386,58 @@ namespace Iis.DbLayer.Repositories
             return Context.Materials
                 .Where(e => e.Id.Equals(materialId))
                 .Select(e => e.ParentId).FirstOrDefaultAsync();
+        }
+
+        public async Task<IReadOnlyList<MaterialEntity>> GetCellSatWithChannelAsync(int limit, string channel)
+        {
+            return await GetMaterialsQuery()
+                .Where(m => (m.Source.StartsWith(SAT_PREFFIX) || m.Source.StartsWith(CELL_PREFFIX))
+                    && m.Channel == channel)
+                .Take(limit)
+                .ToArrayAsync();
+        }
+
+        public async Task<IReadOnlyList<string>> GetCellSatChannelsAsync()
+        {
+            return await GetMaterialsForDistributionQuery()
+                .Where(_ => _.Channel != null)
+                .Select(_ => _.Channel)
+                .Distinct()
+                .ToListAsync();
+        }
+
+        public async Task<IReadOnlyList<MaterialEntity>> GetCellSatWithoutChannelAsync(int limit)
+        {
+            return await GetMaterialsForDistributionQuery()
+                .Where(m => (m.Source.StartsWith(SAT_PREFFIX) || m.Source.StartsWith(CELL_PREFFIX)) && m.Channel == null)
+                .Take(limit)
+                .ToArrayAsync();
+        }
+
+        public async Task<IReadOnlyList<MaterialEntity>> GetNotCellSatAsync(int limit)
+        {
+            return await GetMaterialsForDistributionQuery()
+                .Where(m => !(m.Source.StartsWith(SAT_PREFFIX) || m.Source.StartsWith(CELL_PREFFIX)))
+                .Take(limit)
+                .ToArrayAsync();
+        }
+
+        public async Task<IReadOnlyList<MaterialChannelMappingEntity>> GetChannelMappingsAsync()
+        {
+            return await Context.MaterialChannelMappings.ToArrayAsync();
+        }
+
+        public async Task SaveDistributionResult(DistributionResult distributionResult)
+        {
+            var materialIds = distributionResult.Items.Select(_ => _.MaterialId).ToList();
+            var materials = await Context.Materials
+                .Where(_ => materialIds.Contains(_.Id)).ToArrayAsync();
+
+            foreach (var material in materials)
+            {
+                var userId = distributionResult.GetUserId(material.Id);
+                material.AssigneeId = userId;
+            }
         }
 
         private MaterialDocument MapEntityToDocument(MaterialEntity material)
@@ -600,62 +645,10 @@ namespace Iis.DbLayer.Repositories
             return FaceAPIResponseParser.GetFaceVectorList(response?.OriginalResponse);
         }
 
-        public async Task<IEnumerable<MaterialEntity>> GetCellSatWithChannel(int limit, string channel)
-        {
-            return await GetMaterialsQuery()
-                .Where(m => (m.Source.StartsWith("sat.") || m.Source.StartsWith("cell."))
-                    && m.Channel == channel)
-                .Take(limit)
-                .ToArrayAsync();
-        }
-
         private IQueryable<MaterialEntity> GetMaterialsForDistributionQuery() =>
-            GetMaterialsQuery()
-                .Where(_ => (_.ProcessedStatusSignId == null
-                        || _.ProcessedStatusSignId == MaterialEntity.ProcessingStatusNotProcessedSignId)
-                    && _.ParentId == null);
-
-        public async Task<IEnumerable<string>> GetCellSatChannelsAsync()
-        {
-            return await GetMaterialsForDistributionQuery()
-                .Where(_ => _.Channel != null)
-                .Select(_ => _.Channel)
-                .Distinct()
-                .ToListAsync();
-        }
-
-        public async Task<IEnumerable<MaterialEntity>> GetCellSatWithoutChannel(int limit)
-        {
-            return await GetMaterialsForDistributionQuery()
-                .Where(m => (m.Source.StartsWith("sat.") || m.Source.StartsWith("cell.")) && m.Channel == null)
-                .Take(limit)
-                .ToArrayAsync();
-        }
-
-        public async Task<IEnumerable<MaterialEntity>> GetNotCellSat(int limit)
-        {
-            return await GetMaterialsForDistributionQuery()
-                .Where(m => !(m.Source.StartsWith("sat.") || m.Source.StartsWith("cell.")))
-                .Take(limit)
-                .ToArrayAsync();
-        }
-
-        public async Task<IEnumerable<MaterialChannelMappingEntity>> GetChannelMappingsAsync()
-        {
-            return await Context.MaterialChannelMappings.ToArrayAsync();
-        }
-
-        public async Task SaveDistributionResult(DistributionResult distributionResult)
-        {
-            var materialIds = distributionResult.Items.Select(_ => _.MaterialId).ToList();
-            var materials = await Context.Materials
-                .Where(_ => materialIds.Contains(_.Id)).ToArrayAsync();
-
-            foreach (var material in materials)
-            {
-                var userId = distributionResult.GetUserId(material.Id);
-                material.AssigneeId = userId;
-            }
-        }
+           GetMaterialsQuery()
+               .Where(_ => (_.ProcessedStatusSignId == null
+                       || _.ProcessedStatusSignId == MaterialEntity.ProcessingStatusNotProcessedSignId)
+                   && _.ParentId == null);
     }
 }

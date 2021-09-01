@@ -119,10 +119,6 @@ namespace Iis.Services
             return userList.Select(e => e.Id).ToList();
         }
 
-        private List<string> GetRoles(UserEntity userEntity, IEnumerable<Guid> mappingRoleIds) =>
-            userEntity.UserRoles
-                .Where(_ => mappingRoleIds.Contains(_.RoleId))
-                .Select(_ => _.Role.Id.ToString("N")).ToList();
         public async Task<UserDistributionList> GetOperatorsForMaterialsAsync()
         {
             var maxMaterialsCount = _maxMaterialsConfig.Value;
@@ -538,5 +534,9 @@ namespace Iis.Services
             }
             return sb.ToString();
         }
+        private List<string> GetRoles(UserEntity userEntity, IEnumerable<Guid> mappingRoleIds) =>
+           userEntity.UserRoles
+               .Where(_ => mappingRoleIds.Contains(_.RoleId))
+               .Select(_ => _.Role.Id.ToString("N")).ToList();
     }
 }

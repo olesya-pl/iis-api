@@ -633,23 +633,23 @@ namespace IIS.Services.Materials
                    unitOfWork.MaterialRepository.GetAllUnassignedIdsAsync(limit, offset, sorting?.ColumnName, sorting?.Order, cancellationToken));
         }
 
-        public async Task<IEnumerable<string>> GetCellSatChannelsAsync() =>
-            await RunWithoutCommitAsync((unitOfWork) =>
+        public Task<IReadOnlyList<string>> GetCellSatChannelsAsync() =>
+            RunWithoutCommitAsync((unitOfWork) =>
                    unitOfWork.MaterialRepository.GetCellSatChannelsAsync());
-        public async Task<IEnumerable<MaterialEntity>> GetCellSatWithChannelAsync(int limit, string channel) =>
-            await RunWithoutCommitAsync((unitOfWork) =>
-                   unitOfWork.MaterialRepository.GetCellSatWithChannel(limit, channel));
+        public Task<IReadOnlyList<MaterialEntity>> GetCellSatWithChannelAsync(int limit, string channel) =>
+            RunWithoutCommitAsync((unitOfWork) =>
+                   unitOfWork.MaterialRepository.GetCellSatWithChannelAsync(limit, channel));
 
-        public async Task<IEnumerable<MaterialEntity>> GetCellSatWithoutChannelAsync(int limit) =>
-            await RunWithoutCommitAsync((unitOfWork) =>
-                   unitOfWork.MaterialRepository.GetCellSatWithoutChannel(limit));
+        public Task<IReadOnlyList<MaterialEntity>> GetCellSatWithoutChannelAsync(int limit) =>
+            RunWithoutCommitAsync((unitOfWork) =>
+                   unitOfWork.MaterialRepository.GetCellSatWithoutChannelAsync(limit));
 
-        public async Task<IEnumerable<MaterialEntity>> GetNotCellSatAsync(int limit) =>
-            await RunWithoutCommitAsync((unitOfWork) =>
-                   unitOfWork.MaterialRepository.GetNotCellSat(limit));
+        public Task<IReadOnlyList<MaterialEntity>> GetNotCellSatAsync(int limit) =>
+            RunWithoutCommitAsync((unitOfWork) =>
+                   unitOfWork.MaterialRepository.GetNotCellSatAsync(limit));
 
-        public async Task<IEnumerable<MaterialChannelMappingEntity>> GetChannelMappingsAsync() =>
-            await RunWithoutCommitAsync((unitOfWork) =>
+        public Task<IReadOnlyList<MaterialChannelMappingEntity>> GetChannelMappingsAsync() =>
+            RunWithoutCommitAsync((unitOfWork) =>
                    unitOfWork.MaterialRepository.GetChannelMappingsAsync());
     }
 }

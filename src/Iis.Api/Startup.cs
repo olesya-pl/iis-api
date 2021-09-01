@@ -315,7 +315,6 @@ namespace IIS.Core
             services.AddTransient<ModifyDataRunner>();
             services.RegisterEventMaterialAutoAssignment(Configuration);
             services.RegisterCoordinatesMessageHandler(Configuration);
-            services.AddTransient<IMaterialDistributionService, MaterialDistributionService>();
 
             var eusConfiguration = Configuration.GetSection("externalUserService").Get<ExternalUserServiceConfiguration>();
             services.AddTransient<IExternalUserService>(_ => (new ExternalUserServiceFactory()).GetInstance(eusConfiguration));

@@ -33,7 +33,7 @@ namespace Iis.Services.Materials
             MaterialDistributionItem material,
             UserDistributionList users)
         {
-            var user = users.GetUser(material.RoleName);
+            var user = GetUser(users, material.RoleName);
             if (user == null) return null;
             user.FreeSlots--;
             return new DistributionResultItem(material.Id, user.Id);
@@ -60,6 +60,29 @@ namespace Iis.Services.Materials
             }
 
             return result;
+        }
+
+        private UserDistributionItem GetUser(UserDistributionList users, string roleName)
+        {
+            var user = users.Items
+                .Where(_ => _.FreeSlots > 0)
+                .OrderByDescending(_ => GetPriority(_, roleName))
+                .ThenBy(_ => _.FreeSlots)
+                .FirstOrDefault();
+
+            return user == null || GetPriority(user, roleName) == -1 ? null : user;
+        }
+
+        private int GetPriority(UserDistributionItem user, string roleName)
+        {
+            if (user.RoleNames.Count == 0) return 0;
+
+            if (string.IsNullOrEmpty(roleName))
+                return user.RoleNames.Count == 0 ? 0 : 1;
+
+            if (!user.RoleNames.Contains(roleName)) return -1;
+            if (user.RoleNames.Count == 1) return 2;
+            return 1;
         }
     }
 }

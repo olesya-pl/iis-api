@@ -28,8 +28,8 @@ namespace Iis.Api.Materials
         private readonly IMaterialProvider _materialProvider;
         private readonly IMaterialDistributionService _materialDistributionService;
         private Dictionary<string, Guid> _channelRoleMapping;
+        private readonly IReadOnlyList<MaterialDistributionRule> _rules;
 
-        private readonly IReadOnlyList<MaterialDistributionRule> Rules;
         public MaterialOperatorConsumer(
             ILogger<MaterialOperatorConsumer> logger,
             IMaterialService materialService,
@@ -43,7 +43,7 @@ namespace Iis.Api.Materials
             _materialProvider = materialProvider;
             _materialDistributionService = materialDistributionService;
 
-            Rules = new List<MaterialDistributionRule>
+            _rules = new List<MaterialDistributionRule>
             {
                 new MaterialDistributionRule
                 {
@@ -63,7 +63,7 @@ namespace Iis.Api.Materials
                 {
                     GetMaterials = limit => _materialProvider.GetNotCellSatAsync(limit),
                     GetRole = m => null,
-                    Priority = 10
+                    Priority = 0
                 }
             };
         }
@@ -90,13 +90,12 @@ namespace Iis.Api.Materials
 
         private string GetRoleByChannel(string channel)
         {
-            if (string.IsNullOrEmpty(channel)) return null;
-            return _channelRoleMapping.ContainsKey(channel) ? 
+            return !string.IsNullOrEmpty(channel) && _channelRoleMapping.ContainsKey(channel) ? 
                 _channelRoleMapping.GetValueOrDefault(channel).ToString("N") :
                 null;
         }
 
-        private async Task<IEnumerable<MaterialDistributionItem>> GetMaterialsByRule(int limit, MaterialDistributionRule rule)
+        private async Task<IEnumerable<MaterialDistributionItem>> GetMaterialsByRuleAsync(int limit, MaterialDistributionRule rule)
         {
             if (rule.GetMaterials != null)
                 return (await rule.GetMaterials(limit))
@@ -113,12 +112,12 @@ namespace Iis.Api.Materials
             return list;
         }
 
-        private async Task<MaterialDistributionList> GetMaterials(int limit)
+        private async Task<MaterialDistributionList> GetMaterialsAsync(int limit)
         {
             var list = new List<MaterialDistributionItem>();
-            foreach (var rule in Rules)
+            foreach (var rule in _rules)
             {
-                var materials = await GetMaterialsByRule(limit, rule);
+                var materials = await GetMaterialsByRuleAsync(limit, rule);
                 list.AddRange(materials);
             }
             return new MaterialDistributionList(list);
@@ -132,7 +131,7 @@ namespace Iis.Api.Materials
             var users = await _userService.GetOperatorsForMaterialsAsync();
             var totalLimit = users.TotalFreeSlots();
 
-            var materials = await GetMaterials(totalLimit);
+            var materials = await GetMaterialsAsync(totalLimit);
 
             var options = new MaterialDistributionOptions { Strategy = DistributionStrategy.Evenly };
             var distributionResult = _materialDistributionService.Distribute(materials, users, options);
@@ -147,7 +146,6 @@ namespace Iis.Api.Materials
             if (freeSlotsRemains == 0)
             {
                 await Task.Delay(TimeSpan.FromSeconds(Timeout));
-                return;
             }
         }
 
@@ -163,6 +161,18 @@ namespace Iis.Api.Materials
             sb.AppendLine($"Time Elapsed: {(int)timeElapsed.TotalMilliseconds} ms");
 
             return sb.ToString();
+        }
+
+        public int GetPriority(UserDistributionItem user, string roleName)
+        {
+            if (user.RoleNames.Count == 0) return 0;
+
+            if (string.IsNullOrEmpty(roleName))
+                return user.RoleNames.Count == 0 ? 0 : 1;
+
+            if (!user.RoleNames.Contains(roleName)) return -1;
+            if (user.RoleNames.Count == 1) return 2;
+            return 1;
         }
     }
 }

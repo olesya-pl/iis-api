@@ -65,11 +65,11 @@ namespace Iis.DbLayer.Repositories
         Task RemoveMaterialsAndRelatedData(IReadOnlyCollection<Guid> fileIdList);
 
         Task<Guid?> GetParentIdByChildIdAsync(Guid materialId);
-        Task<IEnumerable<MaterialChannelMappingEntity>> GetChannelMappingsAsync();
-        Task<IEnumerable<string>> GetCellSatChannelsAsync();
-        Task<IEnumerable<MaterialEntity>> GetCellSatWithChannel(int limit, string channel);
-        Task<IEnumerable<MaterialEntity>> GetCellSatWithoutChannel(int limit);
-        Task<IEnumerable<MaterialEntity>> GetNotCellSat(int limit);
+        Task<IReadOnlyList<MaterialChannelMappingEntity>> GetChannelMappingsAsync();
+        Task<IReadOnlyList<string>> GetCellSatChannelsAsync();
+        Task<IReadOnlyList<MaterialEntity>> GetCellSatWithChannelAsync(int limit, string channel);
+        Task<IReadOnlyList<MaterialEntity>> GetCellSatWithoutChannelAsync(int limit);
+        Task<IReadOnlyList<MaterialEntity>> GetNotCellSatAsync(int limit);
         Task SaveDistributionResult(DistributionResult distributionResult);
     }
 }
