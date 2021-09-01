@@ -72,15 +72,15 @@ namespace Iis.DbLayer.Repositories
         {
             return Context.Users
                 .AsNoTracking()
-                .Include(_ => _.UserRoles)
-                    .ThenInclude(_ => _.Role)
-                .Where(_ => userNames.Contains(_.Username))
-                .Select(_ => new
+                .Include(user => user.UserRoles)
+                    .ThenInclude(userRoles => userRoles.Role)
+                .Where(user => userNames.Contains(user.Username))
+                .Select(user => new
                 {
-                    UserName = _.Username,
-                    Roles = _.UserRoles.Select(_ => _.Role)
+                    UserName = user.Username,
+                    Roles = user.UserRoles.Select(userRole => userRole.Role)
                 })
-                .ToDictionaryAsync(_ => _.UserName, _ => _.Roles, cancellationToken);
+                .ToDictionaryAsync(userRoles => userRoles.UserName, userRoles => userRoles.Roles, cancellationToken);
         }
 
         private IQueryable<UserEntity> GetUsersQuery()
