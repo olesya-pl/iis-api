@@ -62,7 +62,7 @@ namespace IIS.Core.Ontology.EntityFramework
                 "TerrorOrganization"
             };
 
-            UseElastic = _context.NodeTypes.Any(nt => nt.Name == "ObjectOfStudy");
+            UseElastic = false;
 
             MaterialIndexes = new[] { "Materials" };
         }
