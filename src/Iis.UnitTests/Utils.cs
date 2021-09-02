@@ -105,6 +105,7 @@ namespace Iis.UnitTests
             serviceCollection.AddSingleton(new Mock<IMaterialEventProducer>().Object);
             serviceCollection.AddTransient<IFileService>(factory => new Mock<IFileService>().Object);
             serviceCollection.AddTransient<IElasticService>(factory => new Mock<IElasticService>().Object);
+            serviceCollection.AddTransient(factory => new Mock<IMaterialElasticService>().Object);
             serviceCollection.AddTransient<IOntologyService>(factory => new Mock<IOntologyService>().Object);
             serviceCollection.AddTransient<IOntologyNodesData>(factory => new Mock<IOntologyNodesData>().Object);
             serviceCollection.AddTransient<IMatrixService>(factory => new Mock<IMatrixService>().Object);
