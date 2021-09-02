@@ -413,6 +413,21 @@ namespace Iis.Services
         {
             var material = await RunWithoutCommitAsync(_ => _.MaterialRepository.GetByIdAsync(materialId, IncludeAll));
 
+            return await PutMaterialToElasticSearchAsync(material, ct, waitForIndexing);
+        }
+
+        public async Task PutMaterialsToElasticSearchAsync(IEnumerable<Guid> materialIds, CancellationToken ct = default, bool waitForIndexing = false)
+        {
+            var materials = await RunWithoutCommitAsync(_ => _.MaterialRepository.GetByIdsAsync(materialIds.ToHashSet(), IncludeAll));
+
+            foreach (var material in materials)
+            {
+                await PutMaterialToElasticSearchAsync(material, ct, waitForIndexing);
+            }
+        }
+
+        private async Task<bool> PutMaterialToElasticSearchAsync(MaterialEntity material, CancellationToken ct = default, bool waitForIndexing = false)
+        {
             var materialDocument = MapEntityToDocument(material);
 
             var materialIdList = material.Children
@@ -437,7 +452,7 @@ namespace Iis.Services
             materialDocument.ImageVectors = GetImageVectorList(materialIdList, responseDictionary);
 
             return await _elasticManager.PutDocumentAsync(_elasticState.MaterialIndexes.FirstOrDefault(),
-                materialId.ToString("N"),
+                material.Id.ToString("N"),
                 JsonConvert.SerializeObject(materialDocument),
                 waitForIndexing,
                 ct);

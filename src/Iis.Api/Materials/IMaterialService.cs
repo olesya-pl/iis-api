@@ -5,6 +5,7 @@ using Iis.Interfaces.Materials;
 using Iis.Domain.MachineLearning;
 using Material = Iis.Domain.Materials.Material;
 using Iis.Domain.Users;
+using Iis.Services.Contracts.Materials.Distribution;
 
 namespace IIS.Core.Materials
 {
@@ -15,6 +16,7 @@ namespace IIS.Core.Materials
         Task<Material> UpdateMaterialAsync(IMaterialUpdateInput input, User user);
         Task AssignMaterialsOperatorAsync(ISet<Guid> materialIds, Guid assigneeId, User user);
         Task AssignMaterialOperatorAsync(Guid materialId, Guid assigneeId, User user = null);
+        Task SaveDistributionResult(DistributionResult distributionResult);
         Task<bool> AssignMaterialEditorAsync(Guid materialId, User user);
         Task<bool> UnassignMaterialEditorAsync(Guid materialId, User user);
         Task SetMachineLearningHadnlersCount(Guid materialId, int handlersCount);

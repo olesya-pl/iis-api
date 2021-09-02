@@ -19,4 +19,8 @@
     <ProjectReference Include="..\Iis.Interfaces\Iis.Interfaces.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="MaterialsDistribution\" />
+  </ItemGroup>
+
 </Project>

@@ -6,6 +6,7 @@ using Iis.Services.Elastic;
 using IIS.Services.Contracts.Interfaces;
 using IIS.Services.Materials;
 using Microsoft.Extensions.DependencyInjection;
+using Iis.Services.Materials;
 
 namespace Iis.Services.DI
 {
@@ -30,6 +31,7 @@ namespace Iis.Services.DI
             services.AddTransient<NodeToJObjectMapper>();
             services.AddTransient<NodeFlattener<IIISUnitOfWork>>();
             services.AddTransient<INodeSaveService, NodeSaveService>();
+            services.AddTransient<IMaterialDistributionService, MaterialDistributionService>();
 
             return services;
         }

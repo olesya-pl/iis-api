@@ -4,6 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Iis.Domain.Users;
 using Iis.Services.Contracts.Enums;
+using Iis.Services.Contracts.Materials.Distribution;
 using Iis.Services.Contracts.Params;
 
 namespace Iis.Services.Contracts.Interfaces
@@ -14,6 +15,7 @@ namespace Iis.Services.Contracts.Interfaces
         Task<Guid> CreateUserAsync(User newUser);
         Task<List<Guid>> GetAvailableOperatorIdsAsync();
         Task<List<User>> GetOperatorsAsync(CancellationToken ct = default);
+        Task<UserDistributionList> GetOperatorsForMaterialsAsync();
         User GetUser(Guid userId);
         User GetUser(string userName, string passwordHash);
         User GetUserByUserName(string userName);

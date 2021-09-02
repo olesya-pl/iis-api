@@ -24,6 +24,7 @@ using System.Security.Authentication;
 using Iis.Interfaces.Users;
 using System.Security.Cryptography;
 using System.Text;
+using Iis.Services.Contracts.Materials.Distribution;
 
 namespace Iis.Services
 {
@@ -113,9 +114,44 @@ namespace Iis.Services
                 .Select(key => key)
                 .ToArray();
 
-            var userList = await RunWithoutCommitAsync(uow => uow.UserRepository.GetOperatorsAsync(e => !unavailableOperators.Contains(e.Id), CancellationToken.None));
+            var userList = await RunWithoutCommitAsync(uow => uow.UserRepository.GetOperatorsAsync(e => !unavailableOperators.Contains(e.Id)));
 
             return userList.Select(e => e.Id).ToList();
+        }
+
+        public async Task<UserDistributionList> GetOperatorsForMaterialsAsync()
+        {
+            var maxMaterialsCount = _maxMaterialsConfig.Value;
+
+            var chargedInfo = _context.Materials
+                .AsNoTracking()
+                .Where(p => (p.ProcessedStatusSignId == null
+                    || p.ProcessedStatusSignId == MaterialEntity.ProcessingStatusNotProcessedSignId)
+                    && p.ParentId == null
+                    && p.AssigneeId != null)
+                .GroupBy(p => p.AssigneeId)
+                .Select(group => new 
+                    { 
+                        UserId = group.Key,
+                        FreeSlots = maxMaterialsCount - group.Count()
+                    })
+                .ToList();
+
+            var mapping = await _context.MaterialChannelMappings.ToArrayAsync();
+
+            var allOperators = (await RunWithoutCommitAsync(uow => uow.UserRepository.GetOperatorsAsync())).ToList();
+            var list =
+                (from op in allOperators
+                join ci in chargedInfo
+                    on op.Id equals ci.UserId
+                where ci.FreeSlots > 0
+                select new UserDistributionItem(op.Id, ci.FreeSlots, GetRoles(op, mapping), GetChannels(op, mapping), op.AccessLevel)).ToList();
+
+            list.AddRange(allOperators
+                .Where(op => !chargedInfo.Any(ci => ci.UserId == op.Id))
+                .Select(op => new UserDistributionItem(op.Id, maxMaterialsCount, GetRoles(op, mapping), GetChannels(op, mapping), op.AccessLevel)));
+
+            return new UserDistributionList(list);
         }
 
         public async Task<Guid> UpdateUserAsync(User updatedUser, CancellationToken cancellation = default)
@@ -497,6 +533,20 @@ namespace Iis.Services
 
             }
             return sb.ToString();
+        }
+        private List<string> GetRoles(UserEntity userEntity, IEnumerable<MaterialChannelMappingEntity> mapping) =>
+           userEntity.UserRoles
+               .Where(ur => mapping.Any(mp => mp.RoleId == ur.RoleId))
+               .Select(ur => ur.Role.Id.ToString("N")).ToList();
+
+        private IReadOnlyList<string> GetChannels(UserEntity userEntity, IEnumerable<MaterialChannelMappingEntity> mapping)
+        {
+            var result = 
+                (from ur in userEntity.UserRoles
+                 join mp in mapping on ur.RoleId equals mp.RoleId
+                 select mp.ChannelName).ToList();
+            
+            return result;
         }
     }
 }

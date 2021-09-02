@@ -11,6 +11,7 @@ using Iis.DbLayer.Extensions;
 using Iis.DbLayer.MaterialEnum;
 using Iis.Domain.Materials;
 using IIS.Repository;
+using Iis.Services.Contracts.Materials.Distribution;
 
 namespace Iis.DbLayer.Repositories
 {
@@ -234,6 +235,40 @@ namespace Iis.DbLayer.Repositories
             return GetMaterialsQuery(IncludeAll).CountAsync(cancellationToken);
         }
 
+        public async Task<IReadOnlyList<MaterialDistributionItem>> GetMaterialsForDistribution(
+            UserDistributionItem user,
+            Expression<Func<MaterialEntity, bool>> filter)
+        {
+            var query = GetMaterialsForDistributionQuery().Where(_ => _.AccessLevel <= user.AccessLevel);
+
+            if (filter != null) query.Where(filter);
+
+            if (user.Channels.Count > 0) query.Where(_ => user.Channels.Contains(_.Channel));
+
+            var materialEntities = await query.Take(user.FreeSlots).ToArrayAsync();
+
+            return materialEntities.Select(_ => new MaterialDistributionItem(_.Id, _.Channel)).ToList();
+        }
+
+        public async Task<IReadOnlyList<MaterialChannelMappingEntity>> GetChannelMappingsAsync()
+        {
+            return await Context.MaterialChannelMappings.ToArrayAsync();
+        }
+
+        public async Task SaveDistributionResult(DistributionResult distributionResult)
+        {
+            var materialIds = distributionResult.Items.Select(_ => _.MaterialId).ToList();
+            var materials = await Context.Materials
+                .Where(_ => materialIds.Contains(_.Id)).ToArrayAsync();
+
+            foreach (var material in materials)
+            {
+                var userId = distributionResult.GetUserId(material.Id);
+                material.AssigneeId = userId;
+            }
+        }
+
+
         private async Task<(IEnumerable<MaterialEntity> Entities, int TotalCount)> GetAllWithPredicateAsync(
             int limit = 0,
             int offset = 0,
@@ -324,5 +359,12 @@ namespace Iis.DbLayer.Repositories
 
             return resultQuery;
         }
+
+        private IQueryable<MaterialEntity> GetMaterialsForDistributionQuery() =>
+           GetMaterialsQuery()
+               .Where(_ => (_.ProcessedStatusSignId == null
+                       || _.ProcessedStatusSignId == MaterialEntity.ProcessingStatusNotProcessedSignId)
+                   && _.AssigneeId == null
+                   && _.ParentId == null);
     }
 }

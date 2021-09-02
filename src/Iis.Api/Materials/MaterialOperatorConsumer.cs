@@ -9,6 +9,11 @@ using Iis.Services.Contracts.Interfaces;
 using Iis.DbLayer.MaterialDictionaries;
 using IIS.Services.Contracts.Interfaces;
 using Iis.Services.Contracts.Params;
+using System.Collections.Generic;
+using Iis.DataModel.Materials;
+using Iis.Services.Contracts.Materials.Distribution;
+using System.Diagnostics;
+using System.Text;
 
 namespace Iis.Api.Materials
 {
@@ -16,22 +21,56 @@ namespace Iis.Api.Materials
     {
         private const int MaterialsPage = 1;
         private const int Timeout = 30;
+        private const string SAT_PREFFIX = "sat.";
+        private const string CELL_PREFFIX = "cell.";
 
         private readonly IUserService _userService;
         private readonly ILogger<MaterialOperatorConsumer> _logger;
         private readonly IMaterialService _materialService;
+        private readonly IMaterialElasticService _materialElasticService;
         private readonly IMaterialProvider _materialProvider;
+        private readonly IMaterialDistributionService _materialDistributionService;
+        private readonly IReadOnlyList<MaterialDistributionRule> _rules;
 
         public MaterialOperatorConsumer(
             ILogger<MaterialOperatorConsumer> logger,
             IMaterialService materialService,
+            IMaterialElasticService materialElasticService,
             IUserService userService,
-            IMaterialProvider materialProvider)
+            IMaterialProvider materialProvider,
+            IMaterialDistributionService materialDistributionService)
         {
             _userService = userService;
             _logger = logger;
             _materialService = materialService;
+            _materialElasticService = materialElasticService;
             _materialProvider = materialProvider;
+            _materialDistributionService = materialDistributionService;
+
+            _rules = new List<MaterialDistributionRule>
+            {
+                new MaterialDistributionRule
+                {
+                    Priority = 2,
+                    Filter =  m => (m.Source.StartsWith(SAT_PREFFIX) || m.Source.StartsWith(CELL_PREFFIX))
+                        && m.Channel != null,
+                    GetChannel = m => m.Channel
+                },
+                new MaterialDistributionRule
+                {
+                    Priority = 1,
+                    Filter =  m => (m.Source.StartsWith(SAT_PREFFIX) || m.Source.StartsWith(CELL_PREFFIX))
+                        && m.Channel == null,
+                    GetChannel = m => m.Channel
+                    
+                },
+                new MaterialDistributionRule
+                {
+                    Priority = 0,
+                    Filter =  m => !(m.Source.StartsWith(SAT_PREFFIX) || m.Source.StartsWith(CELL_PREFFIX)),
+                    GetChannel = m => null
+                }
+            };
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -40,30 +79,81 @@ namespace Iis.Api.Materials
             {
                 try
                 {
-                    var availableOperators = await _userService.GetAvailableOperatorIdsAsync();
-                    if (!availableOperators.Any())
-                    {
-                        await Task.Delay(TimeSpan.FromSeconds(Timeout), stoppingToken);
-                        continue;
-                    }
-
-                    var paginationParams = new PaginationParams(MaterialsPage, availableOperators.Count);
-                    var sortingParams = new SortingParams(MaterialSortingFields.RegistrationDate, SortDirections.DESC);
-                    var unassignedMaterials = await _materialProvider.GetAllUnassignedIdsAsync(paginationParams, sortingParams, stoppingToken);
-                    if (!unassignedMaterials.Any())
-                    {
-                        await Task.Delay(TimeSpan.FromSeconds(Timeout), stoppingToken);
-                        continue;
-                    }
-
-                    foreach (var (assignee, materialId) in availableOperators.Zip(unassignedMaterials))
-                        await _materialService.AssignMaterialOperatorAsync(materialId, assignee);
+                    await Distribute();
                 }
                 catch (Exception e)
                 {
-                    _logger.LogError("MaterialOperatorAssigner. Exception={e}", e);
+                    _logger.LogError("MaterialOperatorConsumer. Exception={e}", e);
                 }
             }
+        }
+
+        private async Task<DistributionResult> DistributeForUser(UserDistributionItem user, IReadOnlyList<Guid> distributedIds)
+        {
+            var list = new List<DistributionResultItem>();
+
+            foreach (var rule in _rules.OrderByDescending(_ => _.Priority))
+            {
+                var materials = await _materialProvider.GetMaterialsForDistribution(user, rule.Filter);
+                list.AddRange(materials.Select(_ => new DistributionResultItem(_.Id, user.Id, rule.GetChannel(_))));
+                user.FreeSlots -= materials.Count();
+                if (user.FreeSlots == 0) break;
+            }
+
+            return new DistributionResult(list);
+        }
+
+        private async Task Distribute()
+        {
+            var sw = new Stopwatch();
+            sw.Start();
+
+            var users = await _userService.GetOperatorsForMaterialsAsync();
+            foreach (var user in users.Items)
+            {
+                var oneUserResult = await DistributeForUser(user, new List<Guid> { });
+                await _materialService.SaveDistributionResult(oneUserResult);
+
+                var materialIds = oneUserResult.Items.Select(_ => _.MaterialId).ToList();
+                await _materialElasticService.PutMaterialsToElasticSearchAsync(materialIds);
+
+                _logger.LogInformation(GetLogMessage(oneUserResult, user, sw.Elapsed));
+            }
+
+            var freeSlotsRemains = users.TotalFreeSlots();
+            sw.Stop();
+
+            if (freeSlotsRemains == 0)
+            {
+                await Task.Delay(TimeSpan.FromSeconds(Timeout));
+            }
+        }
+
+        private string GetLogMessage(DistributionResult distributionResult, UserDistributionItem user, TimeSpan timeElapsed)
+        {
+            var sb = new StringBuilder();
+            sb.AppendLine($"Materials assigned for user { user.Id }:");
+
+            foreach (var item in distributionResult.Items)
+            {
+                sb.AppendLine($"{item.MaterialId} ({item.Channel})");
+            }
+            sb.AppendLine($"Free Slots Remains: {user.FreeSlots}");
+            sb.AppendLine($"Time Elapsed: {(int)timeElapsed.TotalMilliseconds} ms");
+
+            return sb.ToString();
+        }
+
+        public int GetPriority(UserDistributionItem user, string roleName)
+        {
+            if (user.RoleNames.Count == 0) return 0;
+
+            if (string.IsNullOrEmpty(roleName))
+                return user.RoleNames.Count == 0 ? 0 : 1;
+
+            if (!user.RoleNames.Contains(roleName)) return -1;
+            if (user.RoleNames.Count == 1) return 2;
+            return 1;
         }
     }
 }

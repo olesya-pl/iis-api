@@ -5,6 +5,8 @@ using Iis.DataModel.Materials;
 using Iis.DbLayer.MaterialEnum;
 using System.Threading;
 using Iis.Domain.Materials;
+using Iis.Services.Contracts.Materials.Distribution;
+using System.Linq.Expressions;
 
 namespace Iis.DbLayer.Repositories
 {
@@ -17,7 +19,7 @@ namespace Iis.DbLayer.Repositories
         Task<IEnumerable<MaterialEntity>> GetAllAsync(params MaterialIncludeEnum[] includes);
 
         Task<IEnumerable<MaterialEntity>> GetAllAsync(int limit, params MaterialIncludeEnum[] includes);
-
+        
         Task<IEnumerable<MaterialEntity>> GetAllAsync(int limit, int offset, params MaterialIncludeEnum[] includes);
 
         Task<IEnumerable<MaterialEntity>> GetAllForRelatedNodeListAsync(IEnumerable<Guid> nodeIdList);
@@ -59,5 +61,9 @@ namespace Iis.DbLayer.Repositories
         Task<Guid?> GetParentIdByChildIdAsync(Guid materialId);
 
         Task<int> GetTotalCountAsync(CancellationToken cancellationToken);
+        Task<IReadOnlyList<MaterialChannelMappingEntity>> GetChannelMappingsAsync();
+        Task<IReadOnlyList<MaterialDistributionItem>> GetMaterialsForDistribution(UserDistributionItem user,
+            Expression<Func<MaterialEntity, bool>> filter);
+        Task SaveDistributionResult(DistributionResult distributionResult);
     }
 }

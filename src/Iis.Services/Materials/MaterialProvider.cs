@@ -14,6 +14,7 @@ using Iis.Interfaces.Ontology.Schema;
 using Iis.Services;
 using Iis.Services.Contracts.Dtos;
 using Iis.Services.Contracts.Interfaces;
+using Iis.Services.Contracts.Materials.Distribution;
 using Iis.Services.Contracts.Params;
 using Iis.Utility;
 using IIS.Repository;
@@ -26,6 +27,7 @@ using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
 using MaterialSign = Iis.Domain.Materials.MaterialSign;
@@ -632,5 +634,17 @@ namespace IIS.Services.Materials
             return RunWithoutCommitAsync((unitOfWork) =>
                    unitOfWork.MaterialRepository.GetAllUnassignedIdsAsync(limit, offset, sorting?.ColumnName, sorting?.Order, cancellationToken));
         }
+
+        public Task<IReadOnlyList<MaterialDistributionItem>> GetMaterialsForDistribution(
+            UserDistributionItem user,
+            Expression<Func<MaterialEntity, bool>> filter)
+        {
+            return RunWithoutCommitAsync((unitOfWork) =>
+                   unitOfWork.MaterialRepository.GetMaterialsForDistribution(user, filter));
+        }
+
+        public Task<IReadOnlyList<MaterialChannelMappingEntity>> GetChannelMappingsAsync() =>
+            RunWithoutCommitAsync((unitOfWork) =>
+                   unitOfWork.MaterialRepository.GetChannelMappingsAsync());
     }
 }
