@@ -21,6 +21,8 @@ namespace Iis.Api.Materials
     {
         private const int MaterialsPage = 1;
         private const int Timeout = 30;
+        private const string SAT_PREFFIX = "sat.";
+        private const string CELL_PREFFIX = "cell.";
 
         private readonly IUserService _userService;
         private readonly ILogger<MaterialOperatorConsumer> _logger;
@@ -47,23 +49,24 @@ namespace Iis.Api.Materials
             {
                 new MaterialDistributionRule
                 {
-                    GetMaterials = null,
-                    GetRole = m => GetRoleByChannel(m.Channel),
                     Priority = 2,
-                    GetChannels = () => _materialProvider.GetCellSatChannelsAsync(),
-                    GetMaterialsByChannel = (limit, channel) => _materialProvider.GetCellSatWithChannelAsync(limit, channel)
+                    Filter =  m => (m.Source.StartsWith(SAT_PREFFIX) || m.Source.StartsWith(CELL_PREFFIX))
+                        && m.Channel != null,
+                    GetChannel = m => m.Channel
                 },
                 new MaterialDistributionRule
                 {
-                    GetMaterials = limit => _materialProvider.GetCellSatWithoutChannelAsync(limit),
-                    GetRole = m => GetRoleByChannel(m.Channel),
-                    Priority = 1
+                    Priority = 1,
+                    Filter =  m => (m.Source.StartsWith(SAT_PREFFIX) || m.Source.StartsWith(CELL_PREFFIX))
+                        && m.Channel == null,
+                    GetChannel = m => m.Channel
+                    
                 },
                 new MaterialDistributionRule
                 {
-                    GetMaterials = limit => _materialProvider.GetNotCellSatAsync(limit),
-                    GetRole = m => null,
-                    Priority = 0
+                    Priority = 0,
+                    Filter =  m => !(m.Source.StartsWith(SAT_PREFFIX) || m.Source.StartsWith(CELL_PREFFIX)),
+                    GetChannel = m => null
                 }
             };
         }
@@ -72,8 +75,8 @@ namespace Iis.Api.Materials
         {
             if (_channelRoleMapping == null)
             {
-                var mappings = await _materialProvider.GetChannelMappingsAsync();
-                _channelRoleMapping = mappings.ToDictionary(m => m.ChannelName, m => m.RoleId);
+                //var mappings = await _materialProvider.GetChannelMappingsAsync();
+                //_channelRoleMapping = mappings.ToDictionary(m => m.ChannelName, m => m.RoleId);
             }
             while (!stoppingToken.IsCancellationRequested)
             {
@@ -95,32 +98,19 @@ namespace Iis.Api.Materials
                 null;
         }
 
-        private async Task<IEnumerable<MaterialDistributionItem>> GetMaterialsByRuleAsync(int limit, MaterialDistributionRule rule)
+        private async Task<DistributionResult> DistributeForUser(UserDistributionItem user, IReadOnlyList<Guid> distributedIds)
         {
-            if (rule.GetMaterials != null)
-                return (await rule.GetMaterials(limit))
-                    .Select(_ => new MaterialDistributionItem(_.Id, rule.Priority, GetRoleByChannel(_.Channel), _.Channel));
+            var list = new List<DistributionResultItem>();
 
-            var channels = await rule.GetChannels();
-            var list = new List<MaterialDistributionItem>();
-            foreach (var channel in channels)
+            foreach (var rule in _rules.OrderByDescending(_ => _.Priority))
             {
-                var materials = (await rule.GetMaterialsByChannel(limit, channel))
-                    .Select(_ => new MaterialDistributionItem(_.Id, rule.Priority, GetRoleByChannel(_.Channel), channel));
-                list.AddRange(materials);
+                var materials = await _materialProvider.GetMaterialsForDistribution(user, rule.Filter, distributedIds);
+                list.AddRange(materials.Select(_ => new DistributionResultItem(_.Id, user.Id)));
+                user.FreeSlots -= materials.Count();
+                if (user.FreeSlots == 0) break;
             }
-            return list;
-        }
 
-        private async Task<MaterialDistributionList> GetMaterialsAsync(int limit)
-        {
-            var list = new List<MaterialDistributionItem>();
-            foreach (var rule in _rules)
-            {
-                var materials = await GetMaterialsByRuleAsync(limit, rule);
-                list.AddRange(materials);
-            }
-            return new MaterialDistributionList(list);
+            return new DistributionResult(list);
         }
 
         private async Task Distribute()
@@ -129,19 +119,17 @@ namespace Iis.Api.Materials
             sw.Start();
 
             var users = await _userService.GetOperatorsForMaterialsAsync();
-            var totalLimit = users.TotalFreeSlots();
-
-            var materials = await GetMaterialsAsync(totalLimit);
-
-            var options = new MaterialDistributionOptions { Strategy = DistributionStrategy.Evenly };
-            var distributionResult = _materialDistributionService.Distribute(materials, users, options);
-
-            await _materialService.SaveDistributionResult(distributionResult);
+            foreach (var user in users.Items)
+            {
+                var oneUserResult = await DistributeForUser(user, new List<Guid> { });
+                await _materialService.SaveDistributionResult(oneUserResult);
+                _logger.LogInformation(GetLogMessage(oneUserResult, user, sw.Elapsed));
+            }
 
             var freeSlotsRemains = users.TotalFreeSlots();
 
             sw.Stop();
-            _logger.LogInformation(GetLogMessage(distributionResult, freeSlotsRemains, sw.Elapsed));
+            
 
             if (freeSlotsRemains == 0)
             {
@@ -149,15 +137,16 @@ namespace Iis.Api.Materials
             }
         }
 
-        private string GetLogMessage(DistributionResult distributionResult, int freeSlotsRemains, TimeSpan timeElapsed)
+        private string GetLogMessage(DistributionResult distributionResult, UserDistributionItem user, TimeSpan timeElapsed)
         {
             var sb = new StringBuilder();
+            sb.AppendLine($"Materials assigned for user { user.Id }:");
 
             foreach (var item in distributionResult.Items)
             {
-                sb.AppendLine($"{item.MaterialId} => {item.UserId}");
+                sb.AppendLine($"{item.MaterialId}");
             }
-            sb.AppendLine($"Free Slots Remains: {freeSlotsRemains}");
+            sb.AppendLine($"Free Slots Remains: {user.FreeSlots}");
             sb.AppendLine($"Time Elapsed: {(int)timeElapsed.TotalMilliseconds} ms");
 
             return sb.ToString();

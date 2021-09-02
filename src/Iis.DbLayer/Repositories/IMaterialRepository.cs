@@ -7,6 +7,7 @@ using System.Threading;
 using Iis.Domain.Materials;
 using Iis.Interfaces.Elastic;
 using Iis.Services.Contracts.Materials.Distribution;
+using System.Linq.Expressions;
 
 namespace Iis.DbLayer.Repositories
 {
@@ -66,10 +67,9 @@ namespace Iis.DbLayer.Repositories
 
         Task<Guid?> GetParentIdByChildIdAsync(Guid materialId);
         Task<IReadOnlyList<MaterialChannelMappingEntity>> GetChannelMappingsAsync();
-        Task<IReadOnlyList<string>> GetCellSatChannelsAsync();
-        Task<IReadOnlyList<MaterialEntity>> GetCellSatWithChannelAsync(int limit, string channel);
-        Task<IReadOnlyList<MaterialEntity>> GetCellSatWithoutChannelAsync(int limit);
-        Task<IReadOnlyList<MaterialEntity>> GetNotCellSatAsync(int limit);
+        Task<IReadOnlyList<MaterialDistributionItem>> GetMaterialsForDistribution(UserDistributionItem user,
+            Expression<Func<MaterialEntity, bool>> filter,
+            IReadOnlyList<Guid> distributedIds);
         Task SaveDistributionResult(DistributionResult distributionResult);
     }
 }

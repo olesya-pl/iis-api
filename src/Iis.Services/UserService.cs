@@ -137,7 +137,7 @@ namespace Iis.Services
                     })
                 .ToList();
 
-            var mappingRoleIds = await _context.MaterialChannelMappings.Select(_ => _.RoleId).ToArrayAsync();
+            var mapping = await _context.MaterialChannelMappings.ToArrayAsync();
 
             var allOperators = (await RunWithoutCommitAsync(uow => uow.UserRepository.GetOperatorsAsync())).ToList();
             var list =
@@ -145,11 +145,11 @@ namespace Iis.Services
                 join ci in chargedInfo
                     on op.Id equals ci.UserId
                 where ci.FreeSlots > 0
-                select new UserDistributionItem(op.Id, ci.FreeSlots, GetRoles(op, mappingRoleIds))).ToList();
+                select new UserDistributionItem(op.Id, ci.FreeSlots, GetRoles(op, mapping), GetChannels(op, mapping))).ToList();
 
             list.AddRange(allOperators
                 .Where(op => !chargedInfo.Any(ci => ci.UserId == op.Id))
-                .Select(op => new UserDistributionItem(op.Id, maxMaterialsCount, GetRoles(op, mappingRoleIds))));
+                .Select(op => new UserDistributionItem(op.Id, maxMaterialsCount, GetRoles(op, mapping), GetChannels(op, mapping))));
 
             return new UserDistributionList(list);
         }
@@ -534,9 +534,14 @@ namespace Iis.Services
             }
             return sb.ToString();
         }
-        private List<string> GetRoles(UserEntity userEntity, IEnumerable<Guid> mappingRoleIds) =>
+        private List<string> GetRoles(UserEntity userEntity, IEnumerable<MaterialChannelMappingEntity> mapping) =>
            userEntity.UserRoles
-               .Where(_ => mappingRoleIds.Contains(_.RoleId))
-               .Select(_ => _.Role.Id.ToString("N")).ToList();
+               .Where(ur => mapping.Any(mp => mp.RoleId == ur.Id))
+               .Select(ur => ur.Role.Id.ToString("N")).ToList();
+
+        private IReadOnlyList<string> GetChannels(UserEntity userEntity, IEnumerable<MaterialChannelMappingEntity> mapping) =>
+            (from ur in userEntity.UserRoles
+             join mp in mapping on ur.Id equals mp.RoleId
+             select mp.ChannelName).ToList();
     }
 }

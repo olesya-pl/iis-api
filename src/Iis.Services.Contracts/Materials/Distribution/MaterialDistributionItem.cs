@@ -19,6 +19,14 @@ namespace Iis.Services.Contracts.Materials.Distribution
             Channel = channel;
         }
 
+        public MaterialDistributionItem(Guid id, string channel)
+        {
+            Id = id;
+            Priority = 0;
+            RoleName = null;
+            Channel = channel;
+        }
+
         public override string ToString() =>
             $"Priority: {Priority}; Role: {RoleName}; Channel: {Channel}; Id: {Id}";
     }

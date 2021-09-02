@@ -437,8 +437,8 @@ namespace IIS.Core.Materials.EntityFramework
                 await unitOfWork.MaterialRepository.SaveDistributionResult(distributionResult));
 
             var materialIds = distributionResult.Items.Select(_ => _.MaterialId).ToList();
-            await RunWithoutCommitAsync(async unitOfWork =>
-                await unitOfWork.MaterialRepository.PutMaterialsToElasticSearchAsync(materialIds));
+            //await RunWithoutCommitAsync(async unitOfWork =>
+            //    await unitOfWork.MaterialRepository.PutMaterialsToElasticSearchAsync(materialIds));
         }
 
         public async Task AssignMaterialOperatorAsync(Guid materialId, Guid assigneeId, User user = null)

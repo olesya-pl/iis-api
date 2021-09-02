@@ -14,6 +14,7 @@ using Iis.Interfaces.Ontology.Schema;
 using Iis.Services;
 using Iis.Services.Contracts.Dtos;
 using Iis.Services.Contracts.Interfaces;
+using Iis.Services.Contracts.Materials.Distribution;
 using Iis.Services.Contracts.Params;
 using Iis.Utility;
 using IIS.Repository;
@@ -26,6 +27,7 @@ using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
 using MaterialSign = Iis.Domain.Materials.MaterialSign;
@@ -633,20 +635,14 @@ namespace IIS.Services.Materials
                    unitOfWork.MaterialRepository.GetAllUnassignedIdsAsync(limit, offset, sorting?.ColumnName, sorting?.Order, cancellationToken));
         }
 
-        public Task<IReadOnlyList<string>> GetCellSatChannelsAsync() =>
-            RunWithoutCommitAsync((unitOfWork) =>
-                   unitOfWork.MaterialRepository.GetCellSatChannelsAsync());
-        public Task<IReadOnlyList<MaterialEntity>> GetCellSatWithChannelAsync(int limit, string channel) =>
-            RunWithoutCommitAsync((unitOfWork) =>
-                   unitOfWork.MaterialRepository.GetCellSatWithChannelAsync(limit, channel));
-
-        public Task<IReadOnlyList<MaterialEntity>> GetCellSatWithoutChannelAsync(int limit) =>
-            RunWithoutCommitAsync((unitOfWork) =>
-                   unitOfWork.MaterialRepository.GetCellSatWithoutChannelAsync(limit));
-
-        public Task<IReadOnlyList<MaterialEntity>> GetNotCellSatAsync(int limit) =>
-            RunWithoutCommitAsync((unitOfWork) =>
-                   unitOfWork.MaterialRepository.GetNotCellSatAsync(limit));
+        public Task<IReadOnlyList<MaterialDistributionItem>> GetMaterialsForDistribution(
+            UserDistributionItem user,
+            Expression<Func<MaterialEntity, bool>> filter,
+            IReadOnlyList<Guid> distributedIds)
+        {
+            return RunWithoutCommitAsync((unitOfWork) =>
+                   unitOfWork.MaterialRepository.GetMaterialsForDistribution(user, filter, distributedIds));
+        }
 
         public Task<IReadOnlyList<MaterialChannelMappingEntity>> GetChannelMappingsAsync() =>
             RunWithoutCommitAsync((unitOfWork) =>

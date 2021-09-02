@@ -28,8 +28,6 @@ namespace Iis.DbLayer.Repositories
     public class MaterialRepository : RepositoryBase<OntologyContext>, IMaterialRepository
     {
         private static readonly string NoneLinkTypeValue = MaterialNodeLinkType.None.ToString();
-        private const string SAT_PREFFIX = "sat.";
-        private const string CELL_PREFFIX = "cell.";
 
         private readonly MaterialIncludeEnum[] _includeAll = new MaterialIncludeEnum[]
         {
@@ -388,38 +386,22 @@ namespace Iis.DbLayer.Repositories
                 .Select(e => e.ParentId).FirstOrDefaultAsync();
         }
 
-        public async Task<IReadOnlyList<MaterialEntity>> GetCellSatWithChannelAsync(int limit, string channel)
+        public async Task<IReadOnlyList<MaterialDistributionItem>> GetMaterialsForDistribution(
+            UserDistributionItem user, 
+            Expression<Func<MaterialEntity, bool>> filter,
+            IReadOnlyList<Guid> distributedIds)
         {
-            return await GetMaterialsQuery()
-                .Where(m => (m.Source.StartsWith(SAT_PREFFIX) || m.Source.StartsWith(CELL_PREFFIX))
-                    && m.Channel == channel)
-                .Take(limit)
-                .ToArrayAsync();
-        }
+            var query = GetMaterialsForDistributionQuery();
 
-        public async Task<IReadOnlyList<string>> GetCellSatChannelsAsync()
-        {
-            return await GetMaterialsForDistributionQuery()
-                .Where(_ => _.Channel != null)
-                .Select(_ => _.Channel)
-                .Distinct()
-                .ToListAsync();
-        }
+            if (distributedIds.Count > 0) query.Where(_ => !distributedIds.Contains(_.Id));
 
-        public async Task<IReadOnlyList<MaterialEntity>> GetCellSatWithoutChannelAsync(int limit)
-        {
-            return await GetMaterialsForDistributionQuery()
-                .Where(m => (m.Source.StartsWith(SAT_PREFFIX) || m.Source.StartsWith(CELL_PREFFIX)) && m.Channel == null)
-                .Take(limit)
-                .ToArrayAsync();
-        }
+            if (filter != null) query.Where(filter);
 
-        public async Task<IReadOnlyList<MaterialEntity>> GetNotCellSatAsync(int limit)
-        {
-            return await GetMaterialsForDistributionQuery()
-                .Where(m => !(m.Source.StartsWith(SAT_PREFFIX) || m.Source.StartsWith(CELL_PREFFIX)))
-                .Take(limit)
-                .ToArrayAsync();
+            if (user.Channels.Count > 0) query.Where(_ => user.Channels.Contains(_.Channel));
+
+            var materialEntities = await query.Take(user.FreeSlots).ToArrayAsync();
+
+            return materialEntities.Select(_ => new MaterialDistributionItem(_.Id, _.Channel)).ToList();
         }
 
         public async Task<IReadOnlyList<MaterialChannelMappingEntity>> GetChannelMappingsAsync()
@@ -649,6 +631,7 @@ namespace Iis.DbLayer.Repositories
            GetMaterialsQuery()
                .Where(_ => (_.ProcessedStatusSignId == null
                        || _.ProcessedStatusSignId == MaterialEntity.ProcessingStatusNotProcessedSignId)
+                   && _.AssigneeId == null
                    && _.ParentId == null);
     }
 }

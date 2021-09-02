@@ -10,6 +10,8 @@ using Iis.Services.Contracts.Params;
 using Iis.Domain.Users;
 using IIS.Services.Contracts.Materials;
 using Iis.Interfaces.Elastic;
+using System.Linq.Expressions;
+using Iis.Services.Contracts.Materials.Distribution;
 
 namespace IIS.Services.Contracts.Interfaces
 {
@@ -48,10 +50,9 @@ namespace IIS.Services.Contracts.Interfaces
         Task<Material> GetMaterialAsync(Guid id);
         Task<IReadOnlyCollection<LocationHistoryDto>> GetLocationHistoriesAsync(Guid materialId);
         Task<IReadOnlyCollection<Guid>> GetAllUnassignedIdsAsync(PaginationParams page, SortingParams sorting, CancellationToken cancellationToken = default);
-        Task<IReadOnlyList<MaterialChannelMappingEntity>> GetChannelMappingsAsync();
-        Task<IReadOnlyList<string>> GetCellSatChannelsAsync();
-        Task<IReadOnlyList<MaterialEntity>> GetCellSatWithChannelAsync(int limit, string channel);
-        Task<IReadOnlyList<MaterialEntity>> GetCellSatWithoutChannelAsync(int limit);
-        Task<IReadOnlyList<MaterialEntity>> GetNotCellSatAsync(int limit);
+        Task<IReadOnlyList<MaterialDistributionItem>> GetMaterialsForDistribution(
+            UserDistributionItem user,
+            Expression<Func<MaterialEntity, bool>> filter,
+            IReadOnlyList<Guid> distributedIds);
     }
 }
