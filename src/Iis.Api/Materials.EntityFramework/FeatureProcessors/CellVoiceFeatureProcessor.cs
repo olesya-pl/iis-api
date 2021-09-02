@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Iis.Domain;
 using Iis.Interfaces.Elastic;
 using Iis.Services.Contracts.Interfaces;
@@ -45,8 +46,9 @@ namespace IIS.Core.Materials.EntityFramework.FeatureProcessors
             MutationUpdateResolver updateResolver,
             IElasticState elasticState,
             IGsmLocationService gsmLocationService,
-            ILocationHistoryService locationHistoryService)
-        : base(elasticService, ontologySchema, createResolver, updateResolver, elasticState, locationHistoryService)
+            ILocationHistoryService locationHistoryService,
+            ILogger logger)
+        : base(elasticService, ontologySchema, createResolver, updateResolver, elasticState, locationHistoryService, logger)
         {
             _gsmLocationService = gsmLocationService;
         }

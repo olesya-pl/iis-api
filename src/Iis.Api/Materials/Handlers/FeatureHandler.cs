@@ -176,8 +176,9 @@ namespace Iis.Api.Materials.Handlers
                         throw new InvalidOperationException($"We received empty message.");
                     }
 
-
                     var message = BodyToObject<MaterialProcessingEventMessage>(args.Body, options);
+
+                    _logger.LogInformation("Message {@message} has been received from exchange:{Exchange} with key:{RoutingKey}", message, args.Exchange, args.RoutingKey);
 
                     await handler(message);
 
