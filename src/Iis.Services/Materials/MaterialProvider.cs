@@ -637,11 +637,10 @@ namespace IIS.Services.Materials
 
         public Task<IReadOnlyList<MaterialDistributionItem>> GetMaterialsForDistribution(
             UserDistributionItem user,
-            Expression<Func<MaterialEntity, bool>> filter,
-            IReadOnlyList<Guid> distributedIds)
+            Expression<Func<MaterialEntity, bool>> filter)
         {
             return RunWithoutCommitAsync((unitOfWork) =>
-                   unitOfWork.MaterialRepository.GetMaterialsForDistribution(user, filter, distributedIds));
+                   unitOfWork.MaterialRepository.GetMaterialsForDistribution(user, filter));
         }
 
         public Task<IReadOnlyList<MaterialChannelMappingEntity>> GetChannelMappingsAsync() =>

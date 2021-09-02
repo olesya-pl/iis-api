@@ -68,8 +68,7 @@ namespace Iis.DbLayer.Repositories
         Task<Guid?> GetParentIdByChildIdAsync(Guid materialId);
         Task<IReadOnlyList<MaterialChannelMappingEntity>> GetChannelMappingsAsync();
         Task<IReadOnlyList<MaterialDistributionItem>> GetMaterialsForDistribution(UserDistributionItem user,
-            Expression<Func<MaterialEntity, bool>> filter,
-            IReadOnlyList<Guid> distributedIds);
+            Expression<Func<MaterialEntity, bool>> filter);
         Task SaveDistributionResult(DistributionResult distributionResult);
     }
 }

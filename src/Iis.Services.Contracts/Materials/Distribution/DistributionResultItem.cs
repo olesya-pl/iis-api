@@ -8,10 +8,12 @@ namespace Iis.Services.Contracts.Materials.Distribution
     {
         public Guid MaterialId { get; }
         public Guid UserId { get; }
-        public DistributionResultItem(Guid materialId, Guid userId)
+        public string Channel { get; }
+        public DistributionResultItem(Guid materialId, Guid userId, string channel = null)
         {
             MaterialId = materialId;
             UserId = userId;
+            Channel = channel;
         }
         public bool IsEqual(DistributionResultItem item) =>
             MaterialId == item.MaterialId &&

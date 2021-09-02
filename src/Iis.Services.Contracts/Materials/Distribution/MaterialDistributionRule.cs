@@ -11,6 +11,6 @@ namespace Iis.Services.Contracts.Materials.Distribution
     {
         public int Priority { get; set; }
         public Expression<Func<MaterialEntity, bool>> Filter { get; set; }
-        public Func<MaterialEntity, string> GetChannel { get; set; }
+        public Func<MaterialDistributionItem, string> GetChannel { get; set; }
     }
 }

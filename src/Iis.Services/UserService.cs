@@ -145,11 +145,11 @@ namespace Iis.Services
                 join ci in chargedInfo
                     on op.Id equals ci.UserId
                 where ci.FreeSlots > 0
-                select new UserDistributionItem(op.Id, ci.FreeSlots, GetRoles(op, mapping), GetChannels(op, mapping))).ToList();
+                select new UserDistributionItem(op.Id, ci.FreeSlots, GetRoles(op, mapping), GetChannels(op, mapping), op.AccessLevel)).ToList();
 
             list.AddRange(allOperators
                 .Where(op => !chargedInfo.Any(ci => ci.UserId == op.Id))
-                .Select(op => new UserDistributionItem(op.Id, maxMaterialsCount, GetRoles(op, mapping), GetChannels(op, mapping))));
+                .Select(op => new UserDistributionItem(op.Id, maxMaterialsCount, GetRoles(op, mapping), GetChannels(op, mapping), op.AccessLevel)));
 
             return new UserDistributionList(list);
         }
@@ -536,12 +536,17 @@ namespace Iis.Services
         }
         private List<string> GetRoles(UserEntity userEntity, IEnumerable<MaterialChannelMappingEntity> mapping) =>
            userEntity.UserRoles
-               .Where(ur => mapping.Any(mp => mp.RoleId == ur.Id))
+               .Where(ur => mapping.Any(mp => mp.RoleId == ur.RoleId))
                .Select(ur => ur.Role.Id.ToString("N")).ToList();
 
-        private IReadOnlyList<string> GetChannels(UserEntity userEntity, IEnumerable<MaterialChannelMappingEntity> mapping) =>
-            (from ur in userEntity.UserRoles
-             join mp in mapping on ur.Id equals mp.RoleId
-             select mp.ChannelName).ToList();
+        private IReadOnlyList<string> GetChannels(UserEntity userEntity, IEnumerable<MaterialChannelMappingEntity> mapping)
+        {
+            var result = 
+                (from ur in userEntity.UserRoles
+                 join mp in mapping on ur.RoleId equals mp.RoleId
+                 select mp.ChannelName).ToList();
+            
+            return result;
+        }
     }
 }

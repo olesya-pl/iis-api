@@ -29,7 +29,6 @@ namespace Iis.Api.Materials
         private readonly IMaterialService _materialService;
         private readonly IMaterialProvider _materialProvider;
         private readonly IMaterialDistributionService _materialDistributionService;
-        private Dictionary<string, Guid> _channelRoleMapping;
         private readonly IReadOnlyList<MaterialDistributionRule> _rules;
 
         public MaterialOperatorConsumer(
@@ -73,11 +72,6 @@ namespace Iis.Api.Materials
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            if (_channelRoleMapping == null)
-            {
-                //var mappings = await _materialProvider.GetChannelMappingsAsync();
-                //_channelRoleMapping = mappings.ToDictionary(m => m.ChannelName, m => m.RoleId);
-            }
             while (!stoppingToken.IsCancellationRequested)
             {
                 try
@@ -91,21 +85,14 @@ namespace Iis.Api.Materials
             }
         }
 
-        private string GetRoleByChannel(string channel)
-        {
-            return !string.IsNullOrEmpty(channel) && _channelRoleMapping.ContainsKey(channel) ? 
-                _channelRoleMapping.GetValueOrDefault(channel).ToString("N") :
-                null;
-        }
-
         private async Task<DistributionResult> DistributeForUser(UserDistributionItem user, IReadOnlyList<Guid> distributedIds)
         {
             var list = new List<DistributionResultItem>();
 
             foreach (var rule in _rules.OrderByDescending(_ => _.Priority))
             {
-                var materials = await _materialProvider.GetMaterialsForDistribution(user, rule.Filter, distributedIds);
-                list.AddRange(materials.Select(_ => new DistributionResultItem(_.Id, user.Id)));
+                var materials = await _materialProvider.GetMaterialsForDistribution(user, rule.Filter);
+                list.AddRange(materials.Select(_ => new DistributionResultItem(_.Id, user.Id, rule.GetChannel(_))));
                 user.FreeSlots -= materials.Count();
                 if (user.FreeSlots == 0) break;
             }
@@ -127,9 +114,7 @@ namespace Iis.Api.Materials
             }
 
             var freeSlotsRemains = users.TotalFreeSlots();
-
             sw.Stop();
-            
 
             if (freeSlotsRemains == 0)
             {
@@ -144,7 +129,7 @@ namespace Iis.Api.Materials
 
             foreach (var item in distributionResult.Items)
             {
-                sb.AppendLine($"{item.MaterialId}");
+                sb.AppendLine($"{item.MaterialId} ({item.Channel})");
             }
             sb.AppendLine($"Free Slots Remains: {user.FreeSlots}");
             sb.AppendLine($"Time Elapsed: {(int)timeElapsed.TotalMilliseconds} ms");

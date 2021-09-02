@@ -52,7 +52,6 @@ namespace IIS.Services.Contracts.Interfaces
         Task<IReadOnlyCollection<Guid>> GetAllUnassignedIdsAsync(PaginationParams page, SortingParams sorting, CancellationToken cancellationToken = default);
         Task<IReadOnlyList<MaterialDistributionItem>> GetMaterialsForDistribution(
             UserDistributionItem user,
-            Expression<Func<MaterialEntity, bool>> filter,
-            IReadOnlyList<Guid> distributedIds);
+            Expression<Func<MaterialEntity, bool>> filter);
     }
 }

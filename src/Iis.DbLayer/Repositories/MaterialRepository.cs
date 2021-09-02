@@ -388,12 +388,9 @@ namespace Iis.DbLayer.Repositories
 
         public async Task<IReadOnlyList<MaterialDistributionItem>> GetMaterialsForDistribution(
             UserDistributionItem user, 
-            Expression<Func<MaterialEntity, bool>> filter,
-            IReadOnlyList<Guid> distributedIds)
+            Expression<Func<MaterialEntity, bool>> filter)
         {
-            var query = GetMaterialsForDistributionQuery();
-
-            if (distributedIds.Count > 0) query.Where(_ => !distributedIds.Contains(_.Id));
+            var query = GetMaterialsForDistributionQuery().Where(_ => _.AccessLevel <= user.AccessLevel);
 
             if (filter != null) query.Where(filter);
 
