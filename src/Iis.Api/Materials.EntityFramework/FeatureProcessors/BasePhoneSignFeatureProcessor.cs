@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Collections.Generic;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
 using Iis.Interfaces.Elastic;
 using Iis.Services.Contracts.Dtos;
@@ -30,6 +31,7 @@ namespace IIS.Core.Materials.EntityFramework.FeatureProcessors
         protected readonly MutationCreateResolver _createResolver;
         protected readonly MutationUpdateResolver _updateResolver;
         protected readonly ILocationHistoryService _locationHistoryService;
+        protected readonly ILogger _logger;
         protected abstract string SignTypeName { get; }
         protected abstract IReadOnlyCollection<string> PrioritizedFields { get; }
         protected abstract Dictionary<string, string> SignFieldsMapping { get; }
@@ -43,7 +45,8 @@ namespace IIS.Core.Materials.EntityFramework.FeatureProcessors
             MutationCreateResolver createResolver,
             MutationUpdateResolver updateResolver,
             IElasticState elasticState,
-            ILocationHistoryService locationHistoryService)
+            ILocationHistoryService locationHistoryService,
+            ILogger logger)
         {
             _elasticService = elasticService;
             _ontologySchema = ontologySchema;
@@ -51,9 +54,12 @@ namespace IIS.Core.Materials.EntityFramework.FeatureProcessors
             _updateResolver = updateResolver;
             _elasticState = elasticState;
             _locationHistoryService = locationHistoryService;
+            _logger = logger;
         }
         public virtual async Task<JObject> ProcessMetadataAsync(JObject metadata, Guid materialId)
         {
+            _logger.LogInformation("Starting processing Metadata for Material {@materialId}", materialId);
+
             if (!FeaturesSectionExists(metadata)) return metadata;
 
             var signType = _ontologySchema.GetEntityTypeByName(SignTypeName);
@@ -107,6 +113,8 @@ namespace IIS.Core.Materials.EntityFramework.FeatureProcessors
             }
 
             await PostMetadataProcessingAsync(metadata, materialId);
+
+            _logger.LogInformation("Finising processing Metadata for Material {@materialId}", materialId);
 
             return metadata;
         }

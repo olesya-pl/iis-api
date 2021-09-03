@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Microsoft.Extensions.Logging;
 using Iis.Interfaces.Elastic;
 using Iis.Interfaces.Constants;
 using Iis.Interfaces.Ontology.Schema;
@@ -17,8 +18,9 @@ namespace IIS.Core.Materials.EntityFramework.FeatureProcessors
             MutationCreateResolver createResolver,
             MutationUpdateResolver updateResolver,
             IElasticState elasticState,
-            ILocationHistoryService locationHistoryService)
-        : base(elasticService, ontologySchema, createResolver, updateResolver, elasticState, locationHistoryService)
+            ILocationHistoryService locationHistoryService,
+            ILogger logger)
+        : base(elasticService, ontologySchema, createResolver, updateResolver, elasticState, locationHistoryService, logger)
         {
         }
 

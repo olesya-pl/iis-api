@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Microsoft.Extensions.Logging;
 using Iis.Interfaces.Elastic;
 using Iis.Interfaces.Constants;
 using Iis.Interfaces.Ontology.Schema;
@@ -12,7 +13,7 @@ namespace IIS.Core.Materials.EntityFramework.FeatureProcessors
     {
         protected override string SignTypeName => "SatellitePhoneSign";
         protected override string LatitudeFeaturePropertyName => FeatureFields.LocationY;
-        protected override string LongitudeFeaturePropertyName => FeatureFields.LocationX; 
+        protected override string LongitudeFeaturePropertyName => FeatureFields.LocationX;
 
         protected override IReadOnlyCollection<string> PrioritizedFields => new string[]
         {
@@ -30,12 +31,13 @@ namespace IIS.Core.Materials.EntityFramework.FeatureProcessors
         };
 
         public SatVoiceFeatureProcessor(IElasticService elasticService,
-            IOntologySchema ontologySchema, 
+            IOntologySchema ontologySchema,
             MutationCreateResolver createResolver,
             MutationUpdateResolver updateResolver,
             IElasticState elasticState,
-            ILocationHistoryService locationHistoryService)
-        : base(elasticService, ontologySchema, createResolver, updateResolver, elasticState, locationHistoryService)
-        {}
+            ILocationHistoryService locationHistoryService,
+            ILogger logger)
+        : base(elasticService, ontologySchema, createResolver, updateResolver, elasticState, locationHistoryService, logger)
+        { }
     }
 }

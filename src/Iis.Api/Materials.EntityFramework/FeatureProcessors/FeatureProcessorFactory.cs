@@ -1,5 +1,6 @@
-using Iis.DbLayer.Repositories;
+using Microsoft.Extensions.Logging;
 using Iis.Domain;
+using Iis.DbLayer.Repositories;
 using Iis.Interfaces.Elastic;
 using Iis.Interfaces.Ontology.Data;
 using Iis.Interfaces.Ontology.Schema;
@@ -21,6 +22,7 @@ namespace IIS.Core.Materials.EntityFramework.FeatureProcessors
         private readonly ILocationHistoryService _locationHistoryService;
         private readonly IOntologyNodesData _nodesData;
         private readonly NodeMaterialRelationService<IIISUnitOfWork> _nodeMaterialRelationService;
+        private readonly ILoggerFactory _loggerFactory;
 
         public FeatureProcessorFactory(IElasticService elasticService,
             IOntologySchema ontologySchema,
@@ -29,7 +31,8 @@ namespace IIS.Core.Materials.EntityFramework.FeatureProcessors
             IElasticState elasticState,
             IGsmLocationService gsmLocationService,
             ILocationHistoryService locationHistoryService,
-            IOntologyNodesData nodesData)
+            IOntologyNodesData nodesData,
+            ILoggerFactory loggerFactory)
         {
             _elasticService = elasticService;
             _ontologySchema = ontologySchema;
@@ -39,15 +42,45 @@ namespace IIS.Core.Materials.EntityFramework.FeatureProcessors
             _gsmLocationService = gsmLocationService;
             _locationHistoryService = locationHistoryService;
             _nodesData = nodesData;
+            _loggerFactory = loggerFactory;
         }
         public IFeatureProcessor GetInstance(string materialSource, string materialType)
         {
             return materialSource switch
             {
-                "cell.voice" when materialType == "audio" => new CellVoiceFeatureProcessor(_elasticService, _ontologySchema, _createResolver, _updateResolver, _elasticState, _gsmLocationService, _locationHistoryService),
-                "sat.voice" when materialType == "audio" => new SatVoiceFeatureProcessor(_elasticService, _ontologySchema, _createResolver, _updateResolver, _elasticState, _locationHistoryService),
-                "sat.iridium.voice" when materialType == "audio" => new SatVoiceIridiumFeatureProcessor(_elasticService, _ontologySchema, _createResolver, _updateResolver, _elasticState, _locationHistoryService),
-                "sat.iridium.paging" when materialType == "text" => new SatPagingIridiumFeatureProcessor(_elasticService, _ontologySchema, _createResolver, _updateResolver, _elasticState, _locationHistoryService),
+                "cell.voice" when materialType == "audio" => new CellVoiceFeatureProcessor(
+                    _elasticService,
+                    _ontologySchema,
+                    _createResolver,
+                    _updateResolver,
+                    _elasticState,
+                    _gsmLocationService,
+                    _locationHistoryService,
+                    _loggerFactory.CreateLogger<CellVoiceFeatureProcessor>()),
+                "sat.voice" when materialType == "audio" => new SatVoiceFeatureProcessor(
+                    _elasticService,
+                    _ontologySchema,
+                    _createResolver,
+                    _updateResolver,
+                    _elasticState,
+                    _locationHistoryService,
+                    _loggerFactory.CreateLogger<SatVoiceFeatureProcessor>()),
+                "sat.iridium.voice" when materialType == "audio" => new SatVoiceIridiumFeatureProcessor(
+                    _elasticService,
+                    _ontologySchema,
+                    _createResolver,
+                    _updateResolver,
+                    _elasticState,
+                    _locationHistoryService,
+                    _loggerFactory.CreateLogger<SatVoiceIridiumFeatureProcessor>()),
+                "sat.iridium.paging" when materialType == "text" => new SatPagingIridiumFeatureProcessor(
+                    _elasticService,
+                    _ontologySchema,
+                    _createResolver,
+                    _updateResolver,
+                    _elasticState,
+                    _locationHistoryService,
+                    _loggerFactory.CreateLogger<SatPagingIridiumFeatureProcessor>()),
                 "osint.data.file" => new OsintDataFeatureProcessor(_nodesData),
                 _ => new DummyFeatureProcessor()
             };
