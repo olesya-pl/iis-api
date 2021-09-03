@@ -64,8 +64,10 @@ namespace Iis.Services
         public async Task<Guid> CreateThemeAsync(ThemeDto theme)
         {
             var entity = _mapper.Map<ThemeEntity>(theme);
+            
             entity.QueryResults = entity.ReadQueryResults = (await GetQueryResultsAsync(entity.Id, entity.UserId, entity.TypeId, GetQuery(entity.QueryRequest))).Count;
-
+            entity.UnreadCount = default;
+                
             _context.Themes.Add(entity);
 
             await _context.SaveChangesAsync();
@@ -95,6 +97,15 @@ namespace Iis.Services
             {
                 entity.QueryResults = entity.ReadQueryResults = (await GetQueryResultsAsync(entity.Id, entity.UserId, entity.TypeId, GetQuery(entity.QueryRequest))).Count;
             }
+            
+            entity.UnreadCount = GetUnreadQueryResult(originalEntity.QueryResults, originalEntity.ReadQueryResults);
+        }
+
+        private int GetUnreadQueryResult(int queryResults, int readQueryResults)
+        {
+            return queryResults - readQueryResults > 0
+                ? queryResults - readQueryResults
+                : 0;
         }
 
         private void PopulateOptionalFields(ThemeDto theme)
@@ -128,6 +139,9 @@ namespace Iis.Services
             if (entity is null) throw new ArgumentException($"Theme does not exist for id = {themeId}");
 
             entity.ReadQueryResults = readCount;
+
+            entity.UnreadCount = GetUnreadQueryResult(entity.QueryResults, entity.ReadQueryResults);
+
             var theme = _mapper.Map<ThemeDto>(entity);
 
             await RunAsync(uow => uow.ThemeRepository.Update(entity));
@@ -164,14 +178,44 @@ namespace Iis.Services
             return _mapper.Map<ThemeDto>(entity);
         }
 
-        public async Task<IEnumerable<ThemeDto>> GetThemesByUserIdAsync(Guid userId, SortingParams sorting)
+        public async Task<IEnumerable<ThemeDto>> GetThemesByUserIdAsync(Guid userId, PaginationParams paginationParams, SortingParams sorting)
+        {
+            var query  = GetThemes().Where(e => e.UserId == userId);
+            var (skip, take) = paginationParams.ToEFPage();
+
+            var entities = await ApplySorting(query, sorting.ColumnName, sorting.Order)
+                    .Skip(skip)
+                    .Take(take)
+                    .ToListAsync();
+
+            var themes = _mapper.Map<IEnumerable<ThemeDto>>(entities);
+
+            return themes;
+        }
+        public async Task<IReadOnlyCollection<ThemeDto>> GetAllThemesByUserIdAsync(Guid userId)
         {
             var query  = GetThemes().Where(e => e.UserId == userId);
 
-            var entities = await ApplySorting(query, sorting.ColumnName, sorting.Order)
-                                    .ToListAsync();
+            var entities = await query.ToListAsync();
 
-            var themes = _mapper.Map<IEnumerable<ThemeDto>>(entities);
+            var themes = _mapper.Map<IReadOnlyCollection<ThemeDto>>(entities);
+
+            return themes;
+        }
+
+        public async Task<IReadOnlyCollection<ThemeDto>> GetAllThemesByEntityTypeNamesAsync(Guid userId, IReadOnlyCollection<string> entityTypeNames)
+        {
+            var entityTypes = await RunWithoutCommitAsync(
+                async uow => await uow.ThemeRepository.GetThemeTypesByEntityTypeNamesAsync(entityTypeNames));
+            
+            var entitiesTypeId = entityTypes.Select(e => e.Id);
+            
+            var entities  = await GetThemes()
+                .Where(e => e.UserId == userId && entitiesTypeId.Contains(e.TypeId))
+                .OrderByDescending(_ => _.UpdatedAt)
+                .ToListAsync();
+            
+            var themes = _mapper.Map<IReadOnlyCollection<ThemeDto>>(entities);
 
             return themes;
         }
@@ -250,9 +294,15 @@ namespace Iis.Services
         {
             return (columnName, order) switch
             {
-                ("updatedAt", "asc") => query.OrderBy(e => e.UpdatedAt),
-                ("updatedAt", "desc") => query.OrderByDescending(e => e.UpdatedAt),
-                _ => query.OrderBy(e => e.Id)
+                ("comment", "asc") => query.OrderBy(e => e.Comment),
+                ("comment", "desc") => query.OrderByDescending(e => e.Comment),
+                ("type", "asc") => query.OrderBy(e => e.Type),
+                ("type", "desc") => query.OrderByDescending(e => e.Type),
+                ("queryResults", "asc") => query.OrderBy(e => e.QueryResults),
+                ("queryResults", "desc") => query.OrderByDescending(e => e.QueryResults),
+                ("unreadCount", "asc") => query.OrderBy(e => e.UnreadCount),
+                ("unreadCount", "desc") => query.OrderByDescending(e => e.UnreadCount),
+                _ => query.OrderByDescending(e => e.UpdatedAt)
             };
         }
 

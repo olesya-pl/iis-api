@@ -36,7 +36,10 @@ namespace Iis.DataModel.Themes
                 .IsRequired()
                 .HasDefaultValue(0);
 
-            builder.Property(p => p.Meta)
+            builder.Property(p => p.UnreadCount)
+                .IsRequired();
+            
+                builder.Property(p => p.Meta)
                 .HasColumnType("jsonb");
 
             builder.Property(p => p.QueryRequest)
