@@ -51,6 +51,7 @@ namespace Iis.DbLayer.ModifyDataScripts
             _items.Add("RemoveDuplicateRelations", actions.RemoveDuplicateRelations);
             _items.Add("ClosePersinMultiple", actions.ClosePersinMultiple);
             _items.Add("MaterialChannel", actions.MaterialChannel);
+            _items.Add("ClosePersinMultiple2", actions.ClosePersinMultiple);
         }
         public bool Run()
         {
