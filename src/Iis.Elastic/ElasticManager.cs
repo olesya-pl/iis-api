@@ -536,7 +536,7 @@ namespace Iis.Elastic
             {
                 PostData postData = data;
                 var response = await _lowLevelClient.DoRequestAsync<StringResponse>(httpMethod, path, cancellationToken, postData, requestParameters);
-                var log = _responseLogUtils.PrepareLog(response);
+                var log = ElasticLogUtils.PrepareLog(data, response);
                 _logger.Log(log.LogLevel, log.Message);
                 return response;
             }
