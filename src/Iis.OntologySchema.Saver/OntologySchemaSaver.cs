@@ -148,6 +148,7 @@ namespace Iis.OntologySchema.Saver
                 var relationType = _mapper.Map<RelationTypeEntity>((IRelationType)item.NodeTypeFrom.RelationType);
                 relationType.Id = item.NodeTypeTo.RelationType.Id;
                 relationType.SourceTypeId = item.NodeTypeTo.RelationType.SourceTypeId;
+                relationType.EmbeddingOptions = item.NodeTypeFrom.EmbeddingOptions;
 
                 var fromTargetType = item.NodeTypeFrom.RelationType.TargetType;
                 var toTargetType = item.NodeTypeTo.RelationType.TargetType;
