@@ -34,7 +34,7 @@ namespace Iis.Elastic.SearchQueryExtensions
                             },
                             script = new
                             {
-                                source = "double total = 0.0; for(vector in params.vectorList) { total += 1/(l2norm(vector, doc['ImageVectors.Vector']) + 1); } return total/params.vectorListLength;",
+                                source = "double total = 0.0; double result = 0.0; for(vector in params.vectorList) { total += 1/(l2norm(vector, doc['ImageVectors.Vector']) + 1); } result = total/params.vectorListLength; if (result < 0.6) {result = 0.0;} return result;",
                                 @params = new
                                 {
                                     vectorList = _imageVectorList,
@@ -56,7 +56,7 @@ namespace Iis.Elastic.SearchQueryExtensions
                 new JProperty("bool", boolObject)
             );
 
-            jsonQuery["min_score"] = 1.35;
+            jsonQuery["min_score"] = 1.0;
             jsonQuery["query"] = query;
 
             //можно будет попробовать эти формулы модифицировать
