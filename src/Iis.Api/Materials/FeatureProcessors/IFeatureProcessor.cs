@@ -11,7 +11,7 @@ namespace IIS.Core.Materials.FeatureProcessors
     public interface IFeatureProcessor
     {
         bool IsDummy { get; }
-        Task<JObject> ProcessMetadataAsync(JObject metadata, Guid materialId);
+        Task<JObject> ProcessMetadataAsync(ProcessingMaterialEntry entry);
         IEnumerable<Guid> GetValidFeatureIds(IEnumerable<Guid> featureIdList);
     }
 }

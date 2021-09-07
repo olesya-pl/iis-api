@@ -15,9 +15,9 @@ namespace IIS.Core.Materials.EntityFramework.FeatureProcessors
             return featureIdList;
         }
 
-        public Task<JObject> ProcessMetadataAsync(JObject metadata, Guid materialId)
+        public Task<JObject> ProcessMetadataAsync(ProcessingMaterialEntry entry)
         {
-            return Task.FromResult(metadata);
+            return Task.FromResult(entry.Metadata);
         }
     }
 
