@@ -3,7 +3,7 @@ using Newtonsoft.Json.Linq;
 
 namespace IIS.Core.Materials.FeatureProcessors
 {
-    public record ProcessingMaterialEntry
+    public class ProcessingMaterialEntry
     {
         public Guid Id { get; set; }
         public DateTime CreatedDate { get; set; }
