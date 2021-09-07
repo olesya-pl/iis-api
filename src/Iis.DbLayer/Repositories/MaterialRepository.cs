@@ -181,9 +181,11 @@ namespace Iis.DbLayer.Repositories
         public void AddFeatureIdList(Guid materialId, IEnumerable<Guid> featureIdList)
         {
             foreach (var featureId in featureIdList)
-                Context.MaterialFeatures.AddRange(
-                    MaterialFeatureEntity.CreateFrom(materialId, featureId),
-                    MaterialFeatureEntity.CreateFrom(materialId, featureId, MaterialNodeLinkType.Caller));
+                Context.MaterialFeatures.Add(MaterialFeatureEntity.CreateFrom(materialId, featureId));
+
+            Guid firstFeatureId = featureIdList.FirstOrDefault();
+            if (firstFeatureId != default)
+                Context.MaterialFeatures.Add(MaterialFeatureEntity.CreateFrom(materialId, firstFeatureId, MaterialNodeLinkType.Caller));
         }
 
         public async Task<IEnumerable<Guid>> GetChildIdListForMaterialAsync(Guid materialId)
