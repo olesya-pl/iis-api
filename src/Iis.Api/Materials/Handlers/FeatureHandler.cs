@@ -96,7 +96,15 @@ namespace Iis.Api.Materials.Handlers
 
             JObject metadata = JObject.Parse(material.Metadata);
 
-            metadata = await processor.ProcessMetadataAsync(metadata, material.Id);
+            var entry = new ProcessingMaterialEntry
+            {
+                Id = material.Id,
+                CreatedDate = material.CreatedDate,
+                RegistrationDate = material.RegistrationDate,
+                Metadata = metadata
+            };
+
+            metadata = await processor.ProcessMetadataAsync(entry);
             material.Metadata = metadata.ToString(Newtonsoft.Json.Formatting.None);
 
             var featureIdList = GetNodeIdentitiesFromFeatures(metadata);
