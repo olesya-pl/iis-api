@@ -26,6 +26,8 @@ using System.Text.RegularExpressions;
 using Iis.DbLayer.MaterialEnum;
 using IIS.Repository;
 using IIS.Repository.Factories;
+using System.Diagnostics;
+using Microsoft.Extensions.Logging;
 
 namespace Iis.Services
 {
@@ -63,6 +65,7 @@ namespace Iis.Services
         private readonly IMLResponseRepository _mLResponseRepository;
         private readonly IMapper _mapper;
         private readonly IOntologyNodesData _ontologyData;
+        private readonly ILogger<MaterialElasticService<TUnitOfWork>> _logger;
 
         public MaterialElasticService(IElasticManager elasticManager,
             IElasticState elasticState,
@@ -71,7 +74,8 @@ namespace Iis.Services
             IMLResponseRepository mLResponseRepository,
             IMapper mapper,
             IOntologyNodesData ontologyData,
-            IUnitOfWorkFactory<TUnitOfWork> unitOfWorkFactory)
+            IUnitOfWorkFactory<TUnitOfWork> unitOfWorkFactory,
+            ILogger<MaterialElasticService<TUnitOfWork>> logger)
             : base(unitOfWorkFactory)
         {
             _elasticManager = elasticManager;
@@ -81,6 +85,7 @@ namespace Iis.Services
             _mLResponseRepository = mLResponseRepository;
             _mapper = mapper;
             _ontologyData = ontologyData;
+            _logger = logger;
         }
 
         public bool ShouldReturnNoEntities(string queryExpression)
@@ -295,11 +300,18 @@ namespace Iis.Services
             {
                 cancellationToken.ThrowIfCancellationRequested();
 
+                var sw = new Stopwatch();
+                sw.Start();
+                _logger.LogInformation("PutAllMaterialsToElasticSearchAsync. Indexing batch {batchIndex}", batchIndex);
+
                 var materialEntities = await RunWithoutCommitAsync(_ => _.MaterialRepository.GetAllAsync(MaterialsBatchSize, batchIndex * MaterialsBatchSize, IncludeAll));
+                _logger.LogInformation("PutAllMaterialsToElasticSearchAsync. Obtained materials from Postgre. Elapsed {elapsed}", sw.ElapsedMilliseconds);
                 var materialIds = materialEntities
                     .Select(_ => _.Id)
                     .ToArray();
+                _logger.LogInformation("PutAllMaterialsToElasticSearchAsync. Selected material ids. Elapsed {elapsed}", sw.ElapsedMilliseconds);
                 var mlResponsesList = await _mLResponseRepository.GetAllForMaterialListAsync(materialIds);
+                _logger.LogInformation("PutAllMaterialsToElasticSearchAsync. Obtained ML responses from Postgre. Elapsed {elapsed}", sw.ElapsedMilliseconds);
                 var mlResponseDictionary = mlResponsesList
                     .GroupBy(p => p.MaterialId)
                     .ToDictionary(k => k.Key, p => p.ToArray());
@@ -324,8 +336,11 @@ namespace Iis.Services
                     })
                     .ToDictionary(_ => _.Id);
                 string json = materialDocuments.ConvertToJson();
+                _logger.LogInformation("PutAllMaterialsToElasticSearchAsync. Mapped materials to elastic documents. Elapsed {elapsed}", sw.ElapsedMilliseconds);
                 var response = await _elasticManager.PutDocumentsAsync(_elasticState.MaterialIndexes.FirstOrDefault(), json, false, cancellationToken);
+                _logger.LogInformation("PutAllMaterialsToElasticSearchAsync. Persisted materials to elastic. Elapsed {elapsed}", sw.ElapsedMilliseconds);
                 responses.AddRange(response);
+                sw.Stop();
             }
 
             return responses;
