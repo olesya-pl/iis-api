@@ -137,8 +137,8 @@ namespace Iis.DataModel.Materials
         public string LoadData { get; set; }
         public Guid? ProcessedStatusSignId { get; set; }
         public MaterialSignEntity ProcessedStatus { get; set; }
-        public virtual ICollection<MaterialEntity> Children { get; set; }
-        public virtual ICollection<MaterialInfoEntity> MaterialInfos { get; set; }
+        public virtual ICollection<MaterialEntity> Children { get; set; } = new List<MaterialEntity>();
+        public virtual ICollection<MaterialInfoEntity> MaterialInfos { get; set; } = new List<MaterialInfoEntity>();
         public Guid? AssigneeId { get; set; }
         public virtual UserEntity Assignee { get; set; }
         public int MlHandlersCount { get; set; }

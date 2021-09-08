@@ -62,7 +62,7 @@ namespace Iis.Domain.Materials
         private MaterialFeature GetFeature(MaterialNodeLinkType linkType) =>
             Infos.SelectMany(i => i.Features)
             .Where(f => f.NodeLinkType == linkType)
-            .SingleOrDefault();
+            .FirstOrDefault();
         private IdTitleDto GetIdTitle(MaterialNodeLinkType linkType)
         {
             var node = GetFeature(linkType)?.Node.OriginalNode;
