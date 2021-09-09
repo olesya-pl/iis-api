@@ -139,8 +139,7 @@ namespace Iis.DataModel.Materials
         public MaterialSignEntity ProcessedStatus { get; set; }
         public virtual ICollection<MaterialEntity> Children { get; set; } = new List<MaterialEntity>();
         public virtual ICollection<MaterialInfoEntity> MaterialInfos { get; set; } = new List<MaterialInfoEntity>();
-        public Guid? AssigneeId { get; set; }
-        public virtual UserEntity Assignee { get; set; }
+        public virtual List<MaterialAssigneeEntity> MaterialAssignees { get; set; } = new List<MaterialAssigneeEntity>();
         public int MlHandlersCount { get; set; }
         public int AccessLevel { get; set; }
 

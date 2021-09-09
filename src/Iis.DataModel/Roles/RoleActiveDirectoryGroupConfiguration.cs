@@ -1,9 +1,11 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Iis.DataModel.Roles
 {
-    public class RoleActiveDirectoryGroupConfiguration : IEntityTypeConfiguration<RoleActiveDirectoryGroupEntity>
+    [DbContext(typeof(OntologyContext))]
+    internal class RoleActiveDirectoryGroupConfiguration : IEntityTypeConfiguration<RoleActiveDirectoryGroupEntity>
     {
         public void Configure(EntityTypeBuilder<RoleActiveDirectoryGroupEntity> builder)
         {

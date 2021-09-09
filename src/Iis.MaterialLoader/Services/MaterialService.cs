@@ -206,7 +206,8 @@ namespace Iis.MaterialLoader.Services
                 .Include(m => m.SourceReliability)
                 .Include(m => m.ProcessedStatus)
                 .Include(m => m.SessionPriority)
-                .Include(m => m.Assignee)
+                .Include(m => m.MaterialAssignees)
+                    .ThenInclude(m => m.Assignee)
                 .AsNoTracking();
         }
     }    

@@ -43,7 +43,7 @@ namespace Iis.UnitTests.Materials
             materialEntity.Metadata = null;
             materialEntity.LoadData = null;
             materialEntity.MaterialInfos = null;
-
+            materialEntity.MaterialAssignees = new List<MaterialAssigneeEntity>();
 
             responses.First().MaterialId = materialId;
 

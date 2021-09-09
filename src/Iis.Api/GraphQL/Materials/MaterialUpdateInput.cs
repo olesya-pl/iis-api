@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-
 using Iis.Interfaces.Materials;
 
 namespace IIS.Core.GraphQL.Materials
@@ -17,7 +16,7 @@ namespace IIS.Core.GraphQL.Materials
         public Guid? SourceReliabilityId { get; set; }
         public Guid? ProcessedStatusId { get; set; }
         public Guid? SessionPriorityId { get; set; }
-        public Guid? AssigneeId { get; set; }
+        public IReadOnlyCollection<Guid> AssigneeIds { get; set; }
         public IEnumerable<string> Objects { get; set; }
         public IEnumerable<string> Tags { get; set; }
         public IEnumerable<string> States { get; set; }

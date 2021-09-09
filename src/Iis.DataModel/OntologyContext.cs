@@ -24,6 +24,7 @@ namespace Iis.DataModel
 
         public DbSet<FileEntity> Files { get; set; }
         public DbSet<MaterialEntity> Materials { get; set; }
+        public DbSet<MaterialAssigneeEntity> MaterialAssignees { get; set; }
         public DbSet<MaterialInfoEntity> MaterialInfos { get; set; }
         public DbSet<MaterialFeatureEntity> MaterialFeatures { get; set; }
         public DbSet<MaterialSignTypeEntity> MaterialSignTypes { get; set; }
@@ -75,59 +76,12 @@ namespace Iis.DataModel
             : base(options)
         {
         }
-        //private readonly string connectionString;
-
-        //public OntologyContext(IConfiguration configuration) : base()
-        //{
-        //    connectionString = configuration.GetConnectionString("db");
-        //}
-
-        //protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        //    => optionsBuilder.UseNpgsql(connectionString);
-
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.ApplyConfiguration(new NodeTypeConfiguration());
-            modelBuilder.ApplyConfiguration(new RelationTypeConfiguration());
-            modelBuilder.ApplyConfiguration(new AttributeTypeConfiguration());
-
-            modelBuilder.ApplyConfiguration(new NodeConfiguration());
-            modelBuilder.ApplyConfiguration(new RelationConfiguration());
-            modelBuilder.ApplyConfiguration(new AttributeConfiguration());
-
-            modelBuilder.ApplyConfiguration(new FileConfiguration());
-            modelBuilder.ApplyConfiguration(new MaterialConfiguration());
-            modelBuilder.ApplyConfiguration(new MaterialInfoConfiguration());
-            modelBuilder.ApplyConfiguration(new MaterialFeatureConfiguration());
-            modelBuilder.ApplyConfiguration(new MaterialSignTypeConfiguration());
-            modelBuilder.ApplyConfiguration(new MaterialSignConfiguration());
-
-            modelBuilder.ApplyConfiguration(new ReportEventConfiguration());
-
-            modelBuilder.ApplyConfiguration(new UserConfiguration());
-
-            modelBuilder.ApplyConfiguration(new AnalyticQueryEntityConfiguration());
-            modelBuilder.ApplyConfiguration(new AnalyticQueryIndicatorConfiguration());
-            modelBuilder.ApplyConfiguration(new AnalyticIndicatorConfiguration());
-            modelBuilder.ApplyConfiguration(new OntologyMigrationsConfiguration());
-
-            modelBuilder.ApplyConfiguration(new RoleConfiguration());
-            modelBuilder.ApplyConfiguration(new RoleActiveDirectoryGroupConfiguration());
-
-            modelBuilder.ApplyConfiguration(new MLResponseConfiguration());
-            modelBuilder.ApplyConfiguration(new ElasticFieldConfiguration());
-            modelBuilder.ApplyConfiguration(new ChangeHistoryConfiguration());
-            modelBuilder.ApplyConfiguration(new ThemeConfiguration());
-            modelBuilder.ApplyConfiguration(new ThemeTypeConfiguration());
-            modelBuilder.ApplyConfiguration(new AliasConfiguration());
-            modelBuilder.ApplyConfiguration(new AnnotationConfiguration());
-
-            modelBuilder.ApplyConfiguration(new FlightRadarHistoryConfiguration());
-            modelBuilder.ApplyConfiguration(new FlightRadarHistorySyncJobConfigConfiguration());
-            modelBuilder.ApplyConfiguration(new TowerLocationConfiguration());
-            modelBuilder.ApplyConfiguration(new ModifyDataLogConfiguration());
+            modelBuilder.ApplyConfigurationsFromAssembly<OntologyContext>(GetType());
         }
+
         public static OntologyContext GetContext(string connectionString)
         {
             var optionsBuilder = new DbContextOptionsBuilder<OntologyContext>()

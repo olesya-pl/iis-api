@@ -30,8 +30,6 @@ namespace Iis.DbLayer.Repositories
 
         Task<(IEnumerable<MaterialEntity> Entities, int TotalCount)> GetAllAsync(IEnumerable<string> types, int limit, int offset, string sortColumnName = null, string sortOrder = null);
 
-        Task<IReadOnlyCollection<Guid>> GetAllUnassignedIdsAsync(int limit, int offset, string sortColumnName = null, string sortOrder = null, CancellationToken cancellationToken = default);
-
         Task<IEnumerable<MaterialEntity>> GetAllByAssigneeIdAsync(Guid assigneeId);
 
         void AddMaterialEntity(MaterialEntity materialEntity);
@@ -39,6 +37,10 @@ namespace Iis.DbLayer.Repositories
         void AddMaterialInfos(IEnumerable<MaterialInfoEntity> materialEntities);
 
         void AddMaterialFeatures(IEnumerable<MaterialFeatureEntity> materialFeatureEntities);
+
+        void AddMaterialAssignees(IEnumerable<MaterialAssigneeEntity> entities);
+
+        void RemoveMaterialAssignees(IEnumerable<MaterialAssigneeEntity> entities);
 
         void EditMaterial(MaterialEntity materialEntity);
 

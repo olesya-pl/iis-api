@@ -1,8 +1,10 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Iis.DataModel.Reports
 {
+    [DbContext(typeof(OntologyContext))]
     internal sealed class ReportEventConfiguration : IEntityTypeConfiguration<ReportEventEntity>
     {
         public void Configure(EntityTypeBuilder<ReportEventEntity> builder)
