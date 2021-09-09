@@ -19,7 +19,6 @@ using Iis.Services.Contracts.Params;
 using Iis.Services.Contracts.Enums;
 using Iis.Domain.Users;
 using Microsoft.Extensions.Configuration;
-using Iis.Utility;
 using System.Security.Authentication;
 using Iis.Interfaces.Users;
 using System.Security.Cryptography;
@@ -97,38 +96,16 @@ namespace Iis.Services
                 .ToList();
         }
 
-        public async Task<List<Guid>> GetAvailableOperatorIdsAsync()
-        {
-            var maxMaterialsCount = _maxMaterialsConfig.Value;
-
-            var unavailableOperators = _context.Materials
-                .AsNoTracking()
-                .Where(p => (p.ProcessedStatusSignId == null
-                    || p.ProcessedStatusSignId == MaterialEntity.ProcessingStatusNotProcessedSignId)
-                    && p.ParentId == null
-                    && p.AssigneeId != null)
-                .GroupBy(p => p.AssigneeId)
-                .Where(group => group.Count() >= maxMaterialsCount)
-                .Select(group => group.Key)
-                .Where(key => key.HasValue)
-                .Select(key => key)
-                .ToArray();
-
-            var userList = await RunWithoutCommitAsync(uow => uow.UserRepository.GetOperatorsAsync(e => !unavailableOperators.Contains(e.Id)));
-
-            return userList.Select(e => e.Id).ToList();
-        }
-
         public async Task<UserDistributionList> GetOperatorsForMaterialsAsync()
         {
             var maxMaterialsCount = _maxMaterialsConfig.Value;
 
-            var chargedInfo = _context.Materials
+            var chargedInfo = _context.MaterialAssignees
                 .AsNoTracking()
-                .Where(p => (p.ProcessedStatusSignId == null
-                    || p.ProcessedStatusSignId == MaterialEntity.ProcessingStatusNotProcessedSignId)
-                    && p.ParentId == null
-                    && p.AssigneeId != null)
+                .Include(_ => _.Material)
+                .Where(p => (p.Material.ProcessedStatusSignId == null
+                    || p.Material.ProcessedStatusSignId == MaterialEntity.ProcessingStatusNotProcessedSignId)
+                    && p.Material.ParentId == null)
                 .GroupBy(p => p.AssigneeId)
                 .Select(group => new 
                     { 

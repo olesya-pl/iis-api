@@ -1,8 +1,10 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Iis.DataModel.Materials
 {
+    [DbContext(typeof(OntologyContext))]
     internal sealed class MaterialConfiguration : IEntityTypeConfiguration<MaterialEntity>
     {
         public void Configure(EntityTypeBuilder<MaterialEntity> builder)
@@ -68,11 +70,6 @@ namespace Iis.DataModel.Materials
             builder
                 .Property(e => e.FileId)
                 .IsRequired(false);
-
-            builder
-                .HasOne(e => e.Assignee)
-                .WithMany(e => e.Materials)
-                .HasForeignKey(e => e.AssigneeId);
 
             builder.Property(e => e.MlHandlersCount)
                 .IsRequired(true)

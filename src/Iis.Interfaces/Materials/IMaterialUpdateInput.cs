@@ -14,7 +14,7 @@ namespace Iis.Interfaces.Materials
         Guid? SourceReliabilityId { get; set; }
         Guid? ProcessedStatusId { get; set; }
         Guid? SessionPriorityId { get; set; }
-        Guid? AssigneeId { get; set; }
+        IReadOnlyCollection<Guid> AssigneeIds { get; set; }
         IEnumerable<string> States { get; set; }
         IEnumerable<string> Tags { get; set; }
         string Title { get; set; }

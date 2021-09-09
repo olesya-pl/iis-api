@@ -1,5 +1,4 @@
 using System;
-using System.Linq;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using HotChocolate;
@@ -58,7 +57,7 @@ namespace IIS.Core.GraphQL.Materials
         public IEnumerable<JObject> Events { get; set; }
         [GraphQLType(typeof(ListType<JsonScalarType>))]
         public IEnumerable<JObject> Features { get; set; }
-        public User Assignee { get; set; }
+        public IReadOnlyCollection<User> Assignees { get; set; } = Array.Empty<User>();
         public User Editor { get; set; }
         public int MlHandlersCount { get; set; }
         public int ProcessedMlHandlersCount { get; set; }

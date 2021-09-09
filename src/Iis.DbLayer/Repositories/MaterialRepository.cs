@@ -84,34 +84,11 @@ namespace Iis.DbLayer.Repositories
             return GetAllWithPredicateAsync(limit, offset, e => types.Contains(e.Type), sortColumnName, sortOrder);
         }
 
-        public async Task<IReadOnlyCollection<Guid>> GetAllUnassignedIdsAsync(
-            int limit,
-            int offset,
-            string sortColumnName = null,
-            string sortOrder = null,
-            CancellationToken cancellationToken = default)
-        {
-            var materialQuery = Context.Materials
-                .AsNoTracking()
-                .Where(_ => _.AssigneeId == null)
-                .ApplySorting(sortColumnName, sortOrder);
-            if (limit != default)
-            {
-                materialQuery = materialQuery
-                                    .Skip(offset)
-                                    .Take(limit);
-            }
-
-            return await materialQuery
-                .Select(_ => _.Id)
-                .ToArrayAsync(cancellationToken);
-        }
-
         public async Task<IEnumerable<MaterialEntity>> GetAllByAssigneeIdAsync(Guid assigneeId)
         {
             return await GetMaterialsQuery()
                             .OnlyParent()
-                            .Where(p => p.AssigneeId == assigneeId)
+                            .Where(p => p.MaterialAssignees.Any(_ => _.AssigneeId == assigneeId))
                             .ToArrayAsync();
         }
 
@@ -128,6 +105,16 @@ namespace Iis.DbLayer.Repositories
         public void AddMaterialFeatures(IEnumerable<MaterialFeatureEntity> materialFeatureEntities)
         {
             Context.MaterialFeatures.AddRange(materialFeatureEntities);
+        }
+
+        public void AddMaterialAssignees(IEnumerable<MaterialAssigneeEntity> entities)
+        {
+            Context.MaterialAssignees.AddRange(entities);
+        }
+
+        public void RemoveMaterialAssignees(IEnumerable<MaterialAssigneeEntity> entities)
+        {
+            Context.MaterialAssignees.RemoveRange(entities);
         }
 
         public void EditMaterial(MaterialEntity materialEntity)
@@ -266,7 +253,11 @@ namespace Iis.DbLayer.Repositories
             foreach (var material in materials)
             {
                 var userId = distributionResult.GetUserId(material.Id);
-                material.AssigneeId = userId;
+                if (!userId.HasValue)
+                    continue;
+
+                var newMaterialAssignee = MaterialAssigneeEntity.CreateFrom(material.Id, userId.Value);
+                material.MaterialAssignees.Add(newMaterialAssignee);
             }
         }
 
@@ -321,7 +312,8 @@ namespace Iis.DbLayer.Repositories
                     .Include(m => m.SourceReliability)
                     .Include(m => m.ProcessedStatus)
                     .Include(m => m.SessionPriority)
-                    .Include(m => m.Assignee)
+                    .Include(m => m.MaterialAssignees)
+                        .ThenInclude(_ => _.Assignee)
                     .Include(m => m.Editor)
                     .AsNoTracking();
         }
@@ -366,7 +358,7 @@ namespace Iis.DbLayer.Repositories
            GetMaterialsQuery()
                .Where(_ => (_.ProcessedStatusSignId == null
                        || _.ProcessedStatusSignId == MaterialEntity.ProcessingStatusNotProcessedSignId)
-                   && _.AssigneeId == null
+                   && !_.MaterialAssignees.Any()
                    && _.ParentId == null);
     }
 }

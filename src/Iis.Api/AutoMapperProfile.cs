@@ -204,7 +204,9 @@ namespace Iis.Api
                     context.Mapper.Map<Domain.Materials.MaterialSign>(MaterialEntity.ProcessedStatus)))
                 .ForMember(dest => dest.SessionPriority, src => src.MapFrom((MaterialEntity, Material, MaterialSign, context) =>
                     context.Mapper.Map<Domain.Materials.MaterialSign>(MaterialEntity.SessionPriority)))
-                .ForMember(dest => dest.LoadData, opts => opts.MapFrom(src => Domain.Materials.MaterialLoadData.MapLoadData(src.LoadData)));
+                .ForMember(dest => dest.LoadData, opts => opts.MapFrom(src => Domain.Materials.MaterialLoadData.MapLoadData(src.LoadData)))
+                .ForMember(dest => dest.Assignees, opts => opts.MapFrom((MaterialEntity, Material, MaterialAssignees, context) =>
+                    context.Mapper.Map<Domain.Users.User[]>(MaterialEntity.MaterialAssignees.Select(_ => _.Assignee))));
 
             CreateMap<MaterialInput, Iis.Domain.Materials.Material>()
                 .ForMember(dest => dest.Id, opts => opts.MapFrom(src => Guid.NewGuid()))
@@ -259,7 +261,11 @@ namespace Iis.Api
                 .ForMember(dest => dest.SessionPriority, src => src.MapFrom((MaterialEntity, Material, MaterialSign, context) =>
                     context.Mapper.Map<DbLayer.Repositories.MaterialSign>(MaterialEntity.SessionPriority)))
                 .ForMember(dest => dest.LoadData, opts =>
-                    opts.MapFrom(src => JsonConvert.DeserializeObject<DbLayer.Repositories.MaterialLoadData>(src.LoadData)));
+                    opts.MapFrom(src => JsonConvert.DeserializeObject<DbLayer.Repositories.MaterialLoadData>(src.LoadData)))
+                .ForMember(dest => dest.Assignees, src => src.MapFrom(_ => _.MaterialAssignees));
+
+            CreateMap<MaterialAssigneeEntity, DbLayer.Repositories.Assignee>()
+                .ConstructUsing((entity, context) => context.Mapper.Map<DbLayer.Repositories.Assignee>(entity.Assignee));
 
             CreateMap<DbLayer.Repositories.Assignee, Iis.Domain.Users.User>();
             CreateMap<DbLayer.Repositories.Editor, Iis.Domain.Users.User>();
@@ -272,7 +278,7 @@ namespace Iis.Api
                 .ForMember(dest => dest.UpdatedAt, opts => opts.MapFrom(src => DateTime.ParseExact(src.UpdatedAt, Iso8601DateFormat, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind)))
                 .ForMember(dest => dest.RegistrationDate, opts => opts.MapFrom(src => src.RegistrationDate.AsDateTime(Iso8601DateFormat, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind)))
                 .ForMember(dest => dest.Children, opts => opts.Ignore())
-                .ForMember(dest => dest.Assignee, opts => opts.MapFrom(src => src.Assignee))
+                .ForMember(dest => dest.Assignees, opts => opts.MapFrom(src => src.Assignees))
                 .ForMember(dest => dest.Editor, opts => opts.MapFrom(src => src.Editor));
 
 
