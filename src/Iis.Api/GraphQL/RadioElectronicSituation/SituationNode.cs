@@ -19,24 +19,24 @@ namespace Iis.Api.GraphQL.RadioElectronicSituation
 
     public class Attributes
     {
-        public ObjectOfStudy ObjectOfStudy { get; set; }
-        public ObjectSign Sign { get; set; }
-        public Material Material { get; set; }
+        public ObjectNode ObjectOfStudy { get; set; }
+        public SignNode Sign { get; set; }
+        public MaterialNode Material { get; set; }
     }
 
-    public class ObjectOfStudy : Object
+    public class ObjectNode : BaseObjectNode
     {
         public string Title { get; set; }
         public string Sidc { get; set; }
         public string LastConfirmAt { get; set; }
     }
 
-    public class ObjectSign : Object
+    public class SignNode : BaseObjectNode
     {
         public string Value { get; set; }
     }
 
-    public class Material
+    public class MaterialNode
     {
         public Guid Id { get; set; }
         public string Url { get; set; }
@@ -47,7 +47,7 @@ namespace Iis.Api.GraphQL.RadioElectronicSituation
         public string RegistrationDate { get; set; }
     }
 
-    public abstract class Object
+    public abstract class BaseObjectNode
     {
         [GraphQLType(typeof(IdType))]
         public Guid Id { get; set; }
