@@ -49,7 +49,6 @@ namespace IIS.Services.Contracts.Interfaces
         Task<IReadOnlyCollection<Guid>> GetMaterialsIdsAsync(int limit);
         Task<Material> GetMaterialAsync(Guid id);
         Task<IReadOnlyCollection<LocationHistoryDto>> GetLocationHistoriesAsync(Guid materialId);
-        Task<IReadOnlyCollection<Guid>> GetAllUnassignedIdsAsync(PaginationParams page, SortingParams sorting, CancellationToken cancellationToken = default);
         Task<IReadOnlyList<MaterialDistributionItem>> GetMaterialsForDistribution(
             UserDistributionItem user,
             Expression<Func<MaterialEntity, bool>> filter);

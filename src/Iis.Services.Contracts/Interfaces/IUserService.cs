@@ -13,7 +13,6 @@ namespace Iis.Services.Contracts.Interfaces
     {
         Task<User> AssignRole(Guid userId, Guid roleId);
         Task<Guid> CreateUserAsync(User newUser);
-        Task<List<Guid>> GetAvailableOperatorIdsAsync();
         Task<List<User>> GetOperatorsAsync(CancellationToken ct = default);
         Task<UserDistributionList> GetOperatorsForMaterialsAsync();
         User GetUser(Guid userId);

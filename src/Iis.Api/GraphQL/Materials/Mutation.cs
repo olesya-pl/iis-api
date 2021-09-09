@@ -5,7 +5,7 @@ using HotChocolate;
 using HotChocolate.Types;
 using HotChocolate.Resolvers;
 using IIS.Core.Materials;
-using System.Collections.Generic;
+using System.Linq;
 
 namespace IIS.Core.GraphQL.Materials
 {
@@ -36,12 +36,16 @@ namespace IIS.Core.GraphQL.Materials
             return mapper.Map<Material>(material);
         }
 
-        public async Task<AssignMaterialsOperatorResult> AssignMaterialsOperator(IResolverContext context,
+        public async Task<AssignMaterialsOperatorResult> AssignMaterialOperator(IResolverContext context,
             [Service] IMaterialService materialService,
-            AssignMaterialsOperatorInput input)
+            AssignMaterialOperatorInput input)
         {
             var tokenPayload = context.GetToken();
-            await materialService.AssignMaterialsOperatorAsync(new HashSet<Guid>(input.MaterialIds), input.AssigneeId, tokenPayload.User);
+            var materialIds = input.MaterialIds.ToHashSet();
+            var assigneeIds = input.AssigneeIds.ToHashSet();
+
+            await materialService.AssignMaterialOperatorAsync(materialIds, assigneeIds, tokenPayload.User);
+
             return new AssignMaterialsOperatorResult
             {
                 IsSuccess = true

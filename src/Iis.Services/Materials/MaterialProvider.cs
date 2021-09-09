@@ -221,8 +221,6 @@ namespace IIS.Services.Materials
 
             result.Children.AddRange(MapChildren(material));
 
-            result.Assignee = _mapper.Map<User>(material.Assignee);
-
             result.Editor = _mapper.Map<User>(material.Editor);
 
             var nodes = result.Infos
@@ -625,14 +623,6 @@ namespace IIS.Services.Materials
                 unitOfWork.MaterialRepository.GetByIdAsync(id));
 
             return entity != null;
-        }
-
-        public Task<IReadOnlyCollection<Guid>> GetAllUnassignedIdsAsync(PaginationParams page, SortingParams sorting = default, CancellationToken cancellationToken = default)
-        {
-            var (offset, limit) = page.ToEFPage();
-
-            return RunWithoutCommitAsync((unitOfWork) =>
-                   unitOfWork.MaterialRepository.GetAllUnassignedIdsAsync(limit, offset, sorting?.ColumnName, sorting?.Order, cancellationToken));
         }
 
         public Task<IReadOnlyList<MaterialDistributionItem>> GetMaterialsForDistribution(

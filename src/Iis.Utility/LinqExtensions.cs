@@ -6,6 +6,11 @@ namespace Iis.Utility
 {
     public static class LinqExtensions
     {
+        public static IReadOnlyCollection<TItem> AsReadOnlyCollection<TItem>(this TItem item) => new[] { item };
+
+        public static (IReadOnlyCollection<TItem> Added, IReadOnlyCollection<TItem> Removed) GetChanges<TItem>(this IEnumerable<TItem> first, IEnumerable<TItem> second) =>
+            (first.Except(second).ToArray(), second.Except(first).ToArray());
+
         public static bool AnyDuplicate<T, TProperty>(this IEnumerable<T> collection, Func<T, TProperty> property) =>
             collection.GroupBy(property).Any(_ => _.Count() > 1);
 

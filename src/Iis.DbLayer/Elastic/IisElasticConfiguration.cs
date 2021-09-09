@@ -153,7 +153,7 @@ namespace Iis.DbLayer.Elastic
                 $"{nameof(MaterialDocument.Metadata)}.*",
                 $"{nameof(MaterialDocument.Transcriptions)}.*",
                 $"{nameof(MaterialDocument.Children)}.*",
-                $"{nameof(MaterialDocument.Assignee)}.*",
+                $"{nameof(MaterialDocument.Assignees)}.*",
                 $"{nameof(MaterialDocument.Editor)}.*"
             };
         }

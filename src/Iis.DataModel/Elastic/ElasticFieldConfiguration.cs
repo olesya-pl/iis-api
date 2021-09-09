@@ -1,12 +1,11 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Iis.DataModel.Elastic
 {
-    public class ElasticFieldConfiguration: IEntityTypeConfiguration<ElasticFieldEntity>
+    [DbContext(typeof(OntologyContext))]
+    internal class ElasticFieldConfiguration: IEntityTypeConfiguration<ElasticFieldEntity>
     {
         public void Configure(EntityTypeBuilder<ElasticFieldEntity> builder)
         {

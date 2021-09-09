@@ -14,8 +14,8 @@ namespace IIS.Core.Materials
         Task SaveAsync(Material material, Guid? changeRequestId = null);
         Task<MLResponse> SaveMlHandlerResponseAsync(MLResponse response);
         Task<Material> UpdateMaterialAsync(IMaterialUpdateInput input, User user);
-        Task AssignMaterialsOperatorAsync(ISet<Guid> materialIds, Guid assigneeId, User user);
-        Task AssignMaterialOperatorAsync(Guid materialId, Guid assigneeId, User user = null);
+        Task AssignMaterialOperatorAsync(ISet<Guid> materialIds, ISet<Guid> assigneeIds, User user);
+        Task AssignMaterialOperatorsAsync(Guid materialId, ISet<Guid> assigneeIds, User user);
         Task SaveDistributionResult(DistributionResult distributionResult);
         Task<bool> AssignMaterialEditorAsync(Guid materialId, User user);
         Task<bool> UnassignMaterialEditorAsync(Guid materialId, User user);

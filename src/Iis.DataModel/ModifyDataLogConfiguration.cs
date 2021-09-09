@@ -1,12 +1,11 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Iis.DataModel
 {
-    public class ModifyDataLogConfiguration : IEntityTypeConfiguration<ModifyDataLogEntity>
+    [DbContext(typeof(OntologyContext))]
+    internal class ModifyDataLogConfiguration : IEntityTypeConfiguration<ModifyDataLogEntity>
     {
         public void Configure(EntityTypeBuilder<ModifyDataLogEntity> builder)
         {

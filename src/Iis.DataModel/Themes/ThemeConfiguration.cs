@@ -1,8 +1,10 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Iis.DataModel.Themes
 {
+    [DbContext(typeof(OntologyContext))]
     internal class ThemeConfiguration : IEntityTypeConfiguration<ThemeEntity>
     {
         public void Configure(EntityTypeBuilder<ThemeEntity> builder)
