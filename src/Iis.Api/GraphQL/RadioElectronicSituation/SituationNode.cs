@@ -22,13 +22,13 @@ namespace Iis.Api.GraphQL.RadioElectronicSituation
         public ObjectNode ObjectOfStudy { get; set; }
         public SignNode Sign { get; set; }
         public MaterialNode Material { get; set; }
+        public string RegisteredAt { get; set; }
     }
 
     public class ObjectNode : BaseObjectNode
     {
         public string Title { get; set; }
         public string Sidc { get; set; }
-        public string LastConfirmAt { get; set; }
     }
 
     public class SignNode : BaseObjectNode
@@ -38,8 +38,8 @@ namespace Iis.Api.GraphQL.RadioElectronicSituation
 
     public class MaterialNode
     {
+        [GraphQLType(typeof(IdType))]
         public Guid Id { get; set; }
-        public string Url { get; set; }
         public string Title { get; set; }
         public string Type { get; set; }
         public string Source { get; set; }

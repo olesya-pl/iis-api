@@ -10,11 +10,14 @@ using Iis.Services.Mappers.RadioElectronicSituation;
 using Iis.DbLayer.Repositories;
 using IIS.Repository;
 using IIS.Repository.Factories;
+using Iis.DataModel.Materials;
+using Iis.DataModel.FlightRadar;
 
 namespace Iis.Services
 {
     public class RadioElectronicSituationService<TUnitOfWork> : BaseService<TUnitOfWork>, IRadioElectronicSituationService where TUnitOfWork : IIISUnitOfWork
     {
+        private const int HistoryAllocationMultiplier = 10;
         private static readonly string[] ObjectSignTypeNames = new[] { EntityTypeNames.ObjectSign.ToString() };
         private static readonly string[] SignProperties = new[] { "sign" };
         private readonly IOntologyNodesData _data;
@@ -32,35 +35,60 @@ namespace Iis.Services
         {
             var signTypes = _schema
                                 .GetEntityTypesByName(ObjectSignTypeNames, true)
-                                .Select(e => e.Id)
+                                .Select(_ => _.Id)
                                 .ToArray();
 
             var signsDictionary = _data.GetNodesByTypeIds(signTypes)
                                 .ToDictionary(e => e.Id);
 
             var signIds = signsDictionary
-                                .Select(e => e.Key)
+                                .Select(_ => _.Key)
+                                .Distinct()
                                 .ToArray();
 
-            var locationHistories = await RunWithoutCommitAsync(uow => uow.LocationHistoryRepository.GetLatestLocationHistoryListAsync(signIds));
+            var locationHistories = await RunWithoutCommitAsync(_ => _.LocationHistoryRepository.GetLatestLocationHistoryListAsync(signIds));
 
             if (locationHistories.Length == 0) return Array.Empty<SituationNodeDto>();
 
-            var result = new List<SituationNodeDto>(locationHistories.Length);
+            var materialIdCollection = locationHistories
+                                        .Where(_ => _.MaterialId.HasValue)
+                                        .Select(_ => _.MaterialId.Value)
+                                        .ToHashSet();
+
+            var materialCollection = await RunWithoutCommitAsync(_ => _.MaterialRepository.GetByIdsAsync(materialIdCollection));
+
+            var materialDictionary = materialCollection
+                                        .ToDictionary(_ => _.Id);
+
+            var mappingData = new List<(LocationHistoryEntity LocationHistory, INode SignNode, INode ObjectNode, MaterialEntity Material)>(locationHistories.Length * HistoryAllocationMultiplier);
 
             foreach (var locationHistory in locationHistories)
             {
-                if(!signsDictionary.TryGetValue(locationHistory.EntityId.Value, out INode node)) continue;
-                var entities = node.GetIncomingRelations(SignProperties)
-                    .Select(p => p.SourceNode);
+                if(!signsDictionary.TryGetValue(locationHistory.EntityId.Value, out INode signNode)) continue;
 
-                foreach (var entity in entities)
-                {
-                    result.Add(RadioElectronicSituationMapper.Map(locationHistory, entity));
-                }
+                var material = GetMaterialEntity(locationHistory.MaterialId, materialDictionary);
+
+                var data = signNode
+                    .GetIncomingRelations(SignProperties)
+                    .Select(p => (LocationHistory: locationHistory, SignNode: signNode, ObjectNode: p.SourceNode, Material: material))
+                    .ToArray();
+
+                mappingData.AddRange(data);
             }
 
-            return result;
+            return mappingData
+                    .Select(_ => RadioElectronicSituationMapper.Map(
+                        _.LocationHistory,
+                        _.SignNode,
+                        _.ObjectNode,
+                        _.Material
+                    ))
+                    .ToArray();
+        }
+
+        private MaterialEntity GetMaterialEntity(Guid? materialId, Dictionary<Guid, MaterialEntity> materialDictionary)
+        {
+            return materialId.HasValue ? materialDictionary.GetValueOrDefault(materialId.Value) : null;
         }
     }
 }
