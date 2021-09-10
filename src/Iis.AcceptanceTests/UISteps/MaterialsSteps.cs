@@ -102,6 +102,7 @@ namespace AcceptanceTests.UISteps
             materialModel.FileName = materialModel.FileName + uniqueSuffix;
             materialModel.Content = materialModel.Content + uniqueSuffix;
             context.Set(materialModel.FileName, "uploadedMaterial");
+            context.Set(materialModel.Content, "uploadedMaterialContent");
             await MaterialsHelper.UploadDocxMaterial(materialModel);
         }
 
