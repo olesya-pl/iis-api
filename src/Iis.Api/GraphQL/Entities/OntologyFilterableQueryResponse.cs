@@ -12,5 +12,6 @@ namespace IIS.Core.GraphQL.Entities
         public IEnumerable<JObject> Items { get; set; }
         public int Count { get; set; }
         public Dictionary<string, AggregationItem> Aggregations { get; set; }
+        public IReadOnlyList<AggregationNodeTypeItem> NodeTypeAggregations { get; set; }
     }
 }
