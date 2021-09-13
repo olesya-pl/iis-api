@@ -121,6 +121,9 @@ namespace Iis.Services
 
         public async Task SaveMaterialChanges(IReadOnlyCollection<ChangeHistoryDto> changes, string materialTitle = null)
         {
+            if (changes.Count == 0)
+                return;
+
             var entities = _mapper.Map<List<ChangeHistoryEntity>>(changes);
             var mirrorEntities = new List<ChangeHistoryEntity>();
 
