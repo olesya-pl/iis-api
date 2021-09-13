@@ -8,6 +8,8 @@ using Microsoft.EntityFrameworkCore;
 using IIS.Repository;
 using Iis.DataModel;
 using Iis.DataModel.Roles;
+using Iis.DbLayer.Extensions;
+using System.ComponentModel;
 
 namespace Iis.DbLayer.Repositories
 {
@@ -53,19 +55,31 @@ namespace Iis.DbLayer.Repositories
                 .ToArrayAsync(ct);
         }
 
-        public Task<UserEntity[]> GetUsersAsync(int skip, int take, Expression<Func<UserEntity, bool>> predicate, CancellationToken ct)
+        public Task<UserEntity[]> GetUsersAsync(
+            int skip,
+            int take,
+            string sortColumn,
+            ListSortDirection? sortDirection,
+            Expression<Func<UserEntity, bool>> predicate = null,
+            CancellationToken cancellationToken = default)
         {
-            return GetUsersQuery()
-                .Where(predicate)
+            var query = GetUsersQuery();
+            if (predicate != null)
+                query = query.Where(predicate);
+
+            return query.OrderBy(sortColumn, sortDirection)
                 .Skip(skip)
                 .Take(take)
-                .ToArrayAsync(ct);
+                .ToArrayAsync(cancellationToken);
         }
 
-        public Task<int> GetUserCountAsync(Expression<Func<UserEntity, bool>> predicate, CancellationToken ct)
+        public Task<int> GetUserCountAsync(Expression<Func<UserEntity, bool>> predicate = null, CancellationToken cancellationToken = default)
         {
-            return GetUsersQuery()
-                    .CountAsync(predicate, ct);
+            var query = GetUsersQuery();
+            if (predicate != null)
+                query = query.Where(predicate);
+
+            return query.CountAsync(cancellationToken);
         }
 
         public Task<Dictionary<string, IEnumerable<RoleEntity>>> GetRolesByUserNamesDictionaryAsync(ISet<string> userNames, CancellationToken cancellationToken = default)

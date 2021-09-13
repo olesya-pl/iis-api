@@ -19,7 +19,7 @@ namespace Iis.Services.Contracts.Interfaces
         User GetUser(string userName, string passwordHash);
         User GetUserByUserName(string userName);
         Task<User> GetUserAsync(Guid userId);
-        Task<(IReadOnlyCollection<User> Users, int TotalCount)> GetUsersByStatusAsync(PaginationParams page, string suggestion, UserStatusType userStatusFilter, CancellationToken ct = default);
+        Task<(IReadOnlyCollection<User> Users, int TotalCount)> GetUsersByStatusAsync(PaginationParams page, SortingParams sorting, string suggestion, UserStatusType userStatusFilter, CancellationToken ct = default);
         Task<User> RejectRole(Guid userId, Guid roleId);
         bool IsAccessLevelAllowedForUser(int userAccessLevel, int newAccessLevel);
         Task<Guid> UpdateUserAsync(User updatedUser, CancellationToken cancellationToken = default);

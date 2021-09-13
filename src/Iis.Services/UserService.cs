@@ -24,6 +24,7 @@ using Iis.Interfaces.Users;
 using System.Security.Cryptography;
 using System.Text;
 using Iis.Services.Contracts.Materials.Distribution;
+using Iis.Services.Contracts.Extensions;
 
 namespace Iis.Services
 {
@@ -231,6 +232,7 @@ namespace Iis.Services
 
         public async Task<(IReadOnlyCollection<User> Users, int TotalCount)> GetUsersByStatusAsync(
             PaginationParams page,
+            SortingParams sorting,
             string suggestion,
             UserStatusType userStatusFilter,
             CancellationToken ct = default)
@@ -247,12 +249,12 @@ namespace Iis.Services
 
             if (string.IsNullOrWhiteSpace(suggestion) && isBlocked.HasValue)
                 predicate = user => user.IsBlocked == isBlocked;
-            else if (isBlocked.HasValue)
+            else if (!string.IsNullOrWhiteSpace(suggestion) && isBlocked.HasValue)
                 predicate = user => user.IsBlocked == isBlocked && (EF.Functions.Like(user.Username, $"%{suggestion}%") || EF.Functions.Like(user.Name, $"%{suggestion}%"));
-            else
+            else if (!string.IsNullOrWhiteSpace(suggestion) && !isBlocked.HasValue)
                 predicate = user => EF.Functions.Like(user.Username, $"%{suggestion}%") || EF.Functions.Like(user.Name, $"%{suggestion}%");
 
-            var getUserListTask = RunWithoutCommitAsync(uow => uow.UserRepository.GetUsersAsync(skip, take, predicate, ct));
+            var getUserListTask = RunWithoutCommitAsync(uow => uow.UserRepository.GetUsersAsync(skip, take, sorting.ColumnName, sorting.AsSortDirection(), predicate, ct));
             var getUserCountTask = RunWithoutCommitAsync(uow => uow.UserRepository.GetUserCountAsync(predicate, ct));
 
             await Task.WhenAll(getUserListTask, getUserCountTask);
