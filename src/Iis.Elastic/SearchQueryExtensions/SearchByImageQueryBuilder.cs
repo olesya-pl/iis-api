@@ -34,7 +34,7 @@ namespace Iis.Elastic.SearchQueryExtensions
                             },
                             script = new
                             {
-                                source = "double total = 0.0; double result = 0.0; for(vector in params.vectorList) { total += 1/(l2norm(vector, doc['ImageVectors.Vector']) + 1); } result = total/params.vectorListLength; if (result < 0.6) {result = 0.0;} return result;",
+                                source = "double total = 0.0; double result = 0.0; for(vector in params.vectorList) { total += 1/(l2norm(vector, doc['ImageVectors.Vector']) + 1); } result = total/params.vectorListLength; if (result < 0.67) {result = 0.0;} return result;",
                                 @params = new
                                 {
                                     vectorList = _imageVectorList,
