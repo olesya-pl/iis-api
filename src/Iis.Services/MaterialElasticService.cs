@@ -290,6 +290,7 @@ namespace Iis.Services
 
         public async Task<List<ElasticBulkResponse>> PutAllMaterialsToElasticSearchAsync(CancellationToken cancellationToken = default)
         {
+            const int MaxDegreeOfParallelism = 8;
             int materialsCount = await RunWithoutCommitAsync(_ => _.MaterialRepository.GetTotalCountAsync(cancellationToken));
             if (materialsCount == 0)
                 return new List<ElasticBulkResponse>();
@@ -315,7 +316,10 @@ namespace Iis.Services
                 var mlResponseDictionary = mlResponsesList
                     .GroupBy(p => p.MaterialId)
                     .ToDictionary(k => k.Key, p => p.ToArray());
+                _logger.LogInformation("PutAllMaterialsToElasticSearchAsync. Group by material id. Elapsed {elapsed}", sw.ElapsedMilliseconds);
                 var materialDocuments = materialEntities
+                    .AsParallel()
+                    .WithDegreeOfParallelism(MaxDegreeOfParallelism)
                     .Select(p => MapEntityToDocument(p))
                     .Select(p =>
                     {
@@ -335,8 +339,9 @@ namespace Iis.Services
                         return p;
                     })
                     .ToDictionary(_ => _.Id);
-                string json = materialDocuments.ConvertToJson();
                 _logger.LogInformation("PutAllMaterialsToElasticSearchAsync. Mapped materials to elastic documents. Elapsed {elapsed}", sw.ElapsedMilliseconds);
+                string json = materialDocuments.ConvertToJson();
+                _logger.LogInformation("PutAllMaterialsToElasticSearchAsync. Generated json query. Elapsed {elapsed}", sw.ElapsedMilliseconds);
                 var response = await _elasticManager.PutDocumentsAsync(_elasticState.MaterialIndexes.FirstOrDefault(), json, false, cancellationToken);
                 _logger.LogInformation("PutAllMaterialsToElasticSearchAsync. Persisted materials to elastic. Elapsed {elapsed}", sw.ElapsedMilliseconds);
                 responses.AddRange(response);
