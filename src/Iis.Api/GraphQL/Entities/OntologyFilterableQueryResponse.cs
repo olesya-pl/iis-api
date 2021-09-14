@@ -15,6 +15,6 @@ namespace IIS.Core.GraphQL.Entities
         public int Count { get; set; }
         public Dictionary<string, AggregationItem> Aggregations { get; set; }
         [GraphQLType(typeof(ListType<JsonScalarType>))]
-        public IEnumerable<JObject> NodeTypeAggregations { get; set; }
+        public IReadOnlyList<JObject> NodeTypeAggregations { get; set; }
     }
 }
