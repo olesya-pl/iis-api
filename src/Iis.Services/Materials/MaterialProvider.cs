@@ -522,30 +522,35 @@ namespace IIS.Services.Materials
             return RunWithoutCommitAsync(uow => uow.MaterialRepository.GetMaterialCollectionByNodeIdAsync(nodeIdList, MaterialIncludeEnum.WithChildren, MaterialIncludeEnum.WithFeatures, MaterialIncludeEnum.WithFiles));
         }
 
-        private JObject GetObjectOfStudyListForMaterial(IEnumerable<Node> nodeList)
+        private JObject GetObjectOfStudyListForMaterial(IReadOnlyCollection<Node> nodeList)
         {
             var result = new JObject();
-
-            if (!nodeList.Any()) return result;
+            if (nodeList.Count == 0)
+                return result;
 
             var directIdList = nodeList
-                                .Where(x => IsObjectOfStudy(x))
-                                .Select(x => x.Id)
-                                .ToArray();
-
+                .Where(x => IsObjectOfStudy(x))
+                .Select(x => x.Id)
+                .ToArray();
             var featureIdList = nodeList
-                                    .Where(x => IsObjectSign(x))
-                                    .Select(x => x.Id)
-                                    .ToArray();
+                .Where(x => IsObjectSign(x))
+                .Select(x => x.Id)
+                .ToArray();
+            var featureList = _ontologyService.GetNodeIdListByFeatureIdList(featureIdList)
+                .Except(directIdList)
+                .Select(_ => CreateJProperty(_, EntityMaterialRelation.Feature));
+            var directList = directIdList
+                .Select(_ => CreateJProperty(_, EntityMaterialRelation.Direct));
 
-            var featureList = _ontologyService.GetNodeIdListByFeatureIdList(featureIdList);
-
-            featureList = featureList.Except(directIdList).ToArray();
-
-            result.Add(featureList.Select(i => new JProperty(i.ToString("N"), EntityMaterialRelation.Feature)));
-            result.Add(directIdList.Select(i => new JProperty(i.ToString("N"), EntityMaterialRelation.Direct)));
+            result.Add(featureIdList);
+            result.Add(directList);
 
             return result;
+        }
+
+        private JProperty CreateJProperty(Guid id, string value)
+        {
+            return new JProperty(id.ToString("N"), value);
         }
 
         private IReadOnlyCollection<Material> MapChildren(MaterialEntity material)
