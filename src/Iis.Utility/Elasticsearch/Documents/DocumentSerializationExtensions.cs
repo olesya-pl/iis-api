@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 
 namespace Iis.Utility.Elasticsearch.Documents
 {
@@ -16,14 +17,16 @@ namespace Iis.Utility.Elasticsearch.Documents
             if (documentDictionary.Any(_ => _.Value is null))
                 throw new ArgumentNullException(nameof(documentDictionary), "Some element is null");
 
-            var values = documentDictionary.Select(_ =>
+            var sb = new StringBuilder();
+            
+            foreach (var item in documentDictionary)
             {
-                string documentJson = JsonConvert.SerializeObject(_.Value);
+                var documentJson = JsonConvert.SerializeObject(item.Value);
 
-                return $"{{\"index\":{{\"_id\":\"{_.Key:N}\"}}}}\n{documentJson}{Environment.NewLine}";
-            });
-
-            return string.Join(string.Empty, values);
+                sb.Append($"{{\"index\":{{\"_id\":\"{item.Key:N}\"}}}}\n{documentJson}{Environment.NewLine}");
+            }
+            
+            return sb.ToString();
         }
     }
 }
