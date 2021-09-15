@@ -1,7 +1,9 @@
 using System.Collections.Generic;
+using System.Text.Json.Serialization;
 using HotChocolate;
 using HotChocolate.Types;
 using IIS.Core.GraphQL.Scalars;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 namespace IIS.Core.GraphQL.Entities
@@ -12,6 +14,7 @@ namespace IIS.Core.GraphQL.Entities
         public IEnumerable<JObject> Items { get; set; }
         public int Count { get; set; }
         public Dictionary<string, AggregationItem> Aggregations { get; set; }
-        public IReadOnlyList<AggregationNodeTypeItem> NodeTypeAggregations { get; set; }
+        [GraphQLType(typeof(ListType<JsonScalarType>))]
+        public IReadOnlyList<JObject> NodeTypeAggregations { get; set; }
     }
 }
