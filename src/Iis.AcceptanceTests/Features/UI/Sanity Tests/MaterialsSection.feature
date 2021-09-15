@@ -50,10 +50,20 @@ Feature: MaterialsSectionUI - Sanity
 
     @sanity @UI @MaterialsSanityUI
     Scenario: IIS-6363 - Search a material by keyword from the material
-        When I navigated to Materials page
-        And I clicked search button in the Materials section
-        And I searched NATO data in the materials
-        Then I must see a material that contains NATO word in the Materials search result
+        Given I upload a new docx material via API
+		| Field                 | Value                                      |
+		| FileName              | тестовий матеріал                          |
+		| SourceReliabilityText | Здебільшого надійне                        |
+		| ReliabilityText       | Достовірна                                 |
+		| Content               | таємний контент                           |
+		| AccessLevel           | 0                                          |
+		| LoadedBy              | автотест                                   |
+		| MetaData              | {"type":"document","source":"contour.doc"} |
+	When I navigated to Materials page
+	And I clicked search button in the Materials section
+	And I searched таємний data in the materials
+    Then I must see a material that contains таємний word in the Materials search result
+
 
 
 

@@ -346,17 +346,44 @@ namespace AcceptanceTests.Features.UI.SanityTests
 #line 8
     this.FeatureBackground();
 #line hidden
+                TechTalk.SpecFlow.Table table4 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Field",
+                            "Value"});
+                table4.AddRow(new string[] {
+                            "FileName",
+                            "тестовий матеріал"});
+                table4.AddRow(new string[] {
+                            "SourceReliabilityText",
+                            "Здебільшого надійне"});
+                table4.AddRow(new string[] {
+                            "ReliabilityText",
+                            "Достовірна"});
+                table4.AddRow(new string[] {
+                            "Content",
+                            "таємний контент"});
+                table4.AddRow(new string[] {
+                            "AccessLevel",
+                            "0"});
+                table4.AddRow(new string[] {
+                            "LoadedBy",
+                            "автотест"});
+                table4.AddRow(new string[] {
+                            "MetaData",
+                            "{\"type\":\"document\",\"source\":\"contour.doc\"}"});
 #line 53
-        testRunner.When("I navigated to Materials page", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+        testRunner.Given("I upload a new docx material via API", ((string)(null)), table4, "Given ");
 #line hidden
-#line 54
-        testRunner.And("I clicked search button in the Materials section", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 62
+ testRunner.When("I navigated to Materials page", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 55
-        testRunner.And("I searched NATO data in the materials", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 63
+ testRunner.And("I clicked search button in the Materials section", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 56
-        testRunner.Then("I must see a material that contains NATO word in the Materials search result", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 64
+ testRunner.And("I searched таємний data in the materials", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 65
+    testRunner.Then("I must see a material that contains таємний word in the Materials search result", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
             this.ScenarioCleanup();
