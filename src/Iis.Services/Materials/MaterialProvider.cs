@@ -542,7 +542,7 @@ namespace IIS.Services.Materials
             var directList = directIdList
                 .Select(_ => CreateJProperty(_, EntityMaterialRelation.Direct));
 
-            result.Add(featureIdList);
+            result.Add(featureList);
             result.Add(directList);
 
             return result;
