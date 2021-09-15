@@ -50,7 +50,7 @@ namespace IIS.Core.GraphQL.Entities
             mapped.Aggregations = EnrichWithNodeTypeNames(nodesData, mapped.Aggregations);
             var nodeTypeAggregations = GetNodeTypeAggregations(nodesData.Schema, types,
                 mapped.Aggregations.GetValueOrDefault(ElasticConfigConstants.NodeTypeTitleAlias)?.Buckets);
-            mapped.NodeTypeAggregations = nodeTypeAggregations.Select(_ => JObject.FromObject(_));
+            mapped.NodeTypeAggregations = nodeTypeAggregations.Select(_ => JObject.FromObject(_)).ToList();
 
             return mapped;
         }
