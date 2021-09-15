@@ -107,11 +107,11 @@ namespace Iis.Services
                     || p.Material.ProcessedStatusSignId == MaterialEntity.ProcessingStatusNotProcessedSignId)
                     && p.Material.ParentId == null)
                 .GroupBy(p => p.AssigneeId)
-                .Select(group => new 
-                    { 
-                        UserId = group.Key,
-                        FreeSlots = maxMaterialsCount - group.Count()
-                    })
+                .Select(group => new
+                {
+                    UserId = group.Key,
+                    FreeSlots = maxMaterialsCount - group.Count()
+                })
                 .ToList();
 
             var mapping = await _context.MaterialChannelMappings.ToArrayAsync();
@@ -119,10 +119,10 @@ namespace Iis.Services
             var allOperators = (await RunWithoutCommitAsync(uow => uow.UserRepository.GetOperatorsAsync())).ToList();
             var list =
                 (from op in allOperators
-                join ci in chargedInfo
-                    on op.Id equals ci.UserId
-                where ci.FreeSlots > 0
-                select new UserDistributionItem(op.Id, ci.FreeSlots, GetRoles(op, mapping), GetChannels(op, mapping), op.AccessLevel)).ToList();
+                 join ci in chargedInfo
+                     on op.Id equals ci.UserId
+                 where ci.FreeSlots > 0
+                 select new UserDistributionItem(op.Id, ci.FreeSlots, GetRoles(op, mapping), GetChannels(op, mapping), op.AccessLevel)).ToList();
 
             list.AddRange(allOperators
                 .Where(op => !chargedInfo.Any(ci => ci.UserId == op.Id))
@@ -140,7 +140,7 @@ namespace Iis.Services
                 throw new InvalidOperationException($"Cannot find User with id:'{updatedUser.Id}'.");
             }
 
-            if (userEntity.Source == UserSource.Internal && 
+            if (userEntity.Source == UserSource.Internal &&
                 string.Equals(userEntity.PasswordHash, updatedUser.PasswordHash, StringComparison.Ordinal))
             {
                 throw new InvalidOperationException($"New password must not match old.");
@@ -229,16 +229,26 @@ namespace Iis.Services
             return user;
         }
 
-        public async Task<(IReadOnlyCollection<User> Users, int TotalCount)> GetUsersByStatusAsync(PaginationParams page, UserStatusType userStatusFilter, CancellationToken ct = default)
+        public async Task<(IReadOnlyCollection<User> Users, int TotalCount)> GetUsersByStatusAsync(
+            PaginationParams page,
+            string suggestion,
+            UserStatusType userStatusFilter,
+            CancellationToken ct = default)
         {
             var (skip, take) = page.ToEFPage();
-
-            Expression<Func<UserEntity, bool>> predicate = userStatusFilter switch
+            bool isBlocked = userStatusFilter switch
             {
-                UserStatusType.Active  => (user) => !user.IsBlocked,
-                UserStatusType.Blocked => (user) => user.IsBlocked,
-                _ => (user) => true
+                UserStatusType.Active => false,
+                UserStatusType.Blocked => true,
+                _ => false
             };
+
+            Expression<Func<UserEntity, bool>> predicate = null;
+
+            if (string.IsNullOrWhiteSpace(suggestion))
+                predicate = user => user.IsBlocked == isBlocked;
+            else
+                predicate = user => user.IsBlocked == isBlocked && (EF.Functions.Like(user.Username, $"%{suggestion}%") || EF.Functions.Like(user.Name, $"%{suggestion}%"));
 
             var getUserListTask = RunWithoutCommitAsync(uow => uow.UserRepository.GetUsersAsync(skip, take, predicate, ct));
             var getUserCountTask = RunWithoutCommitAsync(uow => uow.UserRepository.GetUserCountAsync(predicate, ct));
@@ -453,7 +463,7 @@ namespace Iis.Services
 
             return sb.ToString();
         }
-        
+
         public async Task<string> CreateMatrixUserAsync(User user)
         {
             try
@@ -518,11 +528,11 @@ namespace Iis.Services
 
         private IReadOnlyList<string> GetChannels(UserEntity userEntity, IEnumerable<MaterialChannelMappingEntity> mapping)
         {
-            var result = 
+            var result =
                 (from ur in userEntity.UserRoles
                  join mp in mapping on ur.RoleId equals mp.RoleId
                  select mp.ChannelName).ToList();
-            
+
             return result;
         }
     }
