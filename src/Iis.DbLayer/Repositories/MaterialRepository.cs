@@ -230,11 +230,13 @@ namespace Iis.DbLayer.Repositories
         {
             var query = GetMaterialsForDistributionQuery().Where(_ => _.AccessLevel <= user.AccessLevel);
 
-            if (filter != null) query.Where(filter);
+            if (filter != null) query = query.Where(filter);
 
-            if (user.Channels.Count > 0) query.Where(_ => user.Channels.Contains(_.Channel));
+            if (user.Channels.Count > 0) query = query.Where(_ => user.Channels.Contains(_.Channel));
 
-            var materialEntities = await query.Take(user.FreeSlots).ToArrayAsync();
+            var materialEntities = await query
+                .OrderByDescending(_ => _.RegistrationDate)
+                .Take(user.FreeSlots).ToArrayAsync();
 
             return materialEntities.Select(_ => new MaterialDistributionItem(_.Id, _.Channel)).ToList();
         }
@@ -355,7 +357,7 @@ namespace Iis.DbLayer.Repositories
         }
 
         private IQueryable<MaterialEntity> GetMaterialsForDistributionQuery() =>
-           GetMaterialsQuery()
+           Context.Materials
                .Where(_ => (_.ProcessedStatusSignId == null
                        || _.ProcessedStatusSignId == MaterialEntity.ProcessingStatusNotProcessedSignId)
                    && !_.MaterialAssignees.Any()
