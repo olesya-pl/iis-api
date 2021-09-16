@@ -9,6 +9,7 @@ using IIS.Core.GraphQL.Common;
 using Iis.Services.Contracts.Enums;
 using Iis.Services.Contracts.Params;
 using Iis.Services.Contracts.Interfaces;
+using Iis.Api.GraphQL.Common;
 
 namespace IIS.Core.GraphQL.Users
 {
@@ -27,12 +28,16 @@ namespace IIS.Core.GraphQL.Users
             [Service] IUserService userService,
             [Service] IMapper mapper,
             [GraphQLNonNullType] PaginationInput pagination,
-            UserFilterInput filter)
+            UserFilterInput filter,
+            SortingInput sorting)
         {
             var pageParam = new PaginationParams(pagination.Page, pagination.PageSize);
-            var userStatusFilterValue = filter is null || !Enum.IsDefined(typeof(UserStatusType), filter.UserStatus) ? UserStatusType.All : (UserStatusType) filter.UserStatus;
+            var sortingParams = mapper.Map<SortingParams>(sorting) ?? SortingParams.Default;
+            var userStatusFilterValue = filter is null || !Enum.IsDefined(typeof(UserStatusType), filter.UserStatus)
+                ? UserStatusType.All
+                : (UserStatusType)filter.UserStatus;
 
-            var usersResult = await userService.GetUsersByStatusAsync(pageParam, filter?.Suggestion, userStatusFilterValue);
+            var usersResult = await userService.GetUsersByStatusAsync(pageParam, sortingParams, filter?.Suggestion, userStatusFilterValue);
 
             var graphQLUsers = usersResult.Users
                                     .Select(user => mapper.Map<User>(user))
