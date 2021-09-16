@@ -250,9 +250,9 @@ namespace Iis.Services
             if (string.IsNullOrWhiteSpace(suggestion) && isBlocked.HasValue)
                 predicate = user => user.IsBlocked == isBlocked;
             else if (!string.IsNullOrWhiteSpace(suggestion) && isBlocked.HasValue)
-                predicate = user => user.IsBlocked == isBlocked && (EF.Functions.Like(user.Username, $"%{suggestion}%") || EF.Functions.Like(user.Name, $"%{suggestion}%"));
+                predicate = user => user.IsBlocked == isBlocked && (EF.Functions.ILike(user.Username, $"%{suggestion}%") || EF.Functions.ILike(user.Name, $"%{suggestion}%"));
             else if (!string.IsNullOrWhiteSpace(suggestion) && !isBlocked.HasValue)
-                predicate = user => EF.Functions.Like(user.Username, $"%{suggestion}%") || EF.Functions.Like(user.Name, $"%{suggestion}%");
+                predicate = user => EF.Functions.ILike(user.Username, $"%{suggestion}%") || EF.Functions.ILike(user.Name, $"%{suggestion}%");
 
             var getUserListTask = RunWithoutCommitAsync(uow => uow.UserRepository.GetUsersAsync(skip, take, sorting.ColumnName, sorting.AsSortDirection(), predicate, ct));
             var getUserCountTask = RunWithoutCommitAsync(uow => uow.UserRepository.GetUserCountAsync(predicate, ct));
