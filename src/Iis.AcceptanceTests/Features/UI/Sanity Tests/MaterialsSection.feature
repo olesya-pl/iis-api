@@ -4,6 +4,7 @@ Feature: MaterialsSectionUI - Sanity
     - IIS-6374 - ML results display for DOCX material
     - IIS-5837- Connect a material with an object of study from material
     - IIS-6363 - Search a material by keyword from the material
+    - IIS-8102 - Go to Events page from the material
 
     Background:
         Given I sign in with the user olya and password 123 in the Contour
@@ -61,8 +62,26 @@ Feature: MaterialsSectionUI - Sanity
 		| MetaData              | {"type":"document","source":"contour.doc"} |
 	When I navigated to Materials page
 	And I clicked search button in the Materials section
-	And I searched таємний data in the materials
-    Then I must see a material that contains таємний word in the Materials search result
+	And I searched таємн data in the materials
+    Then I must see a material that contains таємн word in the Materials search result
+
+     @sanity @UI @MaterialsSanityUI
+    Scenario: IIS-8102 - Go to Events page from the material
+        Given I upload a new docx material via API
+		| Field                 | Value                                      |
+		| FileName              | тестовий матеріал                          |
+		| SourceReliabilityText | Здебільшого надійне                        |
+		| ReliabilityText       | Достовірна                                 |
+		| Content               | таємний контент                           |
+		| AccessLevel           | 0                                          |
+		| LoadedBy              | автотест                                   |
+		| MetaData              | {"type":"document","source":"contour.doc"} |
+	When I navigated to Materials page
+	And I clicked search button in the Materials section
+	And I searched таємн data in the materials
+    And I clicked on the first material in the Materials list
+    When I clicked on the Events section
+	Then I must see first event in the events list	
 
 
 

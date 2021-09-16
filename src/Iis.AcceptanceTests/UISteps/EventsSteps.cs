@@ -192,6 +192,12 @@ namespace AcceptanceTests.UISteps
             eventPage.AdditionalDataTextField.SendKeys(additionalText);
             driver.WaitFor(0.5);
         }
+        [When(@"I clicked on the Events section")]
+        public void WhenIClickedOnTheEventsSection()
+        {
+            navigationSection.EventsLink.Click();
+            driver.WaitFor(5);
+        }
 
         #endregion
 
