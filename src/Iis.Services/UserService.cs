@@ -236,19 +236,21 @@ namespace Iis.Services
             CancellationToken ct = default)
         {
             var (skip, take) = page.ToEFPage();
-            bool isBlocked = userStatusFilter switch
+            bool? isBlocked = userStatusFilter switch
             {
                 UserStatusType.Active => false,
                 UserStatusType.Blocked => true,
-                _ => false
+                _ => null
             };
 
             Expression<Func<UserEntity, bool>> predicate = null;
 
-            if (string.IsNullOrWhiteSpace(suggestion))
+            if (string.IsNullOrWhiteSpace(suggestion) && isBlocked.HasValue)
                 predicate = user => user.IsBlocked == isBlocked;
-            else
+            else if (isBlocked.HasValue)
                 predicate = user => user.IsBlocked == isBlocked && (EF.Functions.Like(user.Username, $"%{suggestion}%") || EF.Functions.Like(user.Name, $"%{suggestion}%"));
+            else
+                predicate = user => EF.Functions.Like(user.Username, $"%{suggestion}%") || EF.Functions.Like(user.Name, $"%{suggestion}%");
 
             var getUserListTask = RunWithoutCommitAsync(uow => uow.UserRepository.GetUsersAsync(skip, take, predicate, ct));
             var getUserCountTask = RunWithoutCommitAsync(uow => uow.UserRepository.GetUserCountAsync(predicate, ct));
