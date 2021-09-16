@@ -32,7 +32,7 @@ namespace IIS.Core.GraphQL.Users
             var pageParam = new PaginationParams(pagination.Page, pagination.PageSize);
             var userStatusFilterValue = filter is null || !Enum.IsDefined(typeof(UserStatusType), filter.UserStatus) ? UserStatusType.All : (UserStatusType) filter.UserStatus;
 
-            var usersResult = await userService.GetUsersByStatusAsync(pageParam, userStatusFilterValue);
+            var usersResult = await userService.GetUsersByStatusAsync(pageParam, filter.Suggestion, userStatusFilterValue);
 
             var graphQLUsers = usersResult.Users
                                     .Select(user => mapper.Map<User>(user))
