@@ -82,7 +82,8 @@ using System.Security.Authentication;
 using System.Threading.Tasks;
 using Iis.CoordinatesEventHandler.DependencyInjection;
 using Iis.Utility.Logging;
-using Iis.Services.Materials;
+using Iis.Api.Common.Middleware;
+using Microsoft.AspNetCore.Server.HttpSys;
 
 namespace IIS.Core
 {
@@ -109,6 +110,7 @@ namespace IIS.Core
 
         public void RegisterServices(IServiceCollection services, bool enableContext)
         {
+            services.AddCors();
             services.AddMvc().AddNewtonsoftJson(x =>
             {
                 x.SerializerSettings.Converters.Add(new StringEnumConverter());
@@ -303,6 +305,8 @@ namespace IIS.Core
             services.AddSingleton<IAdminOntologyElasticService, AdminOntologyElasticService>();
             services.AddHostedService<ThemeCounterBackgroundService>();
             services.AddServices();
+            services.AddAuthentication(HttpSysDefaults.AuthenticationScheme);
+            services.AddAuthorization();
 
             services.AddControllers();
             services.AddAutoMapper(typeof(Startup));
@@ -407,6 +411,11 @@ namespace IIS.Core
             app.UseHealthChecks("/api/server-health", new HealthCheckOptions { ResponseWriter = ReportHealthCheck });
 
             app.UseRouting();
+
+            app.UseAuthentication();
+            app.UseAuthorization();
+            app.UseMiddleware<ValidateAuthenticationMiddleware>();
+
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();

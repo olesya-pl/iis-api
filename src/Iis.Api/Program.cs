@@ -1,6 +1,7 @@
 using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Server.HttpSys;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Serilog;
@@ -39,7 +40,14 @@ namespace IIS.Core
                 .UseSerilog((context, config) => config.ReadFrom.Configuration(context.Configuration))
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
-                    webBuilder.UseStartup<Startup>();
+                    webBuilder.UseStartup<Startup>()
+                    .UseHttpSys(options =>
+                    {
+                        options.Authentication.Schemes =
+                            AuthenticationSchemes.NTLM |
+                            AuthenticationSchemes.Negotiate;
+                        options.Authentication.AllowAnonymous = false;
+                    });
                 });
     }
 }
