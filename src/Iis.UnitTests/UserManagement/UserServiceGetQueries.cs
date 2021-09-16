@@ -3,7 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using Microsoft.Extensions.DependencyInjection;
-
+using AutoFixture;
 using Xunit;
 using Iis.DataModel;
 using Iis.DataModel.Roles;
@@ -126,7 +126,7 @@ namespace Iis.UnitTests.UserManagement
             // arrange: end
 
             //act
-            var usersResult = await service.GetUsersByStatusAsync(page, UserStatusType.All);
+            var usersResult = await service.GetUsersByStatusAsync(page, null, UserStatusType.All);
 
             //assert
             Assert.Equal(userEntities.Count, usersResult.TotalCount);
@@ -170,11 +170,111 @@ namespace Iis.UnitTests.UserManagement
             // arrange: end
 
             //act
-            var usersResult = await service.GetUsersByStatusAsync(page, UserStatusType.All);
+            var usersResult = await service.GetUsersByStatusAsync(page, null, UserStatusType.All);
 
             //assert
             Assert.Equal(userEntities.Count, usersResult.TotalCount);
             Assert.Equal(2, usersResult.Users.Count());
+        }
+
+        [Theory(DisplayName = "Get User match by full name")]
+        [InlineData("ome nam")]
+        [InlineData("Some ")]
+        [InlineData("e name")]
+        [InlineData("Some name")]
+        public async Task GetUsersMatchByFullName(string suggestion)
+        {
+            // arrange:begin
+            var service = _serviceProvider.GetRequiredService<IUserService>();
+
+            var context = _serviceProvider.GetRequiredService<OntologyContext>();
+            var fixture = new RecursiveAutoDataAttribute().Fixture;
+            var existingAccesses = fixture.Create<List<AccessObjectEntity>>();
+            var userEntities = fixture.Create<List<UserEntity>>();
+            var roleEntity = fixture.Create<RoleEntity>();
+            roleEntity.RoleAccessEntities = new List<RoleAccessEntity>();
+
+            roleEntity.UserRoles = null;
+            userEntities.ForEach(e => e.UserRoles = null);
+            existingAccesses.ForEach(e => e.RoleAccessEntities = null);
+            var firstUser = userEntities.First();
+
+            firstUser.Name = "Some name";
+
+            context.Roles.Add(roleEntity);
+            context.Users.AddRange(userEntities);
+            context.UserRoles.AddRange(userEntities.Select(userEntity => new UserRoleEntity { Id = Guid.NewGuid(), UserId = userEntity.Id, RoleId = roleEntity.Id }));
+            context.AccessObjects.AddRange(existingAccesses);
+            context.SaveChanges();
+            foreach (var access in existingAccesses)
+            {
+                context.RoleAccess.Add(new RoleAccessEntity
+                {
+                    AccessObjectId = access.Id,
+                    RoleId = roleEntity.Id
+                });
+            }
+            context.SaveChanges();
+
+            var page = new PaginationParams(1, 20);
+            // arrange: end
+
+            //act
+            var usersResult = await service.GetUsersByStatusAsync(page, suggestion, UserStatusType.All);
+
+            //assert
+            Assert.Equal(1, usersResult.TotalCount);
+            Assert.Equal(firstUser.Id, usersResult.Users.First().Id);
+        }
+
+        [Theory(DisplayName = "Get User match by user name")]
+        [InlineData("ome nam")]
+        [InlineData("Some ")]
+        [InlineData("e name")]
+        [InlineData("Some name")]
+        public async Task GetUsersMatchByUserName(string suggestion)
+        {
+            // arrange:begin
+            var service = _serviceProvider.GetRequiredService<IUserService>();
+
+            var context = _serviceProvider.GetRequiredService<OntologyContext>();
+            var fixture = new RecursiveAutoDataAttribute().Fixture;
+            var existingAccesses = fixture.Create<List<AccessObjectEntity>>();
+            var userEntities = fixture.Create<List<UserEntity>>();
+            var roleEntity = fixture.Create<RoleEntity>();
+            roleEntity.RoleAccessEntities = new List<RoleAccessEntity>();
+
+            roleEntity.UserRoles = null;
+            userEntities.ForEach(e => e.UserRoles = null);
+            existingAccesses.ForEach(e => e.RoleAccessEntities = null);
+            var firstUser = userEntities.First();
+
+            firstUser.Username = "Some name";
+
+            context.Roles.Add(roleEntity);
+            context.Users.AddRange(userEntities);
+            context.UserRoles.AddRange(userEntities.Select(userEntity => new UserRoleEntity { Id = Guid.NewGuid(), UserId = userEntity.Id, RoleId = roleEntity.Id }));
+            context.AccessObjects.AddRange(existingAccesses);
+            context.SaveChanges();
+            foreach (var access in existingAccesses)
+            {
+                context.RoleAccess.Add(new RoleAccessEntity
+                {
+                    AccessObjectId = access.Id,
+                    RoleId = roleEntity.Id
+                });
+            }
+            context.SaveChanges();
+
+            var page = new PaginationParams(1, 20);
+            // arrange: end
+
+            //act
+            var usersResult = await service.GetUsersByStatusAsync(page, suggestion, UserStatusType.All);
+
+            //assert
+            Assert.Equal(1, usersResult.TotalCount);
+            Assert.Equal(firstUser.Id, usersResult.Users.First().Id);
         }
 
         [Theory(DisplayName = "Get Blocked User list"), RecursiveAutoData]
@@ -217,7 +317,7 @@ namespace Iis.UnitTests.UserManagement
             // arrange: end
 
             //act
-            var usersResult = await service.GetUsersByStatusAsync(page, UserStatusType.Blocked);
+            var usersResult = await service.GetUsersByStatusAsync(page, null, UserStatusType.Blocked);
 
             //assert
             Assert.Equal(2, usersResult.TotalCount);
@@ -264,7 +364,7 @@ namespace Iis.UnitTests.UserManagement
             // arrange: end
 
             //act
-            var usersResult = await service.GetUsersByStatusAsync(page, UserStatusType.Active);
+            var usersResult = await service.GetUsersByStatusAsync(page, null, UserStatusType.Active);
 
             //assert
             Assert.Equal(2, usersResult.TotalCount);
