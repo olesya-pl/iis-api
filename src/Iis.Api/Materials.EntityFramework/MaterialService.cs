@@ -464,7 +464,6 @@ namespace IIS.Core.Materials.EntityFramework
                 return false;
 
             material.EditorId = user.Id;
-            material.Editor = null;
 
             Run(_ => _.MaterialRepository.EditMaterial(material));
             await _materialElasticService.PutMaterialToElasticSearchAsync(material.Id);
@@ -482,7 +481,6 @@ namespace IIS.Core.Materials.EntityFramework
                 return false;
 
             material.EditorId = null;
-            material.Editor = null;
 
             Run(_ => _.MaterialRepository.EditMaterial(material));
             await _materialElasticService.PutMaterialToElasticSearchAsync(material.Id);
