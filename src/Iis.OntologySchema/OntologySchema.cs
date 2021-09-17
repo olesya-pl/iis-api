@@ -69,8 +69,7 @@ namespace Iis.OntologySchema
         public IEnumerable<INodeTypeLinked> GetEntityTypes()
         {
             return _storage.NodeTypes.Values
-                .Where(nt => nt.Kind == Kind.Entity)
-                .OrderBy(nt => nt.Name);
+                .Where(nt => nt.Kind == Kind.Entity);
         }
 
         public INodeTypeLinked GetNodeTypeById(Guid id)
