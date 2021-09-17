@@ -120,6 +120,8 @@ namespace Iis.DbLayer.Repositories
         public void EditMaterial(MaterialEntity materialEntity)
         {
             materialEntity.UpdatedAt = DateTime.UtcNow;
+            materialEntity.Editor = null;
+
             Context.Materials.Update(materialEntity);
         }
 
