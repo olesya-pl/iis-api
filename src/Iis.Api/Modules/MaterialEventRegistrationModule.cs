@@ -36,7 +36,7 @@ namespace Iis.Api.Modules
                         .AddSingleton(featureHandlerConfig)
                         .AddSingleton(elasticSaver)
                         .AddTransient<IMaterialEventProducer, MaterialEventProducer>()
-                        .AddHostedService<MaterialOperatorConsumer>()
+                        .AddHostedService<MaterialOperatorDistributor>()
                         .AddHostedService<MaterialElasticConsumer>()
                         .AddHostedService<FeatureHandler>()
                         .AddHostedService<MaterialConsumer>();

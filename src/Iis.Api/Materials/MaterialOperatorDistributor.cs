@@ -17,7 +17,7 @@ using System.Text;
 
 namespace Iis.Api.Materials
 {
-    public class MaterialOperatorConsumer : BackgroundService
+    public class MaterialOperatorDistributor : BackgroundService
     {
         private const int MaterialsPage = 1;
         private const int Timeout = 30;
@@ -25,15 +25,15 @@ namespace Iis.Api.Materials
         private const string CELL_PREFFIX = "cell.";
 
         private readonly IUserService _userService;
-        private readonly ILogger<MaterialOperatorConsumer> _logger;
+        private readonly ILogger<MaterialOperatorDistributor> _logger;
         private readonly IMaterialService _materialService;
         private readonly IMaterialElasticService _materialElasticService;
         private readonly IMaterialProvider _materialProvider;
         private readonly IMaterialDistributionService _materialDistributionService;
         private readonly IReadOnlyList<MaterialDistributionRule> _rules;
 
-        public MaterialOperatorConsumer(
-            ILogger<MaterialOperatorConsumer> logger,
+        public MaterialOperatorDistributor(
+            ILogger<MaterialOperatorDistributor> logger,
             IMaterialService materialService,
             IMaterialElasticService materialElasticService,
             IUserService userService,
