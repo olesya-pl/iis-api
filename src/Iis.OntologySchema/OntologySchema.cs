@@ -75,14 +75,16 @@ namespace Iis.OntologySchema
 
         public INodeTypeLinked GetNodeTypeById(Guid id)
         {
-            var nodeType = _storage.NodeTypes.Values
-                .Where(nt => nt.Id == id)
-                .SingleOrDefault();
+            if (_storage.NodeTypes.TryGetValue(id, out var nodeType)) {
+                return nodeType;
+            };
 
-            return nodeType ?? _storage.InversedRelationTypes.Values
-                .Where(rt => rt.Id == id)
-                .Select(rt => rt.NodeType)
-                .SingleOrDefault();
+            if (_storage.InversedRelationTypes.TryGetValue(id, out var relation))
+            {
+                return relation.NodeType;
+            }
+
+            return null;
         }
 
         public IOntologyRawData GetRawData()
