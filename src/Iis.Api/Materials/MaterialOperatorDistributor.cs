@@ -123,10 +123,7 @@ namespace Iis.Api.Materials
             var freeSlotsRemains = users.TotalFreeSlots();
             sw.Stop();
 
-            if (freeSlotsRemains == 0)
-            {
-                await Task.Delay(TimeSpan.FromSeconds(Timeout));
-            }
+            await Task.Delay(TimeSpan.FromSeconds(Timeout));
         }
 
         private string GetLogMessage(DistributionResult distributionResult, UserDistributionItem user, TimeSpan timeElapsed)
