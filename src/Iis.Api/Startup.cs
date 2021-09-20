@@ -312,7 +312,7 @@ namespace IIS.Core
             services.RegisterElasticModules();
             services.AddMediatR(typeof(ReportEventHandler));
             services.AddTransient<ModifyDataRunner>();
-            services.RegisterEventMaterialAutoAssignment(Configuration);
+            //services.RegisterEventMaterialAutoAssignment(Configuration);
             services.RegisterCoordinatesMessageHandler(Configuration);
 
             var eusConfiguration = Configuration.GetSection("externalUserService").Get<ExternalUserServiceConfiguration>();
