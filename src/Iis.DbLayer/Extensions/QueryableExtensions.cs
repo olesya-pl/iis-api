@@ -1,9 +1,12 @@
 ﻿using Iis.DataModel;
+using Iis.DbLayer.Common;
 using System;
 using System.ComponentModel;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Iis.DbLayer.Extensions
 {
@@ -48,6 +51,25 @@ namespace Iis.DbLayer.Extensions
                 Expression.Quote(orderByExpression));
 
             return source.Provider.CreateQuery<TEntity>(resultExpression);
+        }
+
+        public static IQueryable<TEntity> WhereOrDefault<TEntity>(this IQueryable<TEntity> query, Expression<Func<TEntity, bool>> predicate)
+            where TEntity : BaseEntity
+        {
+            if (predicate == null)
+                return query;
+
+            return query.Where(predicate);
+        }
+
+        public static Task<PaginatedCollection<TEntity>> AsPaginatedCollectionAsync<TEntity>(
+            this IQueryable<TEntity> source,
+            int offset,
+            int limit,
+            CancellationToken cancellationToken = default)
+            where TEntity : BaseEntity
+        {
+            return PaginatedCollection<TEntity>.CreateAsync(source, offset, limit, cancellationToken);
         }
 
         private static string AsOrderMethodName(this ListSortDirection? sortDirection) => sortDirection switch
