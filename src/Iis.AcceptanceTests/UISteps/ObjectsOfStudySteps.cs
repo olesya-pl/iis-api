@@ -168,6 +168,7 @@ namespace AcceptanceTests.UISteps
         public void WhenIClickOnTheCreateANewMilitaryOrganizationButton()
         {
             objectsOfStudyPage.CreateAMilitaryOrganizationButton.Click();
+            driver.WaitFor(5);
         }
 
         [When(@"I expand all blocks")]
