@@ -314,6 +314,7 @@ namespace AcceptanceTests.UISteps
         public void IMustSeeRelevanceDropDownInTheMaterialsCard()
         {
             Assert.True(materialsSectionPage.RelevanceDropDown.Displayed);
+            driver.WaitFor(5);
         }
 
         [Then(@"I must see these elements")]
