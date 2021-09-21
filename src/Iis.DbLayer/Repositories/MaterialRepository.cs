@@ -234,7 +234,7 @@ namespace Iis.DbLayer.Repositories
 
             if (filter != null) query = query.Where(filter);
 
-            if (user.Channels.Count > 0) query = query.Where(_ => user.Channels.Contains(_.Channel));
+            if (user.Channels.Count > 0) query = query.Where(_ => _.Channel == null || user.Channels.Contains(_.Channel));
 
             var materialEntities = await query
                 .OrderByDescending(_ => _.RegistrationDate)
