@@ -9,6 +9,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Iis.Services.Contracts.Interfaces;
 using System.Threading;
+using Iis.DbLayer.MaterialDictionaries;
 using IIS.Repository;
 using Iis.DbLayer.Repositories;
 using IIS.Repository.Factories;
@@ -294,15 +295,33 @@ namespace Iis.Services
         {
             return (columnName, order) switch
             {
-                ("comment", "asc") => query.OrderBy(e => e.Comment),
-                ("comment", "desc") => query.OrderByDescending(e => e.Comment),
-                ("type", "asc") => query.OrderBy(e => e.Type),
-                ("type", "desc") => query.OrderByDescending(e => e.Type),
-                ("queryResults", "asc") => query.OrderBy(e => e.QueryResults),
-                ("queryResults", "desc") => query.OrderByDescending(e => e.QueryResults),
-                ("unreadCount", "asc") => query.OrderBy(e => e.UnreadCount),
-                ("unreadCount", "desc") => query.OrderByDescending(e => e.UnreadCount),
-                _ => query.OrderByDescending(e => e.UpdatedAt)
+                ("comment", SortDirections.ASC) => query
+                    .OrderBy(e => e.Comment)
+                    .ThenBy(e => e.Id),
+                ("comment", SortDirections.DESC) => query
+                    .OrderByDescending(e => e.Comment)
+                    .ThenBy(e => e.Id),
+                ("type", SortDirections.ASC) => query
+                    .OrderBy(e => e.Type)
+                    .ThenBy(e => e.Id),
+                ("type", SortDirections.DESC) => query
+                    .OrderByDescending(e => e.Type)
+                    .ThenBy(e => e.Id),
+                ("queryResults", SortDirections.ASC) => query
+                    .OrderBy(e => e.QueryResults)
+                    .ThenBy(e => e.Id),
+                ("queryResults", SortDirections.DESC) => query
+                    .OrderByDescending(e => e.QueryResults)
+                    .ThenBy(e => e.Id),
+                ("unreadCount", SortDirections.ASC) => query
+                    .OrderBy(e => e.UnreadCount)
+                    .ThenBy(e => e.Id),
+                ("unreadCount", SortDirections.DESC) => query
+                    .OrderByDescending(e => e.UnreadCount)
+                    .ThenBy(e => e.Id),
+                _ => query
+                    .OrderByDescending(e => e.UpdatedAt)
+                    .ThenBy(e => e.Id)
             };
         }
 
