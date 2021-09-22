@@ -43,6 +43,8 @@
     <ProjectReference Include="..\Iis.OntologySchema\Iis.OntologySchema.csproj" />
     <ProjectReference Include="..\Iis.Services\Iis.Services.csproj" />
     <ProjectReference Include="..\Iis.Utility\Iis.Utility.csproj" />
+    <ProjectReference Include="..\Iis.RabbitMq\Iis.RabbitMq.csproj" />
+    <ProjectReference Include="..\Iis.CoordinatesHandler\Iis.CoordinatesHandler.csproj" />
   </ItemGroup>  
 
   <ItemGroup>

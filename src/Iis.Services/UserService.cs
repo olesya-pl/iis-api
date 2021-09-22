@@ -19,11 +19,12 @@ using Iis.Services.Contracts.Params;
 using Iis.Services.Contracts.Enums;
 using Iis.Domain.Users;
 using Microsoft.Extensions.Configuration;
-using Iis.Utility;
 using System.Security.Authentication;
 using Iis.Interfaces.Users;
 using System.Security.Cryptography;
 using System.Text;
+using Iis.Services.Contracts.Materials.Distribution;
+using Iis.Services.Contracts.Extensions;
 
 namespace Iis.Services
 {
@@ -96,26 +97,39 @@ namespace Iis.Services
                 .ToList();
         }
 
-        public async Task<List<Guid>> GetAvailableOperatorIdsAsync()
+        public async Task<UserDistributionList> GetOperatorsForMaterialsAsync()
         {
             var maxMaterialsCount = _maxMaterialsConfig.Value;
 
-            var unavailableOperators = _context.Materials
+            var chargedInfo = _context.MaterialAssignees
                 .AsNoTracking()
-                .Where(p => (p.ProcessedStatusSignId == null
-                    || p.ProcessedStatusSignId == MaterialEntity.ProcessingStatusNotProcessedSignId)
-                    && p.ParentId == null
-                    && p.AssigneeId != null)
+                .Include(_ => _.Material)
+                .Where(p => (p.Material.ProcessedStatusSignId == null
+                    || p.Material.ProcessedStatusSignId == MaterialEntity.ProcessingStatusNotProcessedSignId)
+                    && p.Material.ParentId == null)
                 .GroupBy(p => p.AssigneeId)
-                .Where(group => group.Count() >= maxMaterialsCount)
-                .Select(group => group.Key)
-                .Where(key => key.HasValue)
-                .Select(key => key)
-                .ToArray();
+                .Select(group => new
+                {
+                    UserId = group.Key,
+                    FreeSlots = maxMaterialsCount - group.Count()
+                })
+                .ToList();
 
-            var userList = await RunWithoutCommitAsync(uow => uow.UserRepository.GetOperatorsAsync(e => !unavailableOperators.Contains(e.Id), CancellationToken.None));
+            var mapping = await _context.MaterialChannelMappings.ToArrayAsync();
 
-            return userList.Select(e => e.Id).ToList();
+            var allOperators = (await RunWithoutCommitAsync(uow => uow.UserRepository.GetOperatorsAsync())).ToList();
+            var list =
+                (from op in allOperators
+                 join ci in chargedInfo
+                     on op.Id equals ci.UserId
+                 where ci.FreeSlots > 0
+                 select new UserDistributionItem(op.Id, ci.FreeSlots, GetRoles(op, mapping), GetChannels(op, mapping), op.AccessLevel)).ToList();
+
+            list.AddRange(allOperators
+                .Where(op => !chargedInfo.Any(ci => ci.UserId == op.Id))
+                .Select(op => new UserDistributionItem(op.Id, maxMaterialsCount, GetRoles(op, mapping), GetChannels(op, mapping), op.AccessLevel)));
+
+            return new UserDistributionList(list);
         }
 
         public async Task<Guid> UpdateUserAsync(User updatedUser, CancellationToken cancellation = default)
@@ -127,13 +141,14 @@ namespace Iis.Services
                 throw new InvalidOperationException($"Cannot find User with id:'{updatedUser.Id}'.");
             }
 
-            if (userEntity.Source == UserSource.Internal && 
+            if (userEntity.Source == UserSource.Internal &&
                 string.Equals(userEntity.PasswordHash, updatedUser.PasswordHash, StringComparison.Ordinal))
             {
                 throw new InvalidOperationException($"New password must not match old.");
             }
 
             var updatedEntity = _mapper.Map<UserEntity>(updatedUser);
+            updatedEntity.Source = userEntity.Source;
 
             var newUserRolesEntitiesList = updatedUser.Roles
                                             .Select(role => CreateUserRole(updatedUser.Id, role.Id))
@@ -215,18 +230,31 @@ namespace Iis.Services
             return user;
         }
 
-        public async Task<(IReadOnlyCollection<User> Users, int TotalCount)> GetUsersByStatusAsync(PaginationParams page, UserStatusType userStatusFilter, CancellationToken ct = default)
+        public async Task<(IReadOnlyCollection<User> Users, int TotalCount)> GetUsersByStatusAsync(
+            PaginationParams page,
+            SortingParams sorting,
+            string suggestion,
+            UserStatusType userStatusFilter,
+            CancellationToken ct = default)
         {
             var (skip, take) = page.ToEFPage();
-
-            Expression<Func<UserEntity, bool>> predicate = userStatusFilter switch
+            bool? isBlocked = userStatusFilter switch
             {
-                UserStatusType.Active  => (user) => !user.IsBlocked,
-                UserStatusType.Blocked => (user) => user.IsBlocked,
-                _ => (user) => true
+                UserStatusType.Active => false,
+                UserStatusType.Blocked => true,
+                _ => null
             };
 
-            var getUserListTask = RunWithoutCommitAsync(uow => uow.UserRepository.GetUsersAsync(skip, take, predicate, ct));
+            Expression<Func<UserEntity, bool>> predicate = null;
+
+            if (string.IsNullOrWhiteSpace(suggestion) && isBlocked.HasValue)
+                predicate = user => user.IsBlocked == isBlocked;
+            else if (!string.IsNullOrWhiteSpace(suggestion) && isBlocked.HasValue)
+                predicate = user => user.IsBlocked == isBlocked && (EF.Functions.ILike(user.Username, $"%{suggestion}%") || EF.Functions.ILike(user.Name, $"%{suggestion}%"));
+            else if (!string.IsNullOrWhiteSpace(suggestion) && !isBlocked.HasValue)
+                predicate = user => EF.Functions.ILike(user.Username, $"%{suggestion}%") || EF.Functions.ILike(user.Name, $"%{suggestion}%");
+
+            var getUserListTask = RunWithoutCommitAsync(uow => uow.UserRepository.GetUsersAsync(skip, take, sorting.ColumnName, sorting.AsSortDirection(), predicate, ct));
             var getUserCountTask = RunWithoutCommitAsync(uow => uow.UserRepository.GetUserCountAsync(predicate, ct));
 
             await Task.WhenAll(getUserListTask, getUserCountTask);
@@ -439,7 +467,7 @@ namespace Iis.Services
 
             return sb.ToString();
         }
-        
+
         public async Task<string> CreateMatrixUserAsync(User user)
         {
             try
@@ -496,6 +524,20 @@ namespace Iis.Services
 
             }
             return sb.ToString();
+        }
+        private List<string> GetRoles(UserEntity userEntity, IEnumerable<MaterialChannelMappingEntity> mapping) =>
+           userEntity.UserRoles
+               .Where(ur => mapping.Any(mp => mp.RoleId == ur.RoleId))
+               .Select(ur => ur.Role.Id.ToString("N")).ToList();
+
+        private IReadOnlyList<string> GetChannels(UserEntity userEntity, IEnumerable<MaterialChannelMappingEntity> mapping)
+        {
+            var result =
+                (from ur in userEntity.UserRoles
+                 join mp in mapping on ur.RoleId equals mp.RoleId
+                 select mp.ChannelName).ToList();
+
+            return result;
         }
     }
 }

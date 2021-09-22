@@ -1,9 +1,12 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Iis.Interfaces.Enums;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 
 namespace Iis.DataModel.FlightRadar
 {
-    public class FlightRadarHistoryConfiguration : IEntityTypeConfiguration<LocationHistoryEntity>
+    [DbContext(typeof(OntologyContext))]
+    internal class FlightRadarHistoryConfiguration : IEntityTypeConfiguration<LocationHistoryEntity>
     {
         public void Configure(EntityTypeBuilder<LocationHistoryEntity> builder)
         {

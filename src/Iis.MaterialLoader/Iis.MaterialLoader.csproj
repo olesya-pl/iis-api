@@ -6,6 +6,12 @@
       <UserSecretsId>8e09b9ab-30e6-4677-a102-8de60c3457f2</UserSecretsId>
   </PropertyGroup>
 
+	<PropertyGroup>
+		<EnableNETAnalyzers>true</EnableNETAnalyzers>
+		<AnalysisMode>AllEnabledByDefault</AnalysisMode>
+		<AnalysisLevel>latest</AnalysisLevel>
+	</PropertyGroup>
+
     <ItemGroup>
       <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="7.0.0" />
       <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
@@ -23,7 +29,9 @@
       <ProjectReference Include="..\Iis.Messages\Iis.Messages.csproj" />
       <ProjectReference Include="..\IIS.Repository\IIS.Repository.csproj" />
       <ProjectReference Include="..\Iis.Services\Iis.Services.csproj" />
-      <ProjectReference Include="..\Iis.Interfaces\Iis.Interfaces.csproj"/>
+      <ProjectReference Include="..\Iis.Interfaces\Iis.Interfaces.csproj" />
+      <ProjectReference Include="..\Iis.RabbitMq\Iis.RabbitMq.csproj" />
+      <ProjectReference Include="..\Iis.Utility\Iis.Utility.csproj" />
     </ItemGroup>
 
 

@@ -26,6 +26,7 @@ namespace Iis.Domain.ExtendedData
         public bool IsAttribute => AttributeValue != null && Children.Count == 0;
 
         public INodeTypeLinked NodeType { get; set; }
+        public GeoCoordinates Location { get; set; }
 
         public List<GeoCoordinates> GetCoordinatesWithoutNestedObjects()
         {

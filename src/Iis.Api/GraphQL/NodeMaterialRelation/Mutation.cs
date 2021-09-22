@@ -22,7 +22,7 @@ namespace IIS.Core.GraphQL.NodeMaterialRelation
             var tokenPayload = ctx.GetToken();
             var materialsSet = input.MaterialIds.ToHashSet();
             var nodesSet = input.NodeIds.ToHashSet();
-            await relationService.CreateMultipleRelations(nodesSet, materialsSet, tokenPayload.User.UserName);
+            await relationService.CreateMultipleRelations(nodesSet, materialsSet, tokenPayload.User.UserName, input.NodeLinkType);
             var material = await materialProvider.GetMaterialsByIdsAsync(materialsSet, tokenPayload.User);
             return mapper.Map<Material[]>(material);
         }

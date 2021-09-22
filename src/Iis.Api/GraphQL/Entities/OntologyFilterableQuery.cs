@@ -48,7 +48,10 @@ namespace IIS.Core.GraphQL.Entities
             var mapped = mapper.Map<OntologyFilterableQueryResponse>(response);
             EnrichWithSelectedFilteredItems(mapped.Aggregations, elasticFilter);
             mapped.Aggregations = EnrichWithNodeTypeNames(nodesData, mapped.Aggregations);
-            
+            var nodeTypeAggregations = GetNodeTypeAggregations(nodesData.Schema, types,
+                mapped.Aggregations.GetValueOrDefault(ElasticConfigConstants.NodeTypeTitleAlias)?.Buckets);
+            mapped.NodeTypeAggregations = nodeTypeAggregations.Select(_ => JObject.FromObject(_)).ToList();
+
             return mapped;
         }
 
@@ -166,6 +169,41 @@ namespace IIS.Core.GraphQL.Entities
                     }
                 }
             }
+        }
+
+        private AggregationNodeTypeItem GetAggregationNodeTypeItem(INodeTypeLinked nodeType)
+        {
+            return new AggregationNodeTypeItem
+            {
+                NodeTypeId = nodeType.Id,
+                NodeTypeName = nodeType.Name,
+                Title = nodeType.Title,
+                Children = nodeType.GetDirectDescendants()
+                    .Select(nt => GetAggregationNodeTypeItem(nt))
+                    .OrderBy(ag => ag.Title)
+                    .ToList()
+            };
+        }
+
+        private IReadOnlyList<AggregationNodeTypeItem> GetNodeTypeAggregations(
+            IOntologySchema schema, 
+            IEnumerable<string> typeNames,
+            IReadOnlyList<AggregationBucket> buckets)
+        {
+            var list = typeNames
+                .Select(name => GetAggregationNodeTypeItem(schema.GetEntityTypeByName(name)))
+                .OrderBy(ag => ag.Title)
+                .ToList();
+
+            if (list.Count == 1 && EntityList.Contains(list[0].NodeTypeName))
+            {
+                list = list[0].Children;
+            }
+
+            var aggregations = new AggregationNodeTypeTree(list);
+            aggregations.MergeBuckets(buckets);
+
+            return aggregations.Items;
         }
     }
 }

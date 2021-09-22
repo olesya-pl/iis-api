@@ -2,12 +2,20 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
+    <LangVersion>latest</LangVersion>
     <AspNetCoreHostingModel>InProcess</AspNetCoreHostingModel>
     <SourceRevisionId Condition="'$(IIS_SOURCE_REVISION_ID)' != ''">$(IIS_SOURCE_REVISION_ID)</SourceRevisionId>
     <UserSecretsId>7fbdec57-37c4-4ac5-bbe0-b67a05e1794d</UserSecretsId>
   </PropertyGroup>
 
-  <ItemGroup>
+  <PropertyGroup>
+	<EnableNETAnalyzers>true</EnableNETAnalyzers>
+	<AnalysisMode>AllEnabledByDefault</AnalysisMode>
+	<AnalysisLevel>latest</AnalysisLevel>
+  </PropertyGroup>
+
+
+	<ItemGroup>
     <Compile Remove="Logs\**" />
     <Content Remove="Logs\**" />
     <EmbeddedResource Remove="Logs\**" />
@@ -20,7 +28,7 @@
     </None>
     <None Include="..\..\scripts\script-update-wrongValue-PropertyName.sql" Link="data\scripts\script-update-wrongValue-PropertyName.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
+    </None>    
   </ItemGroup>
 
   <ItemGroup>
@@ -39,16 +47,15 @@
     <PackageReference Include="MediatR.Extensions.Microsoft.DependencyInjection" Version="8.1.0" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="3.1.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.1.6" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="3.1.4">
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="3.1.6">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="3.1.4" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="3.1.4">
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="3.1.6" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="3.1.6">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.IO.RecyclableMemoryStream" Version="1.3.4" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="3.1.4" />
     <PackageReference Include="protobuf-net" Version="2.4.4" />
     <PackageReference Include="RabbitMQ.Client" Version="5.1.2" />
@@ -78,6 +85,7 @@
     <ProjectReference Include="..\Iis.Services.Contracts\Iis.Services.Contracts.csproj" />
     <ProjectReference Include="..\Iis.Utility\Iis.Utility.csproj" />
     <ProjectReference Include="..\Iis.RabbitMq\Iis.RabbitMq.csproj" />
+    <ProjectReference Include="..\Iis.CoordinatesHandler\Iis.CoordinatesHandler.csproj" />
   </ItemGroup>
   <ItemGroup>
     <None Update="data\contour\migrations\002\migration-002.ont">

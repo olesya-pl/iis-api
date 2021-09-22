@@ -5,10 +5,8 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
-using Iis.DbLayer.Repositories;
 using Iis.Domain.Elastic;
 using Iis.Elastic.SearchQueryExtensions;
-using Iis.Services.Contracts;
 using Iis.Services.Contracts.Interfaces;
 using Iis.Interfaces.Elastic;
 using Iis.Interfaces.Ontology.Data;
@@ -20,14 +18,15 @@ namespace IIS.Core.Ontology.EntityFramework
     {
         private readonly IElasticManager _elasticManager;
         private readonly IElasticConfiguration _elasticConfiguration;
-        private readonly INodeRepository _nodeRepository;
+        private readonly INodeSaveService _nodeRepository;
         private readonly IElasticState _elasticState;
         private const decimal HistoricalSearchBoost = 0.05m;
+        private const string ExclamationMark = "!";
 
         public ElasticService(
             IElasticManager elasticManager,
             IElasticConfiguration elasticConfiguration,
-            INodeRepository nodeRepository,
+            INodeSaveService nodeRepository,
             IElasticState elasticState)
         {
             _elasticManager = elasticManager;
@@ -98,6 +97,10 @@ namespace IIS.Core.Ontology.EntityFramework
                    && !filter.FilteredItems.Any() 
                    && !filter.CherryPickedItems.Any();
         }
+        public bool ShouldReturnNoEntities(ElasticFilter filter)
+        {
+            return filter.Suggestion?.Trim() == ExclamationMark;
+        }
 
         public async Task<SearchEntitiesByConfiguredFieldsResult> SearchEntitiesByConfiguredFieldsAsync(
             IEnumerable<string> typeNames, 
@@ -105,7 +108,7 @@ namespace IIS.Core.Ontology.EntityFramework
             Guid userId,
             CancellationToken ct = default)
         {
-            if(ShouldReturnAllEntities(filter))
+            if (ShouldReturnAllEntities(filter))
             {
                 var defaultAggregations = new List<AggregationField>
                 {
@@ -126,30 +129,44 @@ namespace IIS.Core.Ontology.EntityFramework
                 return results.ToOutputSearchResult();
             }
 
-            var (multiSearchParams, historicalResult) = await PrepareMultiElasticSearchParamsAsync(typeNames, filter, ct);
+            const int maxAggregationsCount = 20;
+
+            var (multiSearchQuery, multiSearchParams, historicalResult) = await PrepareMultiSearchQuery(typeNames, filter, ct);
 
             var aggregationFieldList = multiSearchParams.SearchParams.SelectMany(p => p.Fields)
                                     .Where(p => p.IsAggregated)
                                     .Select(e => new AggregationField($"{e.Name}{SearchQueryExtension.AggregateSuffix}", e.Alias, $"{e.Name}{SearchQueryExtension.AggregateSuffix}", e.Name))
                                     .ToArray();
 
-            var multiSearchQuery = new MultiSearchParamsQueryBuilder(multiSearchParams.SearchParams)
-                .WithLeniency(multiSearchParams.IsLenient)
-                .WithPagination(multiSearchParams.From, multiSearchParams.Size)
-                .WithResultFields(multiSearchParams.ResultFields)
-                .BuildSearchQuery()
+            var (multiSearchAggregationQuery, _, _) = await PrepareMultiSearchQuery(typeNames, new ElasticFilter { 
+                CherryPickedItems = filter.CherryPickedItems,
+                Limit = filter.Limit,
+                Offset = filter.Offset,
+                Suggestion = filter.Suggestion
+            }, ct);
+
+            var aggregationQueryResults = new List<Dictionary<string, AggregationItem>>();
+
+            var batchCount = aggregationFieldList.Count() / maxAggregationsCount + 1;
+            for (var i = 0; i < batchCount; i++)
+            {
+                var fieldsToAggregate = aggregationFieldList
+                    .Skip(i * maxAggregationsCount)
+                    .Take(maxAggregationsCount);
+
+
+                var aggregationQuery = multiSearchAggregationQuery
+                    .WithAggregation(fieldsToAggregate, filter)
+                    .ToString();
+
+                var aggregationResult = await _elasticManager.WithUserId(userId).SearchAsync(aggregationQuery, typeNames, ct);
+                aggregationQueryResults.Add(aggregationResult.Aggregations);
+            }
+
+            var multiSearchQueryString = multiSearchQuery
                 .WithHighlights()
                 .ToString();
-
-            var aggregationQuery = new MatchAllQueryBuilder()
-                .WithPagination(0, 0)
-                .BuildSearchQuery()
-                .WithAggregation(aggregationFieldList, filter)
-                .ToString();
-
-            var searchResult = await _elasticManager.WithUserId(userId).SearchAsync(multiSearchQuery, typeNames, ct);
-            var aggregationResult = await _elasticManager.WithUserId(userId).SearchAsync(aggregationQuery, typeNames, ct);
-
+            var searchResult = await _elasticManager.WithUserId(userId).SearchAsync(multiSearchQueryString, typeNames, ct);
             if (historicalResult != null && historicalResult.Count > 0)
             {
                 var highlightsById = historicalResult.Items
@@ -165,7 +182,24 @@ namespace IIS.Core.Ontology.EntityFramework
                 }
             }
 
-            return searchResult.ToOutputSearchResult(ExtractSubAggregations(aggregationResult.Aggregations));
+            var aggregations = aggregationQueryResults.SelectMany(p => p).ToDictionary(p => p.Key, p => p.Value);
+            return searchResult.ToOutputSearchResult(ExtractSubAggregations(aggregations));
+        }
+
+        private async Task<(JObject multiSearchQuery, MultiElasticSearchParams multiSearchParams, IElasticSearchResult historicalResult)> PrepareMultiSearchQuery(
+            IEnumerable<string> typeNames, 
+            ElasticFilter filter, 
+            CancellationToken ct)
+        {
+            var (multiSearchParams, historicalResult) = await PrepareMultiElasticSearchParamsAsync(typeNames, filter, ct);
+
+            var multiSearchQuery = new MultiSearchParamsQueryBuilder(multiSearchParams.SearchParams)
+                .WithLeniency(multiSearchParams.IsLenient)
+                .WithPagination(multiSearchParams.From, multiSearchParams.Size)
+                .WithResultFields(multiSearchParams.ResultFields)
+                .BuildSearchQuery();
+                
+            return (multiSearchQuery, multiSearchParams, historicalResult);
         }
 
         private Dictionary<string, AggregationItem> ExtractSubAggregations(Dictionary<string, AggregationItem> aggregations)
@@ -174,7 +208,7 @@ namespace IIS.Core.Ontology.EntityFramework
             {
                 return SearchResultsExtension.EmptyAggregation;
             }
-            return aggregations.ToDictionary(x => x.Key, pair => pair.Value.SubAggs);
+            return aggregations.ToDictionary(x => x.Key, pair => pair.Value.SubAggs ?? pair.Value);
         }
 
         public async Task<SearchEntitiesByConfiguredFieldsResult> FilterNodeCoordinatesAsync(

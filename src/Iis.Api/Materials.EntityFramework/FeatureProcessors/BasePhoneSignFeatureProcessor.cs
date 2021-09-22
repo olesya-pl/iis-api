@@ -3,7 +3,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using Newtonsoft.Json.Linq;
-
 using Iis.Interfaces.Elastic;
 using Iis.Services.Contracts.Dtos;
 using Iis.Services.Contracts.Interfaces;
@@ -39,7 +38,7 @@ namespace IIS.Core.Materials.EntityFramework.FeatureProcessors
 
         public virtual bool IsDummy => false;
 
-        public BasePhoneSignFeatureProcessor(IElasticService elasticService,
+        protected BasePhoneSignFeatureProcessor(IElasticService elasticService,
             IOntologySchema ontologySchema,
             MutationCreateResolver createResolver,
             MutationUpdateResolver updateResolver,
@@ -53,13 +52,13 @@ namespace IIS.Core.Materials.EntityFramework.FeatureProcessors
             _elasticState = elasticState;
             _locationHistoryService = locationHistoryService;
         }
-        public virtual async Task<JObject> ProcessMetadataAsync(JObject metadata, Guid materialId)
+        public virtual async Task<JObject> ProcessMetadataAsync(ProcessingMaterialEntry entry)
         {
-            if (!FeaturesSectionExists(metadata)) return metadata;
+            if (!FeaturesSectionExists(entry.Metadata)) return entry.Metadata;
 
             var signType = _ontologySchema.GetEntityTypeByName(SignTypeName);
 
-            var features = metadata.SelectToken(FeatureFields.FeaturesSection);
+            var features = entry.Metadata.SelectToken(FeatureFields.FeaturesSection);
 
             foreach (JObject originalFeature in features)
             {
@@ -103,12 +102,20 @@ namespace IIS.Core.Materials.EntityFramework.FeatureProcessors
 
                     originalFeature[FeatureFields.featureId] = entity.Id.ToString();
                 }
-
-                await SaveCoordinatesToLocationHistoryAsync(originalFeature);
             }
 
-            await PostMetadataProcessingAsync(metadata, materialId);
-            return metadata;
+            var locationHistoryCollection = await GetLocationHistoryCollectionAsync(entry);
+
+            await SaveLocationHistoryCollectionAsync(locationHistoryCollection);
+
+            await UpldateSignElasticDocumentAsync(entry);
+
+            return entry.Metadata;
+        }
+
+        public IEnumerable<Guid> GetValidFeatureIds(IEnumerable<Guid> featureIdList)
+        {
+            return featureIdList;
         }
 
         protected virtual bool FeaturesSectionExists(JObject metadata) =>
@@ -254,29 +261,53 @@ namespace IIS.Core.Materials.EntityFramework.FeatureProcessors
             return (true, featurePair.Key, feature);
         }
 
-        protected virtual Task PostMetadataProcessingAsync(JObject metadata, Guid materialId)
+        protected virtual Task<IReadOnlyCollection<LocationHistoryDto>> GetLocationHistoryCollectionAsync(ProcessingMaterialEntry entry)
         {
-            return Task.CompletedTask;
+            var result = new List<LocationHistoryDto>();
+
+            var features = entry.Metadata.SelectToken(FeatureFields.FeaturesSection);
+
+            var locationTimeStamp = entry.RegistrationDate ?? entry.CreatedDate;
+
+            foreach (JObject feature in features)
+            {
+                var coordinatesResult = TryFetchCoordinatiesFromFeature(feature);
+
+                var entityIdResult  = TryFetchEntityIdFromFeature(feature);
+
+                if (!coordinatesResult.IsSuccess || !entityIdResult.IsSuccess) continue;
+
+                result.Add(new LocationHistoryDto
+                {
+                    EntityId = entityIdResult.FeatureId,
+                    NodeId = entityIdResult.FeatureId,
+                    Lat = coordinatesResult.Latitude,
+                    Long = coordinatesResult.Longitude,
+                    RegisteredAt = locationTimeStamp,
+                    MaterialId = entry.Id
+                });
+            }
+
+            return Task.FromResult<IReadOnlyCollection<LocationHistoryDto>>(result);
         }
 
-        protected virtual Task SaveCoordinatesToLocationHistoryAsync(JObject feature)
+        private async Task UpldateSignElasticDocumentAsync(ProcessingMaterialEntry entry)
         {
-            var coordinatesResult = TryFetchCoordinatiesFromFeature(feature);
+            var features = entry.Metadata.SelectToken(FeatureFields.FeaturesSection);
 
-            var entityIdResult  = TryFetchEntityIdFromFeature(feature);
-
-            if (!coordinatesResult.IsSuccess || !entityIdResult.IsSuccess) return Task.CompletedTask;
-
-            var lhDto = new LocationHistoryDto
+            foreach (JObject feature in features)
             {
-                EntityId = entityIdResult.FeatureId,
-                NodeId = entityIdResult.FeatureId,
-                Lat = coordinatesResult.Latitude,
-                Long = coordinatesResult.Longitude,
-                RegisteredAt = DateTime.UtcNow
-            };
+                var entityIdResult  = TryFetchEntityIdFromFeature(feature);
 
-            return _locationHistoryService.SaveLocationHistoryAsync(lhDto);
+                if (!entityIdResult.IsSuccess || entityIdResult.FeatureId == Guid.Empty) continue;
+
+                await _elasticService.PutNodeAsync(entityIdResult.FeatureId);
+            }
+        }
+
+        private Task SaveLocationHistoryCollectionAsync(IReadOnlyCollection<LocationHistoryDto> collection)
+        {
+            return _locationHistoryService.SaveLocationHistoryAsync(collection);
         }
 
         private (decimal Latitude, decimal Longitude, bool IsSuccess) TryFetchCoordinatiesFromFeature(JObject feature)

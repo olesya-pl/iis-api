@@ -6,6 +6,7 @@ using Iis.Interfaces.Elastic;
 using Iis.Interfaces.Enums;
 using Iis.Interfaces.Ontology.Data;
 using Iis.Interfaces.Ontology.Schema;
+using Iis.OntologySchema.DataTypes;
 using Iis.Services.Contracts.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -18,10 +19,11 @@ namespace Iis.Services
 {
     public class AdminOntologyElasticService : IAdminOntologyElasticService
     {
+        private const string LocationPropertyName = "location";
         private readonly IElasticManager _elasticManager;
         private readonly IElasticState _elasticState;
         private readonly IOntologySchema _ontologySchema;
-        private readonly INodeRepository _nodeRepository;
+        private readonly INodeSaveService _nodeRepository;
         private readonly IOntologyNodesData _ontologyNodesData;
         private readonly IReportElasticService _reportElasticService;
         private readonly IReportService _reportService;
@@ -35,7 +37,7 @@ namespace Iis.Services
             IElasticState elasticState,
             IElasticManager elasticManager,
             IOntologySchema ontologySchema,
-            INodeRepository nodeRepository,
+            INodeSaveService nodeRepository,
             IOntologyNodesData ontologyNodesData,
             IReportElasticService reportElasticService,
             IReportService reportService,
@@ -71,6 +73,12 @@ namespace Iis.Services
                 var attributesInfo = isHistorical
                     ? _ontologySchema.GetHistoricalAttributesInfo(index, GetHistoricalIndex(index))
                     : _ontologySchema.GetAttributesInfo(index);
+
+                if(_ontologySchema.GetEntityTypeByName(index).IsObjectSign)
+                {
+                    var singLocationAttribute = new AttributeInfoItem(LocationPropertyName, ScalarType.GeoPoint, null, false);
+                    attributesInfo.TryAddItem(singLocationAttribute);
+                }
 
                 var result = await _elasticManager.CreateMapping(attributesInfo, ct);
 

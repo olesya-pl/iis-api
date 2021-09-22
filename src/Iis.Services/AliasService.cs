@@ -48,7 +48,7 @@ namespace Iis.Services
             return _mapper.Map<AliasDto>(alias);
         }
 
-        public async Task<List<AliasDto>> CreateAsync(List<AliasDto> aliasDtos)
+        public async Task<List<AliasDto>> CreateAsync(IReadOnlyCollection<AliasDto> aliasDtos)
         {
             var aliases = _mapper.Map<List<AliasEntity>>(aliasDtos);
             aliases.ForEach(a => a.Id = Guid.NewGuid());

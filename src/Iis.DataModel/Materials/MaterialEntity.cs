@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using Iis.Interfaces.Enums;
+
 namespace Iis.DataModel.Materials
 {
     public class MaterialEntity : BaseEntity
@@ -116,8 +116,10 @@ namespace Iis.DataModel.Materials
         public string Data { get; set; }
         public string Type { get; set; }
         public string Source { get; set; }
+        public string Channel { get; set; }
         public string Content { get; set; }
         public DateTime CreatedDate { get; set; } = DateTime.Now;
+        public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
         public Guid? ImportanceSignId { get; set; }
         public Guid? ReliabilitySignId { get; set; }
         public Guid? RelevanceSignId { get; set; }
@@ -135,24 +137,25 @@ namespace Iis.DataModel.Materials
         public string LoadData { get; set; }
         public Guid? ProcessedStatusSignId { get; set; }
         public MaterialSignEntity ProcessedStatus { get; set; }
-        public virtual ICollection<MaterialEntity> Children { get; set; }
-        public virtual ICollection<MaterialInfoEntity> MaterialInfos { get; set; }
-        public Guid? AssigneeId { get; set; }
-        public virtual UserEntity Assignee { get; set; }
+        public virtual ICollection<MaterialEntity> Children { get; set; } = new List<MaterialEntity>();
+        public virtual ICollection<MaterialInfoEntity> MaterialInfos { get; set; } = new List<MaterialInfoEntity>();
+        public virtual List<MaterialAssigneeEntity> MaterialAssignees { get; set; } = new List<MaterialAssigneeEntity>();
         public int MlHandlersCount { get; set; }
         public int AccessLevel { get; set; }
+
+        public Guid? EditorId { get; set; }
+        public virtual UserEntity Editor { get; set; }
+
+        public DateTime? RegistrationDate { get; set; }
 
         public bool CanBeEdited(Guid userId)
         {
             if (ProcessedStatusSignId == ProcessingStatusProcessingSignId)
-            {
-                return AssigneeId == userId;
-            }
+                return Editor == null || EditorId == userId;
+
             return true;
         }
 
         public bool CanBeAccessedBy(int accessLevel) => accessLevel >= AccessLevel;
-
-
     }
 }

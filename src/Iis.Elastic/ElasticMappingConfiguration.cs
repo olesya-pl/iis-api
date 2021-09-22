@@ -65,6 +65,7 @@ namespace Iis.Elastic
                 ScalarType.FloatRange => ElasticMappingPropertyType.FloatRange,
                 ScalarType.Date => ElasticMappingPropertyType.Date,
                 ScalarType.DateRange => ElasticMappingPropertyType.DateRange,
+                ScalarType.GeoPoint => ElasticMappingPropertyType.GeoPoint,
                 ScalarType.File => ElasticMappingPropertyType.Nested,
                 _ => ElasticMappingPropertyType.Text,
             };

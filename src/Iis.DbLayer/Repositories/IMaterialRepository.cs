@@ -5,20 +5,22 @@ using Iis.DataModel.Materials;
 using Iis.DbLayer.MaterialEnum;
 using System.Threading;
 using Iis.Domain.Materials;
-using Iis.Interfaces.Elastic;
+using Iis.Services.Contracts.Materials.Distribution;
+using System.Linq.Expressions;
 
 namespace Iis.DbLayer.Repositories
 {
     public interface IMaterialRepository
     {
-        string[] MaterialIndexes { get; }
         Task<MaterialEntity> GetByIdAsync(Guid id, params MaterialIncludeEnum[] includes);
 
         Task<MaterialEntity[]> GetByIdsAsync(ISet<Guid> ids, params MaterialIncludeEnum[] includes);
 
         Task<IEnumerable<MaterialEntity>> GetAllAsync(params MaterialIncludeEnum[] includes);
-        
+
         Task<IEnumerable<MaterialEntity>> GetAllAsync(int limit, params MaterialIncludeEnum[] includes);
+        
+        Task<IEnumerable<MaterialEntity>> GetAllAsync(int limit, int offset, params MaterialIncludeEnum[] includes);
 
         Task<IEnumerable<MaterialEntity>> GetAllForRelatedNodeListAsync(IEnumerable<Guid> nodeIdList);
 
@@ -30,31 +32,25 @@ namespace Iis.DbLayer.Repositories
 
         Task<IEnumerable<MaterialEntity>> GetAllByAssigneeIdAsync(Guid assigneeId);
 
-        Task<List<ElasticBulkResponse>> PutAllMaterialsToElasticSearchAsync(CancellationToken ct = default);
-
-        Task<List<ElasticBulkResponse>> PutCreatedMaterialsToElasticSearchAsync(IReadOnlyCollection<Guid> materialIds, CancellationToken token = default);
-
-        Task<bool> PutMaterialToElasticSearchAsync(Guid materialId, CancellationToken ct = default, bool waitForIndexing = false);
-
         void AddMaterialEntity(MaterialEntity materialEntity);
 
         void AddMaterialInfos(IEnumerable<MaterialInfoEntity> materialEntities);
 
         void AddMaterialFeatures(IEnumerable<MaterialFeatureEntity> materialFeatureEntities);
 
+        void AddMaterialAssignees(IEnumerable<MaterialAssigneeEntity> entities);
+
+        void RemoveMaterialAssignees(IEnumerable<MaterialAssigneeEntity> entities);
+
         void EditMaterial(MaterialEntity materialEntity);
 
-        List<MaterialEntity> GetMaterialByNodeIdQuery(IList<Guid> nodeIds, params MaterialIncludeEnum[] includes);
+        Task<List<Guid>> GetNodeIsWithMaterialsAsync(IReadOnlyCollection<Guid> nodeIdCollection);
 
-        Task<List<Guid>> GetNodeIsWithMaterials(IList<Guid> nodeIds);
+        Task<IReadOnlyCollection<MaterialEntity>> GetMaterialCollectionByNodeIdAsync(IReadOnlyCollection<Guid> nodeIdCollection, params MaterialIncludeEnum[] includes);
 
-        Task<List<MaterialEntity>> GetMaterialByNodeIdQueryAsync(IEnumerable<Guid> nodeIds);
+        Task<IReadOnlyCollection<Guid>> GetMaterialIdCollectionByNodeIdCollectionAsync(IReadOnlyCollection<Guid> nodeIdCollection);
 
-        Task<List<MaterialsCountByType>> GetParentMaterialByNodeIdQueryAsync(IList<Guid> nodeIds);
-
-        List<Guid> GetFeatureIdListThatRelatesToObjectId(Guid nodeId);
-
-        Task<List<ObjectFeatureRelation>> GetFeatureIdListThatRelatesToObjectIdsAsync(IReadOnlyCollection<Guid> nodeIds);
+        Task<List<MaterialsCountByType>> GetParentMaterialByNodeIdQueryAsync(IReadOnlyCollection<Guid> nodeIdCollection);
 
         void AddFeatureIdList(Guid materialId, IEnumerable<Guid> featureIdList);
 
@@ -65,5 +61,11 @@ namespace Iis.DbLayer.Repositories
         Task RemoveMaterialsAndRelatedData(IReadOnlyCollection<Guid> fileIdList);
 
         Task<Guid?> GetParentIdByChildIdAsync(Guid materialId);
+
+        Task<int> GetTotalCountAsync(CancellationToken cancellationToken);
+        Task<IReadOnlyList<MaterialChannelMappingEntity>> GetChannelMappingsAsync();
+        Task<IReadOnlyList<MaterialDistributionItem>> GetMaterialsForDistribution(UserDistributionItem user,
+            Expression<Func<MaterialEntity, bool>> filter);
+        Task SaveDistributionResult(DistributionResult distributionResult);
     }
 }

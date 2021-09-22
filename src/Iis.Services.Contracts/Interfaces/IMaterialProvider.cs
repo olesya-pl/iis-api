@@ -5,10 +5,13 @@ using System.Collections.Generic;
 using Iis.Domain.Materials;
 using Iis.Domain.MachineLearning;
 using Iis.DataModel.Materials;
+using Iis.Services.Contracts.Dtos;
 using Iis.Services.Contracts.Params;
 using Iis.Domain.Users;
 using IIS.Services.Contracts.Materials;
 using Iis.Interfaces.Elastic;
+using System.Linq.Expressions;
+using Iis.Services.Contracts.Materials.Distribution;
 
 namespace IIS.Services.Contracts.Interfaces
 {
@@ -16,7 +19,6 @@ namespace IIS.Services.Contracts.Interfaces
     {
         Task<Material> GetMaterialAsync(Guid id, User user);
         Task<Material[]> GetMaterialsByIdsAsync(ISet<Guid> ids, User user);
-
         Task<MaterialsDto> GetMaterialsAsync(Guid userId,
             string filterQuery,
             IReadOnlyCollection<Property> filteredItems,
@@ -30,7 +32,8 @@ namespace IIS.Services.Contracts.Interfaces
         MaterialSign GetMaterialSign(Guid id);
         Task<List<MLResponse>> GetMLProcessingResultsAsync(Guid materialId);
         Task<MaterialsDto> GetMaterialsByImageAsync(Guid userId, PaginationParams page, string fileName, byte[] content);
-        Task<(IEnumerable<Material> Materials, int Count)> GetMaterialsByNodeIdQuery(Guid nodeId);
+        Task<(IEnumerable<Material> Materials, int Count)> GetMaterialsByNodeId(Guid nodeId);
+        Task<(IEnumerable<Material> Materials, int Count)> GetMaterialsByNodeIdAndRelatedEntities(Guid nodeId);
         Task<MaterialsDto> GetMaterialsCommonForEntitiesAsync(Guid userId,
             IEnumerable<Guid> nodeIdList, 
             bool includeDescendants,
@@ -44,5 +47,10 @@ namespace IIS.Services.Contracts.Interfaces
         Task<(IEnumerable<Material> Materials,  int Count)> GetMaterialsLikeThisAsync(Guid userId, Guid materialId, PaginationParams page, SortingParams sorting);
         Task<bool> MaterialExists(Guid value);
         Task<IReadOnlyCollection<Guid>> GetMaterialsIdsAsync(int limit);
+        Task<Material> GetMaterialAsync(Guid id);
+        Task<IReadOnlyCollection<LocationHistoryDto>> GetLocationHistoriesAsync(Guid materialId);
+        Task<IReadOnlyList<MaterialDistributionItem>> GetMaterialsForDistribution(
+            UserDistributionItem user,
+            Expression<Func<MaterialEntity, bool>> filter);
     }
 }

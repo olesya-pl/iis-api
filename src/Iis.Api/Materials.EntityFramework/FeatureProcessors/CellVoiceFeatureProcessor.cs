@@ -1,14 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using Iis.Domain;
 using Iis.Interfaces.Elastic;
+using Iis.Interfaces.Constants;
+using Iis.Interfaces.Ontology.Schema;
+using Iis.Services.Contracts.Dtos;
 using Iis.Services.Contracts.Interfaces;
 using IIS.Core.GraphQL.Entities.Resolvers;
 using IIS.Core.Materials.FeatureProcessors;
-using Iis.Interfaces.Constants;
-using Newtonsoft.Json.Linq;
-using Iis.Interfaces.Ontology.Schema;
 
 namespace IIS.Core.Materials.EntityFramework.FeatureProcessors
 {
@@ -34,11 +32,6 @@ namespace IIS.Core.Materials.EntityFramework.FeatureProcessors
             { FeatureFields.TMSI, SignFields.TMSI }
         };
 
-        protected override Task PostMetadataProcessingAsync(JObject metadata, Guid materialId)
-        {
-            return _gsmLocationService.TryFillTowerLocationHistory(metadata, materialId);
-        }
-
         public CellVoiceFeatureProcessor(IElasticService elasticService,
             IOntologySchema ontologySchema,
             MutationCreateResolver createResolver,
@@ -51,9 +44,9 @@ namespace IIS.Core.Materials.EntityFramework.FeatureProcessors
             _gsmLocationService = gsmLocationService;
         }
 
-        protected override Task SaveCoordinatesToLocationHistoryAsync(JObject feature)
+        protected override Task<IReadOnlyCollection<LocationHistoryDto>> GetLocationHistoryCollectionAsync(ProcessingMaterialEntry entry)
         {
-            return Task.CompletedTask;
+            return _gsmLocationService.GetLocationHistoryCollectionAsync(entry.Metadata, entry.Id);
         }
     }
 

@@ -12,10 +12,10 @@ namespace Iis.Elastic
         {
         }
 
-        public (LogLevel LogLevel, string Message) PrepareLog(StringResponse response)
+        public static (LogLevel LogLevel, string Message) PrepareLog(string request, StringResponse response)
         {
             
-            var sb = new StringBuilder($"Request {response.HttpMethod} with path {response.Uri} completed. Success:{response.Success} ");
+            var sb = new StringBuilder($"Request {response.HttpMethod} with path {response.Uri} and request {request} completed. Success:{response.Success} ");
             try
             {
                 var json = JObject.Parse(response.Body);

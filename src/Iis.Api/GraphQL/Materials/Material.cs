@@ -1,9 +1,9 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
+using System.Collections.Generic;
 using HotChocolate;
 using HotChocolate.Types;
+using Iis.Api.GraphQL.Entities;
 using Iis.Api.GraphQL.Entities.ObjectTypes;
 using Iis.Interfaces.Materials;
 using Iis.Services.Contracts.Interfaces;
@@ -11,17 +11,22 @@ using IIS.Core.GraphQL.Scalars;
 using IIS.Core.GraphQL.Users;
 using Newtonsoft.Json.Linq;
 using FileInfo = IIS.Core.GraphQL.Files.FileInfo;
+using Iis.Api.GraphQL.Common;
 
 namespace IIS.Core.GraphQL.Materials
 {
     public class Material : IMaterialLoadData
     {
-        [GraphQLType(typeof(NonNullType<IdType>))] public Guid Id { get; set; }
-        [GraphQLIgnore] public Guid? FileId { get; set; }
-        [GraphQLNonNullType, GraphQLType(typeof(JsonScalarType))] public JObject Metadata { get; set; }
+        [GraphQLType(typeof(NonNullType<IdType>))]
+        public Guid Id { get; set; }
+        [GraphQLIgnore]
+        public Guid? FileId { get; set; }
+        [GraphQLNonNullType, GraphQLType(typeof(JsonScalarType))]
+        public JObject Metadata { get; set; }
         public string Type { get; set; }
         public string Source { get; set; }
         public string CreatedDate { get; set; }
+        public string UpdatedAt { get; set; }
         public string Content { get; set; }
         public MaterialSign Importance { get; set; }
         public MaterialSign Reliability { get; set; }
@@ -44,24 +49,27 @@ namespace IIS.Core.GraphQL.Materials
         public IEnumerable<string> Tags { get; set; } = new List<string>();
         public IEnumerable<string> States { get; set; } = new List<string>();
         public IEnumerable<Material> Children { get; set; } = new List<Material>();
-
         [GraphQLType(typeof(JsonScalarType))]
         public JToken Highlight { get; set; }
-
         [GraphQLType(typeof(JsonScalarType))]
         public JObject ObjectsOfStudy { get; set; }
-
         [GraphQLType(typeof(ListType<JsonScalarType>))]
         public IEnumerable<JObject> Events { get; set; }
-
         [GraphQLType(typeof(ListType<JsonScalarType>))]
         public IEnumerable<JObject> Features { get; set; }
-        public User Assignee { get; set; }
+        public IReadOnlyCollection<User> Assignees { get; set; } = Array.Empty<User>();
+        public User Editor { get; set; }
         public int MlHandlersCount { get; set; }
         public int ProcessedMlHandlersCount { get; set; }
         public bool CanBeEdited { get; set; }
         public int AccessLevel { get; set; }
-
+        public IdTitle Caller { get; set; }
+        public IdTitle Receiver { get; set; }
+        public string RegistrationDate { get; set; }
+        public IReadOnlyCollection<GeoCoordinate> CoordinateList { get; set; }
+        public IReadOnlyCollection<RelatedObject> RelatedObjectCollection { get; set; } = Array.Empty<RelatedObject>();
+        public IReadOnlyCollection<RelatedObject> RelatedEventCollection { get; set; } = Array.Empty<RelatedObject>();
+        public IReadOnlyCollection<RelatedObject> RelatedSignCollection { get; set; } = Array.Empty<RelatedObject>();
         public async Task<FileInfo> GetFile([Service] IFileService fileService)
         {
             if (FileId == null) return null;

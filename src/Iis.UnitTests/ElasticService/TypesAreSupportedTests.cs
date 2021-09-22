@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using AutoFixture.Xunit2;
-using Iis.Api;
 using Iis.DbLayer.Repositories;
 using Iis.Interfaces.Elastic;
 using Iis.Interfaces.Ontology.Schema;
@@ -53,7 +52,7 @@ namespace Iis.UnitTests.Iis.Elastic.Tests
             var elasticServiceMock = new Mock<IElasticManager>();
             var elasticConfigurationMock = new Mock<IElasticConfiguration>();
             var ontologySchemaMock = new Mock<IOntologySchema>();
-            var nodeRepositoryMock = new Mock<INodeRepository>();
+            var nodeRepositoryMock = new Mock<INodeSaveService>();
             var materialRepositoryMock = new Mock<IMaterialRepository>();
             var elasticStateMock = new Mock<IElasticState>();
             var elasticResponseManagerFactory = new Mock<IElasticResponseManagerFactory>();

@@ -72,13 +72,16 @@ namespace Iis.Elastic
             return response.Success;
         }
 
-        public async Task<List<ElasticBulkResponse>> PutDocumentsAsync(string indexName, string documents, CancellationToken ct = default)
+        public async Task<List<ElasticBulkResponse>> PutDocumentsAsync(string indexName, string documents, bool waitForIndexing, CancellationToken ct = default)
         {
             if (string.IsNullOrWhiteSpace(indexName))
                 return null;
 
             var indexUrl = $"{GetRealIndexName(indexName)}/_bulk";
-            var response = await PostAsync(indexUrl, documents, ct);
+            var response = await PostAsync(indexUrl, documents, new IndexRequestParameters
+            {
+                Refresh = waitForIndexing ? Refresh.WaitFor : Refresh.False
+            }, ct);
 
             return ParseBulkBodyResponse(response.Body);
         }
@@ -190,7 +193,7 @@ namespace Iis.Elastic
                 ""scroll"" : ""{ scrollDuration.TotalSeconds }s"",                                                                 
                 ""scroll_id"" : ""{scrollId}""
             }}";
-            var response = await PostAsync(path, postData, CancellationToken.None);
+            var response = await PostAsync(path, postData, cancellationToken: CancellationToken.None);
             return _resultExtractor.GetFromResponse(response);
         }
 
@@ -489,10 +492,7 @@ namespace Iis.Elastic
             {
                 var query = new JObject();
                 var queryString = new JObject();
-                queryString["query"] = ApplyFuzzinessOperator(
-                    searchParams.Query
-                        .RemoveSymbols(RemoveSymbolsPattern)
-                        .EscapeSymbols(EscapeSymbolsPattern));
+                queryString["query"] = SearchQueryExtension.ApplyFuzzinessOperator(searchParams.Query);
                 queryString["fuzziness"] = searchFieldGroup.Key.Fuzziness;
                 queryString["boost"] = searchFieldGroup.Key.Boost;
                 queryString["lenient"] = searchParams.IsLenient;
@@ -530,38 +530,13 @@ namespace Iis.Elastic
             return string.Join(',', baseIndexNames.Select(name => GetRealIndexName(name)));
         }
 
-        public static string ApplyFuzzinessOperator(string input)
-        {
-            if (IsWildCard(input))
-            {
-                return input;
-            }
-
-            if(IsDoubleQuoted(input))
-            {
-                return $"{input} OR {input}~";
-            }
-
-            return $"\"{input}\" OR {input}~";
-        }
-
-        private static bool IsWildCard(string input)
-        {
-            return input.Contains('*');
-        }
-
-        private static bool IsDoubleQuoted(string input)
-        {
-            return input.StartsWith('\"') && input.EndsWith('\"');
-        }
-
         private async Task<StringResponse> DoRequestAsync(HttpMethod httpMethod, string path, string data, IRequestParameters requestParameters, CancellationToken cancellationToken)
         {
             using (DurationMeter.Measure($"Elastic request {httpMethod} {path}", _logger))
             {
                 PostData postData = data;
                 var response = await _lowLevelClient.DoRequestAsync<StringResponse>(httpMethod, path, cancellationToken, postData, requestParameters);
-                var log = _responseLogUtils.PrepareLog(response);
+                var log = ElasticLogUtils.PrepareLog(data, response);
                 _logger.Log(log.LogLevel, log.Message);
                 return response;
             }
@@ -618,9 +593,9 @@ namespace Iis.Elastic
             return await DoRequestAsync(HttpMethod.GET, path, data, parameters, cancellationToken);
         }
 
-        private async Task<StringResponse> PostAsync(string path, string data, CancellationToken cancellationToken)
+        private async Task<StringResponse> PostAsync(string path, string data, IRequestParameters requestParameters = null, CancellationToken cancellationToken = default)
         {
-            return await DoRequestAsync(HttpMethod.POST, path, data, null, cancellationToken);
+            return await DoRequestAsync(HttpMethod.POST, path, data, requestParameters, cancellationToken);
         }        
     }
 }

@@ -2,77 +2,73 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Iis.Api.BackgroundServices;
-using Iis.Api.Materials.Handlers;
 using IIS.Core.Materials;
-using Iis.Messages;
 using Iis.Messages.Materials;
-using Iis.Utility;
+using Iis.RabbitMq.Helpers;
+using Iis.RabbitMq.Channels;
+using Iis.Services.Contracts.Configurations;
+using Iis.RabbitMq.Helpers;
+using Iis.RabbitMq.Channels;
+using Iis.Services.Contracts.Configurations;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
-using RabbitMQ.Client.Exceptions;
 
 namespace Iis.Api.Materials
 {
     public class MaterialConsumer : BackgroundService
     {
-        private const int ReConnectTimeoutSec = 5;
+        private const int RetryIntervalSec = 5;
         private const int PrefetchCount = 5;
-        private readonly ILogger<FeatureHandler> _logger;
+        private readonly ILogger<MaterialConsumer> _logger;
         private IConnection _connection;
-        private IModel _channel;
+        private IConnectionFactory _connectionFactory;
+        private MaterialConsumerConfiguration _configuration;
+        private IConsumeMessageChannel<MaterialCreatedMessage> _consumeChannel;
         private readonly IServiceProvider _serviceProvider;
 
         public MaterialConsumer(
-            ILogger<FeatureHandler> logger,
+            ILogger<MaterialConsumer> logger,
             IConnectionFactory connectionFactory,
+            MaterialConsumerConfiguration configuration,
             IServiceProvider serviceProvider)
         {
             _logger = logger;
+            _connectionFactory = connectionFactory;
             _serviceProvider = serviceProvider;
-
-            while (true)
-            {
-                try
-                {
-                    _connection = connectionFactory.CreateConnection();
-                    break;
-                }
-                catch (BrokerUnreachableException)
-                {
-                    _logger.LogError($"Attempting to connect again in {ReConnectTimeoutSec} sec.");
-
-                    Thread.Sleep(ReConnectTimeoutSec * 1000);
-                }
-            }
-
-            _channel = _connection.CreateModel();
+            _configuration = configuration;
         }
 
         protected override Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            _channel.QueueDeclare(
-                queue: MaterialRabbitConsts.QueueName,
-                durable: true,
-                exclusive: false,
-                autoDelete: false);
+            _connection = _connectionFactory.CreateAndWaitConnection(RetryIntervalSec, _logger, _configuration.HandlerName);
 
-            _channel.BasicQos(0, PrefetchCount, global: false);
+            _consumeChannel = new ConsumeMessageChannel<MaterialCreatedMessage>(
+                _connection,
+                _configuration.SourceChannel,
+                _logger
+            );
 
-            ConfigureConsumer(_channel, ProcessMessage);
+            _consumeChannel.OnMessageReceived = ProcessMessage;
 
             return Task.CompletedTask;
         }
 
         public override void Dispose()
         {
-            _channel.Close();
-            _channel.Dispose();
+            if(_consumeChannel != null)
+            {
+                _consumeChannel.Dispose();
+                _consumeChannel = null;
+            }
 
-            _connection.Close();
-            _connection.Dispose();
+            if(_connection != null)
+            {
+                _connection.Close();
+                _connection.Dispose();
+            }
 
             base.Dispose();
         }
@@ -91,46 +87,17 @@ namespace Iis.Api.Materials
                     eventProducer.SendAvailableForOperatorEvent(message.MaterialId);
                 }
 
-                var materialEvent = new MaterialEventMessage
+                var materialEvent = new MaterialProcessingEventMessage
                 {
                     Id = message.MaterialId,
                     Source = message.Source,
                     Type = message.Type
                 };
 
-                eventProducer.SendMaterialEvent(materialEvent);
-                eventProducer.SendMaterialFeatureEvent(materialEvent);
+                eventProducer.SendMaterialProcessingEvent(materialEvent);
 
                 return Task.CompletedTask;
             }
-        }
-
-        private void ConfigureConsumer(IModel channel, Func<MaterialCreatedMessage, Task> handler)
-        {
-            var channelConsumer = new AsyncEventingBasicConsumer(channel);
-
-            channelConsumer.Received += async (sender, args) =>
-            {
-                try
-                {
-                    if (args.Body.LongLength == 0)
-                    {
-                        throw new InvalidOperationException("We received empty message.");
-                    }
-
-                    await handler(args.Body.FromBytes<MaterialCreatedMessage>());
-
-                    channel.BasicAck(args.DeliveryTag, false);
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError("Exception {ex} during receiving message.", ex);
-
-                    channel.BasicReject(args.DeliveryTag, false);
-                }
-            };
-
-            channel.BasicConsume(queue: MaterialRabbitConsts.QueueName, false, consumer: channelConsumer);
         }
     }
 }

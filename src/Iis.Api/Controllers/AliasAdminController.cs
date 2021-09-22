@@ -12,7 +12,7 @@ namespace Iis.Api.Controllers
     [ApiController]
     public class AliasAdminController : ControllerBase
     {
-        public readonly IAliasService _aliasService;
+        private readonly IAliasService _aliasService;
 
         public AliasAdminController(IAliasService aliasService)
         {
@@ -22,7 +22,6 @@ namespace Iis.Api.Controllers
         [HttpGet]
         public Task<List<AliasDto>> GetAsync([FromQuery] AliasType? type) 
         {
-            
             return type.HasValue
                 ? _aliasService.GetByTypeAsync(type.Value)
                 : _aliasService.GetAllAsync();
@@ -47,7 +46,7 @@ namespace Iis.Api.Controllers
         }
 
         [HttpPost("list")]
-        public Task<List<AliasDto>> CreateAliasesAsync([FromBody] List<AliasDto> aliases) 
+        public Task<List<AliasDto>> CreateAliasesAsync([FromBody] IReadOnlyCollection<AliasDto> aliases) 
         {
             return _aliasService.CreateAsync(aliases);
         }

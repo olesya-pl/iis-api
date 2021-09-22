@@ -39,7 +39,7 @@ Feature: ObjectsOfStudySection - smoke
         Then I must see Тестове найменування дійсне скорочене title of the object
         When I clicked on the Objects section
         And I clicked on search button in the Object of study section
-        And I searched Тестове найменування дійсне скорочене data in the Objects of study section
+        And I searched Тестове найменування дійсне скорочене data created today in the Objects of study section
         When I clicked on the first search result title in the Objects of study section
         Then I must see the title Тестове найменування дійсне скорочене in the small card
 

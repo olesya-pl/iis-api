@@ -19,12 +19,19 @@ namespace Iis.Services
     public class ChangeHistoryService<TUnitOfWork> : BaseService<TUnitOfWork>, IChangeHistoryService where TUnitOfWork : IIISUnitOfWork
     {
         private const string DefaultSignLocationPropName = "sign.location";
-        private readonly IOntologyNodesData _ontologyNodesData;
         private readonly IMapper _mapper;
-        public ChangeHistoryService(IUnitOfWorkFactory<TUnitOfWork> unitOfWorkFactory, IMapper mapper, IOntologyNodesData ontologyNodesData) : base(unitOfWorkFactory)
+        private readonly IOntologyNodesData _ontologyNodesData;
+        private readonly IMaterialElasticService _materialElasticService;
+
+        public ChangeHistoryService(IUnitOfWorkFactory<TUnitOfWork> unitOfWorkFactory,
+            IMapper mapper,
+            IOntologyNodesData ontologyNodesData,
+            IMaterialElasticService materialElasticService)
+            : base(unitOfWorkFactory)
         {
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
             _ontologyNodesData = ontologyNodesData ?? throw new ArgumentNullException(nameof(ontologyNodesData));
+            _materialElasticService = materialElasticService ?? throw new ArgumentNullException(nameof(materialElasticService));
         }
 
         public async Task SaveNodeChange(
@@ -114,6 +121,9 @@ namespace Iis.Services
 
         public async Task SaveMaterialChanges(IReadOnlyCollection<ChangeHistoryDto> changes, string materialTitle = null)
         {
+            if (changes.Count == 0)
+                return;
+
             var entities = _mapper.Map<List<ChangeHistoryEntity>>(changes);
             var mirrorEntities = new List<ChangeHistoryEntity>();
 
@@ -130,7 +140,9 @@ namespace Iis.Services
                 }
             }
             entities.AddRange(mirrorEntities);
+
             await RunAsync(uow => uow.ChangeHistoryRepository.AddRange(entities));
+            await _materialElasticService.PutMaterialChangesToElasticSearchAsync(entities, waitForIndexing: true);
         }
 
         private ChangeHistoryEntity GetMirrorChangeHistoryEntity(ChangeHistoryEntity entity, string materialTitle)
@@ -140,7 +152,7 @@ namespace Iis.Services
                 Id = Guid.NewGuid(),
                 TargetId = Guid.Parse(entity.OldValue ?? entity.NewValue),
                 UserName = entity.UserName,
-                PropertyName = "MaterialLink",
+                PropertyName = ChangeHistoryDocument.MaterialLinkPropertyName,
                 Date = entity.Date,
                 OldValue = entity.OldValue == null ? null : entity.TargetId.ToString("N"),
                 NewValue = entity.NewValue == null ? null : entity.TargetId.ToString("N"),

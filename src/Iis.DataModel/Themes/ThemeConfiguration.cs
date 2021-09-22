@@ -1,8 +1,10 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Iis.DataModel.Themes
 {
+    [DbContext(typeof(OntologyContext))]
     internal class ThemeConfiguration : IEntityTypeConfiguration<ThemeEntity>
     {
         public void Configure(EntityTypeBuilder<ThemeEntity> builder)
@@ -36,7 +38,10 @@ namespace Iis.DataModel.Themes
                 .IsRequired()
                 .HasDefaultValue(0);
 
-            builder.Property(p => p.Meta)
+            builder.Property(p => p.UnreadCount)
+                .IsRequired();
+            
+                builder.Property(p => p.Meta)
                 .HasColumnType("jsonb");
 
             builder.Property(p => p.QueryRequest)

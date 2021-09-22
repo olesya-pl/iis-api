@@ -137,6 +137,7 @@ namespace Iis.DbLayer.Elastic
                 nameof(MaterialDocument.Type),
                 nameof(MaterialDocument.Content),
                 nameof(MaterialDocument.CreatedDate),
+                nameof(MaterialDocument.UpdatedAt),
                 nameof(MaterialDocument.Importance),
                 nameof(MaterialDocument.Reliability),
                 nameof(MaterialDocument.Relevance),
@@ -152,7 +153,8 @@ namespace Iis.DbLayer.Elastic
                 $"{nameof(MaterialDocument.Metadata)}.*",
                 $"{nameof(MaterialDocument.Transcriptions)}.*",
                 $"{nameof(MaterialDocument.Children)}.*",
-                $"{nameof(MaterialDocument.Assignee)}.*"
+                $"{nameof(MaterialDocument.Assignees)}.*",
+                $"{nameof(MaterialDocument.Editor)}.*"
             };
         }
 

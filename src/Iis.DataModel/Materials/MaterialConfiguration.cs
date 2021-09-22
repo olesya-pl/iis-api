@@ -1,10 +1,11 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Iis.Interfaces.Enums;
 
 namespace Iis.DataModel.Materials
 {
-    internal sealed class MaterialConfiguration: IEntityTypeConfiguration<MaterialEntity>
+    [DbContext(typeof(OntologyContext))]
+    internal sealed class MaterialConfiguration : IEntityTypeConfiguration<MaterialEntity>
     {
         public void Configure(EntityTypeBuilder<MaterialEntity> builder)
         {
@@ -63,13 +64,12 @@ namespace Iis.DataModel.Materials
                 .IsRequired(true)
                 .HasDefaultValue(MaterialEntity.ProcessingStatusNotProcessedSignId);
 
-            builder.Property(e => e.ParentId).IsRequired(false);
-            builder.Property(e => e.FileId).IsRequired(false);
-
             builder
-                .HasOne(e => e.Assignee)
-                .WithMany(e => e.Materials)
-                .HasForeignKey(e => e.AssigneeId);
+                .Property(e => e.ParentId)
+                .IsRequired(false);
+            builder
+                .Property(e => e.FileId)
+                .IsRequired(false);
 
             builder.Property(e => e.MlHandlersCount)
                 .IsRequired(true)
@@ -77,10 +77,19 @@ namespace Iis.DataModel.Materials
 
             builder.Property(e => e.Content)
                 .IsRequired(true)
-                .HasDefaultValue("");
+                .HasDefaultValue(string.Empty);
 
             builder.Property(e => e.AccessLevel)
                 .HasDefaultValue(0);
+
+            builder
+                .HasOne(e => e.Editor)
+                .WithMany()
+                .HasForeignKey(e => e.EditorId);
+
+            builder
+                .Property(e => e.UpdatedAt)
+                .HasDefaultValueSql("timezone('utc', now())");
         }
     }
 }

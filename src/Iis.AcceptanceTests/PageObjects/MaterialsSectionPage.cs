@@ -54,7 +54,10 @@ namespace AcceptanceTests.PageObjects
         [CacheLookup]
         public IWebElement EventsSearch;
 
-		[FindsBy(How = How.CssSelector, Using = ".sidebar__nav li.objects")]
+        [FindsBy(How = How.CssSelector, Using = ".material-objects input")]
+        public IWebElement ObjectsSearch;
+
+        [FindsBy(How = How.CssSelector, Using = ".sidebar__nav li.objects")]
         public IWebElement ObjectsTabSearch;
 
         public MaterialPage MaterialPage => new MaterialPage(driver);
@@ -63,7 +66,7 @@ namespace AcceptanceTests.PageObjects
         [CacheLookup]
         public IWebElement AuthenticityDropDown;
 
-        [FindsBy(How = How.CssSelector, Using = "div:nth-of-type(3) > .el-form-item__content > .el-select.el-tooltip  .el-input__inner")]
+        [FindsBy(How = How.CssSelector, Using = ".material-general .material-intelligence .action-select--relevance")]
         [CacheLookup]
         public IWebElement RelevanceDropDown;
 
@@ -125,6 +128,15 @@ namespace AcceptanceTests.PageObjects
 
         [FindsBy(How = How.CssSelector, Using = ".icon-wrapper-close")]
         public IWebElement CloseMaterialCardButton;
+
+        [FindsBy(How = How.CssSelector, Using = "button.action-button--important")]
+        public IWebElement MaterialImportantButton;
+
+        [FindsBy(How = How.CssSelector, Using = "button.action-button--immediateReport")]
+        public IWebElement MaterialImmediateReportButton;
+
+        [FindsBy(How = How.CssSelector, Using = "button.action-button--translation")]
+        public IWebElement MaterialTranslationButton;
 
         public void ScrollToEnd()
         {

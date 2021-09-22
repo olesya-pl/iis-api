@@ -12,6 +12,8 @@ namespace Iis.Interfaces.Ontology.Schema
         Json = 7,
         DateRange = 8,
         IntegerRange = 9,
-        FloatRange = 10
+        FloatRange = 10,
+        [System.Obsolete]
+        GeoPoint = 11
     }
 }

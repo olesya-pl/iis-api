@@ -1,6 +1,5 @@
 using System;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using AutoMapper;
@@ -14,7 +13,6 @@ using Iis.DbLayer.MaterialEnum;
 using Iis.DbLayer.MaterialDictionaries;
 using Iis.DataModel.Materials;
 using Iis.Interfaces.Roles;
-using Iis.Interfaces.Elastic;
 using Iis.Interfaces.Materials;
 using IIS.Repository;
 using IIS.Repository.Factories;
@@ -25,11 +23,14 @@ using Iis.Interfaces.Common;
 using Microsoft.Extensions.Logging;
 using Iis.Domain.Users;
 using IIS.Services.Contracts.Interfaces;
+using Iis.Services.Contracts.Materials.Distribution;
 
 namespace IIS.Core.Materials.EntityFramework
 {
-    public class MaterialService<TUnitOfWork> : BaseService<TUnitOfWork>, IMaterialService, IMaterialPutToElasticService where TUnitOfWork : IIISUnitOfWork
+    public class MaterialService<TUnitOfWork> : BaseService<TUnitOfWork>, IMaterialService where TUnitOfWork : IIISUnitOfWork
     {
+        private const string AssigneeNameSeparator = "; ";
+
         private readonly IMapper _mapper;
         private readonly IFileService _fileService;
         private readonly IMaterialEventProducer _eventProducer;
@@ -40,6 +41,7 @@ namespace IIS.Core.Materials.EntityFramework
         private readonly IUserService _userService;
         private readonly ICommonData _commonData;
         private readonly ILogger<MaterialService<TUnitOfWork>> _logger;
+        private readonly IMaterialElasticService _materialElasticService;
 
         public MaterialService(IFileService fileService,
             IMapper mapper,
@@ -52,7 +54,8 @@ namespace IIS.Core.Materials.EntityFramework
             IMaterialSignRepository materialSignRepository,
             IUnitOfWorkFactory<TUnitOfWork> unitOfWorkFactory,
             ICommonData commonData,
-            ILogger<MaterialService<TUnitOfWork>> logger) : base(unitOfWorkFactory)
+            ILogger<MaterialService<TUnitOfWork>> logger,
+            IMaterialElasticService materialElasticService) : base(unitOfWorkFactory)
         {
             _fileService = fileService;
             _mapper = mapper;
@@ -64,6 +67,7 @@ namespace IIS.Core.Materials.EntityFramework
             _materialSignRepository = materialSignRepository;
             _commonData = commonData;
             _logger = logger;
+            _materialElasticService = materialElasticService;
         }
 
         public async Task SaveAsync(Material material, Guid? changeRequestId = null)
@@ -92,7 +96,8 @@ namespace IIS.Core.Materials.EntityFramework
                 ParentId = material.ParentId,
                 CreatedDate = material.CreatedDate,
                 Type = material.Type,
-                Source = material.Source
+                Source = material.Source,
+                Channel = material.Channel
             };
         }
 
@@ -114,6 +119,14 @@ namespace IIS.Core.Materials.EntityFramework
                     Date = timeSpan,
                     NewValue = material.Source,
                     PropertyName = nameof(material.Source),
+                    RequestId = changeRequestId,
+                    TargetId = material.Id,
+                },
+                new ChangeHistoryDto
+                {
+                    Date = timeSpan,
+                    NewValue = material.Channel,
+                    PropertyName = nameof(material.Channel),
                     RequestId = changeRequestId,
                     TargetId = material.Id,
                 },
@@ -183,16 +196,13 @@ namespace IIS.Core.Materials.EntityFramework
 
             responseEntity = await _mLResponseRepository.SaveAsync(responseEntity);
 
-            await RunWithoutCommitAsync(uow => uow.MaterialRepository.PutMaterialToElasticSearchAsync(responseEntity.MaterialId));
+            await _materialElasticService.PutMaterialToElasticSearchAsync(responseEntity.MaterialId);
 
-            if(responseEntity.HandlerCode == MlHandlerCodeList.ImageVector)
+            if (responseEntity.HandlerCode == MlHandlerCodeList.ImageVector)
             {
                 var parentId = await RunWithoutCommitAsync(uow => uow.MaterialRepository.GetParentIdByChildIdAsync(responseEntity.MaterialId));
-
-                if(parentId.HasValue)
-                {
-                    await RunWithoutCommitAsync(uow => uow.MaterialRepository.PutMaterialToElasticSearchAsync(parentId.Value));
-                }
+                if (parentId.HasValue)
+                    await _materialElasticService.PutMaterialToElasticSearchAsync(parentId.Value);
             }
 
             return _mapper.Map<MLResponse>(responseEntity);
@@ -279,29 +289,6 @@ namespace IIS.Core.Materials.EntityFramework
                     material.SessionPriorityId = p;
                 });
 
-                await input.AssigneeId.DoIfHasValueAsync(async p =>
-                {
-
-                    if (material.AssigneeId.HasValue && material.AssigneeId.Value == p)
-                    {
-                        return;
-                    }
-
-                    var user = await RunWithoutCommitAsync(uowfactory => uowfactory.UserRepository.GetByIdAsync(p, CancellationToken.None));
-
-                    changesList.Add(new ChangeHistoryDto
-                    {
-                        Date = DateTime.UtcNow,
-                        NewValue = user.Username,
-                        OldValue = material.Assignee?.Username?.ToString(),
-                        PropertyName = nameof(material.Assignee),
-                        RequestId = changeRequestId,
-                        TargetId = material.Id,
-                        UserName = username
-                    });
-                    material.Assignee = null;
-                    material.AssigneeId = input.AssigneeId;
-                });
                 var eventReassignmentNeeded = false;
                 if (input.Content != null && !string.Equals(material.Content, input.Content, StringComparison.Ordinal))
                 {
@@ -343,7 +330,14 @@ namespace IIS.Core.Materials.EntityFramework
 
                 Run((unitOfWork) => { unitOfWork.MaterialRepository.EditMaterial(material); });
 
-                var fillElasticTask = RunWithoutCommitAsync(unitOfWork => unitOfWork.MaterialRepository.PutMaterialToElasticSearchAsync(material.Id, waitForIndexing: true));
+                if (input.AssigneeIds != null)
+                {
+                    var change = await AssignMaterialOperatorsAsync(material, input.AssigneeIds.ToHashSet(), user, changeRequestId);
+                    if (change != default)
+                        changesList.Add(change);
+                }
+
+                var fillElasticTask = _materialElasticService.PutMaterialToElasticSearchAsync(material.Id, waitForIndexing: true);
 
                 var addHistoryTask = _changeHistoryService.SaveMaterialChanges(changesList);
 
@@ -396,11 +390,11 @@ namespace IIS.Core.Materials.EntityFramework
 
         private void QueueMaterialForMachineLearning(MaterialEntity material)
         {
-            _eventProducer.SendMaterialEvent(new MaterialEventMessage { Id = material.Id, Source = material.Source, Type = material.Type });
+            _eventProducer.SendMaterialEvent(new MaterialProcessingEventMessage { Id = material.Id, Source = material.Source, Type = material.Type });
 
             foreach (var child in material.Children)
             {
-                _eventProducer.SendMaterialEvent(new MaterialEventMessage { Id = child.Id, Source = child.Source, Type = child.Type });
+                _eventProducer.SendMaterialEvent(new MaterialProcessingEventMessage { Id = child.Id, Source = child.Source, Type = child.Type });
             }
         }
 
@@ -409,33 +403,89 @@ namespace IIS.Core.Materials.EntityFramework
             return material.ProcessedStatusSignId.HasValue && material.ProcessedStatusSignId == MaterialEntity.ProcessingStatusProcessedSignId;
         }
 
-        public Task AssignMaterialsOperatorAsync(ISet<Guid> materialIds, Guid assigneeId, User user)
+        public Task AssignMaterialOperatorAsync(ISet<Guid> materialIds, ISet<Guid> assigneeIds, User user)
         {
-            var tasks = new List<Task>();
-
-            foreach (var materialId in materialIds)
-            {
-                tasks.Add(AssignMaterialOperatorAsync(materialId, assigneeId, user));
-            }
+            var tasks = materialIds.Select(_ => AssignMaterialOperatorsAsync(_, assigneeIds, user));
 
             return Task.WhenAll(tasks);
         }
 
-        public async Task AssignMaterialOperatorAsync(Guid materialId, Guid assigneeId, User user = null)
+        public Task SaveDistributionResult(DistributionResult distributionResult)
         {
-            var accessLevel = user?.AccessLevel ?? int.MaxValue;
+            return RunAsync(_ => _.MaterialRepository.SaveDistributionResult(distributionResult));
+        }
 
-            var material = await RunWithoutCommitAsync(async unitOfWork =>
-                await unitOfWork.MaterialRepository.GetByIdAsync(materialId));
-            if (material == null || !material.CanBeAccessedBy(accessLevel))
-            {
+        public async Task AssignMaterialOperatorsAsync(Guid materialId, ISet<Guid> assigneeIds, User user)
+        {
+            var material = await RunWithoutCommitAsync(_ => _.MaterialRepository.GetByIdAsync(materialId));
+            if (material == null
+                || !material.CanBeAccessedBy(user.AccessLevel))
                 return;
-            }
-            material.AssigneeId = assigneeId;
-            material.Assignee = null;
-            Run(unitOfWork => unitOfWork.MaterialRepository.EditMaterial(material));
-            await RunWithoutCommitAsync(async unitOfWork =>
-                await unitOfWork.MaterialRepository.PutMaterialToElasticSearchAsync(material.Id));
+
+            var existingMaterialAssigneeIds = material.MaterialAssignees.Select(_ => _.AssigneeId);
+            IReadOnlyCollection<Guid> addedAssigneeIds = assigneeIds.Except(existingMaterialAssigneeIds).ToArray();
+            if (addedAssigneeIds.Count == 0)
+                return;
+
+            var addedAssignees = await RunWithoutCommitAsync(_ => _.UserRepository.GetOperatorsAsync(user => addedAssigneeIds.Contains(user.Id)));
+            var oldAssigneeNames = material.MaterialAssignees.Select(_ => _.Assignee.Username).ToArray();
+            string oldValue = GetAssigneeChangeValue(oldAssigneeNames);
+            var addedAssigneeNames = addedAssignees.Select(_ => _.Username);
+            string newValue = GetAssigneeChangeValue(oldAssigneeNames.Concat(addedAssigneeNames));
+
+            var addedEntities = addedAssignees.Select(_ => MaterialAssigneeEntity.CreateFrom(material.Id, _.Id));
+
+            await RunAsync(_ => _.MaterialRepository.AddMaterialAssignees(addedEntities));
+
+            var change = new ChangeHistoryDto
+            {
+                Date = DateTime.UtcNow,
+                NewValue = newValue,
+                OldValue = oldValue,
+                PropertyName = nameof(material.MaterialAssignees),
+                RequestId = Guid.NewGuid(),
+                TargetId = material.Id,
+                UserName = user.UserName
+            };
+
+            var putToElasticTask = _materialElasticService.PutMaterialToElasticSearchAsync(material.Id);
+            var addHistoryTask = _changeHistoryService.SaveMaterialChanges(change.AsReadOnlyCollection());
+
+            await Task.WhenAll(putToElasticTask, addHistoryTask);
+        }
+
+        public async Task<bool> AssignMaterialEditorAsync(Guid materialId, User user)
+        {
+            var accessLevel = user.AccessLevel;
+            var material = await RunWithoutCommitAsync(_ => _.MaterialRepository.GetByIdAsync(materialId));
+            if (material == null
+                || material.EditorId != null
+                || !material.CanBeAccessedBy(accessLevel))
+                return false;
+
+            material.EditorId = user.Id;
+
+            Run(_ => _.MaterialRepository.EditMaterial(material));
+            await _materialElasticService.PutMaterialToElasticSearchAsync(material.Id);
+
+            return true;
+        }
+
+        public async Task<bool> UnassignMaterialEditorAsync(Guid materialId, User user)
+        {
+            var accessLevel = user.AccessLevel;
+            var material = await RunWithoutCommitAsync(_ => _.MaterialRepository.GetByIdAsync(materialId));
+            if (material == null
+                || material.EditorId != user.Id
+                || !material.CanBeAccessedBy(accessLevel))
+                return false;
+
+            material.EditorId = null;
+
+            Run(_ => _.MaterialRepository.EditMaterial(material));
+            await _materialElasticService.PutMaterialToElasticSearchAsync(material.Id);
+
+            return true;
         }
 
         public async Task SetMachineLearningHadnlersCount(Guid materialId, int handlersCount)
@@ -450,8 +500,7 @@ namespace IIS.Core.Materials.EntityFramework
 
             material.MlHandlersCount += handlersCount;
             Run(unitOfWork => unitOfWork.MaterialRepository.EditMaterial(material));
-            await RunWithoutCommitAsync(async unitOfWork =>
-                await unitOfWork.MaterialRepository.PutMaterialToElasticSearchAsync(material.Id));
+            await _materialElasticService.PutMaterialToElasticSearchAsync(material.Id);
         }
 
         private MaterialInfoEntity Map(MaterialInfo info, Guid materialId)
@@ -467,23 +516,13 @@ namespace IIS.Core.Materials.EntityFramework
             };
         }
 
-        public Task<List<ElasticBulkResponse>> PutAllMaterialsToElasticSearchAsync(CancellationToken ct)
-        {
-            return RunWithoutCommitAsync(uow => uow.MaterialRepository.PutAllMaterialsToElasticSearchAsync(ct));
-        }
-
-        public Task<List<ElasticBulkResponse>> PutCreatedMaterialsToElasticSearchAsync(IReadOnlyCollection<Guid> materialIds, CancellationToken ct)
-        {
-            return RunWithoutCommitAsync(uow => uow.MaterialRepository.PutCreatedMaterialsToElasticSearchAsync(materialIds, ct));
-        }
-
         public async Task<Material> ChangeMaterialAccessLevel(Guid materialId, int accessLevel, User user)
         {
             var accessLevelValidationResult = IsValidAccessLevel(accessLevel);
 
             if (!accessLevelValidationResult.IsValid) throw new ArgumentException("Wrong Access level value");
 
-            if( !IsUserAuthorizedForChangeAccessLevel(user) || !_userService.IsAccessLevelAllowedForUser(user.AccessLevel, accessLevelValidationResult.Value))
+            if (!IsUserAuthorizedForChangeAccessLevel(user) || !_userService.IsAccessLevelAllowedForUser(user.AccessLevel, accessLevelValidationResult.Value))
             {
                 throw new InvalidOperationException($"Unable to change AccessLevel by user {user.UserName}");
             }
@@ -505,7 +544,7 @@ namespace IIS.Core.Materials.EntityFramework
 
             Run(uow => uow.MaterialRepository.EditMaterial(material));
 
-            var elasticTask = RunWithoutCommitAsync(unitOfWork => unitOfWork.MaterialRepository.PutMaterialToElasticSearchAsync(material.Id, waitForIndexing: true));
+            var elasticTask = _materialElasticService.PutMaterialToElasticSearchAsync(material.Id, waitForIndexing: true);
 
             var changeHistoryTask = _changeHistoryService.SaveMaterialChanges(new[] { changeHistory });
 
@@ -536,5 +575,50 @@ namespace IIS.Core.Materials.EntityFramework
         {
             return user.IsGranted(AccessKind.Material, AccessOperation.AccessLevelUpdate, AccessCategory.Entity);
         }
+
+        private async Task<ChangeHistoryDto> AssignMaterialOperatorsAsync(
+            MaterialEntity material,
+            ISet<Guid> assigneeIds,
+            User user,
+            Guid changeRequestId)
+        {
+            var existingAssignees = await RunWithoutCommitAsync(_ => _.UserRepository.GetOperatorsAsync(user => assigneeIds.Contains(user.Id)));
+            var existingAssigneeDictionary = existingAssignees.ToDictionary(_ => _.Id);
+            var existingMaterialAssigneeIds = material.MaterialAssignees.Select(_ => _.AssigneeId);
+            var (added, removed) = existingAssigneeDictionary.Keys.GetChanges(existingMaterialAssigneeIds);
+            if (added.Count == 0
+                && removed.Count == 0)
+                return default;
+
+            string oldValue = GetAssigneeChangeValue(material.MaterialAssignees.Select(_ => _.Assignee.Username));
+            string newValue = GetAssigneeChangeValue(existingAssignees.Select(_ => _.Username));
+
+            await RunAsync(unitOfWork =>
+            {
+                if (added.Count > 0)
+                {
+                    var addedEntities = added.Select(_ => MaterialAssigneeEntity.CreateFrom(material.Id, _));
+                    unitOfWork.MaterialRepository.AddMaterialAssignees(addedEntities);
+                }
+                if (removed.Count > 0)
+                {
+                    var removedEntities = removed.Select(_ => MaterialAssigneeEntity.CreateFrom(material.Id, _));
+                    unitOfWork.MaterialRepository.RemoveMaterialAssignees(removedEntities);
+                }
+            });
+
+            return new ChangeHistoryDto
+            {
+                Date = DateTime.UtcNow,
+                NewValue = newValue,
+                OldValue = oldValue,
+                PropertyName = nameof(material.MaterialAssignees),
+                RequestId = changeRequestId,
+                TargetId = material.Id,
+                UserName = user.UserName
+            };
+        }
+
+        private string GetAssigneeChangeValue(IEnumerable<string> userNames) => string.Join(AssigneeNameSeparator, userNames);
     }
 }

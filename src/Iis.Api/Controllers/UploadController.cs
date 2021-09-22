@@ -134,18 +134,19 @@ namespace Iis.Api.Controllers
             var fullDataName = Path.Combine(directory, dataFileName);
             var userName = user?.FullUserName ?? string.Empty;
 
-            using (var fs = new FileStream(fileName, FileMode.Create, FileAccess.Write))
-            {
-                _logger.LogInformation("UploadController. Copying file to {directory}", directory);
-                await fileStream.CopyToAsync(fs);
-            }
             using (var sw = System.IO.File.CreateText(fullDataName))
             {
                 var accessLine = $"{AccessLevelPropertyName}: {input.AccessLevel}";
                 var loadedByLine = $"{LoadedByPropertyName}: {userName}";
                 await sw.WriteLineAsync(accessLine);
                 await sw.WriteLineAsync(loadedByLine);
-                _logger.LogInformation("UploadController. Generating data file. Access level {accessLine} Loaded by {loadedByLine}", accessLine, loadedByLine);
+                _logger.LogInformation("UploadController. Generating data file for {fileName}. Access level {accessLine} Loaded by {loadedByLine}", input.Name, accessLine, loadedByLine);
+            }
+
+            using (var fs = new FileStream(fileName, FileMode.Create, FileAccess.Write))
+            {
+                _logger.LogInformation("UploadController. Copying file {fileName} to {directory}", input.Name, directory);
+                await fileStream.CopyToAsync(fs);
             }
 
             return UploadResult.Ok;

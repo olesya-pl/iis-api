@@ -7,8 +7,7 @@ using Iis.DataModel;
 using Iis.DataModel.Materials;
 using Iis.Domain.Materials;
 using Iis.MaterialLoader.Models;
-using Iis.MaterialLoader.Rabbit;
-using Iis.Messages;
+using Iis.RabbitMq.Channels;
 using Iis.Messages.Materials;
 using Iis.Services.Contracts.Dtos;
 using Iis.Services.Contracts.Interfaces;
@@ -20,19 +19,20 @@ namespace Iis.MaterialLoader.Services
     {
         private readonly IMapper _mapper;
         private readonly IFileService _fileService;
-        private readonly IMaterialEventProducer _eventProducer;
         private readonly IChangeHistoryService _changeHistoryService;
         private readonly OntologyContext _dbContext;
+        private readonly IPublishMessageChannel<MaterialCreatedMessage> _targetChannel;
 
         public MaterialService(IFileService fileService,
             IMapper mapper,
-            IMaterialEventProducer eventProducer,
-            IChangeHistoryService changeHistoryService, OntologyContext dbContext)
+            IChangeHistoryService changeHistoryService,
+            IPublishMessageChannel<MaterialCreatedMessage> targetChannel,
+            OntologyContext dbContext)
         {
             _fileService = fileService;
             _mapper = mapper;
-            _eventProducer = eventProducer;
             _changeHistoryService = changeHistoryService;
+            _targetChannel = targetChannel;
             _dbContext = dbContext;
         }
 
@@ -51,7 +51,7 @@ namespace Iis.MaterialLoader.Services
             await SaveMaterialChildren(material, requestId);
             await SaveMaterialInfoEntities(material);
 
-            _eventProducer.PublishMaterialCreatedMessage(CreatedMessage(material));
+            _targetChannel.Send(CreatedMessage(material));
 
             return material;
         }
@@ -65,7 +65,8 @@ namespace Iis.MaterialLoader.Services
                 ParentId = material.ParentId,
                 CreatedDate = material.CreatedDate,
                 Type = material.Type,
-                Source = material.Source
+                Source = material.Source,
+                Channel = material.Channel
             };
         }
 
@@ -205,7 +206,8 @@ namespace Iis.MaterialLoader.Services
                 .Include(m => m.SourceReliability)
                 .Include(m => m.ProcessedStatus)
                 .Include(m => m.SessionPriority)
-                .Include(m => m.Assignee)
+                .Include(m => m.MaterialAssignees)
+                    .ThenInclude(m => m.Assignee)
                 .AsNoTracking();
         }
     }    

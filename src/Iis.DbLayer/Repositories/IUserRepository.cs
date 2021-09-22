@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Iis.DataModel;
+using Iis.DataModel.Roles;
+using System.ComponentModel;
 
 namespace Iis.DbLayer.Repositories
 {
@@ -13,9 +15,10 @@ namespace Iis.DbLayer.Repositories
         UserEntity GetByUserName(string userName);
         Task<UserEntity> GetByIdAsync(Guid userId, CancellationToken ct);
         Task<List<UserEntity>> GetAllUsersAsync(CancellationToken ct);
-        Task<UserEntity[]> GetOperatorsAsync(CancellationToken ct);
-        Task<UserEntity[]> GetOperatorsAsync(Expression<Func<UserEntity, bool>> predicate, CancellationToken ct);
-        Task<UserEntity[]> GetUsersAsync(int skip, int take, Expression<Func<UserEntity, bool>> predicate, CancellationToken ct);
-        Task<int> GetUserCountAsync(Expression<Func<UserEntity, bool>> predicate, CancellationToken ct);
+        Task<UserEntity[]> GetOperatorsAsync(CancellationToken ct = default);
+        Task<UserEntity[]> GetOperatorsAsync(Expression<Func<UserEntity, bool>> predicate, CancellationToken ct = default);
+        Task<UserEntity[]> GetUsersAsync(int skip, int take, string sortColumn, ListSortDirection? sortDirection, Expression<Func<UserEntity, bool>> predicate = null, CancellationToken cancellationToken = default);
+        Task<int> GetUserCountAsync(Expression<Func<UserEntity, bool>> predicate = null, CancellationToken cancellationToken = default);
+        Task<Dictionary<string, IEnumerable<RoleEntity>>> GetRolesByUserNamesDictionaryAsync(ISet<string> userNames, CancellationToken cancellationToken = default);
     }
 }

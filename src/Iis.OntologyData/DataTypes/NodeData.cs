@@ -69,7 +69,7 @@ namespace Iis.OntologyData.DataTypes
                 return result;
             });
         }
-        public IDotNameValues GetDotNameValues()
+        public IDotNameValues GetDotNameValues(bool showTitlesForSeparateObjects = false)
         {
             return AllData.Locker.ReadLock(() =>
             {
@@ -87,16 +87,18 @@ namespace Iis.OntologyData.DataTypes
                     {
                         list.Add(new DotNameValue(
                             relation.TypeName,
-                            relation.TargetNodeId.ToString(),
+                            showTitlesForSeparateObjects ? 
+                                relation._targetNode.GetTitleValue() : 
+                                relation.TargetNodeId.ToString(),
                             new List<INode> { relation.Node }));
                     }
                     else
                     {
-                        var values = relation._targetNode.GetDotNameValues();
+                        var values = relation._targetNode.GetDotNameValues(showTitlesForSeparateObjects);
                         foreach (var item in values.Items)
                         {
                             list.Add(new DotNameValue(
-                                $"{NodeType.Name}.{item.DotName}",
+                                $"{relation.Node.NodeType.Name}.{item.DotName}",
                                 item.Value,
                                 new List<INode> { relation.Node, relation.TargetNode }
                                     .Concat(item.Nodes)));
@@ -253,7 +255,7 @@ namespace Iis.OntologyData.DataTypes
             var result = new List<INode>();
 
             result.AddRange(GetDirectChildNodes(filter));
-            foreach (var relation in _outgoingRelations.Where(r => r.IsLinkToInternalObject 
+            foreach (var relation in _outgoingRelations.Where(r => r.IsLinkToInternalObject
                 && !r.TargetNode.NodeType.IsEnum))
             {
                 result.AddRange(relation.TargetNode.GetDirectChildNodes(filter));
@@ -275,22 +277,35 @@ namespace Iis.OntologyData.DataTypes
         }
         public string GetDotName()
         {
-            var node = NodeType.Kind == Kind.Relation ? this.Relation.TargetNode : this;
+            if (this.NodeType.Kind == Kind.Entity) return this.NodeType.Name;
+
+            var node = NodeType.Kind == Kind.Attribute ? this.IncomingRelations.First().Node : this;
             var sb = new StringBuilder();
-            bool isFirst = true;
-
-            while (isFirst || !node.NodeType.IsObject)
+            try
             {
-                isFirst = false;
-                if (sb.Length > 0) sb.Insert(0, ".");
-                sb.Insert(0, node.IncomingRelations.First().Node.NodeType.Name);
+                while (true)
+                {
+                    if (sb.Length > 0) sb.Insert(0, ".");
+                    sb.Insert(0, node.NodeType.Name);
 
-                node = node.IncomingRelations.First().SourceNode;
+                    var sourceNode = node.Relation.SourceNode;
+                    if (sourceNode.NodeType.IsObject)
+                    {
+                        sb.Insert(0, sourceNode.NodeType.Name + ".");
+                        break;
+                    }
+                    node = sourceNode.IncomingRelations.First().Node;
+                }
+
+                return sb.ToString();
             }
-
-            return sb.ToString();
+            catch (Exception ex)
+            {
+                throw;
+            }
         }
-        public string GetTitleValue() => GetSingleProperty(NodeType.TitleAttributeName)?.Value;
+        public string GetTitleValue() => GetSingleProperty(NodeType.TitleAttributeName)?.Value 
+            ?? GetComputedValue(NodeType.TitleAttributeName);
 
         public IRelation GetAccessLevelRelationId() =>
             GetSingleDirectRelation("accessLevel");

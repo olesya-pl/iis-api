@@ -6,7 +6,6 @@ using Iis.Services.Contracts.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -16,18 +15,18 @@ namespace Iis.Services
     {
         OntologyContext _context;
         ICommonData _commonData;
-        IMaterialPutToElasticService _materialService;
+        IMaterialElasticService _materialElasticService;
         IOntologyNodesData _ontologyData;
 
         public AccessLevelService(
             OntologyContext context,
             ICommonData commonData,
-            IMaterialPutToElasticService materialService,
+            IMaterialElasticService materialElasticService,
             IOntologyNodesData ontologyData)
         {
             _context = context;
             _commonData = commonData;
-            _materialService = materialService;
+            _materialElasticService = materialElasticService;
             _ontologyData = ontologyData;
         }
 
@@ -39,9 +38,9 @@ namespace Iis.Services
             _ontologyData.SaveAccessLevels(newAccessLevels);
             ChangeAccessLevelsUsers(numericIndexMapping);
             ChangeAccessLevelsReports(numericIndexMapping);
-            await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync(ct);
             if (materialIds.Any())
-                await _materialService.PutCreatedMaterialsToElasticSearchAsync(materialIds, ct);
+                await _materialElasticService.PutCreatedMaterialsToElasticSearchAsync(materialIds, false, ct);
         }
 
         private List<Guid> ChangeAccessLevelsMaterials(Dictionary<int, int> mappings)

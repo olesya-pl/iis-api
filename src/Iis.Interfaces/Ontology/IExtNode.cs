@@ -22,5 +22,6 @@ namespace Iis.Interfaces.Ontology
         List<IExtNode> GetAttributesRecursive(ScalarType scalarType);
         List<IExtNode> GetAttributesRecursiveWithoutNestedObjects(ScalarType scalarType);
         INodeTypeLinked NodeType { get; }
+        GeoCoordinates Location { get; set; }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System;
-using System.Linq.Expressions;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Iis.DataModel;
 using Iis.DataModel.Themes;
@@ -18,6 +19,16 @@ namespace Iis.DbLayer.Repositories
         public void Update(ThemeEntity entity)
         {
             Context.Themes.Update(entity);
+        }
+
+        public async Task<IReadOnlyCollection<ThemeTypeEntity>> GetThemeTypesByEntityTypeNamesAsync(IReadOnlyCollection<string> entityTypeNames)
+        {
+            var entities = await Context.ThemeTypes
+                .AsNoTracking()
+                .Where(_ => entityTypeNames.Contains(_.EntityTypeName))
+                .ToListAsync();
+            
+            return entities;
         }
     }
 }

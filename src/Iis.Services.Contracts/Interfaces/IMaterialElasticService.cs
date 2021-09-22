@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 using Iis.Interfaces.Elastic;
 using Iis.Services.Contracts.Params;
+using Iis.DataModel.ChangeHistory;
 
 namespace Iis.Services.Contracts.Interfaces
 {
@@ -16,5 +17,12 @@ namespace Iis.Services.Contracts.Interfaces
         Task<SearchResult> SearchByImageVector(Guid userId, IReadOnlyCollection<decimal[]> imageVectorList, PaginationParams page, CancellationToken ct = default);
         Task<int> CountMaterialsByConfiguredFieldsAsync(Guid userId, SearchParams searchParams, CancellationToken ct = default);
         Task<SearchResult> SearchByScroll(Guid userId, string scrollId);
+        bool ShouldReturnNoEntities(string queryExpression);
+        Task<List<ElasticBulkResponse>> PutAllMaterialsToElasticSearchAsync(CancellationToken ct = default);
+        Task<List<ElasticBulkResponse>> PutAllMaterialChangesToElasticSearchAsync(CancellationToken cancellationToken = default);
+        Task<List<ElasticBulkResponse>> PutMaterialChangesToElasticSearchAsync(IReadOnlyCollection<ChangeHistoryEntity> changes, bool waitForIndexing = false, CancellationToken cancellationToken = default);
+        Task<List<ElasticBulkResponse>> PutCreatedMaterialsToElasticSearchAsync(IReadOnlyCollection<Guid> materialIds, bool waitForIndexing = false, CancellationToken token = default);
+        Task<bool> PutMaterialToElasticSearchAsync(Guid materialId, CancellationToken ct = default, bool waitForIndexing = false);
+        Task PutMaterialsToElasticSearchAsync(IEnumerable<Guid> materialIds, CancellationToken ct = default, bool waitForIndexing = false);
     }
 }

@@ -4,9 +4,20 @@
     <TargetFramework>netstandard2.1</TargetFramework>
   </PropertyGroup>
 
+  <PropertyGroup>
+	<EnableNETAnalyzers>true</EnableNETAnalyzers>
+	<AnalysisMode>AllEnabledByDefault</AnalysisMode>
+	<AnalysisLevel>latest</AnalysisLevel>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.Threading.Tasks" Version="4.3.0" />
+  </ItemGroup>
+
   <ItemGroup>
     <ProjectReference Include="..\Iis.Domain\Iis.Domain.csproj" />
     <ProjectReference Include="..\Iis.Interfaces\Iis.Interfaces.csproj" />
+    <ProjectReference Include="..\Iis.RabbitMq\Iis.RabbitMq.csproj" />
   </ItemGroup>
 
 </Project>

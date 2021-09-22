@@ -13,6 +13,8 @@ using Attribute = Iis.Domain.Attribute;
 using Iis.Interfaces.AccessLevels;
 using Iis.Domain.Users;
 using Newtonsoft.Json.Linq;
+using Iis.Domain.TreeResult;
+using Iis.Interfaces.Ontology;
 
 namespace Iis.DbLayer.Ontology.EntityFramework
 {
@@ -386,6 +388,8 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             User user, 
             CancellationToken cancellationToken = default)
         {
+            if(_elasticService.ShouldReturnNoEntities(filter)) return SearchEntitiesByConfiguredFieldsResult.Empty;
+
             var entitySearchGranted = _elasticService.ShouldReturnAllEntities(filter) ? user.IsEntityReadGranted() : user.IsEntitySearchGranted();
             var wikiSearchGranted = _elasticService.ShouldReturnAllEntities(filter) ? user.IsWikiReadGranted() : user.IsWikiSearchGranted();
 
@@ -492,5 +496,41 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             return res;
         }
 
+        public TreeResultList GetEventTypes(string suggestion)
+        {
+            const string NAME = "name";
+            const string CHILD = "child";
+
+            var eventTypeType = _data.Schema.GetEntityTypeByName("EventType");
+            if (eventTypeType == null) throw new Exception("EventType type is not found");
+
+            var nodes = _data.GetNodesByTypeId(eventTypeType.Id)
+                .Where(n => (string.IsNullOrEmpty(suggestion) ||
+                    n.GetSingleDirectProperty(NAME)?.Value?.Contains(suggestion, StringComparison.OrdinalIgnoreCase) == true)
+                    && !n.OutgoingRelations.Any(r => r.Node.NodeType.Name == CHILD))
+                .OrderBy(n => n.GetSingleDirectProperty(NAME)?.Value);
+
+            var result = new TreeResultList().Init(
+                    nodes, 
+                    n => n.GetSingleProperty(NAME)?.Value,
+                    n => n.Id.ToString("N"),
+                    n => n.IncomingRelations
+                        .Where(r => r.Node.NodeType.Name == CHILD)
+                        .Select(r => r.SourceNode)
+                        .SingleOrDefault()
+                        ?.GetSingleDirectProperty(NAME)
+                        ?.Value
+                );
+
+            return result;
+        }
+
+        public IReadOnlyCollection<ObjectFeatureRelation> GetObjectFeatureRelationCollection(IReadOnlyCollection<Guid> nodeIdCollection)
+        {
+            return _data.GetNodes(nodeIdCollection)
+                .SelectMany(n => n.OutgoingRelations.Where(r => r.TargetNode.NodeType.IsObjectSign))
+                .Select(r => new ObjectFeatureRelation(r.SourceNodeId, r.TargetNodeId))
+                .ToArray();
+        }
     }
 }

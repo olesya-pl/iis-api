@@ -5,7 +5,7 @@ using HotChocolate;
 using HotChocolate.Types;
 using HotChocolate.Resolvers;
 using IIS.Core.Materials;
-using System.Collections.Generic;
+using System.Linq;
 
 namespace IIS.Core.GraphQL.Materials
 {
@@ -27,8 +27,7 @@ namespace IIS.Core.GraphQL.Materials
             [Service] IMaterialService materialService,
             [Service] IMapper mapper,
             [GraphQLType(typeof(NonNullType<IdType>))] Guid materialId,
-            [GraphQLType(typeof(int))] int newAccessLevel
-        )
+            [GraphQLType(typeof(int))] int newAccessLevel)
         {
             var tokenPayload = context.GetToken();
 
@@ -37,16 +36,45 @@ namespace IIS.Core.GraphQL.Materials
             return mapper.Map<Material>(material);
         }
 
-        public async Task<AssignMaterialsOperatorResult> AssignMaterialsOperator(IResolverContext context,
+        public async Task<AssignMaterialsOperatorResult> AssignMaterialOperator(IResolverContext context,
             [Service] IMaterialService materialService,
-            AssignMaterialsOperatorInput input
-            )
+            AssignMaterialOperatorInput input)
         {
             var tokenPayload = context.GetToken();
-            await materialService.AssignMaterialsOperatorAsync(new HashSet<Guid>(input.MaterialIds), input.AssigneeId, tokenPayload.User);
+            var materialIds = input.MaterialIds.ToHashSet();
+            var assigneeIds = input.AssigneeIds.ToHashSet();
+
+            await materialService.AssignMaterialOperatorAsync(materialIds, assigneeIds, tokenPayload.User);
+
             return new AssignMaterialsOperatorResult
             {
                 IsSuccess = true
+            };
+        }
+
+        public async Task<ChangeMaterialEditorResult> AssignMaterialEditor(IResolverContext context,
+            [Service] IMaterialService materialService,
+            [GraphQLType(typeof(NonNullType<IdType>))] Guid materialId)
+        {
+            var tokenPayload = context.GetToken();
+            var result = await materialService.AssignMaterialEditorAsync(materialId, tokenPayload.User);
+
+            return new ChangeMaterialEditorResult
+            {
+                IsSuccess = result
+            };
+        }
+
+        public async Task<ChangeMaterialEditorResult> UnassignMaterialEditor(IResolverContext context,
+            [Service] IMaterialService materialService,
+            [GraphQLType(typeof(NonNullType<IdType>))] Guid materialId)
+        {
+            var tokenPayload = context.GetToken();
+            var result = await materialService.UnassignMaterialEditorAsync(materialId, tokenPayload.User);
+
+            return new ChangeMaterialEditorResult
+            {
+                IsSuccess = result
             };
         }
     }

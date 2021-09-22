@@ -1,5 +1,7 @@
 ﻿using HotChocolate;
 using Iis.Interfaces.Ontology.Schema;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,12 +11,12 @@ namespace Iis.Api.GraphQL.CreateMenu
 {
     public class CreateMenuItemsQuery
     {
-        public List<CreateMenuItem> GetCreateMenuItems([Service] IOntologySchema schema)
+        public CreateMenuResponse GetCreateMenuItems([Service] IOntologySchema schema)
         {
             var list = new List<CreateMenuItem>();
             AddCreateMenuItem(list, EntityTypeNames.ObjectOfStudy.ToString(), schema);
             AddCreateMenuItem(list, EntityTypeNames.Wiki.ToString(), schema);
-            return list;
+            return new CreateMenuResponse { Items = list.Select(_ => JObject.FromObject(_)).ToList() };
         }
 
         private void AddCreateMenuItem(List<CreateMenuItem> list, string entityTypeName, IOntologySchema schema)

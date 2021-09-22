@@ -8,6 +8,8 @@ using Microsoft.EntityFrameworkCore;
 using IIS.Repository;
 using Iis.DataModel;
 using Iis.DataModel.Roles;
+using Iis.DbLayer.Extensions;
+using System.ComponentModel;
 
 namespace Iis.DbLayer.Repositories
 {
@@ -38,34 +40,61 @@ namespace Iis.DbLayer.Repositories
                 .ToListAsync(ct);
         }
 
-        public Task<UserEntity[]> GetOperatorsAsync(CancellationToken ct)
+        public Task<UserEntity[]> GetOperatorsAsync(CancellationToken ct = default)
         {
             return GetUsersQuery()
-                .Where(e => e.UserRoles.Any(r => r.RoleId == RoleEntity.OperatorRoleId))
+                .Where(e => e.UserRoles.Any(r => r.RoleId == RoleEntity.OperatorRoleId) && !e.IsBlocked)
                 .ToArrayAsync(ct);
         }
 
-        public Task<UserEntity[]> GetOperatorsAsync(Expression<Func<UserEntity, bool>> predicate, CancellationToken ct)
+        public Task<UserEntity[]> GetOperatorsAsync(Expression<Func<UserEntity, bool>> predicate, CancellationToken ct = default)
         {
             return GetUsersQuery()
-                .Where(e => e.UserRoles.Any(r => r.RoleId == RoleEntity.OperatorRoleId))
+                .Where(e => e.UserRoles.Any(r => r.RoleId == RoleEntity.OperatorRoleId) && !e.IsBlocked)
                 .Where(predicate)
                 .ToArrayAsync(ct);
         }
 
-        public Task<UserEntity[]> GetUsersAsync(int skip, int take, Expression<Func<UserEntity, bool>> predicate, CancellationToken ct)
+        public Task<UserEntity[]> GetUsersAsync(
+            int skip,
+            int take,
+            string sortColumn,
+            ListSortDirection? sortDirection,
+            Expression<Func<UserEntity, bool>> predicate = null,
+            CancellationToken cancellationToken = default)
         {
-            return GetUsersQuery()
-                .Where(predicate)
+            var query = GetUsersQuery();
+            if (predicate != null)
+                query = query.Where(predicate);
+
+            return query.OrderBy(sortColumn, sortDirection)
                 .Skip(skip)
                 .Take(take)
-                .ToArrayAsync(ct);
+                .ToArrayAsync(cancellationToken);
         }
 
-        public Task<int> GetUserCountAsync(Expression<Func<UserEntity, bool>> predicate, CancellationToken ct)
+        public Task<int> GetUserCountAsync(Expression<Func<UserEntity, bool>> predicate = null, CancellationToken cancellationToken = default)
         {
-            return GetUsersQuery()
-                    .CountAsync(predicate, ct);
+            var query = GetUsersQuery();
+            if (predicate != null)
+                query = query.Where(predicate);
+
+            return query.CountAsync(cancellationToken);
+        }
+
+        public Task<Dictionary<string, IEnumerable<RoleEntity>>> GetRolesByUserNamesDictionaryAsync(ISet<string> userNames, CancellationToken cancellationToken = default)
+        {
+            return Context.Users
+                .AsNoTracking()
+                .Include(user => user.UserRoles)
+                    .ThenInclude(userRoles => userRoles.Role)
+                .Where(user => userNames.Contains(user.Username))
+                .Select(user => new
+                {
+                    UserName = user.Username,
+                    Roles = user.UserRoles.Select(userRole => userRole.Role)
+                })
+                .ToDictionaryAsync(userRoles => userRoles.UserName, userRoles => userRoles.Roles, cancellationToken);
         }
 
         private IQueryable<UserEntity> GetUsersQuery()

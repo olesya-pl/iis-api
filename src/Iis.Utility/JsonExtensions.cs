@@ -5,11 +5,10 @@ namespace Iis.Utility
 {
     public static class JsonExtensions
     {
-        public static string ReplaceValue(this string json, string path, string newValue) 
+        public static string ReplaceValue(this string json, string path, string newValue)
         {
             var jObject = JObject.Parse(json);
             jObject.SelectToken(path, false).Replace(newValue);
-            
             return jObject.ToString();
         }
 
@@ -23,9 +22,9 @@ namespace Iis.Utility
                 {
                     continue;
                 }
-                
+
                 var jToken = TryGetJToken(jObject, item.Path);
-                if(jToken == null)
+                if (jToken == null)
                 {
                     jObject.Add(item.Path, item.NewValue);
                 }
@@ -38,7 +37,22 @@ namespace Iis.Utility
             return jObject.ToString();
         }
 
-        private static JToken TryGetJToken(JObject jObject, string path) 
+        public static bool TryParseToJObject(this string json, out JObject value)
+        {
+            try
+            {
+                value = JObject.Parse(json);
+
+                return true;
+            }
+            catch (JsonReaderException)
+            {
+                value = default;
+                return false;
+            }
+        }
+
+        private static JToken TryGetJToken(JObject jObject, string path)
         {
             try
             {
@@ -48,7 +62,6 @@ namespace Iis.Utility
             {
                 return null;
             }
-            
         }
     }
 }

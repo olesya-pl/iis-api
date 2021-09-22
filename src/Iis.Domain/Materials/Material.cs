@@ -1,7 +1,10 @@
+using Iis.DataModel.Materials;
 using Iis.Domain.Users;
+using Iis.Interfaces.Common;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Iis.Domain.Materials
 {
@@ -13,6 +16,7 @@ namespace Iis.Domain.Materials
         public JObject Metadata { get; set; }
         public string Type { get; set; }
         public string Source { get; set; }
+        public string Channel { get; set; }
         public string Content { get; set; }
         public MaterialSign Importance { get; set; }
         public Guid? ImportanceSignId => Importance?.Id;
@@ -33,10 +37,12 @@ namespace Iis.Domain.Materials
         public Guid? FileId => File?.Id;
         public List<MaterialInfo> Infos { get; } = new List<MaterialInfo>();
         public DateTime CreatedDate { get; set; }
+        public DateTime UpdatedAt { get; set; }
         public string Title { get; set; }
         public MaterialLoadData LoadData { get; set; }
-        public User Assignee { get; set; }
-        public Guid? AssigneeId { get; set; }
+        public IReadOnlyCollection<User> Assignees { get; set; } = Array.Empty<User>();
+        public User Editor { get; set; }
+        public Guid? EditorId { get; set; }
         public int MlHandlersCount { get; set; }
         public int ProcessedMlHandlersCount { get; set; }
         public JObject ObjectsOfStudy { get; set; }
@@ -44,9 +50,28 @@ namespace Iis.Domain.Materials
         public IEnumerable<JObject> Features { get; set; }
         public bool CanBeEdited { get; set; }
         public int AccessLevel { get; set; }
-
+        public DateTime? RegistrationDate { get; set; }
         public bool HasAttachedFile() => File != null;
-
         public bool IsParentMaterial() => ParentId == null;
+        public IdTitleDto Caller => GetIdTitle(MaterialNodeLinkType.Caller);
+        public IdTitleDto Receiver => GetIdTitle(MaterialNodeLinkType.Receiver);
+        public IReadOnlyCollection<RelatedObject> RelatedObjectCollection { get; set; } = Array.Empty<RelatedObject>();
+        public IReadOnlyCollection<RelatedObject> RelatedEventCollection { get; set; } = Array.Empty<RelatedObject>();
+        public IReadOnlyCollection<RelatedObject> RelatedSignCollection { get; set; } = Array.Empty<RelatedObject>();
+        private MaterialFeature GetFeature(MaterialNodeLinkType linkType) =>
+            Infos.SelectMany(i => i.Features)
+            .Where(f => f.NodeLinkType == linkType)
+            .FirstOrDefault();
+        private IdTitleDto GetIdTitle(MaterialNodeLinkType linkType)
+        {
+            var node = GetFeature(linkType)?.Node.OriginalNode;
+            return node == null ? null :
+                new IdTitleDto
+                {
+                    Id = node.Id,
+                    Title = node.GetTitleValue(),
+                    NodeTypeName = node.NodeType.Name
+                };
+        }
     }
 }

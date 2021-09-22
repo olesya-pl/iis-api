@@ -1,6 +1,5 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Iis.Services.Contracts.Configurations;
 
 namespace Iis.Services.Contracts.Configurations
 {

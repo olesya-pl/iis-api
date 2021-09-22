@@ -9,6 +9,8 @@ using IIS.Core.Materials.FeatureProcessors;
 using IIS.Core.Materials.Handlers.Configurations;
 using Iis.DbLayer.Repositories;
 using Iis.Interfaces.Constants;
+using Iis.RabbitMq.Channels;
+using Iis.RabbitMq.Helpers;
 using IIS.Repository.Factories;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -16,9 +18,8 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
-using RabbitMQ.Client.Exceptions;
 using Iis.Messages.Materials;
-using Iis.Services.Contracts.Configurations;
+using Iis.Interfaces.Ontology.Data;
 
 namespace Iis.Api.Materials.Handlers
 {
@@ -35,6 +36,7 @@ namespace Iis.Api.Materials.Handlers
         private IConnection _connection;
         private IModel _channel;
         private readonly JsonSerializerOptions options;
+
         public FeatureHandler(ILogger<FeatureHandler> logger,
             IConnectionFactory connectionFactory,
             FeatureHandlerConfig configuration,
@@ -46,20 +48,7 @@ namespace Iis.Api.Materials.Handlers
             _provider = provider;
             _unitOfWorkFactory = unitOfWorkFactory;
 
-            while (true)
-            {
-                try
-                {
-                    _connection = connectionFactory.CreateConnection();
-                    break;
-                }
-                catch (BrokerUnreachableException)
-                {
-                    _logger.LogError($"Attempting to connect again in {ReConnectTimeoutSec} sec.");
-
-                    Thread.Sleep(ReConnectTimeoutSec * 1000);
-                }
-            }
+            _connection = connectionFactory.CreateAndWaitConnection(ReConnectTimeoutSec, logger);
 
             _channel = _connection.CreateModel();
 
@@ -94,9 +83,10 @@ namespace Iis.Api.Materials.Handlers
             base.Dispose();
         }
 
-        private async Task ProcessMessage(MaterialEventMessage message)
+        private async Task ProcessMessage(MaterialProcessingEventMessage message)
         {
             var processor = _provider.GetService<IFeatureProcessorFactory>().GetInstance(message.Source, message.Type);
+            var nodesData = _provider.GetService<IOntologyNodesData>();
 
             if(processor.IsDummy) return;
 
@@ -106,12 +96,19 @@ namespace Iis.Api.Materials.Handlers
 
             JObject metadata = JObject.Parse(material.Metadata);
 
-            metadata = await processor.ProcessMetadataAsync(metadata, material.Id);
+            var entry = new ProcessingMaterialEntry
+            {
+                Id = material.Id,
+                CreatedDate = material.CreatedDate,
+                RegistrationDate = material.RegistrationDate,
+                Metadata = metadata
+            };
 
+            metadata = await processor.ProcessMetadataAsync(entry);
             material.Metadata = metadata.ToString(Newtonsoft.Json.Formatting.None);
 
             var featureIdList = GetNodeIdentitiesFromFeatures(metadata);
-
+            featureIdList = processor.GetValidFeatureIds(featureIdList);
             RunWithCommit(uow => {
                 uow.MaterialRepository.AddFeatureIdList(material.Id, featureIdList);
                 uow.MaterialRepository.EditMaterial(material);
@@ -168,12 +165,13 @@ namespace Iis.Api.Materials.Handlers
             }
         }
 
-        private void ConfigureConsumer(IModel channel, ChannelConfig config, Func<MaterialEventMessage, Task> handler)
+        private void ConfigureConsumer(IModel channel, ChannelConfig config, Func<MaterialProcessingEventMessage, Task> handler)
         {
             var channelConsumer = new AsyncEventingBasicConsumer(channel);
 
             channelConsumer.Received += async (sender, args) =>
             {
+                var messageState = args.ToState();
                 try
                 {
                     if (!string.IsNullOrWhiteSpace(config.ExchangeName) && args.Exchange != config.ExchangeName)
@@ -187,7 +185,7 @@ namespace Iis.Api.Materials.Handlers
                     }
 
 
-                    var message = BodyToObject<MaterialEventMessage>(args.Body, options);
+                    var message = BodyToObject<MaterialProcessingEventMessage>(args.Body, options);
 
                     await handler(message);
 
@@ -195,7 +193,7 @@ namespace Iis.Api.Materials.Handlers
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError("Exception {ex} during receiving message.", ex);
+                    _logger.LogError("Exception {ex} during receiving message {@messageState}.", ex, messageState);
 
                     channel.BasicReject(args.DeliveryTag, false);
                 }

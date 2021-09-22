@@ -11,5 +11,6 @@ namespace Iis.Messages.Materials
         public DateTime CreatedDate { get; set; }
         public string Type { get; set; }
         public string Source { get; set; }
+        public string Channel { get; set; }
     }
 }

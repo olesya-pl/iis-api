@@ -80,6 +80,9 @@ using System.Linq;
 using System.Reflection;
 using System.Security.Authentication;
 using System.Threading.Tasks;
+using Iis.CoordinatesEventHandler.DependencyInjection;
+using Iis.Utility.Logging;
+using Iis.Services.Materials;
 
 namespace IIS.Core
 {
@@ -172,7 +175,7 @@ namespace IIS.Core
                 });
 
                 services.AddTransient<IFieldToAliasMapper>(provider => provider.GetRequiredService<IOntologySchema>());
-                services.AddTransient<INodeRepository, NodeRepository>();
+                services.AddTransient<INodeSaveService, NodeSaveService>();
                 services.AddTransient<ElasticConfiguration>();
             }
 
@@ -180,7 +183,6 @@ namespace IIS.Core
 
             services.AddTransient<IUnitOfWorkFactory<IIISUnitOfWork>, IISUnitOfWorkFactory>();
             services.AddTransient<IMaterialService, MaterialService<IIISUnitOfWork>>();
-            services.AddTransient<IMaterialPutToElasticService, MaterialService<IIISUnitOfWork>>();
             services.AddTransient<IOntologyService, OntologyServiceWithCache>();            
 
             services.AddSingleton<IElasticConfiguration, IisElasticConfiguration>();
@@ -292,7 +294,6 @@ namespace IIS.Core
             services.AddTransient<IAutocompleteService, AutocompleteService>();
             services.AddTransient<IReportService, ReportService<IIISUnitOfWork>>();
             services.AddTransient<IReportElasticService, ReportElasticService>();
-            services.AddTransient<ISanitizeService, SanitizeService>();
             services.AddTransient<IActiveDirectoryClient, ActiveDirectoryClient>(_ =>
                 new ActiveDirectoryClient(
                     Configuration["activeDirectory:server"],
@@ -312,6 +313,7 @@ namespace IIS.Core
             services.AddMediatR(typeof(ReportEventHandler));
             services.AddTransient<ModifyDataRunner>();
             services.RegisterEventMaterialAutoAssignment(Configuration);
+            services.RegisterCoordinatesMessageHandler(Configuration);
 
             var eusConfiguration = Configuration.GetSection("externalUserService").Get<ExternalUserServiceConfiguration>();
             services.AddTransient<IExternalUserService>(_ => (new ExternalUserServiceFactory()).GetInstance(eusConfiguration));

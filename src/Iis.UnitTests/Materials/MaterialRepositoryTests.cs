@@ -3,18 +3,15 @@ using System.Linq;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using AutoFixture.Xunit2;
-using DocumentFormat.OpenXml.Math;
-using DocumentFormat.OpenXml.Office2010.ExcelAc;
 using Iis.DataModel;
 using Iis.DataModel.Materials;
 using Iis.DbLayer.Repositories;
 using Iis.Interfaces.Elastic;
-using Iis.Interfaces.Ontology.Schema;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using Newtonsoft.Json.Linq;
 using Xunit;
+using Iis.Services.Contracts.Interfaces;
 
 namespace Iis.UnitTests.Materials
 {
@@ -46,7 +43,7 @@ namespace Iis.UnitTests.Materials
             materialEntity.Metadata = null;
             materialEntity.LoadData = null;
             materialEntity.MaterialInfos = null;
-
+            materialEntity.MaterialAssignees = new List<MaterialAssigneeEntity>();
 
             responses.First().MaterialId = materialId;
 
@@ -71,10 +68,8 @@ namespace Iis.UnitTests.Materials
             await context.Materials.AddAsync(materialEntity);
             await context.SaveChangesAsync();
 
-            var sut = _serviceProvider.GetRequiredService<IMaterialRepository>() as MaterialRepository;
-            sut.SetContext(context);
-
-            var res = await sut.PutMaterialToElasticSearchAsync(materialId, CancellationToken.None);
+            var materialElasticService = _serviceProvider.GetRequiredService<IMaterialElasticService>();
+            var res = await materialElasticService.PutMaterialToElasticSearchAsync(materialId, CancellationToken.None);
 
             elasticManagerMock
                 .Verify(

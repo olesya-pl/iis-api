@@ -1,13 +1,9 @@
-﻿using Iis.DataModel;
-using Iis.DbLayer.OntologyData;
-using Iis.DbLayer.Repositories;
+﻿using Iis.DbLayer.Repositories;
 using Iis.Elastic;
+using Iis.Elastic.Dictionaries;
 using Iis.Elastic.ElasticMappingProperties;
-using Iis.Interfaces.AccessLevels;
 using Iis.Interfaces.Elastic;
 using Iis.Interfaces.Enums;
-using Iis.Interfaces.Ontology.Schema;
-using Iis.OntologyData;
 using Iis.OntologyData.IisAccessLevels;
 using Iis.Services.Contracts.Csv;
 using Iis.Services.Contracts.Interfaces;
@@ -15,13 +11,11 @@ using Iis.Services.Contracts.Params;
 using IIS.Core;
 using IIS.Core.Materials;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using MoreLinq;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -36,15 +30,15 @@ namespace Iis.Api.Controllers
     public class AdminController : Controller
     {
         private const string AllIndexes = "all";
-        private readonly IElasticManager _elasticManager;
-        private readonly INodeRepository _nodeRepository;
         private readonly IMaterialService _materialService;
+        private readonly IMaterialElasticService _materialElasticService;
+        private readonly IElasticManager _elasticManager;
+        private readonly INodeSaveService _nodeSaveService;
         private readonly IElasticState _elasticState;
         private readonly IUserService _userService;
         private readonly IUserElasticService _userElasticService;
         private readonly IAdminOntologyElasticService _adminElasticService;
         private readonly IHost _host;
-        private readonly IConfiguration _configuration;
         private readonly IOntologyDataService _nodesDataService;
         private readonly IConnectionStringService _connectionStringService;
         private readonly IAccessLevelService _accessLevelService;
@@ -54,8 +48,9 @@ namespace Iis.Api.Controllers
 
         public AdminController(
             IMaterialService materialService,
+            IMaterialElasticService materialElasticService,
             IElasticManager elasticManager,
-            INodeRepository nodeRepository,
+            INodeSaveService nodeSaveService,
             IElasticState elasticState,
             IUserService userService,
             IUserElasticService userElasticService,
@@ -68,9 +63,10 @@ namespace Iis.Api.Controllers
             IMaterialProvider materialProvider,
             NodeMaterialRelationService<IIISUnitOfWork> nodeMaterialRelationService)
         {
-            _elasticManager = elasticManager;
             _materialService = materialService;
-            _nodeRepository = nodeRepository;
+            _materialElasticService = materialElasticService;
+            _elasticManager = elasticManager;
+            _nodeSaveService = nodeSaveService;
             _elasticState = elasticState;
             _adminElasticService = adminElasticService;
             _userService = userService;
@@ -83,15 +79,15 @@ namespace Iis.Api.Controllers
             _materialProvider = materialProvider;
             _nodeMaterialRelationService = nodeMaterialRelationService;
         }
-        
+
         [HttpGet("CreateBindingNodesToMaterial/{nodeId}/{limit}")]
         public async Task<string> CreateBindingNodesToMaterial(Guid nodeId, int limit)
         {
             var materialsIds = await _materialProvider.GetMaterialsIdsAsync(limit);
-            
+
             await _nodeMaterialRelationService.CreateMultipleRelations(
                 new HashSet<Guid>(new[] { nodeId }), new HashSet<Guid>(materialsIds), null);
-            
+
             return nodeId.ToString();
         }
 
@@ -183,33 +179,87 @@ namespace Iis.Api.Controllers
                 KeywordProperty.Create("Metadata.features.PhoneNumber", false),
                 DateProperty.Create("Metadata.RegTime", ElasticConfiguration.DefaultDateFormats),
                 DateProperty.Create("Metadata.RegDate", ElasticConfiguration.DefaultDateFormats),
+                DateProperty.Create("RegistrationDate", ElasticConfiguration.DefaultDateFormats),
                 TextProperty.Create("Metadata.Duration"),
                 DateProperty.Create("CreatedDate", ElasticConfiguration.DefaultDateFormats),
+                DateProperty.Create("UpdatedAt", ElasticConfiguration.DefaultDateFormats),
                 DateProperty.Create("LoadData.ReceivingDate", ElasticConfiguration.DefaultDateFormats),
                 KeywordProperty.Create("ParentId", true),
                 TextProperty.Create("Type", true),
                 TextProperty.Create("Source", true),
-                KeywordProperty.Create("ProcessedStatus.Title", false),
+                AliasProperty.Create(MaterialAliases.Type.Alias, MaterialAliases.Type.Path),
+                AliasProperty.Create(MaterialAliases.Source.Alias, MaterialAliases.Source.Path),
+                KeywordProperty.Create(MaterialAliases.ProcessedStatus.Path, false),
+                AliasProperty.Create(MaterialAliases.ProcessedStatus.Alias, MaterialAliases.ProcessedStatus.Path),
                 ByteProperty.Create("ProcessedStatus.OrderNumber"),
-                KeywordProperty.Create("Completeness.Title", false),
-                KeywordProperty.Create("Importance.Title", false),
+                KeywordProperty.Create(MaterialAliases.Completeness.Path, false),
+                AliasProperty.Create(MaterialAliases.Completeness.Alias, MaterialAliases.Completeness.Path),
+                KeywordProperty.Create(MaterialAliases.Importance.Path, false),
+                AliasProperty.Create(MaterialAliases.Importance.Alias, MaterialAliases.Importance.Path),
                 ByteProperty.Create("Importance.OrderNumber"),
-                KeywordProperty.Create("Reliability.Title", false),
-                KeywordProperty.Create("Relevance.Title", false),
-                KeywordProperty.Create("SourceReliability.Title", false),
-                KeywordProperty.Create("SessionPriority.Title", false),
+                KeywordProperty.Create(MaterialAliases.Reliability.Path, false),
+                AliasProperty.Create(MaterialAliases.Reliability.Alias, MaterialAliases.Reliability.Path),
+                KeywordProperty.Create(MaterialAliases.Relevance.Path, false),
+                AliasProperty.Create(MaterialAliases.Relevance.Alias, MaterialAliases.Relevance.Path),
+                KeywordProperty.Create(MaterialAliases.SourceReliability.Path, false),
+                AliasProperty.Create(MaterialAliases.SourceReliability.Alias, MaterialAliases.SourceReliability.Path),
+                KeywordProperty.Create(MaterialAliases.SessionPriority.Path, false),
+                AliasProperty.Create(MaterialAliases.SessionPriority.Alias, MaterialAliases.SessionPriority.Path),
                 ByteProperty.Create("SessionPriority.OrderNumber"),
                 IntegerProperty.Create("NodesCount"),
-                DenseVectorProperty.Create("ImageVectors.Vector", MaterialDocument.ImageVectorDimensionsCount)
+                DenseVectorProperty.Create("ImageVectors.Vector", MaterialDocument.ImageVectorDimensionsCount),
+                TextProperty.Create("MLResponses.namedEntityRecognition", ElasticConfiguration.DefaultTermVector),
+                TextProperty.Create("MLResponses.textAnnotation", ElasticConfiguration.DefaultTermVector)
             });
-
             await _elasticManager.CreateIndexesAsync(new[] { materialIndex },
                 mappingConfiguration.ToJObject(),
                 cancellationToken);
 
-            var response = await _materialService.PutAllMaterialsToElasticSearchAsync(cancellationToken);
+            var response = await _materialElasticService.PutAllMaterialsToElasticSearchAsync(cancellationToken);
 
             await _adminElasticService.AddAliasesToIndexAsync(AliasType.Material, cancellationToken);
+
+            LogElasticResult(log, response);
+
+            return Content(log.ToString());
+        }
+
+        [HttpGet("RecreateElasticChangeHistoryIndexes")]
+        public async Task<IActionResult> RecreateElasticChangeHistoryIndexes(CancellationToken cancellationToken)
+        {
+            var log = new StringBuilder();
+            _adminElasticService.Logger = log;
+
+            var index = _elasticState.ChangeHistoryIndexes.First();
+
+            await _elasticManager.DeleteIndexAsync(index, cancellationToken);
+
+            var mappingConfiguration = new ElasticMappingConfiguration(new List<ElasticMappingProperty>
+            {
+                KeywordProperty.Create("TargetId", false),
+                KeywordProperty.Create("RequestId", false),
+                KeywordProperty.Create("UserName", true),
+                KeywordProperty.Create("PropertyName", true),
+                DateProperty.Create("Date", ElasticConfiguration.DefaultDateFormats),
+                TextProperty.Create("OldValue", true),
+                TextProperty.Create("NewValue", true),
+                IntegerProperty.Create("Type"),
+                TextProperty.Create("ParentTypeName", true),
+                TextProperty.Create("OldTitle", true),
+                TextProperty.Create("NewTitle", true),
+                KeywordProperty.Create("Roles.Id", false),
+                KeywordProperty.Create("Roles.Name", false),
+                AliasProperty.Create("Користувач", "UserName"),
+                AliasProperty.Create("Назва поля", "PropertyName"),
+                AliasProperty.Create("Дата зміни", "Date"),
+                AliasProperty.Create("Було", "OldValue"),
+                AliasProperty.Create("Стало", "NewValue")
+            });
+            await _elasticManager.CreateIndexesAsync(new[] { index },
+                mappingConfiguration.ToJObject(),
+                cancellationToken);
+
+            var response = await _materialElasticService.PutAllMaterialChangesToElasticSearchAsync(cancellationToken);
 
             LogElasticResult(log, response);
 
@@ -247,7 +297,7 @@ namespace Iis.Api.Controllers
         public async Task<IActionResult> GetElasticJson(string id, CancellationToken cancellationToken)
         {
             var uid = new Guid(id);
-            var jObj = await _nodeRepository.GetJsonNodeByIdAsync(uid, cancellationToken);
+            var jObj = await _nodeSaveService.GetJsonNodeByIdAsync(uid, cancellationToken);
             if (jObj == null)
             {
                 return Content($"Entity is not found for id = {uid}");
@@ -265,11 +315,11 @@ namespace Iis.Api.Controllers
         }
 
         [HttpPost("ReloadOntologyData")]
-        public async Task<IActionResult> ReloadOntologyData()
+        public Task<IActionResult> ReloadOntologyData()
         {
             var connectionString = _connectionStringService.GetIisApiConnectionString();
             _nodesDataService.ReloadOntologyData(connectionString);
-            return Content("Success");
+            return Task.FromResult<IActionResult>(Content("Success"));
         }
 
         [HttpPost("ChangeAccessLevels")]
@@ -288,33 +338,34 @@ namespace Iis.Api.Controllers
         }
 
         [HttpGet("ImportExternalUsers/{userNames}")]
-        public async Task<IActionResult> ImportExternalUsers(string userNames, CancellationToken ct)
+        public Task<IActionResult> ImportExternalUsers(string userNames, CancellationToken ct)
         {
+            string message;
             try
             {
-                var msg = _userService.ImportUsersFromExternalSource(userNames.Split(','));
-
-                return Content(msg);
+                message = _userService.ImportUsersFromExternalSource(userNames.Split(','));
             }
             catch (Exception ex)
             {
-                return Content($"Error: {ex.Message}");
+                message = $"Error: {ex.Message}";
             }
+            return Task.FromResult<IActionResult>(Content(message));
         }
 
         [HttpGet("ImportExternalUsers")]
-        public async Task<IActionResult> ImportExternalUsers(CancellationToken ct)
+        public Task<IActionResult> ImportExternalUsers(CancellationToken ct)
         {
+            string message;
             try
             {
-                var msg = _userService.ImportUsersFromExternalSource();
+                message = _userService.ImportUsersFromExternalSource();
 
-                return Content(msg);
             }
             catch (Exception ex)
             {
-                return Content($"Error: {ex.Message}");
+                message = $"Error: {ex.Message}";
             }
+            return Task.FromResult<IActionResult>(Content(message));
         }
 
         [HttpGet("CheckMatrixUsers")]
@@ -332,13 +383,13 @@ namespace Iis.Api.Controllers
         }
 
         [HttpGet("GetCsv/{typeName}")]
-        public async Task<IActionResult> GetCsv(string typeName, CancellationToken ct)
+        public Task<IActionResult> GetCsv(string typeName, CancellationToken ct)
         {
             var result = _csvService.GetDorCsvByTypeName(typeName);
             var bytes = Encoding.Unicode.GetBytes(result);
             var csv = Encoding.Unicode.GetPreamble().Concat(bytes).ToArray();
 
-            return File(csv, "text/csv", $"{typeName}.csv");
+            return Task.FromResult<IActionResult>(File(csv, "text/csv", $"{typeName}.csv"));
         }
 
         private void LogElasticResult(StringBuilder log, IEnumerable<ElasticBulkResponse> response)
@@ -371,7 +422,7 @@ namespace Iis.Api.Controllers
                 return Content($"There are not valid index names in list: {string.Join(", ", notValidIndexes)}");
             }
 
-            _adminElasticService.Logger  = new StringBuilder();
+            _adminElasticService.Logger = new StringBuilder();
 
             await _adminElasticService.DeleteIndexesAsync(indexes, isHistorical, ct);
 

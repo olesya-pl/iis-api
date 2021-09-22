@@ -32,7 +32,7 @@ namespace AcceptanceTests.UISteps
         public void IWantNavigateToMaterialsPage()
         {
             navigationSection.MaterialsLink.Click();
-            driver.WaitFor(7);
+            driver.WaitFor(2);
         }
 
         [When(@"I clicked on the first material in the Materials list")]
@@ -117,10 +117,22 @@ namespace AcceptanceTests.UISteps
             materialsSectionPage.MaterialPage.ReliabilityDropDown.Select(priority);
         }
 
-        [When(@"I set the session priority (.*) value")]
-        public void WhenISetTheSessionPriorityValue(string sessionPriority)
+        [When(@"I set the session priority to Important")]
+        public void WhenISetTheSessionPriorityValueImportant()
         {
-            materialsSectionPage.MaterialPage.SessionPriorityDropDown.Select(sessionPriority);
+            materialsSectionPage.MaterialImportantButton.Click();
+        }
+
+        [When(@"I set the session priority to Immediate Report")]
+        public void WhenISetTheSessionPriorityValueImmediateReport()
+        {
+            materialsSectionPage.MaterialImmediateReportButton.Click();
+        }
+
+        [When(@"I set the session priority to Translation")]
+        public void WhenISetTheSessionPriorityValueTranslation()
+        {
+            materialsSectionPage.MaterialTranslationButton.Click();
         }
 
         [When(@"I set the source credibility (.*) value")]
@@ -132,6 +144,13 @@ namespace AcceptanceTests.UISteps
 
         [When(@"I pressed Processed button")]
         public void WhenIPressProcessedButton()
+        {
+            materialsSectionPage.ProcessedButton.Click();
+            driver.WaitFor(15);
+        }
+
+        [Then(@"I pressed Processed button")]
+        public void ThenIPressProcessedButton()
         {
             materialsSectionPage.ProcessedButton.Click();
             driver.WaitFor(15);
@@ -167,11 +186,11 @@ namespace AcceptanceTests.UISteps
         [When(@"I enter (.*) value in the search object field")]
         public void WhenIEnterValueInTheSearchObjectField(string inputValue)
         {
-            materialsSectionPage.ObjectsTabSearch.SendKeys(inputValue);
-            driver.WaitFor(2);
-            materialsSectionPage.ObjectsTabSearch.SendKeys(Keys.Down);
-            materialsSectionPage.ObjectsTabSearch.SendKeys(Keys.Enter);
-            materialsSectionPage.ObjectsTabSearch.SendKeys(Keys.Escape);
+            materialsSectionPage.ObjectsSearch.SendKeys(inputValue);            
+            driver.WaitFor(10);
+            materialsSectionPage.ObjectsSearch.SendKeys(Keys.Down);
+            materialsSectionPage.ObjectsSearch.SendKeys(Keys.Enter);
+            materialsSectionPage.ObjectsSearch.SendKeys(Keys.Escape);
         }
 
         [When(@"I clicked on the connected object")]
@@ -295,6 +314,7 @@ namespace AcceptanceTests.UISteps
         public void IMustSeeRelevanceDropDownInTheMaterialsCard()
         {
             Assert.True(materialsSectionPage.RelevanceDropDown.Displayed);
+            driver.WaitFor(5);
         }
 
         [Then(@"I must see these elements")]
@@ -349,11 +369,29 @@ namespace AcceptanceTests.UISteps
             Assert.Equal(expectedValue, actualValue);
         }
 
-        [Then(@"I must see that the session priority value must be set to the (.*) value")]
-        public void ThenIMustSeeThatTheSessionPriorityValueMustBeSetToTheValue(string expectedValue)
+        //[Then(@"I must see that the session priority value must be set to the (.*) value")]
+        //public void ThenIMustSeeThatTheSessionPriorityValueMustBeSetToTheValue(string expectedValue)
+        //{
+        //    var actualValue = materialsSectionPage.MaterialPage.SessionPriorityDropDown.Text;
+        //    Assert.Equal(expectedValue, actualValue);
+        //}
+
+        [Then(@"I must see that the session priority value must be set to Important")]
+        public void ThenIMustSeeThatTheSessionPriorityValueMustBeSetToTheImportantValue()
         {
-            var actualValue = materialsSectionPage.MaterialPage.SessionPriorityDropDown.Text;
-            Assert.Equal(expectedValue, actualValue);
+            materialsSectionPage.MaterialImportantButton.HasClass("selected");
+        }
+
+        [Then(@"I must see that the session priority value must be set to Immediate Report")]
+        public void ThenIMustSeeThatTheSessionPriorityValueMustBeSetToTheImmediateReportValue()
+        {
+            materialsSectionPage.MaterialImmediateReportButton.HasClass("selected");
+        }
+
+        [Then(@"I must see that the session priority value must be set to Translation")]
+        public void ThenIMustSeeThatTheSessionPriorityValueMustBeSetToTheTranslationValue()
+        {
+            materialsSectionPage.MaterialTranslationButton.HasClass("selected");
         }
 
         [Then(@"I must see that the source credibility value must be set to the (.*) value")]

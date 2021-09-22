@@ -7,23 +7,65 @@ using IIS.Core.GraphQL.Common;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using System.Linq;
+using HotChocolate.Resolvers;
+using Iis.Api.GraphQL.Common;
 
 namespace IIS.Core.GraphQL.Themes
 {
     public class Query
     {
         public async Task<GraphQLCollection<Theme>> GetThemesForUser(
+            IResolverContext ctx,
             [Service] IThemeService themeService,
             [Service] IMapper mapper,
-            [GraphQLType(typeof(NonNullType<IdType>))] Guid userId)
+            [GraphQLNonNullType] PaginationInput pagination,
+            SortingInput sorting)
         {
-            var sortingParam = new SortingParams("updatedAt", "desc");
+            var userId = ctx.GetToken().UserId;
 
-            var themes = await themeService.GetThemesByUserIdAsync(userId, sortingParam);
+            var paginationParams = new PaginationParams(pagination.Page, pagination.PageSize);
+            
+            var sortingParams = mapper.Map<SortingParams>(sorting) ?? SortingParams.Default;
+            
+            var themes = await themeService.GetThemesByUserIdAsync(userId, paginationParams, sortingParams);
 
             var graphThemes = mapper.Map<List<Theme>>(themes);
 
             return new GraphQLCollection<Theme>(graphThemes, graphThemes.Count);
+        }
+        
+        public async Task<GraphQLCollection<Theme>> GetThemesByEntityTypeNames(
+            IResolverContext ctx,
+            [Service] IThemeService themeService,
+            [Service] IMapper mapper,
+            [GraphQLNonNullType] ThemesFilterInput filter)
+        {
+            var userId = ctx.GetToken().UserId;
+            
+            var entityTypeNames = filter.EntityTypeNames;
+            
+            var themes = await themeService.GetAllThemesByEntityTypeNamesAsync(userId, entityTypeNames);
+
+            var graphThemes = mapper.Map<List<Theme>>(themes);
+
+            return new GraphQLCollection<Theme>(graphThemes, graphThemes.Count);
+        }
+        
+        public async Task<UnreadCount> GetUnreadThemesCount(
+            IResolverContext ctx,
+            [Service] IThemeService themeService)
+        {
+            var userId = ctx.GetToken().UserId;
+            
+            var themes = await themeService.GetAllThemesByUserIdAsync(userId);
+            
+            var count = themes.Aggregate(0, (acc, theme) => acc + theme.UnreadCount);
+     
+            return new UnreadCount
+            {
+                Count = count
+            };
         }
 
         public async Task<Theme> GetTheme(
@@ -46,5 +88,10 @@ namespace IIS.Core.GraphQL.Themes
 
             return new GraphQLCollection<ThemeType>(graphThemeTypes, graphThemeTypes.Count);
         }
+    }
+    
+    public class UnreadCount
+    {
+        public int Count { get; set; }
     }
 }

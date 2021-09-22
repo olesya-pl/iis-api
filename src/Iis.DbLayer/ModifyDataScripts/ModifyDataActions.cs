@@ -9,6 +9,7 @@ using Iis.Interfaces.Ontology.Schema;
 using Iis.Services.Contracts.Interfaces;
 using Iis.OntologySchema.ChangeParameters;
 using Iis.OntologyData;
+using Iis.Domain.Materials;
 
 namespace Iis.DbLayer.ModifyDataScripts
 {
@@ -773,6 +774,73 @@ namespace Iis.DbLayer.ModifyDataScripts
                 "{\"Formula\": \"{name};\\\"Об'єкт без назви\\\"\"}"
             );
             SaveOntologySchema(data.Schema);
+        }
+
+        public void RemoveDuplicateRelations(OntologyContext context, IOntologyNodesData data)
+        {
+            var entityNodes = data.GetAllNodes()
+                    .Where(n => n.NodeType.Kind == Kind.Entity)
+                    .ToList();
+
+            var duplicates = new List<Guid>();
+
+            foreach (var node in entityNodes)
+            {
+                var relations = node.OutgoingRelations
+                    .Where(r => r.RelationKind == RelationKind.Embedding)
+                    .OrderBy(r => r.TargetNodeId)
+                    .ThenBy(r => r.Node.NodeTypeId)
+                    .ToList();
+
+                if (relations.Count <= 1) continue;
+                var prev = relations.First();
+                for (int i = 1; i < relations.Count; i++)
+                {
+                    var current = relations[i];
+                    if (prev.TargetNodeId == current.TargetNodeId
+                        && prev.Node.NodeTypeId == current.Node.NodeTypeId)
+                    {
+                        duplicates.Add(current.Id);
+                        continue;
+                    }
+                    prev = current;
+                }
+            }
+            data.WriteLock(() =>
+            {
+                data.RemoveNodes(duplicates);
+            });
+        }
+        public void ClosePersinMultiple(OntologyContext context, IOntologyNodesData data)
+        {
+            var person = data.Schema.GetEntityTypeByName("Person");
+            var closePerson = person?.GetRelationTypeByName("closePersin");
+            if (closePerson == null) return;
+
+            data.Schema.UpdateNodeType(new NodeTypeUpdateParameter
+            {
+                Id = closePerson.Id,
+                EmbeddingOptions = EmbeddingOptions.Multiple
+            });
+            SaveOntologySchema(data.Schema);
+        }
+        public void MaterialChannel(OntologyContext context, IOntologyNodesData data)
+        {
+            var materials = context.Materials
+                .Where(m => (m.Source.StartsWith("sat.") || m.Source.StartsWith("cell."))
+                  && m.Channel == null)
+                .ToList();
+
+            foreach (var material in materials)
+            {
+                var extractor = new MaterialMetadataExtractor(material.Metadata);
+                var channel = extractor.Channel;
+                if (channel != null)
+                {
+                    material.Channel = channel;
+                }
+            }
+            context.SaveChanges();
         }
     }
 }

@@ -65,7 +65,7 @@ namespace AcceptanceTests.UISteps
             eventPage.ConfirmSaveEventChangesButton.Click();
             driver.WaitFor(2);
             driver.Navigate().Refresh();
-            driver.WaitFor(2);
+            driver.WaitFor(5);
             eventPage.CloseEventCreationWindow.Click();
         }
 
@@ -192,6 +192,12 @@ namespace AcceptanceTests.UISteps
             eventPage.AdditionalDataTextField.SendKeys(additionalText);
             driver.WaitFor(0.5);
         }
+        [When(@"I clicked on the Events section")]
+        public void WhenIClickedOnTheEventsSection()
+        {
+            navigationSection.EventsLink.Click();
+            driver.WaitFor(5);
+        }
 
         #endregion
 
@@ -232,6 +238,13 @@ namespace AcceptanceTests.UISteps
             var additionalText = context.Get<string>("additionalText");
             var actualText = eventPage.AdditionalDataTextField.GetAttribute("value");
             Assert.Contains(additionalText, actualText);
+        }
+
+        [Then(@"I open first event in the events list")]
+        public void ThenIOpenFirstEventInTheEventsList()
+        {
+            var viewEventButton = eventsSection.FirstEventInTheEventsListFullscreenButton;
+            viewEventButton.Click();
         }
 
         #endregion

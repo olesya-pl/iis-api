@@ -1,56 +1,27 @@
 using System;
-using System.Text;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Collections.Generic;
-using System.Text.RegularExpressions;
 using Microsoft.EntityFrameworkCore;
-using AutoMapper;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-
 using Iis.DataModel;
 using Iis.DataModel.Materials;
 using Iis.DbLayer.Extensions;
 using Iis.DbLayer.MaterialEnum;
-using Iis.DbLayer.Repositories.Helpers;
-using Iis.DbLayer.MaterialDictionaries;
-using Iis.Interfaces.Elastic;
-using Iis.Interfaces.Ontology.Data;
-using Iis.Interfaces.Ontology.Schema;
 using Iis.Domain.Materials;
 using IIS.Repository;
-using Iis.Utility;
+using Iis.Services.Contracts.Materials.Distribution;
 
 namespace Iis.DbLayer.Repositories
 {
     public class MaterialRepository : RepositoryBase<OntologyContext>, IMaterialRepository
     {
-        private readonly MaterialIncludeEnum[] _includeAll = new MaterialIncludeEnum[]
+        private static readonly MaterialIncludeEnum[] IncludeAll = new MaterialIncludeEnum[]
         {
             MaterialIncludeEnum.WithChildren,
             MaterialIncludeEnum.WithFeatures
         };
-
-        private readonly IMLResponseRepository _mLResponseRepository;
-        private readonly IElasticManager _elasticManager;
-        private readonly IMapper _mapper;
-        private readonly IOntologySchema _ontologySchema;
-        private readonly IOntologyNodesData _ontologyData;
-        public string[] MaterialIndexes => new[] { "Materials" };
-
-        public MaterialRepository(IMLResponseRepository mLResponseRepository,
-            IElasticManager elasticManager,
-            IMapper mapper, IOntologySchema ontologySchema, IOntologyNodesData ontologyData)
-        {
-            _mLResponseRepository = mLResponseRepository;
-            _elasticManager = elasticManager;
-            _mapper = mapper;
-            _ontologySchema = ontologySchema;
-            _ontologyData = ontologyData;
-        }
 
         public Task<MaterialEntity> GetByIdAsync(Guid id, params MaterialIncludeEnum[] includes)
         {
@@ -70,10 +41,19 @@ namespace Iis.DbLayer.Repositories
             return await GetMaterialsQuery(includes)
                             .ToArrayAsync();
         }
-        
+
         public async Task<IEnumerable<MaterialEntity>> GetAllAsync(int limit, params MaterialIncludeEnum[] includes)
         {
             return await GetMaterialsQuery(includes)
+                .Take(limit)
+                .ToArrayAsync();
+        }
+
+        public async Task<IEnumerable<MaterialEntity>> GetAllAsync(int limit, int offset, params MaterialIncludeEnum[] includes)
+        {
+            return await GetMaterialsQuery(includes)
+                .OrderBy(_ => _.Id)
+                .Skip(offset)
                 .Take(limit)
                 .ToArrayAsync();
         }
@@ -108,121 +88,8 @@ namespace Iis.DbLayer.Repositories
         {
             return await GetMaterialsQuery()
                             .OnlyParent()
-                            .Where(p => p.AssigneeId == assigneeId)
+                            .Where(p => p.MaterialAssignees.Any(_ => _.AssigneeId == assigneeId))
                             .ToArrayAsync();
-        }
-
-        public async Task<List<ElasticBulkResponse>> PutAllMaterialsToElasticSearchAsync(CancellationToken ct = default)
-        {
-            const int batchSize = 50000;
-
-            var materialsCount = await GetMaterialsQuery(MaterialIncludeEnum.WithChildren, MaterialIncludeEnum.WithFeatures)
-                .CountAsync();
-
-            if(materialsCount == 0) return new List<ElasticBulkResponse>();
-
-            var responses = new List<ElasticBulkResponse>(materialsCount);
-            for (var i = 0; i < (materialsCount / batchSize) + 1; i++)
-            {
-                ct.ThrowIfCancellationRequested();
-
-                var materialEntities = await GetMaterialsQuery(MaterialIncludeEnum.WithChildren, MaterialIncludeEnum.WithFeatures)
-                    .OrderBy(p => p.Id)
-                    .Skip(i*batchSize)
-                    .Take(batchSize)
-                    .ToArrayAsync();
-
-                var mlResponsesList = await Context.MLResponses
-                                    .AsNoTracking()
-                                    .ToArrayAsync();
-
-                var mlResponseDictionary = mlResponsesList
-                    .GroupBy(p => p.MaterialId)
-                    .ToDictionary(k => k.Key, p => p.ToArray());
-
-                var materialDocuments = materialEntities
-                    .Select(p => MapEntityToDocument(p))
-                    .Select(p =>
-                    {
-                        var materialIdList = p.Children
-                                                .Select(e => e.Id)
-                                                .Union(new []{p.Id})
-                                                .ToArray();
-
-                        var (mlResponses, mlResponsesCount) = GetResponseJsonWithCounter(p.Id, mlResponseDictionary);
-
-                        p.MLResponses = mlResponses;
-
-                        p.ProcessedMlHandlersCount = mlResponsesCount;
-
-                        p.ImageVectors = GetImageVectorList(materialIdList, mlResponseDictionary);
-
-                        return p;
-                    });
-
-                var json = ConvertToJson(materialDocuments);
-                var response = await _elasticManager.PutDocumentsAsync(MaterialIndexes.FirstOrDefault(), json, ct);
-                responses.AddRange(response);
-            }
-
-            return responses;
-        }
-
-        public async Task<List<ElasticBulkResponse>> PutCreatedMaterialsToElasticSearchAsync(IReadOnlyCollection<Guid> materialIds, CancellationToken token = default)
-        {
-            var materials = await GetMaterialsQuery(MaterialIncludeEnum.WithChildren, MaterialIncludeEnum.WithFeatures)
-            .Where(p => materialIds.Contains(p.Id))
-            .ToListAsync();
-
-            var materialDocuments = materials.Select(p => MapEntityToDocument(p));
-            var json = ConvertToJson(materialDocuments);
-
-            return await _elasticManager.PutDocumentsAsync(MaterialIndexes.FirstOrDefault(), json, token);
-        }
-
-        public string ConvertToJson(IEnumerable<MaterialDocument> materialDocuments)
-        {
-            var sb = new StringBuilder();
-            foreach (var materialDocument in materialDocuments)
-            {
-                sb.AppendLine($"{{ \"index\":{{ \"_id\": \"{materialDocument.Id:N}\" }} }}\n{JsonConvert.SerializeObject(materialDocument)}");
-            }
-            return sb.ToString();
-        }
-
-        public async Task<bool> PutMaterialToElasticSearchAsync(Guid materialId, CancellationToken ct = default, bool waitForIndexing = false)
-        {
-            var material = await GetMaterialsQuery(MaterialIncludeEnum.WithChildren, MaterialIncludeEnum.WithFeatures)
-                .SingleOrDefaultAsync(p => p.Id == materialId);
-
-            var materialDocument = MapEntityToDocument(material);
-
-            var materialIdList = material.Children
-                                .Select(e => e.Id)
-                                .Union(new []{material.Id})
-                                .ToArray();
-
-            var responseList = await _mLResponseRepository.GetAllForMaterialListAsync(materialIdList);
-
-            var responseDictionary = responseList
-                                        .GroupBy(e => e.MaterialId)
-                                        .ToDictionary(group => group.Key, group => group.ToArray());
-
-
-
-            var (mlResponses, mlResponsesCount) = GetResponseJsonWithCounter(materialDocument.Id, responseDictionary);
-
-            materialDocument.MLResponses = mlResponses;
-
-            materialDocument.ProcessedMlHandlersCount = mlResponsesCount;
-
-            materialDocument.ImageVectors = GetImageVectorList(materialIdList, responseDictionary);
-
-            return await _elasticManager.PutDocumentAsync(MaterialIndexes.FirstOrDefault(),
-                materialId.ToString("N"),
-                JsonConvert.SerializeObject(materialDocument),
-                waitForIndexing,
-                ct);
         }
 
         public void AddMaterialEntity(MaterialEntity materialEntity)
@@ -240,98 +107,56 @@ namespace Iis.DbLayer.Repositories
             Context.MaterialFeatures.AddRange(materialFeatureEntities);
         }
 
+        public void AddMaterialAssignees(IEnumerable<MaterialAssigneeEntity> entities)
+        {
+            Context.MaterialAssignees.AddRange(entities);
+        }
+
+        public void RemoveMaterialAssignees(IEnumerable<MaterialAssigneeEntity> entities)
+        {
+            Context.MaterialAssignees.RemoveRange(entities);
+        }
+
         public void EditMaterial(MaterialEntity materialEntity)
         {
+            materialEntity.UpdatedAt = DateTime.UtcNow;
+            materialEntity.Editor = null;
+
             Context.Materials.Update(materialEntity);
         }
 
-        public List<Guid> GetFeatureIdListThatRelatesToObjectId(Guid nodeId)
+        public Task<List<Guid>> GetNodeIsWithMaterialsAsync(IReadOnlyCollection<Guid> nodeIdCollection)
         {
-            var type = _ontologySchema.GetEntityTypeByName(EntityTypeNames.ObjectSign.ToString());
-
-            var typeIdList = new List<Guid>();
-
-            if (type != null)
-            {
-                typeIdList = type.IncomingRelations
-                    .Select(p => p.SourceTypeId)
-                    .ToList();
-            }
-            return Context.Nodes
-                .Join(Context.Relations, n => n.Id, r => r.TargetNodeId, (node, relation) => new { Node = node, Relation = relation })
-                .Where(e => (!typeIdList.Any() || typeIdList.Contains(e.Node.NodeTypeId)) && e.Relation.SourceNodeId == nodeId && !e.Relation.Node.IsArchived)
-                .AsNoTracking()
-                .Select(e => e.Node.Id)
-                .ToList();
-        }
-
-        public async Task<List<ObjectFeatureRelation>> GetFeatureIdListThatRelatesToObjectIdsAsync(IReadOnlyCollection<Guid> nodeIds)
-        {
-            var type = _ontologySchema.GetEntityTypeByName(EntityTypeNames.ObjectSign.ToString());
-
-            var typeIdList = new List<Guid>();
-
-            if (type != null)
-            {
-                typeIdList = type.IncomingRelations
-                    .Select(p => p.SourceTypeId)
-                    .ToList();
-            }
-            return await Context.Nodes
-                .Join(Context.Relations, n => n.Id, r => r.TargetNodeId, (node, relation) => new { Node = node, Relation = relation })
-                .Where(e => (!typeIdList.Any() 
-                    || typeIdList.Contains(e.Node.NodeTypeId)) 
-                    && nodeIds.Contains(e.Relation.SourceNodeId)  
-                    && !e.Relation.Node.IsArchived)
-                .AsNoTracking()
-                .Select(e => new ObjectFeatureRelation { ObjectId = e.Relation.SourceNodeId, FeatureId = e.Node.Id })
-                .ToListAsync();
-        }
-
-        public List<MaterialEntity> GetMaterialByNodeIdQuery(IList<Guid> nodeIds, params MaterialIncludeEnum[] includes)
-        {
-            return GetMaterialsQuery(includes)
-                .Join(Context.MaterialInfos, m => m.Id, mi => mi.MaterialId,
-                    (Material, MaterialInfo) => new { Material, MaterialInfo })
-                .Join(Context.MaterialFeatures, m => m.MaterialInfo.Id, mf => mf.MaterialInfoId,
-                    (MaterialInfoJoined, MaterialFeature) => new { MaterialInfoJoined, MaterialFeature })
-                .Where(m => nodeIds.Contains(m.MaterialFeature.NodeId))
-                .Select(m => m.MaterialInfoJoined.Material).ToList();
-        }
-
-        public async Task<List<Guid>> GetNodeIsWithMaterials(IList<Guid> nodeIds)
-        {
-            return await Context.Materials
-                .Join(Context.MaterialInfos, m => m.Id, mi => mi.MaterialId,
-                    (Material, MaterialInfo) => new { Material, MaterialInfo })
-                .Join(Context.MaterialFeatures, m => m.MaterialInfo.Id, mf => mf.MaterialInfoId,
-                    (MaterialInfoJoined, MaterialFeature) => new { MaterialInfoJoined, MaterialFeature })
-                .Where(m => nodeIds.Contains(m.MaterialFeature.NodeId))
+            return Context.Materials
+                .JoinMaterialFeaturesAsNoTracking(Context)
+                .Where(m => nodeIdCollection.Contains(m.MaterialFeature.NodeId))
                 .Select(m => m.MaterialFeature.NodeId)
                 .ToListAsync();
         }
 
-        public Task<List<MaterialEntity>> GetMaterialByNodeIdQueryAsync(IEnumerable<Guid> nodeIds)
+        public async Task<IReadOnlyCollection<MaterialEntity>> GetMaterialCollectionByNodeIdAsync(IReadOnlyCollection<Guid> nodeIdCollection, params MaterialIncludeEnum[] includes)
         {
-            return Context.Materials
-                .Join(Context.MaterialInfos, m => m.Id, mi => mi.MaterialId,
-                    (Material, MaterialInfo) => new { Material, MaterialInfo })
-                .Join(Context.MaterialFeatures, m => m.MaterialInfo.Id, mf => mf.MaterialInfoId,
-                    (MaterialInfoJoined, MaterialFeature) => new { MaterialInfoJoined, MaterialFeature })
-                .Where(m => nodeIds.Contains(m.MaterialFeature.NodeId))
-                .AsNoTracking()
+            return await GetMaterialsQuery(includes)
+                .JoinMaterialFeaturesAsNoTracking(Context)
+                .Where(m => nodeIdCollection.Contains(m.MaterialFeature.NodeId))
                 .Select(m => m.MaterialInfoJoined.Material)
-                .ToListAsync();
+                .ToArrayAsync();
         }
 
-        public Task<List<MaterialsCountByType>> GetParentMaterialByNodeIdQueryAsync(IList<Guid> nodeIds)
+        public async Task<IReadOnlyCollection<Guid>> GetMaterialIdCollectionByNodeIdCollectionAsync(IReadOnlyCollection<Guid> nodeIdCollection)
+        {
+            return await Context.Materials
+                .JoinMaterialFeaturesAsNoTracking(Context)
+                .Where(m => nodeIdCollection.Contains(m.MaterialFeature.NodeId))
+                .Select(m => m.MaterialInfoJoined.Material.Id)
+                .ToArrayAsync();
+        }
+
+        public Task<List<MaterialsCountByType>> GetParentMaterialByNodeIdQueryAsync(IReadOnlyCollection<Guid> nodeIdCollection)
         {
             return Context.Materials
-                .Join(Context.MaterialInfos, m => m.Id, mi => mi.MaterialId,
-                    (Material, MaterialInfo) => new { Material, MaterialInfo })
-                .Join(Context.MaterialFeatures, m => m.MaterialInfo.Id, mf => mf.MaterialInfoId,
-                    (MaterialInfoJoined, MaterialFeature) => new { MaterialInfoJoined, MaterialFeature })
-                .Where(m => nodeIds.Contains(m.MaterialFeature.NodeId))
+                .JoinMaterialFeaturesAsNoTracking(Context)
+                .Where(m => nodeIdCollection.Contains(m.MaterialFeature.NodeId))
                 .Select(m => m.MaterialInfoJoined.Material).Where(_ => _.ParentId == null)
                 .GroupBy(p => p.Type)
                 .Select(group => new MaterialsCountByType
@@ -345,16 +170,11 @@ namespace Iis.DbLayer.Repositories
         public void AddFeatureIdList(Guid materialId, IEnumerable<Guid> featureIdList)
         {
             foreach (var featureId in featureIdList)
-            {
-                Context.MaterialFeatures.Add(new MaterialFeatureEntity
-                {
-                    NodeId = featureId,
-                    MaterialInfo = new MaterialInfoEntity
-                    {
-                        MaterialId = materialId
-                    }
-                });
-            }
+                Context.MaterialFeatures.Add(MaterialFeatureEntity.CreateFrom(materialId, featureId));
+
+            Guid firstFeatureId = featureIdList.FirstOrDefault();
+            if (firstFeatureId != default)
+                Context.MaterialFeatures.Add(MaterialFeatureEntity.CreateFrom(materialId, firstFeatureId, MaterialNodeLinkType.Caller));
         }
 
         public async Task<IEnumerable<Guid>> GetChildIdListForMaterialAsync(Guid materialId)
@@ -377,7 +197,7 @@ namespace Iis.DbLayer.Repositories
                 .Select(e => $"'{e.ToString("N")}'")
                 .ToArray();
 
-            using(var transaction = await Context.Database.BeginTransactionAsync())
+            using (var transaction = await Context.Database.BeginTransactionAsync())
             {
                 Context.Database.ExecuteSqlRaw("DELETE FROM public.\"LocationHistory\" where \"MaterialId\" is not null");
                 Context.Database.ExecuteSqlRaw("DELETE FROM public.\"MaterialFeatures\"");
@@ -385,7 +205,7 @@ namespace Iis.DbLayer.Repositories
                 Context.Database.ExecuteSqlRaw("DELETE FROM public.\"Materials\"");
                 Context.Database.ExecuteSqlRaw("DELETE FROM public.\"MLResponses\"");
 
-                if(removeFileIdList.Any())
+                if (removeFileIdList.Any())
                 {
                     Context.Database.ExecuteSqlRaw("DELETE FROM public.\"Files\" WHERE \"Id\"::text in ({0})", string.Join(" , ", fileIdList));
                 }
@@ -393,6 +213,7 @@ namespace Iis.DbLayer.Repositories
                 await transaction.CommitAsync();
             }
         }
+
         public Task<Guid?> GetParentIdByChildIdAsync(Guid materialId)
         {
             return Context.Materials
@@ -400,102 +221,50 @@ namespace Iis.DbLayer.Repositories
                 .Select(e => e.ParentId).FirstOrDefaultAsync();
         }
 
-        private MaterialDocument MapEntityToDocument(MaterialEntity material)
+        public Task<int> GetTotalCountAsync(CancellationToken cancellationToken)
         {
-            var materialDocument = _mapper.Map<MaterialDocument>(material);
-
-            materialDocument.Content = RemoveImagesFromContent(materialDocument.Content);
-
-            materialDocument.Children = material.Children.Select(p => _mapper.Map<MaterialDocument>(p)).ToArray();
-
-            materialDocument.NodeIds = material.MaterialInfos
-                .SelectMany(p => p.MaterialFeatures)
-                .Select(p => p.NodeId)
-                .ToArray();
-
-            materialDocument.ObjectsOfStudyCount = GetObjectOfStudyCount(materialDocument.NodeIds);
-
-            materialDocument.NodesCount = materialDocument.NodeIds.Count();
-
-            return materialDocument;
+            return GetMaterialsQuery(IncludeAll).CountAsync(cancellationToken);
         }
 
-        private int GetObjectOfStudyCount(IReadOnlyCollection<Guid> nodeIdList)
+        public async Task<IReadOnlyList<MaterialDistributionItem>> GetMaterialsForDistribution(
+            UserDistributionItem user,
+            Expression<Func<MaterialEntity, bool>> filter)
         {
-            if(nodeIdList is null || !nodeIdList.Any()) return 0;
+            var query = GetMaterialsForDistributionQuery().Where(_ => _.AccessLevel <= user.AccessLevel);
 
-            var nodeList = _ontologyData.GetNodes(nodeIdList);
+            if (filter != null) query = query.Where(filter);
 
-            return nodeList.Count(n => n.NodeType.IsObjectOfStudy);
+            if (user.Channels.Count > 0) query = query.Where(_ => _.Channel == null || user.Channels.Contains(_.Channel));
+
+            var materialEntities = await query
+                .OrderByDescending(_ => _.RegistrationDate)
+                .Take(user.FreeSlots).ToArrayAsync();
+
+            return materialEntities.Select(_ => new MaterialDistributionItem(_.Id, _.Channel)).ToList();
         }
 
-        private (JObject responseJObject, int responsesCount) GetResponseJsonWithCounter(Guid materialId, Dictionary<Guid, MLResponseEntity[]> responseDictionary)
+        public async Task<IReadOnlyList<MaterialChannelMappingEntity>> GetChannelMappingsAsync()
         {
-            if(responseDictionary.TryGetValue(materialId, out MLResponseEntity[] responseList))
+            return await Context.MaterialChannelMappings.ToArrayAsync();
+        }
+
+        public async Task SaveDistributionResult(DistributionResult distributionResult)
+        {
+            var materialIds = distributionResult.Items.Select(_ => _.MaterialId).ToList();
+            var materials = await Context.Materials
+                .Where(_ => materialIds.Contains(_.Id)).ToArrayAsync();
+
+            foreach (var material in materials)
             {
-                return (ConvertMLResponsesToJson(responseList), responseList.Length);
+                var userId = distributionResult.GetUserId(material.Id);
+                if (!userId.HasValue)
+                    continue;
+
+                var newMaterialAssignee = MaterialAssigneeEntity.CreateFrom(material.Id, userId.Value);
+                material.MaterialAssignees.Add(newMaterialAssignee);
             }
-
-            return (new JObject(), 0);
         }
 
-        private ImageVector[] GetImageVectorList(IReadOnlyCollection<Guid> materialIdList, Dictionary<Guid, MLResponseEntity[]> responseDictionary)
-        {
-            var result = new List<ImageVector>();
-
-            foreach (var materialId in materialIdList)
-            {
-                if(responseDictionary.TryGetValue(materialId, out MLResponseEntity[] responseList))
-                {
-                    var imageVectorList = GetLatestImageVectorList(responseList, MlHandlerCodeList.ImageVector)
-                                        .Select(e => new ImageVector(e))
-                                        .ToArray();
-                    result.AddRange(imageVectorList);
-                }
-            }
-            return result.ToArray();
-        }
-
-        private async Task<(JObject mlResponses, int mlResponsesCount, ImageVector[] imageVector)> GetMLResponseData(Guid materialId)
-        {
-            var mlResponses = await _mLResponseRepository.GetAllForMaterialAsync(materialId);
-
-            var imageVectorList = GetLatestImageVectorList(mlResponses, MlHandlerCodeList.ImageVector)
-                                    .Select(e => new ImageVector(e))
-                                    .ToArray();
-
-            return (ConvertMLResponsesToJson(mlResponses), mlResponses.Count, imageVectorList);
-        }
-
-        private static JObject ConvertMLResponsesToJson(IReadOnlyCollection<MLResponseEntity> mlResponses)
-        {
-            var mlResponsesContainer = new JObject();
-            if (mlResponses.Any())
-            {
-                var mlHandlers = mlResponses.GroupBy(_ => _.HandlerName).ToArray();
-                foreach (var mlHandler in mlHandlers)
-                {
-                    string propertyName = GetMlHandlerName(mlHandler);
-                    mlResponsesContainer.Add(new JProperty(propertyName,
-                            mlHandler.Select(p => p.OriginalResponse).ToArray()));
-                }
-            }
-            return mlResponsesContainer;
-        }
-
-        private static string GetMlHandlerName(IGrouping<string, MLResponseEntity> mlHandler)
-        {
-            var code = mlHandler.FirstOrDefault()?.HandlerCode;
-            var propertyName = string.IsNullOrEmpty(code)
-                ? mlHandler.Key.ToLowerCamelCase().RemoveWhiteSpace()
-                : code;
-            return propertyName;
-        }
-
-        private string RemoveImagesFromContent(string content)
-        {
-            return Regex.Replace(content, @"\(data:image.+\)", string.Empty, RegexOptions.Compiled);
-        }
 
         private async Task<(IEnumerable<MaterialEntity> Entities, int TotalCount)> GetAllWithPredicateAsync(
             int limit = 0,
@@ -505,10 +274,10 @@ namespace Iis.DbLayer.Repositories
             string sortOrder = null)
         {
             var materialQuery = predicate is null
-                                ? GetMaterialsQuery(_includeAll)
+                                ? GetMaterialsQuery(IncludeAll)
                                     .OnlyParent()
                                 : (IQueryable<MaterialEntity>)
-                                    GetMaterialsQuery(_includeAll)
+                                    GetMaterialsQuery(IncludeAll)
                                     .OnlyParent()
                                     .Where(predicate);
 
@@ -547,7 +316,9 @@ namespace Iis.DbLayer.Repositories
                     .Include(m => m.SourceReliability)
                     .Include(m => m.ProcessedStatus)
                     .Include(m => m.SessionPriority)
-                    .Include(m => m.Assignee)
+                    .Include(m => m.MaterialAssignees)
+                        .ThenInclude(_ => _.Assignee)
+                    .Include(m => m.Editor)
                     .AsNoTracking();
         }
 
@@ -587,13 +358,11 @@ namespace Iis.DbLayer.Repositories
             return resultQuery;
         }
 
-        private static IReadOnlyCollection<decimal[]> GetLatestImageVectorList(IReadOnlyCollection<MLResponseEntity> mlResponsesByEntity, string handlerCode)
-        {
-            var response = mlResponsesByEntity
-                                    .OrderByDescending(e => e.ProcessingDate)
-                                    .FirstOrDefault(e => e.HandlerCode == handlerCode);
-
-            return FaceAPIResponseParser.GetFaceVectorList(response?.OriginalResponse);
-        }
+        private IQueryable<MaterialEntity> GetMaterialsForDistributionQuery() =>
+           Context.Materials
+               .Where(_ => (_.ProcessedStatusSignId == null
+                       || _.ProcessedStatusSignId == MaterialEntity.ProcessingStatusNotProcessedSignId)
+                   && !_.MaterialAssignees.Any()
+                   && _.ParentId == null);
     }
 }

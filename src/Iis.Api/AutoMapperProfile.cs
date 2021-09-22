@@ -17,6 +17,7 @@ using Iis.Api.GraphQL.Common;
 using Iis.Api.GraphQL.Roles;
 using Iis.Api.GraphQL.Aliases;
 using GraphQLGraphTypes = Iis.Api.GraphQL.Graph;
+using Iis.Api.GraphQL.RadioElectronicSituation;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
@@ -35,12 +36,15 @@ using Iis.Events.Reports;
 using Iis.DataModel.ChangeHistory;
 using Iis.Elastic;
 using Iis.Domain.Users;
+using Iis.Utility;
 
 namespace Iis.Api
 {
-    public class AutoMapperProfile: Profile
+    public class AutoMapperProfile : Profile
     {
         private const string Iso8601DateFormat = "yyyy-MM-dd'T'HH:mm:ssZ";
+        private const string Iso8601DateFormatWithFraction = "yyyy-MM-ddTHH:mm:ss.fffZ";
+
         public AutoMapperProfile()
         {
             CreateMap<IMaterialSignType, MaterialSignTypeEntity>();
@@ -62,20 +66,27 @@ namespace Iis.Api
                 .ForMember(dest => dest.Name, opts => opts.MapFrom(src => src.Type.Name))
                 .ForMember(dest => dest.Title, opts => opts.MapFrom(src => src.Type.Title));
 
+            CreateMap<Iis.Domain.Materials.RelatedObject, IIS.Core.GraphQL.Materials.RelatedObject>();
             CreateMap<Iis.Domain.Materials.Material, IIS.Core.GraphQL.Materials.Material>()
                 .ForMember(dest => dest.Data, opts => opts.MapFrom(src => src.Data.ToObject<IEnumerable<IIS.Core.GraphQL.Materials.Data>>()))
                 .ForMember(dest => dest.FileId, opts => opts.MapFrom(src => src.File == null ? (Guid?)null : src.File.Id))
                 .ForMember(dest => dest.Transcriptions, opts => opts.MapFrom(src => src.Infos.Select(info => info.Data)))
                 .ForMember(dest => dest.Children, opts => opts.MapFrom(src => src.Children))
                 .ForMember(dest => dest.Highlight, opts => opts.Ignore())
-                .ForMember(dest => dest.CreatedDate, opts => opts.MapFrom(src => src.CreatedDate.ToString("yyyy-MM-ddTHH:mm:ss.fffZ")))
+                .ForMember(dest => dest.CreatedDate, opts => opts.MapFrom(src => src.CreatedDate.ToString(Iso8601DateFormatWithFraction)))
+                .ForMember(dest => dest.UpdatedAt, opts => opts.MapFrom(src => src.UpdatedAt.ToString(Iso8601DateFormatWithFraction)))
+                .ForMember(dest => dest.RegistrationDate, opts => opts.MapFrom(src => src.RegistrationDate.ToString(Iso8601DateFormatWithFraction)))
                 .ForMember(dest => dest.AccessLevel, opts => opts.MapFrom(src => src.AccessLevel))
                 .AfterMap((src, dest, context) => { context.Mapper.Map(src.LoadData, dest); });
 
             CreateMap<Iis.Domain.Materials.MaterialFeature, MaterialFeatureEntity>();
+            CreateMap<MaterialFeatureEntity, Iis.Domain.Materials.MaterialFeature>()
+                .ForMember(dest => dest.Node, opts => opts.Ignore());
             CreateMap<Iis.Domain.Materials.MaterialInfo, MaterialInfoEntity>()
                 .ForMember(dest => dest.Data, opts => opts.MapFrom(src => src.Data.ToString()))
                 .ForMember(dest => dest.MaterialFeatures, opts => opts.MapFrom(src => src.Features));
+
+            CreateMap<Iis.Interfaces.Common.IdTitleDto, IdTitle>().ReverseMap();
 
             CreateMap<RoleAccessEntity, AccessGranted>()
                 .ForMember(dest => dest.Kind, opts => opts.MapFrom(src => src.AccessObject.Kind))
@@ -140,7 +151,7 @@ namespace Iis.Api
 
             CreateMap<UserEntity, IIS.Core.GraphQL.Users.User>();
 
-            CreateMap<IIS.Core.GraphQL.ML.MachineLearningResponseInput,Iis.Domain.MachineLearning.MLResponse>()
+            CreateMap<IIS.Core.GraphQL.ML.MachineLearningResponseInput, Iis.Domain.MachineLearning.MLResponse>()
                 .ForMember(dest => dest.ProcessingDate, opts => opts.MapFrom(src => DateTime.Now));
 
             CreateMap<Iis.Domain.MachineLearning.MLResponse, Iis.DataModel.Materials.MLResponseEntity>()
@@ -172,7 +183,8 @@ namespace Iis.Api
                 .ForMember(dest => dest.SessionPriority, opt => opt.Ignore());
 
             CreateMap<MaterialEntity, Iis.Domain.Materials.Material>()
-                .ForMember(dest => dest.File, opts => {
+                .ForMember(dest => dest.File, opts =>
+                {
                     opts.PreCondition(src => (src.FileId.HasValue));
                     opts.MapFrom(src => new File(src.FileId.Value, src.File == null ? null : src.File.Name));
                 })
@@ -192,21 +204,26 @@ namespace Iis.Api
                     context.Mapper.Map<Domain.Materials.MaterialSign>(MaterialEntity.ProcessedStatus)))
                 .ForMember(dest => dest.SessionPriority, src => src.MapFrom((MaterialEntity, Material, MaterialSign, context) =>
                     context.Mapper.Map<Domain.Materials.MaterialSign>(MaterialEntity.SessionPriority)))
-                .ForMember(dest => dest.LoadData, opts => opts.MapFrom(src => Domain.Materials.MaterialLoadData.MapLoadData(src.LoadData)));
+                .ForMember(dest => dest.LoadData, opts => opts.MapFrom(src => Domain.Materials.MaterialLoadData.MapLoadData(src.LoadData)))
+                .ForMember(dest => dest.Assignees, opts => opts.MapFrom((MaterialEntity, Material, MaterialAssignees, context) =>
+                    context.Mapper.Map<Domain.Users.User[]>(MaterialEntity.MaterialAssignees.Select(_ => _.Assignee))));
 
             CreateMap<MaterialInput, Iis.Domain.Materials.Material>()
                 .ForMember(dest => dest.Id, opts => opts.MapFrom(src => Guid.NewGuid()))
                 .ForMember(dest => dest.Metadata, opts => opts.MapFrom(src => JObject.Parse(src.Metadata)))
                 .ForMember(dest => dest.Data, opts => opts.MapFrom(src => src.Data == null ? null : JArray.FromObject(src.Data)))
-                .ForMember(dest => dest.File, opts => opts.MapFrom(src => src.FileId.HasValue ? new File((Guid)src.FileId): null ))
+                .ForMember(dest => dest.File, opts => opts.MapFrom(src => src.FileId.HasValue ? new File((Guid)src.FileId) : null))
                 .ForMember(dest => dest.ParentId, opts => opts.MapFrom(src => src.ParentId))
                 .ForMember(dest => dest.CreatedDate,
                     opts => opts.MapFrom(src => !src.CreationDate.HasValue ? DateTime.Now : src.CreationDate))
-                .AfterMap((src, dest) => {
+                .AfterMap((src, dest) =>
+                {
                     if (dest.Metadata is null) return;
 
                     dest.Type = dest.Metadata.GetValue("type", StringComparison.InvariantCultureIgnoreCase)?.Value<string>();
                     dest.Source = dest.Metadata.GetValue("source", StringComparison.InvariantCultureIgnoreCase)?.Value<string>();
+                    var extractor = new MaterialMetadataExtractor(dest.Metadata);
+                    dest.Channel = extractor.Channel;
                 });
 
             CreateMap<MaterialInput, Iis.Domain.Materials.MaterialLoadData>()
@@ -220,9 +237,12 @@ namespace Iis.Api
                 .ForMember(dest => dest.States, opts => opts.MapFrom(src => src.States));
 
             CreateMap<UserEntity, DbLayer.Repositories.Assignee>();
+            CreateMap<UserEntity, DbLayer.Repositories.Editor>();
             CreateMap<MaterialSignEntity, DbLayer.Repositories.MaterialSign>();
             CreateMap<MaterialEntity, DbLayer.Repositories.MaterialDocument>()
                 .ForMember(dest => dest.CreatedDate, opts => opts.MapFrom(src => src.CreatedDate.ToString(Iso8601DateFormat, CultureInfo.InvariantCulture)))
+                .ForMember(dest => dest.UpdatedAt, opts => opts.MapFrom(src => src.UpdatedAt.ToString(Iso8601DateFormat, CultureInfo.InvariantCulture)))
+                .ForMember(dest => dest.RegistrationDate, opts => opts.MapFrom(src => src.RegistrationDate.ToString(Iso8601DateFormat, CultureInfo.InvariantCulture)))
                 .ForMember(dest => dest.Metadata, opts => opts.MapFrom(src => src.Metadata == null ? null : JObject.Parse(src.Metadata)))
                 .ForMember(dest => dest.FileName, opts => opts.MapFrom(src => src.File == null ? null : src.File.Name))
                 .ForPath(dest => dest.SecurityAttributes.AccessLevel, opts => opts.MapFrom(src => src.AccessLevel))
@@ -241,21 +261,30 @@ namespace Iis.Api
                 .ForMember(dest => dest.SessionPriority, src => src.MapFrom((MaterialEntity, Material, MaterialSign, context) =>
                     context.Mapper.Map<DbLayer.Repositories.MaterialSign>(MaterialEntity.SessionPriority)))
                 .ForMember(dest => dest.LoadData, opts =>
-                    opts.MapFrom(src => JsonConvert.DeserializeObject<DbLayer.Repositories.MaterialLoadData>(src.LoadData)));
+                    opts.MapFrom(src => JsonConvert.DeserializeObject<DbLayer.Repositories.MaterialLoadData>(src.LoadData)))
+                .ForMember(dest => dest.Assignees, src => src.MapFrom(_ => _.MaterialAssignees));
+
+            CreateMap<MaterialAssigneeEntity, DbLayer.Repositories.Assignee>()
+                .ConstructUsing((entity, context) => context.Mapper.Map<DbLayer.Repositories.Assignee>(entity.Assignee));
 
             CreateMap<DbLayer.Repositories.Assignee, Iis.Domain.Users.User>();
+            CreateMap<DbLayer.Repositories.Editor, Iis.Domain.Users.User>();
             CreateMap<DbLayer.Repositories.MaterialLoadData, Iis.Domain.Materials.MaterialLoadData>();
             CreateMap<DbLayer.Repositories.MaterialSign, Iis.Domain.Materials.MaterialSign>();
+            CreateMap<DbLayer.Repositories.RelatedObject, Iis.Domain.Materials.RelatedObject>();
             CreateMap<DbLayer.Repositories.MaterialDocument, Iis.Domain.Materials.Material>()
-                .ForMember(dest => dest.File, opts => opts.MapFrom(src => src.FileId.HasValue ? new File(src.FileId.Value): null))
+                .ForMember(dest => dest.File, opts => opts.MapFrom(src => src.FileId.HasValue ? new File(src.FileId.Value) : null))
                 .ForMember(dest => dest.CreatedDate, opts => opts.MapFrom(src => DateTime.ParseExact(src.CreatedDate, Iso8601DateFormat, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind)))
+                .ForMember(dest => dest.UpdatedAt, opts => opts.MapFrom(src => DateTime.ParseExact(src.UpdatedAt, Iso8601DateFormat, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind)))
+                .ForMember(dest => dest.RegistrationDate, opts => opts.MapFrom(src => src.RegistrationDate.AsDateTime(Iso8601DateFormat, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind)))
                 .ForMember(dest => dest.Children, opts => opts.Ignore())
-                .ForMember(dest => dest.Assignee, opts => opts.MapFrom(src => src.Assignee));
+                .ForMember(dest => dest.Assignees, opts => opts.MapFrom(src => src.Assignees))
+                .ForMember(dest => dest.Editor, opts => opts.MapFrom(src => src.Editor));
 
 
             //mapping: GraphQl.UserInput -> Roles.User
             CreateMap<BaseUserInput, Iis.Domain.Users.User>()
-                .ForMember(dest => dest.Roles, opts=> opts.MapFrom(src => src.Roles.Select(id =>  new Role{ Id = id})));
+                .ForMember(dest => dest.Roles, opts => opts.MapFrom(src => src.Roles.Select(id => new Role { Id = id })));
             CreateMap<UserCreateInput, Iis.Domain.Users.User>()
                 .IncludeBase<BaseUserInput, Iis.Domain.Users.User>()
                 .ForMember(dest => dest.Id, opts => opts.MapFrom(src => Guid.NewGuid()));
@@ -267,7 +296,7 @@ namespace Iis.Api
             //mapping: Roles.User -> GraphQl.User
             CreateMap<Iis.Domain.Users.User, User>();
 
-            //mappring: UserEntity -> Roles.User
+            //mapping: UserEntity -> Roles.User
             CreateMap<UserEntity, Iis.Domain.Users.User>()
                 .ForMember(dest => dest.Roles, opts => opts.MapFrom(src => src.UserRoles.Select(ur => ur.Role)));
 
@@ -283,7 +312,7 @@ namespace Iis.Api
             //theme: graphQl input -> domain
             CreateMap<IIS.Core.GraphQL.Themes.ThemeInput, ThemeDto>()
                 .ForMember(dest => dest.Id, opts => opts.MapFrom(src => Guid.NewGuid()))
-                .ForMember(dest => dest.User, opts => opts.MapFrom(src => new Iis.Domain.Users.User{ Id = src.UserId.Value }))
+                .ForMember(dest => dest.User, opts => opts.MapFrom(src => new Iis.Domain.Users.User { Id = src.UserId.Value }))
                 .ForMember(dest => dest.UpdatedAt, opts => opts.MapFrom(src => DateTime.UtcNow));
 
             CreateMap<IIS.Core.GraphQL.Themes.UpdateThemeInput, ThemeDto>()
@@ -380,6 +409,10 @@ namespace Iis.Api
                 .ForMember(dest => dest.EntityId, opts => opts.MapFrom(src => src.TargetId))
                 .ForMember(dest => dest.OldValue, opts => opts.MapFrom(src => src.OldTitle ?? src.OldValue))
                 .ForMember(dest => dest.NewValue, opts => opts.MapFrom(src => src.NewTitle ?? src.NewValue));
+            CreateMap<ChangeHistoryDocument, ChangeHistoryDto>()
+                .ForMember(dest => dest.Date, opts => opts.MapFrom(src => DateTime.ParseExact(src.Date, Iso8601DateFormat, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind)));
+            CreateMap<ChangeHistoryEntity, ChangeHistoryDocument>()
+                .ForMember(dest => dest.Date, opts => opts.MapFrom(src => src.Date.ToString(Iso8601DateFormat, CultureInfo.InvariantCulture)));
 
             CreateMap<Iis.Interfaces.Elastic.AggregationBucket, IIS.Core.GraphQL.Entities.AggregationBucket>();
             CreateMap<Iis.Interfaces.Elastic.AggregationItem, IIS.Core.GraphQL.Entities.AggregationItem>();
@@ -397,6 +430,16 @@ namespace Iis.Api
 
             CreateMap<DomainGraphTypes.GraphLink, GraphQLGraphTypes.GraphLink>();
             CreateMap<DomainGraphTypes.GraphNode, GraphQLGraphTypes.GraphNode>();
+
+            CreateMap<SituationNodeDto, SituationNode>();
+            CreateMap<GeometryDto, Geometry>();
+            CreateMap<AttributesDto, Attributes>()
+                .ForMember(_ => _.RegisteredAt, opt => opt.MapFrom(src => src.RegisteredAt.ToString(Iso8601DateFormat, CultureInfo.InvariantCulture)));
+            CreateMap<ObjectDto, ObjectNode>();
+            CreateMap<SignDto, SignNode>();
+            CreateMap<MaterialDto, MaterialNode>()
+                .ForMember(_ => _.CreatedDate,  opt => opt.MapFrom(src => src.CreatedDate.ToString(Iso8601DateFormat, CultureInfo.InvariantCulture)))
+                .ForMember(_ => _.RegistrationDate, opt => opt.MapFrom(src => src.RegistrationDate.HasValue ? src.RegistrationDate.Value.ToString(Iso8601DateFormat, CultureInfo.InvariantCulture): null));
         }
     }
 }

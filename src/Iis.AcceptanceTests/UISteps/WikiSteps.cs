@@ -3,6 +3,7 @@ using OpenQA.Selenium;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using AcceptanceTests.Helpers;
 using TechTalk.SpecFlow;
 using Xunit;
 
@@ -28,6 +29,7 @@ namespace AcceptanceTests.UISteps
 		public void WhenINavigatedToTheWikiPage()
 		{
 			navigationSection.WikiLink.Click();
+			driver.WaitFor(5);
 		}
 
 		[Then(@"I must see the Wiki page")]
