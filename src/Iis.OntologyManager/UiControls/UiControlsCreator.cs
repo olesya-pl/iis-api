@@ -194,6 +194,8 @@ namespace Iis.OntologyManager.UiControls
 
         public void SetSelectedValue(ComboBox comboBox, string value)
         {
+            comboBox.SelectedIndex = -1;
+
             for (int i = 0; i < comboBox.Items.Count; i++)
             {
                 if (comboBox.Items[i].ToString() == value)

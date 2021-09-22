@@ -657,10 +657,10 @@ namespace Iis.OntologyManager
 
             ReloadTypes(_filterControl.GetModel());
 
-            _ontologyData =
-                schemaSource.SourceKind == SchemaSourceKind.Database ?
-                GetOntologyData(schemaSource.Data) :
-                null;
+            //_ontologyData =
+            //    schemaSource.SourceKind == SchemaSourceKind.Database ?
+            //    GetOntologyData(schemaSource.Data) :
+            //    null;
             GridTypesSelectionChanged();
         }
 

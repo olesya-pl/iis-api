@@ -22,15 +22,7 @@ namespace Iis.OntologySchema.DataTypes
         string[] TargetTypes { get; }
         IFormField FormField { get; }
         IContainerMeta Container { get; }
-
-        #endregion
-
-        #region Inversed Fields
-
-        string Code { get; }
-        string Title { get; }
-        bool Multiple { get; }
-        ISchemaMeta Inversed { get; }
+        IInversedMeta Inversed { get; }
 
         #endregion
 

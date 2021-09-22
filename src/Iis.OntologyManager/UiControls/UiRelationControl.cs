@@ -41,7 +41,9 @@ namespace Iis.OntologyManager.UiControls
         ComboBox cmbContainer;
 
         CheckBox cbIsInversed;
+        Label lblInversedCode;
         TextBox txtInversedCode;
+        Label lblInversedTitle;
         TextBox txtInversedTitle;
         CheckBox cbInversedMultiple;
 
@@ -69,6 +71,7 @@ namespace Iis.OntologyManager.UiControls
         {
             var panels = _uiControlsCreator.GetTopBottomPanels(MainPanel, 350);
             var containerTop = new UiContainerManager("MainOptions", panels.panelTop);
+            containerTop.SetColWidth((int)(_style.ControlWidthDefault * 1.5));
             var containerBottom = new UiContainerManager("SecondaryOptions", panels.panelBottom);
 
             containerTop.Add(txtId = new TextBox { ReadOnly = true }, "ІД");
@@ -97,6 +100,11 @@ namespace Iis.OntologyManager.UiControls
                 };
                 containerTop.Add(cmbTargetType, "Зв'язок до типу:");
                 containerTop.Add(cbIsImportantRelation = new CheckBox { Text = "Важливе" });
+                containerTop.Add(cbIsInversed = new CheckBox { Text = "Інвертоване" });
+                cbIsInversed.Click += (o, e) => SetControlsEnabled();
+                lblInversedCode = containerTop.Add(txtInversedCode = new TextBox(), "Інвертоване ім'я");
+                lblInversedTitle = containerTop.Add(txtInversedTitle = new TextBox(), "Інвертований заголовок");
+                containerTop.Add(cbInversedMultiple = new CheckBox { Text = "Інвертоване множинне" });
 
                 containerTop.GoToNewColumn();
                 clbTargetTypes = new CheckedListBox();
@@ -150,6 +158,20 @@ namespace Iis.OntologyManager.UiControls
                 cmbFormat.Text = nodeType.MetaObject.Format ?? string.Empty;
                 txtFormFieldLines.Text = nodeType.MetaObject.FormField?.Lines?.ToString();
             }
+            
+            SetControlsEnabled();
+        }
+
+        public void SetParentTypeId(Guid? parentTypeId)
+        {
+            _parentTypeId = parentTypeId;
+        }
+
+        public void CreateNew()
+        {
+            cmbTargetType.DataSource = _getAllEntities();
+            _uiControlsCreator.SetSelectedValue(cmbTargetType, null);
+            SetControlsEnabled();
         }
 
         private void FillTargetTypes(INodeTypeLinked nodeType)
@@ -197,6 +219,9 @@ namespace Iis.OntologyManager.UiControls
             var sourceType = nodeType.RelationType.SourceType;
             var _containers = GetAllContainers(sourceType);
             cmbContainer.DataSource = _containers;
+
+            var container = _containers.FirstOrDefault(_ => _.Id == nodeType.MetaObject.Container?.Id);
+            _uiControlsCreator.SetSelectedValue(cmbContainer, nodeType.MetaObject.Container?.Title);
         }
 
         private int? GetCurrentSortOrder() =>
@@ -211,6 +236,7 @@ namespace Iis.OntologyManager.UiControls
 
         private string[] GetCurrentTargetTypes()
         {
+            if (clbTargetTypes == null) return new string[] { };
             if (clbTargetTypes.Items.Count == clbTargetTypes.CheckedItems.Count) return null;
 
             var result = new List<string>();
@@ -226,6 +252,7 @@ namespace Iis.OntologyManager.UiControls
 
         private IFormField GetCurrentFormField()
         {
+            if (_nodeType == null) return null;
             var type = _nodeType.MetaObject?.FormField?.Type;
             var hint = _nodeType.MetaObject?.FormField?.Hint;
             var lines = GetCurrentFormFieldLines();
@@ -251,6 +278,15 @@ namespace Iis.OntologyManager.UiControls
                 new SchemaContainer { Id = selected.Id, Title = selected.Title, Type = selected.Type };
         }
 
+        private IInversedMeta GetCurrentInversedMeta() =>
+            !(cbIsInversed?.Checked == true) ? null :
+                new SchemaInversedMeta
+                {
+                    Code = txtInversedCode.Text,
+                    Title = txtInversedTitle.Text,
+                    Multiple = cbInversedMultiple.Checked
+                };
+
         private ISchemaMeta GetMeta()
         {
             var meta = new SchemaMeta();
@@ -264,6 +300,7 @@ namespace Iis.OntologyManager.UiControls
             meta.TargetTypes = GetCurrentTargetTypes();
             meta.FormField = GetCurrentFormField();
             meta.Container = GetCurrentContainer();
+            meta.Inversed = GetCurrentInversedMeta();
 
             return meta;
         }
@@ -280,7 +317,8 @@ namespace Iis.OntologyManager.UiControls
                 Title = txtTitle.Text,
                 Meta = GetMetaJson(),
                 EmbeddingOptions = (EmbeddingOptions)cmbEmbedding.SelectedItem,
-                TargetTypeId = (Guid)cmbTargetType.SelectedValue,
+                ScalarType = (ScalarType?)cmbScalarType?.SelectedItem,
+                TargetTypeId = (Guid?)(cmbTargetType?.SelectedValue),
                 ParentTypeId = _parentTypeId
             };
         }
@@ -307,17 +345,24 @@ namespace Iis.OntologyManager.UiControls
             {
                 sb.AppendLine("Індекс сортування повинен бути цілим числом");
             }
+            if (cmbTargetType != null && cmbTargetType.SelectedItem == null)
+            {
+                sb.AppendLine("Тип повинен бути вибраним");
+            }
             return sb.ToString();
         }
 
-        public void SetParentTypeId(Guid? parentTypeId)
+        private void SetControlsEnabled()
         {
-            _parentTypeId = parentTypeId;
-        }
-
-        public void CreateNew()
-        {
-            throw new NotImplementedException();
+            if (cbIsInversed != null)
+            {
+                bool isInversed = cbIsInversed.Checked;
+                lblInversedCode.Enabled = isInversed;
+                txtInversedCode.Enabled = isInversed;
+                lblInversedTitle.Enabled = isInversed;
+                txtInversedTitle.Enabled = isInversed;
+                cbInversedMultiple.Enabled = isInversed;
+            }
         }
     }
 }
