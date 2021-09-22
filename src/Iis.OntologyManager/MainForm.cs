@@ -57,8 +57,6 @@ namespace Iis.OntologyManager
         UiMigrationControl _migrationControl;
         UiDuplicatesControl _duplicatesControl;
         UiEntityTypeControl _uiEntityTypeControl;
-        UiRelationAttributeControl _uiRelationAttributeControl;
-        //UiRelationEntityControl _uiRelationEntityControl;
         UiRelationControl _uiRelationToEntityControl;
         UiRelationControl _uiRelationToAttributeControl;
         UiOntologyDataControl _uiOntologyDataControl;
@@ -67,11 +65,10 @@ namespace Iis.OntologyManager
         Panel pnlTop;
         Dictionary<NodeViewType, IUiNodeTypeControl> _nodeTypeControls = new Dictionary<NodeViewType, IUiNodeTypeControl>();
         Dictionary<string, IDataViewControl> _dataViewControls = new Dictionary<string, IDataViewControl>();
-        const string VERSION = "1.36";
+        const string VERSION = "1.40";
         Button btnMigrate;
         Button btnDuplicates;
         ILogger _logger;
-        IAccessLevels _accessLevels;
 
         #endregion
 
@@ -177,20 +174,11 @@ namespace Iis.OntologyManager
             _uiEntityTypeControl.OnRemoveInheritance += RemoveInheritance;
             _uiEntityTypeControl.OnSave += OnNodeTypeSaveClick;
 
-            //var pnlRelationAttribute = _uiControlsCreator.GetFillPanel(pnlBottom, true);
-            //_uiRelationAttributeControl = new UiRelationAttributeControl(_uiControlsCreator);
-            //_uiRelationAttributeControl.Initialize("RelationAttributeControl", pnlRelationAttribute);
-            //_uiRelationAttributeControl.OnSave += OnNodeTypeSaveClick;
-
             var pnlRelationToAttribute = _uiControlsCreator.GetFillPanel(pnlBottom, true);
             _uiRelationToAttributeControl = new UiRelationControl(_uiControlsCreator, GetAllEntities, RelationControlMode.ToAttribute);
             _uiRelationToAttributeControl.Initialize("RelationControl", pnlRelationToAttribute);
             _uiRelationToAttributeControl.OnSave += OnNodeTypeSaveClick;
 
-            //var pnlRelationEntity = _uiControlsCreator.GetFillPanel(pnlBottom, true);
-            //_uiRelationEntityControl = new UiRelationEntityControl(_uiControlsCreator, GetAllEntities);
-            //_uiRelationEntityControl.Initialize("RelationEntityControl", pnlRelationEntity);
-            //_uiRelationEntityControl.OnSave += OnNodeTypeSaveClick;
             var pnlRelationToEntity = _uiControlsCreator.GetFillPanel(pnlBottom, true);
             _uiRelationToEntityControl = new UiRelationControl(_uiControlsCreator, GetAllEntities, RelationControlMode.ToEntity);
             _uiRelationToEntityControl.Initialize("RelationControl", pnlRelationToEntity);
@@ -234,7 +222,6 @@ namespace Iis.OntologyManager
             _uiAccessLevelControl.SetEnabled(enabled);
             _uiOntologyDataControl.SetEnabled(enabled);
             _uiEntityTypeControl.SetEnabled(enabled);
-            _uiRelationAttributeControl.SetEnabled(enabled);
             _filterControl.SetEnabled(enabled);
             panelTop.Enabled = enabled;
             btnTypeBack.Enabled = enabled;

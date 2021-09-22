@@ -55,7 +55,6 @@ namespace Iis.OntologyManager.UiControls
         private INodeTypeLinked _nodeType;
         private Guid? Id => string.IsNullOrEmpty(txtId.Text) ? (Guid?)null : new Guid(txtId.Text);
         private Guid? _parentTypeId;
-        private List<IContainerMeta> _containers;
 
         private RelationControlMode _mode;
         public UiRelationControl(
