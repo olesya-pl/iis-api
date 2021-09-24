@@ -47,10 +47,10 @@ namespace Iis.DbLayer.Repositories
                 .ToArrayAsync(ct);
         }
 
-        public Task<UserEntity[]> GetOperatorsAsync(Expression<Func<UserEntity, bool>> predicate, CancellationToken ct = default)
+        public Task<UserEntity[]> GetUsersAsync(Expression<Func<UserEntity, bool>> predicate, CancellationToken ct = default)
         {
             return GetUsersQuery()
-                .Where(e => e.UserRoles.Any(r => r.RoleId == RoleEntity.OperatorRoleId) && !e.IsBlocked)
+                .Where(e => !e.IsBlocked)
                 .Where(predicate)
                 .ToArrayAsync(ct);
         }
