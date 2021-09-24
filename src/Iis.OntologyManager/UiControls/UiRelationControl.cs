@@ -36,6 +36,7 @@ namespace Iis.OntologyManager.UiControls
         CheckBox cbIsImportantRelation;
         CheckBox cbEditing;
         CheckedListBox clbTargetTypes;
+        ToolTip toolTip;
 
         TextBox txtFormFieldLines;
         ComboBox cmbContainer;
@@ -56,6 +57,13 @@ namespace Iis.OntologyManager.UiControls
         private Guid? Id => string.IsNullOrEmpty(txtId.Text) ? (Guid?)null : new Guid(txtId.Text);
         private Guid? _parentTypeId;
 
+        private Dictionary<string, EmbeddingOptions> embeddingOptionsUkr = new Dictionary<string, EmbeddingOptions>
+        {
+            { "Не обов'язкове", EmbeddingOptions.Optional },
+            { "Обов'язкове", EmbeddingOptions.Required },
+            { "Множинне не обов'язкове", EmbeddingOptions.Multiple }
+        };
+
         private RelationControlMode _mode;
         public UiRelationControl(
             UiControlsCreator uiControlsCreator, 
@@ -65,6 +73,13 @@ namespace Iis.OntologyManager.UiControls
             _uiControlsCreator = uiControlsCreator;
             _getAllEntities = getAllEntities;
             _mode = mode;
+            toolTip = new ToolTip
+            {
+                AutoPopDelay = 5000,
+                InitialDelay = 0,
+                ReshowDelay = 10,
+                ShowAlways = true
+            };
         }
         protected override void CreateControls()
         {
@@ -76,12 +91,17 @@ namespace Iis.OntologyManager.UiControls
             containerTop.Add(txtId = new TextBox { ReadOnly = true }, "ІД");
             containerTop.Add(txtName = new TextBox(), "Ім'я");
             containerTop.Add(txtTitle = new TextBox(), "Заголовок");
-            containerTop.Add(cmbEmbedding = _uiControlsCreator.GetEnumComboBox(typeof(EmbeddingOptions)), "Обов'язковість");
-            containerTop.Add(cmbContainer = new ComboBox(), "Контейнер");
+            SetToolTip(txtTitle, "Відображається в меню \"Створити об'єкт\" та агрегації");
+            containerTop.Add(cmbEmbedding = new ComboBox { DropDownStyle = ComboBoxStyle.DropDownList }, "Обов'язковість");
+            cmbEmbedding.DataSource = embeddingOptionsUkr.Keys.ToList();
+            
+            containerTop.Add(cmbContainer = new ComboBox(), "Розділ");
+            SetToolTip(cmbContainer, "Розділ, під яким це поле буде відображатися у веб-додаткі. Можна вибрати існуючий або ввести новий. ");
             cmbContainer.DisplayMember = "Title";
             containerTop.Add(txtSortOrder = new TextBox(), "Індекс сортування");
+            SetToolTip(txtSortOrder, "Ціле число. Визначає порядок сортировки всередині розділу");
             containerTop.Add(cbEditing = new CheckBox { Text = "Можливе редактування" });
-            containerTop.Add(cbHidden = new CheckBox { Text = "Відключений" });
+            containerTop.Add(cbHidden = new CheckBox { Text = "Не відображати в веб додатку" });
             btnSave = new Button { Text = "Зберегти" };
             btnSave.Click += (sender, e) => { ValidateAndSave(); };
             containerTop.Add(btnSave);
@@ -97,34 +117,47 @@ namespace Iis.OntologyManager.UiControls
                     ValueMember = "Id",
                     BackColor = _style.BackgroundColor
                 };
-                containerTop.Add(cmbTargetType, "Зв'язок до типу:");
+                containerTop.Add(cmbTargetType, "Зв'язок до типу");
                 containerTop.Add(cbIsImportantRelation = new CheckBox { Text = "Важливе" });
+                SetToolTip(cbIsImportantRelation, "Зробити це поле пріоритетним при пошуку");
                 containerTop.Add(cbIsInversed = new CheckBox { Text = "Інвертоване" });
+                SetToolTip(cbIsInversed, "Створити зеркальне поле у цільовому типу");
                 cbIsInversed.Click += (o, e) => SetControlsEnabled();
                 lblInversedCode = containerTop.Add(txtInversedCode = new TextBox(), "Інвертоване ім'я");
+                SetToolTip(txtInversedCode, "Ім'я зеркального поля");
                 lblInversedTitle = containerTop.Add(txtInversedTitle = new TextBox(), "Інвертований заголовок");
+                SetToolTip(txtInversedTitle, "Заголовок зеркального поля");
                 containerTop.Add(cbInversedMultiple = new CheckBox { Text = "Інвертоване множинне" });
+                SetToolTip(cbInversedMultiple, "Зробити зеркальне поле множинним");
 
                 containerTop.GoToNewColumn();
                 clbTargetTypes = new CheckedListBox();
                 containerTop.Add(clbTargetTypes, "Типи які можна вибрати", true);
+                SetToolTip(clbTargetTypes, "Типи, які з'явяться для вибору у веб додатку");
             }
 
             if (_mode == RelationControlMode.ToAttribute)
             {
                 containerTop.Add(cmbScalarType = _uiControlsCreator.GetEnumComboBox(typeof(ScalarType)), "Тип даних");
                 containerTop.Add(txtFormula = new TextBox(), "Формула");
+                SetToolTip(txtFormula, "Правила до створення формул дивись у документації");
                 
                 cmbFormat = new ComboBox { DropDownStyle = ComboBoxStyle.DropDownList };
                 cmbFormat.DataSource = _valuesForFormat;
                 containerTop.Add(cmbFormat, "Формат");
+                SetToolTip(cmbFormat, "Правило, з яким поле буде валидуватися у веб додатку");
+
                 containerTop.Add(txtFormFieldLines = new TextBox(), "Рядків у текстовому полі");
+                SetToolTip(txtFormFieldLines, "Числове поле. Кількість рядків у веб додатку");
 
                 containerTop.Add(cbIsAggregated = new CheckBox { Text = "Агрегація" });
+                SetToolTip(cbIsAggregated, "Додати це поле у аггрегацію при пошуку");
             }
 
-            containerTop.GoToNewColumn();
-            containerTop.Add(txtMeta = new RichTextBox(), "Meta", true);
+            txtMeta = new RichTextBox();
+
+            //containerTop.GoToNewColumn();
+            //containerTop.Add(txtMeta = new RichTextBox(), "Meta", true);
         }
 
         public void SetUiValues(INodeTypeLinked nodeType, List<string> aliases)
@@ -138,7 +171,10 @@ namespace Iis.OntologyManager.UiControls
             txtSortOrder.Text = nodeType.MetaObject?.SortOrder?.ToString();
             cbEditing.Checked = nodeType.CanBeEditedOnUi;
 
-            _uiControlsCreator.SetSelectedValue(cmbEmbedding, nodeType.RelationType.EmbeddingOptions.ToString());
+            var embeddingOptions = nodeType.RelationType.EmbeddingOptions == EmbeddingOptions.None ? EmbeddingOptions.Optional
+                : nodeType.RelationType.EmbeddingOptions;
+            var embeddingUkr = embeddingOptionsUkr.FirstOrDefault(_ => _.Value == embeddingOptions).Key;
+            _uiControlsCreator.SetSelectedValue(cmbEmbedding, embeddingUkr);
             FillContainers(nodeType);
 
             if (_mode == RelationControlMode.ToEntity)
@@ -168,8 +204,11 @@ namespace Iis.OntologyManager.UiControls
 
         public void CreateNew()
         {
-            cmbTargetType.DataSource = _getAllEntities();
-            _uiControlsCreator.SetSelectedValue(cmbTargetType, null);
+            if (cmbTargetType != null)
+            {
+                cmbTargetType.DataSource = _getAllEntities();
+                _uiControlsCreator.SetSelectedValue(cmbTargetType, null);
+            }
             SetControlsEnabled();
         }
 
@@ -315,7 +354,7 @@ namespace Iis.OntologyManager.UiControls
                 Name = txtName.Text,
                 Title = txtTitle.Text,
                 Meta = GetMetaJson(),
-                EmbeddingOptions = (EmbeddingOptions)cmbEmbedding.SelectedItem,
+                EmbeddingOptions = embeddingOptionsUkr.GetValueOrDefault(cmbEmbedding.SelectedItem.ToString()),
                 ScalarType = (ScalarType?)cmbScalarType?.SelectedItem,
                 TargetTypeId = (Guid?)(cmbTargetType?.SelectedValue),
                 ParentTypeId = _parentTypeId
@@ -362,6 +401,11 @@ namespace Iis.OntologyManager.UiControls
                 txtInversedTitle.Enabled = isInversed;
                 cbInversedMultiple.Enabled = isInversed;
             }
+        }
+
+        private void SetToolTip(Control control, string text)
+        {
+            toolTip.SetToolTip(control, text);
         }
     }
 }
