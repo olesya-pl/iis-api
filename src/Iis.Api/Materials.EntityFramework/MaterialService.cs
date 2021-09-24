@@ -427,7 +427,7 @@ namespace IIS.Core.Materials.EntityFramework
             if (addedAssigneeIds.Count == 0)
                 return;
 
-            var addedAssignees = await RunWithoutCommitAsync(_ => _.UserRepository.GetOperatorsAsync(user => addedAssigneeIds.Contains(user.Id)));
+            var addedAssignees = await RunWithoutCommitAsync(_ => _.UserRepository.GetUsersAsync(user => addedAssigneeIds.Contains(user.Id)));
             var oldAssigneeNames = material.MaterialAssignees.Select(_ => _.Assignee.Username).ToArray();
             string oldValue = GetAssigneeChangeValue(oldAssigneeNames);
             var addedAssigneeNames = addedAssignees.Select(_ => _.Username);
@@ -582,7 +582,7 @@ namespace IIS.Core.Materials.EntityFramework
             User user,
             Guid changeRequestId)
         {
-            var existingAssignees = await RunWithoutCommitAsync(_ => _.UserRepository.GetOperatorsAsync(user => assigneeIds.Contains(user.Id)));
+            var existingAssignees = await RunWithoutCommitAsync(_ => _.UserRepository.GetUsersAsync(user => assigneeIds.Contains(user.Id)));
             var existingAssigneeDictionary = existingAssignees.ToDictionary(_ => _.Id);
             var existingMaterialAssigneeIds = material.MaterialAssignees.Select(_ => _.AssigneeId);
             var (added, removed) = existingAssigneeDictionary.Keys.GetChanges(existingMaterialAssigneeIds);
