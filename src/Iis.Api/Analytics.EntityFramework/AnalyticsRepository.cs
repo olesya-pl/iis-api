@@ -7,6 +7,7 @@ using Iis.DataModel;
 using Iis.DataModel.Analytics;
 using Newtonsoft.Json;
 using Iis.Interfaces.Ontology.Schema;
+using System.Linq;
 
 namespace IIS.Core.Analytics.EntityFramework
 {
@@ -21,24 +22,25 @@ namespace IIS.Core.Analytics.EntityFramework
             _ontologySchema = ontologySchema;
         }
 
-        public async Task<IEnumerable<AnalyticIndicatorEntity>> GetAllChildrenAsync(Guid parentId)
+        public IEnumerable<AnalyticIndicatorEntity> GetAllChildrenAsync(Guid parentId)
         {
             // TODO: better to use QueryBuilder because escaping is Postgres specific
-            return await _context.AnalyticIndicators
+            return _context.AnalyticIndicators
                 .FromSqlRaw(@"
                     WITH RECURSIVE children AS (
                         SELECT *
-                        FROM ""AnalyticsIndicators""
+                        FROM ""AnalyticIndicators""
                         WHERE ""ParentId"" = {0}
                         UNION
                         SELECT i.*
-                        FROM ""AnalyticsIndicators"" i
+                        FROM ""AnalyticIndicators"" i
                           INNER JOIN children c ON c.""Id"" = i.""ParentId""
                     )
                     SELECT * FROM children
                 ", parentId)
                 .AsNoTracking()
-                .ToListAsync();
+                .AsEnumerable()
+                .ToList();
         }
 
         public async Task<AnalyticIndicatorEntity> getRootAsync(Guid childId)
