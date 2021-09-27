@@ -63,8 +63,6 @@ namespace Iis.OntologySchema.DataTypes
         public EmbeddingOptions EmbeddingOptions => RelationType?.EmbeddingOptions ?? EmbeddingOptions.None;
         private string _titleAttributeName;
         public string TitleAttributeName => _titleAttributeName ?? (_titleAttributeName = GetTitleAttributeName());
-        public bool CanBeEditedOnUi =>
-            MetaObject?.AcceptsEntityOperations != null && MetaObject.AcceptsEntityOperations.Length > 0;
 
         public string GetMetaDeep()
         {

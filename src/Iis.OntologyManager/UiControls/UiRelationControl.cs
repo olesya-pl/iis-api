@@ -34,11 +34,11 @@ namespace Iis.OntologyManager.UiControls
         CheckBox cbIsAggregated;
         ComboBox cmbFormat;
         CheckBox cbIsImportantRelation;
-        CheckBox cbEditing;
         CheckedListBox clbTargetTypes;
         ToolTip toolTip;
 
         TextBox txtFormFieldLines;
+        Label lblFormFieldLines;
         ComboBox cmbContainer;
 
         CheckBox cbIsInversed;
@@ -89,8 +89,8 @@ namespace Iis.OntologyManager.UiControls
             var containerBottom = new UiContainerManager("SecondaryOptions", panels.panelBottom);
 
             containerTop.Add(txtId = new TextBox { ReadOnly = true }, "ІД");
-            containerTop.Add(txtName = new TextBox(), "Ім'я");
-            containerTop.Add(txtTitle = new TextBox(), "Заголовок");
+            containerTop.Add(txtName = new TextBox(), "Ім'я *");
+            containerTop.Add(txtTitle = new TextBox(), "Заголовок *");
             SetToolTip(txtTitle, "Відображається в меню \"Створити об'єкт\" та агрегації");
             containerTop.Add(cmbEmbedding = new ComboBox { DropDownStyle = ComboBoxStyle.DropDownList }, "Обов'язковість");
             cmbEmbedding.DataSource = embeddingOptionsUkr.Keys.ToList();
@@ -100,7 +100,6 @@ namespace Iis.OntologyManager.UiControls
             cmbContainer.DisplayMember = "Title";
             containerTop.Add(txtSortOrder = new TextBox(), "Індекс сортування");
             SetToolTip(txtSortOrder, "Ціле число. Визначає порядок сортировки всередині розділу");
-            containerTop.Add(cbEditing = new CheckBox { Text = "Можливе редактування" });
             containerTop.Add(cbHidden = new CheckBox { Text = "Не відображати в веб додатку" });
             btnSave = new Button { Text = "Зберегти" };
             btnSave.Click += (sender, e) => { ValidateAndSave(); };
@@ -117,16 +116,17 @@ namespace Iis.OntologyManager.UiControls
                     ValueMember = "Id",
                     BackColor = _style.BackgroundColor
                 };
-                containerTop.Add(cmbTargetType, "Зв'язок до типу");
+                containerTop.Add(cmbTargetType, "Зв'язок до типу *");
+                cmbTargetType.SelectedIndexChanged += (sender, e) => TargetTypeChanged();
                 containerTop.Add(cbIsImportantRelation = new CheckBox { Text = "Важливе" });
                 SetToolTip(cbIsImportantRelation, "Зробити це поле пріоритетним при пошуку");
                 containerTop.Add(cbIsInversed = new CheckBox { Text = "Інвертоване" });
                 SetToolTip(cbIsInversed, "Створити зеркальне поле у цільовому типу");
                 cbIsInversed.Click += (o, e) => SetControlsEnabled();
                 lblInversedCode = containerTop.Add(txtInversedCode = new TextBox(), "Інвертоване ім'я");
-                SetToolTip(txtInversedCode, "Ім'я зеркального поля");
+                SetToolTip(txtInversedCode, "Ім'я зеркального поля *");
                 lblInversedTitle = containerTop.Add(txtInversedTitle = new TextBox(), "Інвертований заголовок");
-                SetToolTip(txtInversedTitle, "Заголовок зеркального поля");
+                SetToolTip(txtInversedTitle, "Заголовок зеркального поля *");
                 containerTop.Add(cbInversedMultiple = new CheckBox { Text = "Інвертоване множинне" });
                 SetToolTip(cbInversedMultiple, "Зробити зеркальне поле множинним");
 
@@ -138,7 +138,8 @@ namespace Iis.OntologyManager.UiControls
 
             if (_mode == RelationControlMode.ToAttribute)
             {
-                containerTop.Add(cmbScalarType = _uiControlsCreator.GetEnumComboBox(typeof(ScalarType)), "Тип даних");
+                containerTop.Add(cmbScalarType = _uiControlsCreator.GetEnumComboBox(typeof(ScalarType)), "Тип даних *");
+                cmbScalarType.SelectedIndexChanged += (sender, e) => SetControlsEnabled();
                 containerTop.Add(txtFormula = new TextBox(), "Формула");
                 SetToolTip(txtFormula, "Правила до створення формул дивись у документації");
                 
@@ -147,7 +148,7 @@ namespace Iis.OntologyManager.UiControls
                 containerTop.Add(cmbFormat, "Формат");
                 SetToolTip(cmbFormat, "Правило, з яким поле буде валидуватися у веб додатку");
 
-                containerTop.Add(txtFormFieldLines = new TextBox(), "Рядків у текстовому полі");
+                lblFormFieldLines = containerTop.Add(txtFormFieldLines = new TextBox(), "Рядків у текстовому полі");
                 SetToolTip(txtFormFieldLines, "Числове поле. Кількість рядків у веб додатку");
 
                 containerTop.Add(cbIsAggregated = new CheckBox { Text = "Агрегація" });
@@ -169,7 +170,6 @@ namespace Iis.OntologyManager.UiControls
             txtMeta.Text = nodeType.Meta;
             cbHidden.Checked = nodeType.MetaObject?.Hidden ?? false;
             txtSortOrder.Text = nodeType.MetaObject?.SortOrder?.ToString();
-            cbEditing.Checked = nodeType.CanBeEditedOnUi;
 
             var embeddingOptions = nodeType.RelationType.EmbeddingOptions == EmbeddingOptions.None ? EmbeddingOptions.Optional
                 : nodeType.RelationType.EmbeddingOptions;
@@ -182,7 +182,7 @@ namespace Iis.OntologyManager.UiControls
                 cmbTargetType.DataSource = _getAllEntities();
                 _uiControlsCreator.SetSelectedValue(cmbTargetType, nodeType.RelationType.TargetType.Name);
                 cbIsImportantRelation.Checked = nodeType.MetaObject?.IsImportantRelation ?? false;
-                FillTargetTypes(nodeType);
+                FillTargetTypes(nodeType.TargetType, nodeType.MetaObject.TargetTypes);
             }
 
             if (_mode == RelationControlMode.ToAttribute)
@@ -209,24 +209,53 @@ namespace Iis.OntologyManager.UiControls
                 cmbTargetType.DataSource = _getAllEntities();
                 _uiControlsCreator.SetSelectedValue(cmbTargetType, null);
             }
+
+            txtId.Text = string.Empty;
+            txtName.Text = string.Empty;
+            txtTitle.Text = string.Empty;
+            txtMeta.Text = string.Empty;
+            cbHidden.Checked = false;
+            txtSortOrder.Text = string.Empty;
+
+            //if (_mode == RelationControlMode.ToEntity)
+            //{
+            //    cmbTargetType.DataSource = _getAllEntities();
+            //    _uiControlsCreator.SetSelectedValue(cmbTargetType, nodeType.RelationType.TargetType.Name);
+            //    cbIsImportantRelation.Checked = nodeType.MetaObject?.IsImportantRelation ?? false;
+            //    FillTargetTypes(nodeType.TargetType, nodeType.MetaObject.TargetTypes);
+            //}
+
+            //if (_mode == RelationControlMode.ToAttribute)
+            //{
+            //    _uiControlsCreator.SetSelectedValue(cmbScalarType, nodeType.RelationType.TargetType.AttributeType.ScalarType.ToString());
+            //    txtFormula.Text = nodeType.MetaObject?.Formula;
+            //    cbIsAggregated.Checked = nodeType.MetaObject?.IsAggregated ?? false;
+            //    cmbFormat.Text = nodeType.MetaObject.Format ?? string.Empty;
+            //    txtFormFieldLines.Text = nodeType.MetaObject.FormField?.Lines?.ToString();
+            //}
             SetControlsEnabled();
         }
 
-        private void FillTargetTypes(INodeTypeLinked nodeType)
+        private void FillTargetTypes(INodeTypeLinked nodeType, string[] savedTargetTypes)
         {
-            var descendants = nodeType.TargetType.GetAllDescendants().Where(nt => !nt.IsAbstract);
+            var descendants = nodeType == null ? new List<INodeTypeLinked>()
+                : nodeType.GetAllDescendants().Where(nt => !nt.IsAbstract);
             clbTargetTypes.Enabled = descendants.Any();
-
-            var allowedTypes = descendants
-                .Union(new[] { nodeType.TargetType })
-                .OrderBy(nt => nt.Name);
-            
             clbTargetTypes.Items.Clear();
-            foreach (var allowedType in allowedTypes)
+
+            if (nodeType != null)
             {
-                bool isChecked = nodeType.MetaObject.TargetTypes == null
-                    || nodeType.MetaObject.TargetTypes.Contains(allowedType.Name);
-                clbTargetTypes.Items.Add(allowedType.Name, isChecked);
+                var allowedTypes = descendants
+                    .Union(new[] { nodeType })
+                    .OrderBy(nt => nt.Name);
+
+
+                foreach (var allowedType in allowedTypes)
+                {
+                    bool isChecked = savedTargetTypes == null
+                        || savedTargetTypes.Contains(allowedType.Name);
+                    clbTargetTypes.Items.Add(allowedType.Name, isChecked);
+                }
             }
         }
 
@@ -268,9 +297,14 @@ namespace Iis.OntologyManager.UiControls
         private string GetCurrentFormat() =>
             string.IsNullOrEmpty(cmbFormat?.Text) ? null : cmbFormat.Text;
 
-        private EntityOperation[] GetCurrentAcceptsEntityOperations() =>
-            cbEditing?.Checked == true ? new[] { EntityOperation.Create, EntityOperation.Update, EntityOperation.Delete } :
-            (EntityOperation[])null;
+        private EntityOperation[] GetCurrentAcceptsEntityOperations()
+        {
+            var targetType = (INodeTypeLinked)cmbTargetType?.SelectedItem;
+            if (targetType == null) return null;
+
+            return targetType.IsObject || targetType.IsEnum || targetType.IsObjectSign ? null
+                : new[] { EntityOperation.Create, EntityOperation.Update, EntityOperation.Delete };
+        }
 
         private string[] GetCurrentTargetTypes()
         {
@@ -401,11 +435,22 @@ namespace Iis.OntologyManager.UiControls
                 txtInversedTitle.Enabled = isInversed;
                 cbInversedMultiple.Enabled = isInversed;
             }
+            if (cmbScalarType != null)
+            {
+                txtFormFieldLines.Enabled = cmbScalarType.SelectedItem != null && (ScalarType)cmbScalarType.SelectedItem == ScalarType.String;
+                lblFormFieldLines.Enabled = txtFormFieldLines.Enabled;
+            }
         }
 
         private void SetToolTip(Control control, string text)
         {
             toolTip.SetToolTip(control, text);
+        }
+
+        private void TargetTypeChanged()
+        {
+            var targetType = (INodeTypeLinked)cmbTargetType.SelectedItem;
+            FillTargetTypes(targetType, null);
         }
     }
 }
