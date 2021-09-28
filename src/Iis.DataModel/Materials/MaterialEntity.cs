@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Iis.DataModel.Materials
 {
-    public class MaterialEntity : BaseEntity
+    public class MaterialEntity : MaterialAccessEntity
     {
         #region Constants
 
@@ -135,22 +135,25 @@ namespace Iis.DataModel.Materials
         public MaterialSignEntity SessionPriority { get; set; }
         public string Title { get; set; }
         public string LoadData { get; set; }
-        public Guid? ProcessedStatusSignId { get; set; }
-        public MaterialSignEntity ProcessedStatus { get; set; }
         public virtual ICollection<MaterialEntity> Children { get; set; } = new List<MaterialEntity>();
         public virtual ICollection<MaterialInfoEntity> MaterialInfos { get; set; } = new List<MaterialInfoEntity>();
         public virtual List<MaterialAssigneeEntity> MaterialAssignees { get; set; } = new List<MaterialAssigneeEntity>();
         public int MlHandlersCount { get; set; }
-        public int AccessLevel { get; set; }
 
+        public DateTime? RegistrationDate { get; set; }
+    }
+
+    public class MaterialAccessEntity : BaseEntity
+    {
+        public int AccessLevel { get; set; }
+        public Guid? ProcessedStatusSignId { get; set; }
+        public MaterialSignEntity ProcessedStatus { get; set; }
         public Guid? EditorId { get; set; }
         public virtual UserEntity Editor { get; set; }
 
-        public DateTime? RegistrationDate { get; set; }
-
         public bool CanBeEdited(Guid userId)
         {
-            if (ProcessedStatusSignId == ProcessingStatusProcessingSignId)
+            if (ProcessedStatusSignId == MaterialEntity.ProcessingStatusProcessingSignId)
                 return Editor == null || EditorId == userId;
 
             return true;

@@ -6,6 +6,8 @@ using HotChocolate.Types;
 using HotChocolate.Resolvers;
 using IIS.Core.Materials;
 using System.Linq;
+using Iis.Api.GraphQL.Materials;
+using IIS.Services.Contracts.Interfaces;
 
 namespace IIS.Core.GraphQL.Materials
 {
@@ -15,10 +17,14 @@ namespace IIS.Core.GraphQL.Materials
             IResolverContext ctx,
             [Service] IMaterialService materialService,
             [Service] IMapper mapper,
+            [Service] IMaterialProvider materialProvider,
             [GraphQLNonNullType] MaterialUpdateInput input)
         {
             var tokenPayload = ctx.GetToken();
-            var material = await materialService.UpdateMaterialAsync(input, tokenPayload.User);
+            var material = input.HasValue()
+                ? await materialService.UpdateMaterialAsync(input, tokenPayload.User)
+                : await materialProvider.GetMaterialAsync(input.Id, tokenPayload.User);
+
             return mapper.Map<Material>(material);
         }
 

@@ -8,6 +8,8 @@ namespace Iis.Utility
     {
         public static IReadOnlyCollection<TItem> AsReadOnlyCollection<TItem>(this TItem item) => new[] { item };
 
+        public static TItem[] AsArray<TItem>(this TItem item) => new[] { item };
+
         public static (IReadOnlyCollection<TItem> Added, IReadOnlyCollection<TItem> Removed) GetChanges<TItem>(this IEnumerable<TItem> first, IEnumerable<TItem> second) =>
             (first.Except(second).ToArray(), second.Except(first).ToArray());
 
