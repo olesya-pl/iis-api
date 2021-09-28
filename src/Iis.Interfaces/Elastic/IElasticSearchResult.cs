@@ -17,6 +17,8 @@ namespace Iis.Interfaces.Elastic
         public AggregationBucket[] Buckets { get; set; }
 
         public AggregationItem SubAggs { get; set; }
+
+        public Dictionary<string, AggregationItem> GroupedSubAggs { get; set; }
     }
 
 
