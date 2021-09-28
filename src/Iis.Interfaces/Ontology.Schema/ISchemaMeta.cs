@@ -5,26 +5,40 @@ namespace Iis.OntologySchema.DataTypes
 {
     public interface ISchemaMeta
     {
+        #region Common Fields
+
+        public bool? Hidden { get; }
+        string Formula { get; }
+        bool? IsAggregated { get; }
+
+        #endregion
+
+        #region Front-End Fields
+
+        int? SortOrder { get; }
+        string Format { get; }
+        public bool? IsImportantRelation { get; }
+        EntityOperation[] AcceptsEntityOperations { get; }
+        string[] TargetTypes { get; }
+        IFormField FormField { get; }
+        IContainerMeta Container { get; }
+        IInversedMeta Inversed { get; }
+
+        #endregion
+
+        #region Obsolete Fields
+
+        [Obsolete]
+        bool Editable { get; }
         [Obsolete]
         bool? ExposeOnApi { get; }
         [Obsolete]
         bool? HasFewEntities { get; }
-        int? SortOrder { get; }
-        string Title { get; }
-        string Formula { get; }
-        string Format { get; }
-        EntityOperation[] AcceptsEntityOperations { get; }
+        [Obsolete]
         string Type { get; }
-        string[] TargetTypes { get; }
-        IFormField FormField { get; }
-        IContainerMeta Container { get; }
-        bool Multiple { get; }
+        [Obsolete]
         IValidation Validation { get; }
-        ISchemaMeta Inversed { get; }
-        bool? IsAggregated { get; }
-        string Code { get; }
-        bool Editable { get; }
-        public bool? IsImportantRelation { get; }
-        public bool? Hidden { get; }
+        
+        #endregion
     }
 }

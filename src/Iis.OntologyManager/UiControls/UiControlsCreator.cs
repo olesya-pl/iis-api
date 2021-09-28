@@ -59,13 +59,13 @@ namespace Iis.OntologyManager.UiControls
             return grid;
         }
 
-        public (Panel panelTop, Panel panelBottom) GetTopBottomPanels(Panel rootPanel, int topPanelWidth, int margin = 0)
+        public (Panel panelTop, Panel panelBottom) GetTopBottomPanels(Panel rootPanel, int topPanelHeight, int margin = 0)
         {
             var panelTop = new Panel
             {
                 Name = $"{rootPanel.Name}_Top",
                 Location = new Point(margin, margin),
-                Size = new Size(rootPanel.Width - margin * 2, topPanelWidth),
+                Size = new Size(rootPanel.Width - margin * 2, topPanelHeight),
                 Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right,
                 BorderStyle = BorderStyle.FixedSingle,
                 BackColor = rootPanel.BackColor
@@ -84,6 +84,33 @@ namespace Iis.OntologyManager.UiControls
             rootPanel.Controls.Add(panelBottom);
 
             return (panelTop, panelBottom);
+        }
+
+        public (Panel panelLeft, Panel panelRight) GetLeftRightPanels(Panel rootPanel, int leftPanelWidth, int margin = 0)
+        {
+            var panelLeft = new Panel
+            {
+                Name = $"{rootPanel.Name}_Left",
+                Location = new Point(margin, margin),
+                Size = new Size(leftPanelWidth, rootPanel.Height - margin * 2),
+                Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Bottom,
+                BorderStyle = BorderStyle.FixedSingle,
+                BackColor = rootPanel.BackColor
+            };
+
+            var panelRight = new Panel
+            {
+                Name = $"{rootPanel.Name}_Right",
+                Location = new Point(panelLeft.Width + margin, margin),
+                Size = new Size(rootPanel.Width - panelLeft.Right - margin * 4, rootPanel.Height - margin * 2),
+                Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right,
+                BorderStyle = BorderStyle.FixedSingle,
+                BackColor = rootPanel.BackColor
+            };
+            rootPanel.Controls.Add(panelLeft);
+            rootPanel.Controls.Add(panelRight);
+
+            return (panelLeft, panelRight);
         }
 
         public void UpdateComboSource(ComboBox comboBox, IEnumerable<object> source)
@@ -167,6 +194,8 @@ namespace Iis.OntologyManager.UiControls
 
         public void SetSelectedValue(ComboBox comboBox, string value)
         {
+            comboBox.SelectedIndex = -1;
+
             for (int i = 0; i < comboBox.Items.Count; i++)
             {
                 if (comboBox.Items[i].ToString() == value)

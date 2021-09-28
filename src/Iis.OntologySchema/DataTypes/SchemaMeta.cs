@@ -23,7 +23,7 @@ namespace Iis.OntologySchema.DataTypes
         public IFormField FormField { get; set; }
         public IContainerMeta Container { get; set; }
         public IValidation Validation { get; set; }
-        public ISchemaMeta Inversed { get; set; }
+        public IInversedMeta Inversed { get; set; }
         public bool? IsAggregated { get; set; }
         public bool? IsImportantRelation { get; set; }
         public string Code { get; set; }
@@ -88,7 +88,7 @@ namespace Iis.OntologySchema.DataTypes
 
             if (KeyExists(jObj, "Inversed"))
             {
-                Inversed = ((JObject)jObj["Inversed"]).ToObject<SchemaMeta>();
+                Inversed = ((JObject)jObj["Inversed"]).ToObject<SchemaInversedMeta>();
             }
             if (KeyExists(jObj, "FormField"))
             {
