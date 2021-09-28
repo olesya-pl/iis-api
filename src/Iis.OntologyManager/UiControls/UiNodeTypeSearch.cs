@@ -29,13 +29,10 @@ namespace Iis.OntologyManager.UiControls
             AddSearchButton(container, "AcceptsOperations", GetWithAcceptOperations);
 
             container.GoToNewColumn();
-
             AddSearchButton(container, "FormFieldType", GetWithFormFieldType);
             AddSearchButton(container, "FormFieldLines", GetWithFormFieldLines);
             AddSearchButton(container, "FormFieldHint", GetWithFormFieldHint);
             AddSearchButton(container, "FormFieldIcon", GetWithFormFieldIcon);
-
-
 
             txtLog = new RichTextBox { Dock = DockStyle.Fill, ReadOnly = true };
             panels.panelBottom.Controls.Add(txtLog);

@@ -492,7 +492,7 @@ namespace Iis.OntologyManager
         {
             WaitCursorAction(() => LoadCurrentSchema(SelectedSchemaSource));
         }
-        public void GridTypes_CellFormatting(object sender, DataGridViewCellFormattingEventArgs e)
+        private void GridTypes_CellFormatting(object sender, DataGridViewCellFormattingEventArgs e)
         {
             var grid = (DataGridView)sender;
             var nodeType = (INodeTypeLinked)grid.Rows[e.RowIndex].DataBoundItem;
@@ -560,7 +560,7 @@ namespace Iis.OntologyManager
                 UseWaitCursor = false;
             }
         }
-        public void ShowMessage(string message, string header = null)
+        private void ShowMessage(string message, string header = null)
         {
             var form = _uiControlsCreator.GetModalForm(this);
             form.Text = header;
@@ -644,10 +644,10 @@ namespace Iis.OntologyManager
 
             ReloadTypes(_filterControl.GetModel());
 
-            //_ontologyData =
-            //    schemaSource.SourceKind == SchemaSourceKind.Database ?
-            //    GetOntologyData(schemaSource.Data) :
-            //    null;
+            _ontologyData =
+                schemaSource.SourceKind == SchemaSourceKind.Database ?
+                GetOntologyData(schemaSource.Data) :
+                null;
             GridTypesSelectionChanged();
         }
 
@@ -806,7 +806,7 @@ namespace Iis.OntologyManager
         {
             return _uiControlsCreator.ChooseFromModalComboBox(GetAllEntities(), "Name");
         }
-        public void ReloadTypes(NodeTypeFilterFunc filter)
+        private void ReloadTypes(NodeTypeFilterFunc filter)
         {
             if (_schema == null) return;
             var ds = _schema.GetEntityTypes()
@@ -825,7 +825,7 @@ namespace Iis.OntologyManager
 
         #region Ontology Data
 
-        public OntologyNodesData GetOntologyData(string connectionString)
+        private OntologyNodesData GetOntologyData(string connectionString)
         {
             var context = OntologyContext.GetContext(connectionString);
             var schema = _schemaService.GetOntologySchema(SelectedSchemaSource);
@@ -835,7 +835,7 @@ namespace Iis.OntologyManager
             return new OntologyNodesData(rawData, schema, saver);
         }
 
-        public OntologyNodesData GetOntologyData() => GetOntologyData(SelectedConnectionString);
+        private OntologyNodesData GetOntologyData() => GetOntologyData(SelectedConnectionString);
 
         #endregion
     }

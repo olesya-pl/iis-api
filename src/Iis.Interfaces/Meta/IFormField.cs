@@ -2,16 +2,6 @@
 
 namespace Iis.Interfaces.Meta
 {
-    public enum FormFieldTypes
-    {
-        dropdown,
-        dropdownTree,
-        form,
-        fuzzyDate,
-        fuzzyDateRange,
-        radioGroup,
-        taggableString,
-    };
     public interface IFormField
     {
         int? Lines { get; set; }

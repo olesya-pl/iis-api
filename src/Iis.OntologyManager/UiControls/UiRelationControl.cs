@@ -23,7 +23,6 @@ namespace Iis.OntologyManager.UiControls
         TextBox txtId;
         TextBox txtName;
         TextBox txtTitle;
-        RichTextBox txtMeta;
         ComboBox cmbEmbedding;
         ComboBox cmbScalarType;
         ComboBox cmbTargetType;
@@ -154,11 +153,6 @@ namespace Iis.OntologyManager.UiControls
                 containerTop.Add(cbIsAggregated = new CheckBox { Text = "Агрегація" });
                 SetToolTip(cbIsAggregated, "Додати це поле у аггрегацію при пошуку");
             }
-
-            txtMeta = new RichTextBox();
-
-            //containerTop.GoToNewColumn();
-            //containerTop.Add(txtMeta = new RichTextBox(), "Meta", true);
         }
 
         public void SetUiValues(INodeTypeLinked nodeType, List<string> aliases)
@@ -167,7 +161,6 @@ namespace Iis.OntologyManager.UiControls
             txtId.Text = nodeType.Id.ToString("N");
             txtName.Text = nodeType.Name;
             txtTitle.Text = nodeType.Title;
-            txtMeta.Text = nodeType.Meta;
             cbHidden.Checked = nodeType.MetaObject?.Hidden ?? false;
             txtSortOrder.Text = nodeType.MetaObject?.SortOrder?.ToString();
 
@@ -213,26 +206,25 @@ namespace Iis.OntologyManager.UiControls
             txtId.Text = string.Empty;
             txtName.Text = string.Empty;
             txtTitle.Text = string.Empty;
-            txtMeta.Text = string.Empty;
             cbHidden.Checked = false;
             txtSortOrder.Text = string.Empty;
 
-            //if (_mode == RelationControlMode.ToEntity)
-            //{
-            //    cmbTargetType.DataSource = _getAllEntities();
-            //    _uiControlsCreator.SetSelectedValue(cmbTargetType, nodeType.RelationType.TargetType.Name);
-            //    cbIsImportantRelation.Checked = nodeType.MetaObject?.IsImportantRelation ?? false;
-            //    FillTargetTypes(nodeType.TargetType, nodeType.MetaObject.TargetTypes);
-            //}
+            if (_mode == RelationControlMode.ToEntity)
+            {
+                cmbTargetType.DataSource = _getAllEntities();
+                cmbTargetType.SelectedIndex = -1;
+                cbIsImportantRelation.Checked = false;
+                clbTargetTypes.Items.Clear();
+            }
 
-            //if (_mode == RelationControlMode.ToAttribute)
-            //{
-            //    _uiControlsCreator.SetSelectedValue(cmbScalarType, nodeType.RelationType.TargetType.AttributeType.ScalarType.ToString());
-            //    txtFormula.Text = nodeType.MetaObject?.Formula;
-            //    cbIsAggregated.Checked = nodeType.MetaObject?.IsAggregated ?? false;
-            //    cmbFormat.Text = nodeType.MetaObject.Format ?? string.Empty;
-            //    txtFormFieldLines.Text = nodeType.MetaObject.FormField?.Lines?.ToString();
-            //}
+            if (_mode == RelationControlMode.ToAttribute)
+            {
+                cmbScalarType.SelectedIndex = -1;
+                txtFormula.Text = string.Empty;
+                cbIsAggregated.Checked = false;
+                cmbFormat.Text = string.Empty;
+                txtFormFieldLines.Text = string.Empty;
+            }
             SetControlsEnabled();
         }
 
@@ -413,13 +405,29 @@ namespace Iis.OntologyManager.UiControls
             var sb = new StringBuilder();
             int n;
 
+            if (string.IsNullOrEmpty(txtName.Text))
+            {
+                sb.AppendLine("Ім'я не може бути порожнім");
+            }
+            if (string.IsNullOrEmpty(txtTitle.Text))
+            {
+                sb.AppendLine("Заголовок не може бути порожнім");
+            }
             if (!string.IsNullOrEmpty(txtSortOrder.Text) && !int.TryParse(txtSortOrder.Text, out n))
             {
                 sb.AppendLine("Індекс сортування повинен бути цілим числом");
             }
+            if (!string.IsNullOrEmpty(txtFormFieldLines?.Text) && !int.TryParse(txtFormFieldLines?.Text, out n))
+            {
+                sb.AppendLine("Рядків у текстовому полі повинне бути цілим числом");
+            }
+            if (cmbScalarType != null && cmbScalarType.SelectedItem == null)
+            {
+                sb.AppendLine("Тип даних не може бути порожнім");
+            }
             if (cmbTargetType != null && cmbTargetType.SelectedItem == null)
             {
-                sb.AppendLine("Тип повинен бути вибраним");
+                sb.AppendLine("Зв'язок до типу не може бути порожнім");
             }
             return sb.ToString();
         }
