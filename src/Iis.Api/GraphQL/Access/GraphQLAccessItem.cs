@@ -11,7 +11,7 @@ namespace Iis.Api.GraphQL.Access
     {
         public AccessKind Kind { get; private set; }
         public AccessOperation Operation { get; private set; }
-        public string[] GraphQLPatterns { get; private set; }
+        public IReadOnlyCollection<string> GraphQLPatterns { get; private set; }
         public Predicate<IReadOnlyDictionary<string, object>> RequestCondition { get; private set; }
         public GraphQLAccessItem(AccessKind kind, AccessOperation operation, params string[] graphQLPatterns)
         {
@@ -32,8 +32,8 @@ namespace Iis.Api.GraphQL.Access
         {
             foreach (var pattern in GraphQLPatterns)
             {
-                var regex = new Regex(pattern);
-                if (regex.IsMatch(graphQLItem))
+                var regex = new Regex(pattern, RegexOptions.Compiled);
+                if (string.Equals(pattern, graphQLItem, StringComparison.Ordinal) || regex.IsMatch(graphQLItem))
                 {
                     return true;
                 }
