@@ -52,6 +52,24 @@ namespace Iis.Services.Mappers.Graph
             };
         }
 
+        public static GraphLink MapMaterialToNodeGraphLink(Material material, INode node)
+        {
+            if (material is null) return null;
+
+            var extraObject = new JObject();
+
+            extraObject.Add(GraphTypeExtraPropNames.Type, node.NodeType.Name);
+            extraObject.Add(GraphTypeExtraPropNames.Name, node.NodeType.Title);
+
+            return new GraphLink
+            {
+                Id = Guid.NewGuid(),
+                From = material.Id,
+                To = node.Id,
+                Extra = extraObject
+            };
+        }
+
         public static GraphNode MapNodeToGraphNode(INode node, IReadOnlyCollection<Guid> exclusionNodeIdList)
         {
             if (node is null) return null;
@@ -110,9 +128,6 @@ namespace Iis.Services.Mappers.Graph
 
         private static bool DoesMaterialHaveLinks(Material material, Guid nodeId)
         {
-            return false;
-            //TEMPORALY COMMENTED
-            /*
             if(material is null) return false;
 
             if(material.ObjectsOfStudy is null || !material.ObjectsOfStudy.HasValues) return false;
@@ -125,7 +140,6 @@ namespace Iis.Services.Mappers.Graph
                                 .ToArray();
 
             return nodeIdList.Any();
-            */
         }
 
         private static string GetGraphNodeNameProperty(INode node) => node switch

@@ -321,7 +321,7 @@ namespace IIS.Core.Materials.EntityFramework
                         TargetId = material.Id,
                         UserName = username
                     });
-                    material.Content = input.Content;
+                    material.Content = input.Content ?? string.Empty;
                     if (input.Objects != null) loadData.Objects = new List<string>(input.Objects);
                     if (input.Tags != null) loadData.Tags = new List<string>(input.Tags);
                     if (input.States != null) loadData.States = new List<string>(input.States);

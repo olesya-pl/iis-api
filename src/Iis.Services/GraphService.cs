@@ -21,30 +21,27 @@ namespace Iis.Services
             _materialProvider = materialProvider;
         }
 
-        public async Task<(IReadOnlyCollection<GraphLink> LinkList, IReadOnlyCollection<GraphNode> NodeList)> GetGraphDataForNodeListAsync(IReadOnlyCollection<Guid> nodeIdList, IReadOnlyCollection<Guid> relationTypeList)
+        public async Task<GraphData> GetGraphDataForNodeListAsync(IReadOnlyCollection<Guid> idList)
         {
-            var nodeList = _data.GetNodes(nodeIdList);
+            var graphData = new GraphData();
 
-            var graphLinkList  = new List<GraphLink>();
-
-            var graphNodeList = new List<GraphNode>();
-
-            foreach (INode node in nodeList)
+            foreach (var id in idList)
             {
-                var materialResult = await _materialProvider.GetMaterialsByNodeIdAndRelatedEntities(node.Id);
+                var node = _data.GetNode(id);
+                if (node != null)
+                {
+                    graphData.AddData(await GetGraphDataForNodeAsync(node));
+                    continue;
+                }
 
-                var materialList = materialResult.Materials.ToArray();
-
-                graphLinkList.AddRange(GetGraphLinkListForNode(node));
-
-                graphLinkList.AddRange(GetGraphLinksForMaterials(materialList, node));
-
-                graphNodeList.AddRange(GetGraphNodeListForNode(node));
-
-                graphNodeList.AddRange(GetGraphNodesForMaterials(materialList, node));
+                var material = await _materialProvider.GetMaterialAsync(id);
+                if (material != null)
+                {
+                    graphData.AddData(GetGraphDataForMaterial(material));
+                }
             }
 
-            return (graphLinkList, graphNodeList);
+            return graphData;
         }
 
         private static IReadOnlyCollection<GraphLink> GetGraphLinkListForNode(INode node)
@@ -118,6 +115,45 @@ namespace Iis.Services
             return materialList
                 .Select(e => GraphTypeMapper.MapMaterialToGraphNode(e, node.Id))
                 .ToArray();
+        }
+
+        private async Task<GraphData> GetGraphDataForNodeAsync(INode node)
+        {
+            var graphData = new GraphData();
+
+            var materialResult = await _materialProvider.GetMaterialsByNodeIdAndRelatedEntities(node.Id);
+
+            var materialList = materialResult.Materials.ToArray();
+
+            graphData.AddLinks(GetGraphLinkListForNode(node));
+
+            graphData.AddLinks(GetGraphLinksForMaterials(materialList, node));
+
+            graphData.AddNodes(GetGraphNodeListForNode(node));
+
+            graphData.AddNodes(GetGraphNodesForMaterials(materialList, node));
+
+            return graphData;
+        }
+
+        private GraphData GetGraphDataForMaterial(Material material)
+        {
+            var graphData = new GraphData();
+
+            var nodes = material.Infos
+                .SelectMany(m => m.Features)
+                .Where(f => f.Node != null && GraphTypeMapper.IsEligibleForGraphByNodeType(f.Node.OriginalNode))
+                .Select(f => f.Node.OriginalNode);
+
+            var exclusionNodeIdList = new Guid[] { };
+
+            foreach (var node in nodes)
+            {
+                graphData.AddLinks(GraphTypeMapper.MapMaterialToNodeGraphLink(material, node));
+                graphData.AddNodes(GraphTypeMapper.MapNodeToGraphNode(node, exclusionNodeIdList));
+            }
+
+            return graphData;
         }
     }
 }
