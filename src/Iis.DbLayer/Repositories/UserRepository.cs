@@ -21,10 +21,10 @@ namespace Iis.DbLayer.Repositories
                 .SingleOrDefault(e => e.Username == userName && e.PasswordHash == passwordHash);
         }
 
-        public UserEntity GetByUserName(string userName)
+        public Task<UserEntity> GetByUserNameAsync(string userName, CancellationToken cancellationToken = default)
         {
             return GetUsersQuery()
-                .SingleOrDefault(e => e.Username == userName);
+                .SingleOrDefaultAsync(e => e.Username == userName, cancellationToken);
         }
 
         public Task<UserEntity> GetByIdAsync(Guid userId, CancellationToken ct)

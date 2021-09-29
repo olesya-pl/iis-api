@@ -8,5 +8,8 @@ namespace Iis.DataModel.Roles
         public Guid RoleId { get; set; }
         public UserEntity User { get; set; }
         public RoleEntity Role { get; set; }
+
+        public static UserRoleEntity CreateFrom(Guid userId, Guid roleId) =>
+            new UserRoleEntity { Id = Guid.NewGuid(), UserId = userId, RoleId = roleId };
     }
 }

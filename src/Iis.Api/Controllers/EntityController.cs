@@ -48,16 +48,18 @@ namespace Iis.Api.Controllers
 
             return Ok($"Deleted:{id:N}");
         }
+
         [HttpGet("GetAccess/{id}")]
-        public Task<IActionResult> GetAccess(Guid id)
+        public async Task<IActionResult> GetAccess(Guid id)
         {
             if (!Request.Headers.TryGetValue("Authorization", out var token))
+            {
                 throw new AuthenticationException("Requires \"Authorization\" header to contain a token");
+            }
 
-            var tokenPayload = TokenHelper.ValidateToken(token, _configuration, _userService);
+            var tokenPayload = await TokenHelper.ValidateTokenAsync(token, _configuration, _userService);
 
-            if (_ontologySerivice.GetNode(id) == null)
-                return Task.FromResult<IActionResult>(ValidationProblem("Entity is not found"));
+            if (_ontologySerivice.GetNode(id) == null) return ValidationProblem("Entity is not found");
 
             var objectAccess = new ObjectAccess
             {
@@ -69,7 +71,7 @@ namespace Iis.Api.Controllers
 
             var json = JsonConvert.SerializeObject(objectAccess);
 
-            return Task.FromResult<IActionResult>(Content(json));
+            return Content(json);
         }
     }
 }

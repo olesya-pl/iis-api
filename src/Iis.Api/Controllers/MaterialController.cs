@@ -2,7 +2,6 @@ using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
-using Iis.Api.Filters;
 using System.Security.Authentication;
 using IIS.Core;
 using Iis.Services.Contracts.Access;
@@ -35,12 +34,16 @@ namespace Iis.Api.Controllers
         public async Task<IActionResult> GetAccess(Guid id)
         {
             if (!Request.Headers.TryGetValue("Authorization", out var token))
+            {
                 throw new AuthenticationException("Requires \"Authorization\" header to contain a token");
+            }
 
-            var tokenPayload = TokenHelper.ValidateToken(token, _configuration, _userService);
+            var tokenPayload = await TokenHelper.ValidateTokenAsync(token, _configuration, _userService);
 
             if (await _materialProvider.GetMaterialAsync(id, tokenPayload.User) == null)
+            {
                 return ValidationProblem("Material is not found");
+            }
 
             var objectAccess = new ObjectAccess
             {

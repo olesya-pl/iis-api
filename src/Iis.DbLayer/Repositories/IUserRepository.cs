@@ -12,7 +12,7 @@ namespace Iis.DbLayer.Repositories
     public interface IUserRepository
     {
         UserEntity GetByUserNameAndHash(string userName, string passwordHash);
-        UserEntity GetByUserName(string userName);
+        Task<UserEntity> GetByUserNameAsync(string userName, CancellationToken cancellationToken = default);
         Task<UserEntity> GetByIdAsync(Guid userId, CancellationToken ct);
         Task<List<UserEntity>> GetAllUsersAsync(CancellationToken ct);
         Task<UserEntity[]> GetOperatorsAsync(CancellationToken ct = default);
