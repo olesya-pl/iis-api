@@ -7,6 +7,7 @@ using System.Threading;
 using Iis.Domain.Materials;
 using Iis.Services.Contracts.Materials.Distribution;
 using System.Linq.Expressions;
+using Iis.DbLayer.Common;
 
 namespace Iis.DbLayer.Repositories
 {
@@ -24,13 +25,15 @@ namespace Iis.DbLayer.Repositories
 
         Task<IEnumerable<MaterialEntity>> GetAllForRelatedNodeListAsync(IEnumerable<Guid> nodeIdList);
 
-        Task<(IEnumerable<MaterialEntity> Entities, int TotalCount)> GetAllAsync(int limit, int offset, string sortColumnName = null, string sortOrder = null);
+        Task<PaginatedCollection<MaterialEntity>> GetAllAsync(int limit, int offset, string sortColumnName = null, string sortOrder = null);
 
-        Task<(IEnumerable<MaterialEntity> Entities, int TotalCount)> GetAllAsync(IEnumerable<Guid> materialIdList, int limit, int offset, string sortColumnName = null, string sortOrder = null);
+        Task<PaginatedCollection<MaterialEntity>> GetAllAsync(IEnumerable<Guid> materialIdList, int limit, int offset, string sortColumnName = null, string sortOrder = null);
 
-        Task<(IEnumerable<MaterialEntity> Entities, int TotalCount)> GetAllAsync(IEnumerable<string> types, int limit, int offset, string sortColumnName = null, string sortOrder = null);
+        Task<PaginatedCollection<MaterialEntity>> GetAllAsync(IEnumerable<string> types, int limit, int offset, string sortColumnName = null, string sortOrder = null);
 
         Task<IEnumerable<MaterialEntity>> GetAllByAssigneeIdAsync(Guid assigneeId);
+
+        Task<MaterialAccessEntity> GetMaterialAccessByIdAsync(Guid materialId, CancellationToken cancellationToken = default);
 
         void AddMaterialEntity(MaterialEntity materialEntity);
 
@@ -42,7 +45,7 @@ namespace Iis.DbLayer.Repositories
 
         void RemoveMaterialAssignees(IEnumerable<MaterialAssigneeEntity> entities);
 
-        void EditMaterial(MaterialEntity materialEntity);
+        Task EditMaterialAsync(Guid id, Action<MaterialEntity> editAction, params MaterialIncludeEnum[] includes);
 
         Task<List<Guid>> GetNodeIsWithMaterialsAsync(IReadOnlyCollection<Guid> nodeIdCollection);
 

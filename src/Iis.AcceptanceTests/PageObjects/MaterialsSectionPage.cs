@@ -66,19 +66,23 @@ namespace AcceptanceTests.PageObjects
         [CacheLookup]
         public IWebElement AuthenticityDropDown;
 
-        [FindsBy(How = How.CssSelector, Using = "div:nth-of-type(3) > .el-form-item__content > .el-select.el-tooltip .el-input__inner")]
+        [FindsBy(How = How.CssSelector, Using = ".material-general .material-intelligence .action-select--relevance")]
         [CacheLookup]
         public IWebElement RelevanceDropDown;
 
-        [FindsBy(How = How.CssSelector, Using = "div:nth-of-type(4) > .el-form-item__content > .el-select.el-tooltip")]
+        [FindsBy(How = How.CssSelector, Using = ".material-general .material-intelligence .action-select--importance")]
+        [CacheLookup]
+        public IWebElement ImportanceDropDown;
+
+        [FindsBy(How = How.CssSelector, Using = ".material-general .material-intelligence .action-select--completeness")]
         [CacheLookup]
         public IWebElement СompletenessOfInformation;
 
-        [FindsBy(How = How.CssSelector, Using = "div:nth-of-type(2) > .general-container > .el-form-item > .el-form-item__content > .el-select.el-tooltip")]
+        [FindsBy(How = How.CssSelector, Using = ".material-general .material-intelligence .action-select--reliability")]
         [CacheLookup]
         public IWebElement SourceCredibility;
 
-        [FindsBy(How = How.CssSelector, Using = "div:nth-of-type(3) > .general-container > .el-form-item > .el-form-item__content > .el-select.el-tooltip")]
+        [FindsBy(How = How.CssSelector, Using = ".material-general .material-assignee .action-select--assignee")]
         [CacheLookup]
         public IWebElement Originator;
 

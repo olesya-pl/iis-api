@@ -4,13 +4,21 @@ namespace Iis.Interfaces.Meta
 {
     public interface IFormField
     {
-        bool? HasIndexColumn { get; set; }
-        string Hint { get; set; }
-        string Icon { get; set; }
-        bool? IncludeParent { get; set; }
-        string Layout { get; set; }
         int? Lines { get; set; }
-        string RadioType { get; set; }
+
+        [Obsolete("Changed to computed property in Attributes.cs")]
         string Type { get; set; }
+        [Obsolete]
+        string Hint { get; set; }
+        [Obsolete("Changed to computed property in Attributes.cs")]
+        string Icon { get; set; }
+        [Obsolete]
+        bool? HasIndexColumn { get; set; }
+        [Obsolete]
+        bool? IncludeParent { get; set; }
+        [Obsolete]
+        string Layout { get; set; }
+        [Obsolete]
+        string RadioType { get; set; }
     }
 }

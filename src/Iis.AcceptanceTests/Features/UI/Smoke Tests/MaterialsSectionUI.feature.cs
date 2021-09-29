@@ -310,28 +310,55 @@ namespace AcceptanceTests.Features.UI.SmokeTests
 #line 12
     this.FeatureBackground();
 #line hidden
+                TechTalk.SpecFlow.Table table9 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Field",
+                            "Value"});
+                table9.AddRow(new string[] {
+                            "FileName",
+                            "тестовий матеріал"});
+                table9.AddRow(new string[] {
+                            "SourceReliabilityText",
+                            "Здебільшого надійне"});
+                table9.AddRow(new string[] {
+                            "ReliabilityText",
+                            "Достовірна"});
+                table9.AddRow(new string[] {
+                            "Content",
+                            "таємний контент"});
+                table9.AddRow(new string[] {
+                            "AccessLevel",
+                            "0"});
+                table9.AddRow(new string[] {
+                            "LoadedBy",
+                            "автотест"});
+                table9.AddRow(new string[] {
+                            "MetaData",
+                            "{\"type\":\"document\",\"source\":\"contour.doc\"}"});
 #line 44
+    testRunner.Given("I upload a new docx material via API", ((string)(null)), table9, "Given ");
+#line hidden
+#line 53
         testRunner.When("I navigated to Materials page", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 45
+#line 54
         testRunner.And("Loading icon is not displayed", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 46
+#line 55
         testRunner.And("I clicked search button in the Materials section", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 47
-        testRunner.And("I searched 20201015_Resilience_Application_Form.docx data in the materials", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 56
+        testRunner.And("I searched таємн data in the materials", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 48
+#line 57
         testRunner.And("Loading icon is not displayed", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 49
+#line 58
         testRunner.And("I clicked on the first material in the Materials list", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 50
+#line 59
         testRunner.Then("I must see relevance drop down in the materials card", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 51
+#line 60
         testRunner.When("I close the material card", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
             }
@@ -355,7 +382,7 @@ namespace AcceptanceTests.Features.UI.SmokeTests
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("IIS-6192 - Open relations tab in the materials card and ensure that events search" +
                     " is present", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
-#line 54
+#line 63
     this.ScenarioInitialize(scenarioInfo);
 #line hidden
             bool isScenarioIgnored = default(bool);
@@ -378,28 +405,28 @@ namespace AcceptanceTests.Features.UI.SmokeTests
 #line 12
     this.FeatureBackground();
 #line hidden
-#line 55
+#line 64
         testRunner.When("I navigated to Materials page", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 56
+#line 65
         testRunner.And("Loading icon is not displayed", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 57
+#line 66
         testRunner.And("I clicked search button in the Materials section", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 58
+#line 67
         testRunner.And("I searched 20201015_Resilience_Application_Form.docx data in the materials", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 59
+#line 68
         testRunner.And("Loading icon is not displayed", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 60
+#line 69
         testRunner.And("I clicked on the first material in the Materials list", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 61
+#line 70
         testRunner.And("I clicked on the relations tab in the material card", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 62
+#line 71
         testRunner.Then("I must see events search in the materials card", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
@@ -420,7 +447,7 @@ namespace AcceptanceTests.Features.UI.SmokeTests
                     "MaterialsCardGeneralTabUI"};
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("IIS-6189 - Open general tab in the materials card", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
-#line 65
+#line 74
     this.ScenarioInitialize(scenarioInfo);
 #line hidden
             bool isScenarioIgnored = default(bool);
@@ -443,32 +470,59 @@ namespace AcceptanceTests.Features.UI.SmokeTests
 #line 12
     this.FeatureBackground();
 #line hidden
-#line 66
+                TechTalk.SpecFlow.Table table10 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Field",
+                            "Value"});
+                table10.AddRow(new string[] {
+                            "FileName",
+                            "тестовий матеріал"});
+                table10.AddRow(new string[] {
+                            "SourceReliabilityText",
+                            "Здебільшого надійне"});
+                table10.AddRow(new string[] {
+                            "ReliabilityText",
+                            "Достовірна"});
+                table10.AddRow(new string[] {
+                            "Content",
+                            "таємний контент"});
+                table10.AddRow(new string[] {
+                            "AccessLevel",
+                            "0"});
+                table10.AddRow(new string[] {
+                            "LoadedBy",
+                            "автотест"});
+                table10.AddRow(new string[] {
+                            "MetaData",
+                            "{\"type\":\"document\",\"source\":\"contour.doc\"}"});
+#line 75
+      testRunner.Given("I upload a new docx material via API", ((string)(null)), table10, "Given ");
+#line hidden
+#line 84
         testRunner.When("I navigated to Materials page", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 67
+#line 85
         testRunner.And("Loading icon is not displayed", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 68
+#line 86
         testRunner.And("I clicked on the first material in the Materials list", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-                TechTalk.SpecFlow.Table table9 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table11 = new TechTalk.SpecFlow.Table(new string[] {
                             "ImportanceDropDown"});
-                table9.AddRow(new string[] {
+                table11.AddRow(new string[] {
                             "RelevanceDropDown"});
-                table9.AddRow(new string[] {
+                table11.AddRow(new string[] {
                             "СompletenessOfInformation"});
-                table9.AddRow(new string[] {
+                table11.AddRow(new string[] {
                             "SourceCredibility"});
-                table9.AddRow(new string[] {
+                table11.AddRow(new string[] {
                             "Originator"});
-#line 69
-        testRunner.Then("I must see these elements", ((string)(null)), table9, "Then ");
+#line 87
+        testRunner.Then("I must see these elements", ((string)(null)), table11, "Then ");
 #line hidden
-#line 77
+#line 95
         testRunner.Then("I must I must see at least one user in the originator drop down menu", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 78
+#line 96
         testRunner.When("I close the material card", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
             }
@@ -492,7 +546,7 @@ namespace AcceptanceTests.Features.UI.SmokeTests
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("IIS-6191 - Open relations tab in the materials card and ensure that objects searc" +
                     "h is present", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
-#line 81
+#line 99
     this.ScenarioInitialize(scenarioInfo);
 #line hidden
             bool isScenarioIgnored = default(bool);
@@ -515,31 +569,31 @@ namespace AcceptanceTests.Features.UI.SmokeTests
 #line 12
     this.FeatureBackground();
 #line hidden
-#line 82
+#line 100
         testRunner.When("I navigated to Materials page", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 83
+#line 101
         testRunner.And("Loading icon is not displayed", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 84
+#line 102
         testRunner.And("I clicked search button in the Materials section", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 85
+#line 103
         testRunner.And("I searched 20201015_Resilience_Application_Form.docx data in the materials", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 86
+#line 104
         testRunner.And("Loading icon is not displayed", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 87
+#line 105
         testRunner.And("I clicked on the first material in the Materials list", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 88
+#line 106
         testRunner.And("I clicked on the relations tab in the material card", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 89
+#line 107
         testRunner.Then("I must see objects search in the materials card", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 90
+#line 108
         testRunner.When("I close the material card", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
             }
@@ -560,7 +614,7 @@ namespace AcceptanceTests.Features.UI.SmokeTests
                     "MaterialsCardGeneralTabUI"};
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("IIS-6190 - Open ML tab in the materials card", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
-#line 93
+#line 111
     this.ScenarioInitialize(scenarioInfo);
 #line hidden
             bool isScenarioIgnored = default(bool);
@@ -583,31 +637,31 @@ namespace AcceptanceTests.Features.UI.SmokeTests
 #line 12
     this.FeatureBackground();
 #line hidden
-#line 94
+#line 112
         testRunner.When("I navigated to Materials page", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 95
+#line 113
         testRunner.And("Loading icon is not displayed", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 96
+#line 114
         testRunner.And("I clicked search button in the Materials section", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 97
+#line 115
         testRunner.And("I searched 20201015_Resilience_Application_Form.docx data in the materials", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 98
+#line 116
         testRunner.And("Loading icon is not displayed", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 99
+#line 117
         testRunner.And("I clicked on the first material in the Materials list", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 100
+#line 118
         testRunner.And("I clicked on the ML tab in the material card", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 101
+#line 119
         testRunner.Then("I must see Show button in the ML tab", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 102
+#line 120
         testRunner.When("I close the material card", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
             }

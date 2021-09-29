@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using Iis.Interfaces.Elastic;
 using Iis.Utility;
 using Newtonsoft.Json.Linq;
@@ -15,6 +16,8 @@ namespace Iis.Elastic.SearchQueryExtensions
         public const string AggregateSuffix = "Aggregate";
         public const string MissingValueKey = "__hasNoValue";
         public const string NoExistsValue = "-_exists_";
+        private const string GroupedAggregationName = "GroupedAggregation";
+        private const string GroupedAggregationNameRegex = "GroupedAggregation\\S{32}$";
 
         public static bool IsExactQuery(string query)
         {
@@ -77,76 +80,17 @@ namespace Iis.Elastic.SearchQueryExtensions
             if (!aggregationFields.Any()) return jsonQuery;
 
             var aggregations = new JObject();
-
             jsonQuery["aggs"] = aggregations;
 
-            foreach (var field in aggregationFields)
-            {
-                if (string.IsNullOrWhiteSpace(field.TermFieldName) || string.IsNullOrWhiteSpace(field.Name)) continue;
-
-                var fieldName = GetFieldName(field);
-                var filterSection = CreateAggregationFilter(field, filter);
-                var subAggsSection = CreateSubAggs("sub_aggs", field);
-
-                aggregations[fieldName] = new JObject
-                {
-                    {"filter", filterSection},
-                    {"aggs", subAggsSection}
-                };
-            }
+            var queryGroups = aggregationFields
+                .Where(_ => !string.IsNullOrWhiteSpace(_.TermFieldName) && !string.IsNullOrWhiteSpace(_.Name))
+                .Select(_ => new AggregationFieldContext(_, filter))
+                .GroupBy(_ => _.Query)
+                .ToDictionary(_ => _.Key, _ => _.ToArray());
+            foreach (var (query, contexts) in queryGroups)
+                aggregations.ProcessQueryGroup(query, contexts);
 
             return jsonQuery;
-        }
-
-        private static JObject CreateSubAggs(string name, AggregationField field)
-        {
-            var aggregation = new JObject
-            (
-                new JProperty("field", field.TermFieldName),
-                new JProperty("missing", MissingValueKey),
-                new JProperty("size", MaxBucketsCount)
-            );
-
-            return new JObject
-            {
-                {name, new JObject {{"terms", aggregation}}}
-            };
-        }
-
-        private static JObject CreateAggregationFilter(AggregationField field, ElasticFilter filter)
-        {
-            var fieldSpecificFilter = new ElasticFilter
-            {
-                Suggestion = filter.Suggestion,
-                FilteredItems = filter.FilteredItems.Where(x => !(x.Name == field.Name || x.Name == field.Alias)).ToList()
-            };
-
-            var possibleQuery = fieldSpecificFilter.ToQueryString();
-            var query = string.IsNullOrEmpty(possibleQuery) ? Wildcard : possibleQuery;
-
-            var boolSection = JObject.FromObject(new
-            {
-                should = new[]
-                {
-                    new
-                    {
-                        query_string = new
-                        {
-                            query
-                        }
-                    }
-                }
-            });
-
-            return new JObject
-            {
-                {"bool", boolSection}
-            };
-        }
-
-        private static string GetFieldName(AggregationField field)
-        {
-            return !string.IsNullOrWhiteSpace(field.Alias) ? field.Alias : field.Name;
         }
 
         public static JObject WithAggregation(this JObject jsonQuery,
@@ -207,7 +151,125 @@ namespace Iis.Elastic.SearchQueryExtensions
 
             queryString = PopulateFilteredItems(filteredItems, queryString);
             return PopulateCherryPickedMaterials(cherryPickedItems, queryString);
-        }       
+        }
+
+        public static string ApplyFuzzinessOperator(string input)
+        {
+            input = input.RemoveSymbols(ElasticManager.RemoveSymbolsPattern)
+                        .EscapeSymbols(ElasticManager.EscapeSymbolsPattern);
+
+            if (IsWildCard(input) || IsInBrackets(input))
+            {
+                return input;
+            }
+
+            if (IsDoubleQuoted(input))
+            {
+                return $"{input} OR {input}~";
+            }
+
+            return $"\"{input}\" OR {input}~";
+        }
+
+        public static bool IsGroupedAggregateName(this string name) => Regex.IsMatch(name, GroupedAggregationNameRegex);
+
+        private static void ProcessQueryGroup(
+            this JObject aggregations,
+            string query,
+            IReadOnlyCollection<AggregationFieldContext> contexts)
+        {
+            if (contexts.Count == 1)
+            {
+                aggregations.ProcessQueryContext(contexts.First());
+                return;
+            }
+
+            aggregations.ProcessQueryContexts(query, contexts);
+        }
+
+        private static void ProcessQueryContexts(
+            this JObject aggregations,
+            string query,
+            IReadOnlyCollection<AggregationFieldContext> contexts)
+        {
+            var fieldName = GetUniqueAggregationName();
+            var filterSection = CreateAggregationFilter(query);
+            var subAggsSection = new JObject();
+            foreach (var context in contexts)
+                context.PopulateAggregation(subAggsSection);
+
+            aggregations[fieldName] = new JObject
+            {
+                {"filter", filterSection},
+                {"aggs", subAggsSection}
+            };
+        }
+
+        private static void ProcessQueryContext(
+            this JObject aggregations,
+            AggregationFieldContext context)
+        {
+            var filterSection = CreateAggregationFilter(context.Query);
+            var subAggsSection = CreateSubAggs("sub_aggs", context.Field);
+
+            aggregations[context.FieldName] = new JObject
+            {
+                {"filter", filterSection},
+                {"aggs", subAggsSection}
+            };
+        }
+
+        private static JObject CreateSubAggs(string name, AggregationField field)
+        {
+            var aggregation = new JObject
+            (
+                new JProperty("field", field.TermFieldName),
+                new JProperty("missing", MissingValueKey),
+                new JProperty("size", MaxBucketsCount)
+            );
+
+            return new JObject
+            {
+                {name, new JObject {{"terms", aggregation}}}
+            };
+        }
+
+        private static void PopulateAggregation(this AggregationFieldContext context, JObject section)
+        {
+            var aggregation = new JObject
+            (
+                new JProperty("field", context.Field.TermFieldName),
+                new JProperty("missing", MissingValueKey),
+                new JProperty("size", MaxBucketsCount)
+            );
+
+            section[context.FieldName] = new JObject
+            {
+                {"terms", aggregation}
+            };
+        }
+
+        private static JObject CreateAggregationFilter(string query)
+        {
+            var boolSection = JObject.FromObject(new
+            {
+                should = new[]
+                {
+                    new
+                    {
+                        query_string = new
+                        {
+                            query
+                        }
+                    }
+                }
+            });
+
+            return new JObject
+            {
+                {"bool", boolSection}
+            };
+        }
 
         private static string PopulateFilteredItems(IReadOnlyCollection<Property> filter, string result)
         {
@@ -261,7 +323,7 @@ namespace Iis.Elastic.SearchQueryExtensions
             for (var i = 0; i < cherryPickedItems.Count; i++)
             {
                 var item = cherryPickedItems.ElementAt(i);
-                var lastOne = i + 1 == cherryPickedItems.Count;                
+                var lastOne = i + 1 == cherryPickedItems.Count;
                 pickedQuery.Append($"_id:{item.Item}");
                 if (lastOne)
                 {
@@ -274,7 +336,7 @@ namespace Iis.Elastic.SearchQueryExtensions
 
         private static string GetFieldQuery(string field, string value)
         {
-            return value == MissingValueKey ? 
+            return value == MissingValueKey ?
                 $"{NoExistsValue}:\"{field}\"" :
                 $"{field}:\"{value}\"";
         }
@@ -291,29 +353,45 @@ namespace Iis.Elastic.SearchQueryExtensions
 
         private static string GetMissingValueSorting(string sortOrder)
         {
-            return sortOrder == "asc" ?  "_last" : "_first";
+            return sortOrder == "asc" ? "_last" : "_first";
         }
 
-        public static string ApplyFuzzinessOperator(string input)
+        private static string ToQueryString(this ElasticFilter filter, AggregationField field)
         {
-            input = input.RemoveSymbols(ElasticManager.RemoveSymbolsPattern)
-                        .EscapeSymbols(ElasticManager.EscapeSymbolsPattern);
-
-            if (IsWildCard(input) || IsInBrackets(input))
+            var fieldSpecificFilter = new ElasticFilter
             {
-                return input;
-            }
+                Suggestion = filter.Suggestion,
+                FilteredItems = filter.FilteredItems.Where(x => !(x.Name == field.Name || x.Name == field.Alias)).ToList()
+            };
+            var possibleQuery = fieldSpecificFilter.ToQueryString();
 
-            if (IsDoubleQuoted(input))
-            {
-                return $"{input} OR {input}~";
-            }
+            return string.IsNullOrEmpty(possibleQuery)
+                ? Wildcard
+                : possibleQuery;
+        }
 
-            return $"\"{input}\" OR {input}~";
+        private static string GetFieldName(this AggregationField field)
+        {
+            return !string.IsNullOrWhiteSpace(field.Alias) ? field.Alias : field.Name;
         }
 
         private static bool IsWildCard(string input) => input.Contains('*');
         private static bool IsDoubleQuoted(string input) => input.StartsWith('\"') && input.EndsWith('\"');
         private static bool IsInBrackets(string input) => input.StartsWith('(') && input.EndsWith(')');
+        private static string GetUniqueAggregationName() => $"{GroupedAggregationName}{Guid.NewGuid().ToString("N")}";
+
+        private class AggregationFieldContext
+        {
+            public AggregationFieldContext(AggregationField aggregationField, ElasticFilter filter)
+            {
+                FieldName = aggregationField.GetFieldName();
+                Field = aggregationField;
+                Query = filter.ToQueryString(aggregationField);
+            }
+
+            public string FieldName { get; }
+            public AggregationField Field { get; }
+            public string Query { get; }
+        }
     }
 }

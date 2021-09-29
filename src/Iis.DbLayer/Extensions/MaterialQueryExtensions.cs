@@ -1,9 +1,9 @@
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
-
 using Iis.DataModel;
 using Iis.DataModel.Materials;
 using Iis.DbLayer.MaterialDictionaries;
+using Iis.DbLayer.MaterialEnum;
 
 namespace Iis.DbLayer.Extensions
 {
@@ -83,6 +83,27 @@ namespace Iis.DbLayer.Extensions
                 _ => materialsQuery.OrderByDescending(p => p.CreatedDate),
             };
             return orderedQueryable.ThenBy(p => p.Id);
+        }
+
+        public static IQueryable<MaterialEntity> Include(this IQueryable<MaterialEntity> query, MaterialIncludeEnum include) => include switch
+        {
+            MaterialIncludeEnum.WithFeatures => query.WithFeatures(),
+            MaterialIncludeEnum.WithNodes => query.WithNodes(),
+            MaterialIncludeEnum.WithChildren => query.WithChildren(),
+            MaterialIncludeEnum.WithFiles => query.WithFiles(),
+            MaterialIncludeEnum.OnlyParent => query.OnlyParent(),
+            _ => query
+        };
+
+        public static IQueryable<MaterialEntity> Include(this IQueryable<MaterialEntity> query, MaterialIncludeEnum[] includes)
+        {
+            if (includes.Length == 0)
+                return query;
+
+            foreach (var include in includes.Distinct())
+                query.Include(include);
+
+            return query;
         }
 
         public static IQueryable<MaterialFeatureJoined> JoinMaterialFeaturesAsNoTracking(

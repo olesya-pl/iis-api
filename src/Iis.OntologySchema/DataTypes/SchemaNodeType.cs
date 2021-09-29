@@ -480,6 +480,7 @@ namespace Iis.OntologySchema.DataTypes
                     .FirstOrDefault()
                 : Name;
         }
+
         private string GetTitleAttributeName()
         {
             return new List<string> { "__title", "name", "value", "title" }

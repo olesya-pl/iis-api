@@ -89,6 +89,110 @@ namespace Iis.UnitTests.Iis.Elastic.Tests
             Assert.Equal("Нех...й выгружаться, надо <em>бежать</em>", item2.Higlight["content"][0]);
         }
 
+        [Theory]
+        [AutoData]
+        public void GetFromReponse_Should_Unwrap_Grouped_Aggregations(Guid id1, Guid id2,
+            string fileName1, string fileName2)
+        {
+            //arrange
+            var apiCallMock = new Mock<IApiCallDetails>(MockBehavior.Strict);
+            apiCallMock.Setup(e => e.HttpStatusCode).Returns(200);
+            apiCallMock.Setup(e => e.Success).Returns(true);
+            apiCallMock.Setup(e => e.AuditTrail).Returns(new List<Audit>());
+
+            //act
+            var sut = new SearchResultExtractor();
+            var res = sut.GetFromResponse(new StringResponse(
+                @"{ ""aggregations"": {
+        ""foreignLang.lang.nameAggregate"": {
+                ""doc_count"": 113,
+            ""sub_aggs"": {
+                    ""doc_count_error_upper_bound"": 0,
+                ""sum_other_doc_count"": 0,
+                ""buckets"": [
+                    {
+                        ""key"": ""__hasNoValue"",
+                        ""doc_count"": 113
+                    }
+                ]
+            }
+            },
+        ""GroupedAggregation7a98108ca54d4834821168739659f7a0"": {
+                ""doc_count"": 113,
+            ""importance.nameAggregate"": {
+                    ""doc_count_error_upper_bound"": 0,
+                ""sum_other_doc_count"": 0,
+                ""buckets"": [
+                    {
+                        ""key"": ""першочерговий"",
+                        ""doc_count"": 41
+                    },
+                    {
+                        ""key"": ""підвищений"",
+                        ""doc_count"": 24
+                    },
+                    {
+                        ""key"": ""звичайний"",
+                        ""doc_count"": 22
+                    },
+                    {
+                        ""key"": ""важливий"",
+                        ""doc_count"": 12
+                    },
+                    {
+                        ""key"": ""низький"",
+                        ""doc_count"": 8
+                    },
+                    {
+                        ""key"": ""ігнорувати"",
+                        ""doc_count"": 6
+                    }
+                ]
+            },
+            ""Приналежність"": {
+                    ""doc_count_error_upper_bound"": 0,
+                ""sum_other_doc_count"": 0,
+                ""buckets"": [
+                    {
+                        ""key"": ""ворожий"",
+                        ""doc_count"": 84
+                    },
+                    {
+                        ""key"": ""підозрілий"",
+                        ""doc_count"": 18
+                    },
+                    {
+                        ""key"": ""умовно дружній"",
+                        ""doc_count"": 5
+                    },
+                    {
+                        ""key"": ""очікує розгляду"",
+                        ""doc_count"": 4
+                    },
+                    {
+                        ""key"": ""дружній"",
+                        ""doc_count"": 1
+                    },
+                    {
+                        ""key"": ""нейтральний"",
+                        ""doc_count"": 1
+                    }
+                ]
+            }
+            }
+        }}")
+            {
+                ApiCall = apiCallMock.Object
+            });
+
+            //assert
+            Assert.Equal(3, res.Aggregations.Count);
+
+            Assert.True(res.Aggregations.ContainsKey("foreignLang.lang.nameAggregate")
+                && res.Aggregations.ContainsKey("importance.nameAggregate")
+                && res.Aggregations.ContainsKey("Приналежність"));
+        }
+
         [Fact]
         public void GetFromReponse_BadRequest()
         {

@@ -41,10 +41,19 @@ Feature: MaterialsSectionUI - Smoke
 
     @smoke @UI @MaterialsCardUI
     Scenario: IIS-6188 - Ensure that the material card can be opened
+    Given I upload a new docx material via API
+		| Field                 | Value                                      |
+		| FileName              | тестовий матеріал                          |
+		| SourceReliabilityText | Здебільшого надійне                        |
+		| ReliabilityText       | Достовірна                                 |
+		| Content               | таємний контент                            |
+		| AccessLevel           | 0                                          |
+		| LoadedBy              | автотест                                   |
+		| MetaData              | {"type":"document","source":"contour.doc"} |
         When I navigated to Materials page
         And Loading icon is not displayed
         And I clicked search button in the Materials section
-        And I searched 20201015_Resilience_Application_Form.docx data in the materials
+        And I searched таємн data in the materials
         And Loading icon is not displayed
         And I clicked on the first material in the Materials list
         Then I must see relevance drop down in the materials card
@@ -63,6 +72,15 @@ Feature: MaterialsSectionUI - Smoke
 
     @smoke @UI @MaterialsCardGeneralTabUI
     Scenario: IIS-6189 - Open general tab in the materials card
+      Given I upload a new docx material via API
+		| Field                 | Value                                      |
+		| FileName              | тестовий матеріал                          |
+		| SourceReliabilityText | Здебільшого надійне                        |
+		| ReliabilityText       | Достовірна                                 |
+		| Content               | таємний контент                           |
+		| AccessLevel           | 0                                          |
+		| LoadedBy              | автотест                                   |
+		| MetaData              | {"type":"document","source":"contour.doc"} |
         When I navigated to Materials page
         And Loading icon is not displayed
         And I clicked on the first material in the Materials list

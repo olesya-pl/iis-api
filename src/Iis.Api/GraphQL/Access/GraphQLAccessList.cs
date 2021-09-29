@@ -109,7 +109,7 @@ namespace Iis.Api.GraphQL.Access
 
         public IReadOnlyCollection<GraphQLAccessItem> GetAccessItem(string graphQLItem, IReadOnlyDictionary<string, object> variableValues)
         {
-            return this.Where(ai => ai.IsMatch(graphQLItem) && ai.IsRequestConditionMatch(variableValues)).ToList();
+            return this.Where(ai => (ai.IsMatch(graphQLItem)) && ai.IsRequestConditionMatch(variableValues)).ToList();
         }
     }
 }

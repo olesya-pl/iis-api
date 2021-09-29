@@ -82,6 +82,7 @@ namespace IIS.Core.GraphQL.AnalyticsQuery
             {
                 _indicators = await context.AnalyticQueryIndicators
                     .Include(i => i.Indicator)
+                    .Include(i => i.Query)
                     .Where(i => i.QueryId == Id)
                     .OrderBy(i => i.SortOrder)
                     .ToListAsync();

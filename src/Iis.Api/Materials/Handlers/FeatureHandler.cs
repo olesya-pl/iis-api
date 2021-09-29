@@ -88,11 +88,12 @@ namespace Iis.Api.Materials.Handlers
             var processor = _provider.GetService<IFeatureProcessorFactory>().GetInstance(message.Source, message.Type);
             var nodesData = _provider.GetService<IOntologyNodesData>();
 
-            if(processor.IsDummy) return;
+            if (processor.IsDummy)
+                return;
 
-            var material = await RunAsync(uow => uow.MaterialRepository.GetByIdAsync(message.Id));
-
-            if(material is null) return;
+            var material = await RunAsync(_ => _.MaterialRepository.GetByIdAsync(message.Id));
+            if (material is null)
+                return;
 
             JObject metadata = JObject.Parse(material.Metadata);
 
@@ -105,13 +106,20 @@ namespace Iis.Api.Materials.Handlers
             };
 
             metadata = await processor.ProcessMetadataAsync(entry);
-            material.Metadata = metadata.ToString(Newtonsoft.Json.Formatting.None);
 
             var featureIdList = GetNodeIdentitiesFromFeatures(metadata);
             featureIdList = processor.GetValidFeatureIds(featureIdList);
-            RunWithCommit(uow => {
-                uow.MaterialRepository.AddFeatureIdList(material.Id, featureIdList);
-                uow.MaterialRepository.EditMaterial(material);
+
+            await RunWithCommitAsync( _ =>
+            {
+                _.MaterialRepository.AddFeatureIdList(material.Id, featureIdList);
+
+                return _.MaterialRepository.EditMaterialAsync(
+                    message.Id,
+                    material =>
+                    {
+                        material.Metadata = metadata.ToString(Newtonsoft.Json.Formatting.None);
+                    });
             });
         }
 
@@ -179,7 +187,7 @@ namespace Iis.Api.Materials.Handlers
                         throw new InvalidOperationException($"We received message from wrong exchange. Expected:{config.ExchangeName}. Received:{args.Exchange}");
                     }
 
-                    if(args.Body.LongLength == 0)
+                    if (args.Body.LongLength == 0)
                     {
                         throw new InvalidOperationException($"We received empty message.");
                     }
@@ -219,7 +227,7 @@ namespace Iis.Api.Materials.Handlers
                 exclusiveQueue,
                 autoDeleteQueue).QueueName;
 
-            channel.BasicQos(0, config.PrefetchCount, global:false);
+            channel.BasicQos(0, config.PrefetchCount, global: false);
 
             if (string.IsNullOrWhiteSpace(config.ExchangeName) || !config.RoutingKeys.Any()) return;
 

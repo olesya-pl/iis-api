@@ -12,6 +12,7 @@ using Iis.DbLayer.MaterialEnum;
 using Iis.Domain.Materials;
 using IIS.Repository;
 using Iis.Services.Contracts.Materials.Distribution;
+using Iis.DbLayer.Common;
 
 namespace Iis.DbLayer.Repositories
 {
@@ -23,35 +24,48 @@ namespace Iis.DbLayer.Repositories
             MaterialIncludeEnum.WithFeatures
         };
 
+        private IQueryable<MaterialEntity> Materials => Context.Materials
+            .Include(m => m.File)
+            .Include(m => m.Importance)
+            .Include(m => m.Reliability)
+            .Include(m => m.Relevance)
+            .Include(m => m.Completeness)
+            .Include(m => m.SourceReliability)
+            .Include(m => m.ProcessedStatus)
+            .Include(m => m.SessionPriority)
+            .Include(m => m.MaterialAssignees)
+                .ThenInclude(_ => _.Assignee)
+            .Include(m => m.Editor);
+
         public Task<MaterialEntity> GetByIdAsync(Guid id, params MaterialIncludeEnum[] includes)
         {
-            return GetMaterialsQuery(includes)
+            return GetMaterialsQueryAsNoTracking(includes)
                     .SingleOrDefaultAsync(e => e.Id == id);
         }
 
         public Task<MaterialEntity[]> GetByIdsAsync(ISet<Guid> ids, params MaterialIncludeEnum[] includes)
         {
-            return GetMaterialsQuery(includes)
+            return GetMaterialsQueryAsNoTracking(includes)
                     .Where(e => ids.Contains(e.Id))
                     .ToArrayAsync();
         }
 
         public async Task<IEnumerable<MaterialEntity>> GetAllAsync(params MaterialIncludeEnum[] includes)
         {
-            return await GetMaterialsQuery(includes)
+            return await GetMaterialsQueryAsNoTracking(includes)
                             .ToArrayAsync();
         }
 
         public async Task<IEnumerable<MaterialEntity>> GetAllAsync(int limit, params MaterialIncludeEnum[] includes)
         {
-            return await GetMaterialsQuery(includes)
+            return await GetMaterialsQueryAsNoTracking(includes)
                 .Take(limit)
                 .ToArrayAsync();
         }
 
         public async Task<IEnumerable<MaterialEntity>> GetAllAsync(int limit, int offset, params MaterialIncludeEnum[] includes)
         {
-            return await GetMaterialsQuery(includes)
+            return await GetMaterialsQueryAsNoTracking(includes)
                 .OrderBy(_ => _.Id)
                 .Skip(offset)
                 .Take(limit)
@@ -61,35 +75,62 @@ namespace Iis.DbLayer.Repositories
         public async Task<IEnumerable<MaterialEntity>> GetAllForRelatedNodeListAsync(IEnumerable<Guid> nodeIdList)
         {
             var materialIdList = await GetOnlyMaterialsForNodeIdListQuery(nodeIdList)
-                                .Select(e => e.Id)
-                                .ToArrayAsync();
+                .Select(e => e.Id)
+                .ToArrayAsync();
+            var result = await GetMaterialsQueryAsNoTracking(IncludeAll)
+                .OnlyParent()
+                .Where(_ => materialIdList.Contains(_.Id))
+                .ToArrayAsync();
 
-            var materialResult = await GetAllAsync(materialIdList, 0, 0);
-
-            return materialResult.Entities;
+            return result;
         }
 
-        public Task<(IEnumerable<MaterialEntity> Entities, int TotalCount)> GetAllAsync(int limit, int offset, string sortColumnName = null, string sortOrder = null)
-        {
-            return GetAllWithPredicateAsync(limit, offset, sortColumnName: sortColumnName, sortOrder: sortOrder);
-        }
+        public Task<PaginatedCollection<MaterialEntity>> GetAllAsync(
+            int limit,
+            int offset,
+            string sortColumnName = null,
+            string sortOrder = null) =>
+            GetAllWithPredicateAsync(limit, offset, sortColumnName: sortColumnName, sortOrder: sortOrder);
 
-        public Task<(IEnumerable<MaterialEntity> Entities, int TotalCount)> GetAllAsync(IEnumerable<Guid> materialIdList, int limit, int offset, string sortColumnName = null, string sortOrder = null)
-        {
-            return GetAllWithPredicateAsync(limit, offset, e => materialIdList.Contains(e.Id), sortColumnName, sortOrder);
-        }
+        public Task<PaginatedCollection<MaterialEntity>> GetAllAsync(
+            IEnumerable<Guid> materialIdList,
+            int limit,
+            int offset,
+            string sortColumnName = null,
+            string sortOrder = null) =>
+            GetAllWithPredicateAsync(limit, offset, e => materialIdList.Contains(e.Id), sortColumnName, sortOrder);
 
-        public Task<(IEnumerable<MaterialEntity> Entities, int TotalCount)> GetAllAsync(IEnumerable<string> types, int limit, int offset, string sortColumnName = null, string sortOrder = null)
-        {
-            return GetAllWithPredicateAsync(limit, offset, e => types.Contains(e.Type), sortColumnName, sortOrder);
-        }
+        public Task<PaginatedCollection<MaterialEntity>> GetAllAsync(
+            IEnumerable<string> types,
+            int limit,
+            int offset,
+            string sortColumnName = null,
+            string sortOrder = null) => 
+            GetAllWithPredicateAsync(limit, offset, e => types.Contains(e.Type), sortColumnName, sortOrder);
 
         public async Task<IEnumerable<MaterialEntity>> GetAllByAssigneeIdAsync(Guid assigneeId)
         {
-            return await GetMaterialsQuery()
-                            .OnlyParent()
-                            .Where(p => p.MaterialAssignees.Any(_ => _.AssigneeId == assigneeId))
-                            .ToArrayAsync();
+            return await GetMaterialsQueryAsNoTracking(MaterialIncludeEnum.OnlyParent)
+                .Where(p => p.MaterialAssignees.Any(_ => _.AssigneeId == assigneeId))
+                .ToArrayAsync();
+        }
+
+        public Task<MaterialAccessEntity> GetMaterialAccessByIdAsync(Guid materialId, CancellationToken cancellationToken = default)
+        {
+            return Context.Materials
+                .AsNoTracking()
+                .Include(_ => _.ProcessedStatus)
+                .Include(_ => _.Editor)
+                .Select(_ => new MaterialAccessEntity
+                {
+                    Id = _.Id,
+                    EditorId = _.EditorId,
+                    Editor = _.Editor,
+                    ProcessedStatusSignId = _.ProcessedStatusSignId,
+                    ProcessedStatus = _.ProcessedStatus,
+                    AccessLevel = _.AccessLevel
+                })
+                .SingleOrDefaultAsync(e => e.Id == materialId, cancellationToken);
         }
 
         public void AddMaterialEntity(MaterialEntity materialEntity)
@@ -117,12 +158,16 @@ namespace Iis.DbLayer.Repositories
             Context.MaterialAssignees.RemoveRange(entities);
         }
 
-        public void EditMaterial(MaterialEntity materialEntity)
+        public async Task EditMaterialAsync(Guid id, Action<MaterialEntity> editAction, params MaterialIncludeEnum[] includes)
         {
-            materialEntity.UpdatedAt = DateTime.UtcNow;
-            materialEntity.Editor = null;
+            var materialEntity = await GetMaterialsQuery(includes)
+                .SingleOrDefaultAsync(_ => _.Id == id);
+            if (materialEntity == null)
+                throw new ArgumentNullException(nameof(id), "Material with given id not found");
 
-            Context.Materials.Update(materialEntity);
+            editAction(materialEntity);
+
+            materialEntity.UpdatedAt = DateTime.UtcNow;
         }
 
         public Task<List<Guid>> GetNodeIsWithMaterialsAsync(IReadOnlyCollection<Guid> nodeIdCollection)
@@ -136,7 +181,7 @@ namespace Iis.DbLayer.Repositories
 
         public async Task<IReadOnlyCollection<MaterialEntity>> GetMaterialCollectionByNodeIdAsync(IReadOnlyCollection<Guid> nodeIdCollection, params MaterialIncludeEnum[] includes)
         {
-            return await GetMaterialsQuery(includes)
+            return await GetMaterialsQueryAsNoTracking(includes)
                 .JoinMaterialFeaturesAsNoTracking(Context)
                 .Where(m => nodeIdCollection.Contains(m.MaterialFeature.NodeId))
                 .Select(m => m.MaterialInfoJoined.Material)
@@ -179,7 +224,7 @@ namespace Iis.DbLayer.Repositories
 
         public async Task<IEnumerable<Guid>> GetChildIdListForMaterialAsync(Guid materialId)
         {
-            return await GetMaterialsQuery(MaterialIncludeEnum.WithChildren)
+            return await GetMaterialsQueryAsNoTracking(MaterialIncludeEnum.WithChildren)
                     .Where(e => e.ParentId == materialId)
                     .Select(e => e.Id)
                     .ToArrayAsync();
@@ -187,8 +232,9 @@ namespace Iis.DbLayer.Repositories
 
         public Task<bool> CheckMaterialExistsAndHasContent(Guid materialId)
         {
-            return GetMaterialsQuery()
-                        .AnyAsync(e => e.Id == materialId && !string.IsNullOrWhiteSpace(e.Content));
+            return Materials
+                .AsNoTracking()
+                .AnyAsync(e => e.Id == materialId && !string.IsNullOrWhiteSpace(e.Content));
         }
 
         public async Task RemoveMaterialsAndRelatedData(IReadOnlyCollection<Guid> fileIdList)
@@ -223,7 +269,7 @@ namespace Iis.DbLayer.Repositories
 
         public Task<int> GetTotalCountAsync(CancellationToken cancellationToken)
         {
-            return GetMaterialsQuery(IncludeAll).CountAsync(cancellationToken);
+            return GetMaterialsQueryAsNoTracking(IncludeAll).CountAsync(cancellationToken);
         }
 
         public async Task<IReadOnlyList<MaterialDistributionItem>> GetMaterialsForDistribution(
@@ -234,7 +280,7 @@ namespace Iis.DbLayer.Repositories
 
             if (filter != null) query = query.Where(filter);
 
-            if (user.Channels.Count > 0) query = query.Where(_ => user.Channels.Contains(_.Channel));
+            if (user.Channels.Count > 0) query = query.Where(_ => _.Channel == null || user.Channels.Contains(_.Channel));
 
             var materialEntities = await query
                 .OrderByDescending(_ => _.RegistrationDate)
@@ -265,61 +311,18 @@ namespace Iis.DbLayer.Repositories
             }
         }
 
-
-        private async Task<(IEnumerable<MaterialEntity> Entities, int TotalCount)> GetAllWithPredicateAsync(
-            int limit = 0,
-            int offset = 0,
+        private Task<PaginatedCollection<MaterialEntity>> GetAllWithPredicateAsync(
+            int limit,
+            int offset,
             Expression<Func<MaterialEntity, bool>> predicate = null,
             string sortColumnName = null,
             string sortOrder = null)
         {
-            var materialQuery = predicate is null
-                                ? GetMaterialsQuery(IncludeAll)
-                                    .OnlyParent()
-                                : (IQueryable<MaterialEntity>)
-                                    GetMaterialsQuery(IncludeAll)
-                                    .OnlyParent()
-                                    .Where(predicate);
-
-            var materialCountQuery = materialQuery;
-
-            if (limit == 0)
-            {
-                materialQuery = materialQuery
-                                    .ApplySorting(sortColumnName, sortOrder);
-            }
-            else
-            {
-                materialQuery = materialQuery
-                                    .ApplySorting(sortColumnName, sortOrder)
-                                    .Skip(offset)
-                                    .Take(limit);
-            }
-
-            var materials = await materialQuery
-                                    .ToArrayAsync();
-
-            var materialCount = await materialCountQuery.CountAsync();
-
-
-            return (materials, materialCount);
-        }
-
-        private IQueryable<MaterialEntity> GetSimplifiedMaterialsQuery()
-        {
-            return Context.Materials
-                    .Include(m => m.File)
-                    .Include(m => m.Importance)
-                    .Include(m => m.Reliability)
-                    .Include(m => m.Relevance)
-                    .Include(m => m.Completeness)
-                    .Include(m => m.SourceReliability)
-                    .Include(m => m.ProcessedStatus)
-                    .Include(m => m.SessionPriority)
-                    .Include(m => m.MaterialAssignees)
-                        .ThenInclude(_ => _.Assignee)
-                    .Include(m => m.Editor)
-                    .AsNoTracking();
+            return GetMaterialsQueryAsNoTracking(IncludeAll)
+                .OnlyParent()
+                .WhereOrDefault(predicate)
+                .ApplySorting(sortColumnName, sortOrder)
+                .AsPaginatedCollectionAsync(offset, limit);
         }
 
         private IQueryable<MaterialEntity> GetOnlyMaterialsForNodeIdListQuery(IEnumerable<Guid> nodeIdList)
@@ -333,30 +336,14 @@ namespace Iis.DbLayer.Repositories
                         .Select(m => m.MaterialInfoJoined.Material);
         }
 
-        private IQueryable<MaterialEntity> GetMaterialsQuery(params MaterialIncludeEnum[] includes)
-        {
-            if (!includes.Any()) return GetSimplifiedMaterialsQuery();
+        private IQueryable<MaterialEntity> GetMaterialsQueryAsNoTracking(MaterialIncludeEnum include) =>
+           Materials.AsNoTracking().Include(include);
 
-            includes = includes.Distinct()
-                                .ToArray();
+        private IQueryable<MaterialEntity> GetMaterialsQueryAsNoTracking(MaterialIncludeEnum[] includes) =>
+            Materials.AsNoTracking().Include(includes);
 
-            var resultQuery = GetSimplifiedMaterialsQuery();
-
-            foreach (var include in includes)
-            {
-                resultQuery = include switch
-                {
-                    MaterialIncludeEnum.WithFeatures => resultQuery.WithFeatures(),
-                    MaterialIncludeEnum.WithNodes => resultQuery.WithNodes(),
-                    MaterialIncludeEnum.WithChildren => resultQuery.WithChildren(),
-                    MaterialIncludeEnum.WithFiles => resultQuery.WithFiles(),
-                    MaterialIncludeEnum.OnlyParent => resultQuery.OnlyParent(),
-                    _ => resultQuery
-                };
-            }
-
-            return resultQuery;
-        }
+        private IQueryable<MaterialEntity> GetMaterialsQuery(MaterialIncludeEnum[] includes) =>
+            Materials.Include(includes);
 
         private IQueryable<MaterialEntity> GetMaterialsForDistributionQuery() =>
            Context.Materials

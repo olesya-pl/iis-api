@@ -23,7 +23,7 @@ namespace IIS.Core.GraphQL.AnalyticsIndicator
 
         public async Task<GraphQLCollection<AnalyticsIndicator>> GetAnalyticsIndicatorList([Service] IAnalyticsRepository repository, [GraphQLType(typeof(NonNullType<IdType>))] Guid parentId)
         {
-            var children = await repository.GetAllChildrenAsync(parentId);
+            var children = repository.GetAllChildrenAsync(parentId);
             var list = children.Select(i => new AnalyticsIndicator(i)).ToList();
 
             return new GraphQLCollection<AnalyticsIndicator>(list, list.Count);
