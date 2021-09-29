@@ -48,9 +48,15 @@ namespace IIS.Core.GraphQL.Entities
             var mapped = mapper.Map<OntologyFilterableQueryResponse>(response);
             EnrichWithSelectedFilteredItems(mapped.Aggregations, elasticFilter);
             mapped.Aggregations = EnrichWithNodeTypeNames(nodesData, mapped.Aggregations);
+
             var nodeTypeAggregations = GetNodeTypeAggregations(nodesData.Schema, types,
                 mapped.Aggregations.GetValueOrDefault(ElasticConfigConstants.NodeTypeTitleAlias)?.Buckets);
             mapped.NodeTypeAggregations = nodeTypeAggregations.Select(_ => JObject.FromObject(_)).ToList();
+
+            if (mapped.Aggregations.ContainsKey(ElasticConfigConstants.NodeTypeTitleAlias))
+            {
+                mapped.Aggregations.Remove(ElasticConfigConstants.NodeTypeTitleAlias);
+            }
 
             return mapped;
         }
