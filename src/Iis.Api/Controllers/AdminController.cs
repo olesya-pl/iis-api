@@ -338,34 +338,34 @@ namespace Iis.Api.Controllers
         }
 
         [HttpGet("ImportExternalUsers/{userNames}")]
-        public Task<IActionResult> ImportExternalUsers(string userNames, CancellationToken ct)
+        public async Task<IActionResult> ImportExternalUsers(string userNames, CancellationToken ct)
         {
             string message;
             try
             {
-                message = _userService.ImportUsersFromExternalSource(userNames.Split(','));
+                message = await _userService.ImportUsersFromExternalSourceAsync(userNames.Split(','));
             }
             catch (Exception ex)
             {
                 message = $"Error: {ex.Message}";
             }
-            return Task.FromResult<IActionResult>(Content(message));
+            return Content(message);
         }
 
         [HttpGet("ImportExternalUsers")]
-        public Task<IActionResult> ImportExternalUsers(CancellationToken ct)
+        public async Task<IActionResult> ImportExternalUsers(CancellationToken ct)
         {
             string message;
             try
             {
-                message = _userService.ImportUsersFromExternalSource();
+                message = await _userService.ImportUsersFromExternalSourceAsync();
 
             }
             catch (Exception ex)
             {
                 message = $"Error: {ex.Message}";
             }
-            return Task.FromResult<IActionResult>(Content(message));
+            return Content(message);
         }
 
         [HttpGet("CheckMatrixUsers")]

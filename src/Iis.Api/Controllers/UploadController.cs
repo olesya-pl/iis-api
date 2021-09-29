@@ -3,7 +3,6 @@ using System.IO;
 using System.Security.Authentication;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
@@ -53,16 +52,18 @@ namespace Iis.Api.Controllers
 
         [HttpPost]
         [DisableRequestSizeLimit]
-        public Task<UploadResult> Post([FromForm] IFormFile file, [FromForm]string fileInfo,  CancellationToken ct)
+        public async Task<UploadResult> Post([FromForm] IFormFile file, [FromForm]string fileInfo,  CancellationToken ct)
         {
             if (!Request.Headers.TryGetValue("Authorization", out var token))
+            {
                 throw new AuthenticationException("Requires \"Authorization\" header to contain a token");
+            }
 
-            var tokenPayload = TokenHelper.ValidateToken(token, _configuration, _userService);
+            var tokenPayload = await TokenHelper.ValidateTokenAsync(token, _configuration, _userService);
 
             var input = JsonConvert.DeserializeObject<UploadInput>(fileInfo);
 
-            return UploadSingleFile(file.OpenReadStream(), input, tokenPayload.User);
+            return await UploadSingleFile(file.OpenReadStream(), input, tokenPayload.User);
         }
 
         private async Task<UploadResult> UploadSingleFile(Stream fileStream, UploadInput input, User user)
