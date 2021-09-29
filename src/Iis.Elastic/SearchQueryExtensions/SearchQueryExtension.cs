@@ -130,10 +130,17 @@ namespace Iis.Elastic.SearchQueryExtensions
             {
                 return filter.Suggestion;
             }
-
-            var result = string.IsNullOrEmpty(filter.Suggestion) ? "" : $"({ApplyFuzzinessOperator(filter.Suggestion)})";
-            result = PopulateFilteredItems(filter.FilteredItems, result);
-            return PopulateCherryPickedObjectsOfStudy(filter.CherryPickedItems, result);
+            return ToQueryStringWithFilterItems(filter);
+        }
+        public static string ToQueryStringWithForcedEscape(this ElasticFilter filter)
+        {
+            if (filter.CherryPickedItems.Count == 0 && filter.FilteredItems.Count == 0)
+            {
+                return filter.Suggestion
+                    .RemoveSymbols(ElasticManager.RemoveSymbolsPattern)
+                    .EscapeSymbols(ElasticManager.EscapeSymbolsPattern);
+            }
+            return ToQueryStringWithFilterItems(filter);
         }
 
         public static string CreateMaterialsQueryString(string suggestion,
@@ -363,7 +370,7 @@ namespace Iis.Elastic.SearchQueryExtensions
                 Suggestion = filter.Suggestion,
                 FilteredItems = filter.FilteredItems.Where(x => !(x.Name == field.Name || x.Name == field.Alias)).ToList()
             };
-            var possibleQuery = fieldSpecificFilter.ToQueryString();
+            var possibleQuery = fieldSpecificFilter.ToQueryStringWithForcedEscape();
 
             return string.IsNullOrEmpty(possibleQuery)
                 ? Wildcard
@@ -376,9 +383,19 @@ namespace Iis.Elastic.SearchQueryExtensions
         }
 
         private static bool IsWildCard(string input) => input.Contains('*');
+
         private static bool IsDoubleQuoted(string input) => input.StartsWith('\"') && input.EndsWith('\"');
+
         private static bool IsInBrackets(string input) => input.StartsWith('(') && input.EndsWith(')');
+
         private static string GetUniqueAggregationName() => $"{GroupedAggregationName}{Guid.NewGuid().ToString("N")}";
+
+        private static string ToQueryStringWithFilterItems(this ElasticFilter filter)
+        {
+            var result = string.IsNullOrEmpty(filter.Suggestion) ? "" : $"({ApplyFuzzinessOperator(filter.Suggestion)})";
+            result = PopulateFilteredItems(filter.FilteredItems, result);
+            return PopulateCherryPickedObjectsOfStudy(filter.CherryPickedItems, result);
+        }
 
         private class AggregationFieldContext
         {
