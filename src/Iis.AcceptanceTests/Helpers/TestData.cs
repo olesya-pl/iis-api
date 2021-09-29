@@ -22,8 +22,8 @@ namespace AcceptanceTests.Helpers
             var environmentVariable = Environment.GetEnvironmentVariable("TargetEnvironment");
             TargetEnvironment targetEnvironment = (!string.IsNullOrWhiteSpace(environmentVariable)) ?
                 Enum.Parse<TargetEnvironment>(environmentVariable)
-                : TargetEnvironment.Dev3;
-            if (targetEnvironment != TargetEnvironment.Dev3 && string.IsNullOrWhiteSpace(environmentVariable))
+                : TargetEnvironment.QA;
+            if (targetEnvironment != TargetEnvironment.QA && string.IsNullOrWhiteSpace(environmentVariable))
                 Console.Out.WriteLine($"YOU ARE TESTING ON {targetEnvironment}!!!");
             ReadTestData(targetEnvironment.ToString());
             if (string.IsNullOrWhiteSpace(environmentVariable))
@@ -57,6 +57,7 @@ namespace AcceptanceTests.Helpers
         QA,
         ContourStage,
         PogliyaStage,
-        Demo
+        Demo,
+        StageN
     }
 }

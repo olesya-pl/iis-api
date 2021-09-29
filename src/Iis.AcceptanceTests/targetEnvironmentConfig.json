@@ -55,5 +55,12 @@
     "defaultUserName": "olya",
     "defaultUserPassword": "123",
     "RemoteWebDriverUrl": "http://192.168.88.114:4444/wd/hub"
+  },
+  "StageN": {
+    "BaseAddress": "http://192.168.88.52",
+    "BaseApiAddress": "http://192.168.88.52:5000",
+    "defaultUserName": "olya",
+    "defaultUserPassword": "123",
+    "RemoteWebDriverUrl": "http://192.168.88.114:4444/wd/hub"
   }
 }

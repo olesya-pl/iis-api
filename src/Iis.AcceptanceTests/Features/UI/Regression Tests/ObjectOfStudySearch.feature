@@ -45,3 +45,19 @@ Scenario: IIS-5830 - Search object by mobile phone sign
 	And I searched 0997908973 data in the Objects of study section
 	Then I must see object of study Бонд as first search result
 	Then I must see sign value 0997908973 in first search result
+
+@functional @UI @ObjectsOfStudySearchUI
+Scenario: IIS-XXXX - Search on object page
+	When I clicked on the Objects section
+	And I clicked on search button in the Object of study section
+	And I searched Бонд data in the Objects of study section
+	Then I must see object of study Бонд Д. as first search result
+
+@functional @UI @ObjectsOfStudySearchUI
+Scenario: IIS-6381 -  Search object type value: "Особа"
+	#When I clicked on the aggregation-filter__item 
+	When I clicked on the ObjectTypeInLis
+
+	#(@"I clicked on the ObjectTypeInList")]
+
+	Then I click

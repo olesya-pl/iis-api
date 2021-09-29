@@ -33,7 +33,6 @@ namespace AcceptanceTests.UISteps
             navigationSection.ObjectOfStudyLink.Click();
         }
 
-
         [When(@"I clicked on search button in the Object of study section")]
         public void IClickedOnSearchButton()
         {
@@ -52,6 +51,23 @@ namespace AcceptanceTests.UISteps
             driver.WaitFor(2);
             objectsOfStudyPage.MinimizeObjectOfStudyBigCardButton.Click();
         }
+
+            /// akrapivka 
+
+        [When (@"I clicked on the aggregation-filter__item")]
+        public void WhenIClickedOnTheAggregationFilterItem()
+        {
+            objectsOfStudyPage.AggregationFilterItem.Click();
+        }
+
+        [When (@"I clicked on the ObjectTypeInList")]
+        public void IClickedOnTheObjectTypeInList () 
+        {
+            objectsOfStudyPage.ObjectTypeInList.Click();
+        }
+ 
+
+
 
 
         [When(@"I got search counter value in the Object of study section")]

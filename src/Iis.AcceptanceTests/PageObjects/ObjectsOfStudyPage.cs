@@ -22,6 +22,19 @@ namespace AcceptanceTests.PageObjects
         [CacheLookup]
         public IWebElement SearchLoopButton;
 
+        /// akrapivka
+
+        [FindsBy(How = How.XPath, Using = "//div[contains (text() , 'Військовий підрозділ')]")]
+        [CacheLookup]
+        public IWebElement AggregationFilterItem;
+
+        [FindsBy(How = How.XPath, Using = "//div[@class='object-type']")]
+        [CacheLookup]
+        public IWebElement ObjectTypeInList;
+
+
+
+
         [FindsBy(How = How.CssSelector, Using = "span > .el-input > .el-input__inner")]
         [CacheLookup]
         public IWebElement SearchField;
@@ -148,7 +161,7 @@ namespace AcceptanceTests.PageObjects
         public IWebElement ThirdBrigadeSearchResult;
 
         [FindsBy(How = How.CssSelector, Using = ".quick-access-panel__actions button.add-button")]
-        public IWebElement CreateANewObjectOfStudyButton;
+        private IWebElement createANewObjectOfStudyButton;
 
         [FindsBy(How = How.XPath, Using = "//span[contains(@class, 'el-tree-node__label') and text() = 'Військовий підрозділ']")]
         public IWebElement CreateAMilitaryOrganizationButton;
@@ -207,6 +220,7 @@ namespace AcceptanceTests.PageObjects
 
         [FindsBy(How = How.XPath, Using = "//span[@class='multiselect__tag-label']")]
         public IWebElement TagInTheSearchField;
+        internal object IClickedOnTheObjectTypeInList;
 
         public ObjectsSearch GetObjectByTitle(string title)
         {
@@ -219,6 +233,8 @@ namespace AcceptanceTests.PageObjects
 
         public List<Event> Events => driver.FindElements(By.CssSelector(".events-table tbody.p-datatable-tbody > tr"))
                    .Select(webElement => new Event(driver, webElement)).ToList();
+
+        public IWebElement CreateANewObjectOfStudyButton { get => createANewObjectOfStudyButton; set => createANewObjectOfStudyButton = value; }
 
         public void ScrollDown(string value)
         {
