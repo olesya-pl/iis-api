@@ -180,7 +180,7 @@ namespace Iis.Api.Controllers
                 DateProperty.Create("Metadata.RegTime", ElasticConfiguration.DefaultDateFormats),
                 DateProperty.Create("Metadata.RegDate", ElasticConfiguration.DefaultDateFormats),
                 DateProperty.Create("RegistrationDate", ElasticConfiguration.DefaultDateFormats),
-                TextProperty.Create("Metadata.Duration"),
+                IntegerProperty.Create("Metadata.Duration"),
                 DateProperty.Create("CreatedDate", ElasticConfiguration.DefaultDateFormats),
                 DateProperty.Create("UpdatedAt", ElasticConfiguration.DefaultDateFormats),
                 DateProperty.Create("LoadData.ReceivingDate", ElasticConfiguration.DefaultDateFormats),
