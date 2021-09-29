@@ -149,8 +149,8 @@ namespace Iis.Services
 
             foreach (var node in nodes)
             {
-                graphData.AddLinks(GraphTypeMapper.MapMaterialToNodeGraphLink(material, node));
-                graphData.AddNodes(GraphTypeMapper.MapNodeToGraphNode(node, exclusionNodeIdList));
+                graphData.AddLink(GraphTypeMapper.MapMaterialToNodeGraphLink(material, node));
+                graphData.AddNode(GraphTypeMapper.MapNodeToGraphNode(node, exclusionNodeIdList));
             }
 
             return graphData;
