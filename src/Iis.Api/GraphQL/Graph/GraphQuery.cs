@@ -18,7 +18,7 @@ namespace Iis.Api.GraphQL.Graph
             Guid[] nodeIdList
         )
         {
-            var graphDataResult = await _graphService.GetGraphDataForNodeListAsync(nodeIdList, null);
+            var graphDataResult = await _graphService.GetGraphDataForNodeListAsync(nodeIdList);
 
             return new GraphResponse(mapper.Map<IReadOnlyCollection<GraphLink>>(graphDataResult.LinkList),  mapper.Map<IReadOnlyCollection<GraphNode>>(graphDataResult.NodeList));
         }

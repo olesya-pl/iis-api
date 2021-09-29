@@ -6,6 +6,6 @@ namespace Iis.Services.Contracts.Interfaces
 {
     public interface IGraphService
     {
-        Task<(IReadOnlyCollection<GraphLink> LinkList, IReadOnlyCollection<GraphNode> NodeList)> GetGraphDataForNodeListAsync(IReadOnlyCollection<Guid> nodeIdList, IReadOnlyCollection<Guid> relationTypeList);
+        Task<GraphData> GetGraphDataForNodeListAsync(IReadOnlyCollection<Guid> nodeIdList);
     }
 }

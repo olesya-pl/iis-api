@@ -328,7 +328,7 @@ namespace IIS.Core.Materials.EntityFramework
                             UserName = username
                         });
 
-                        material.Content = input.Content;
+                        material.Content = input.Content ?? string.Empty;
 
                         if (input.Objects != null) loadData.Objects = new List<string>(input.Objects);
                         if (input.Tags != null) loadData.Tags = new List<string>(input.Tags);

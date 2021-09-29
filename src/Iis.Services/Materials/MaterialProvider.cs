@@ -165,7 +165,7 @@ namespace IIS.Services.Materials
             var entities = await RunWithoutCommitAsync(uow =>
                 uow.MaterialRepository.GetByIdsAsync(ids, MaterialIncludeEnum.WithChildren, MaterialIncludeEnum.WithFeatures));
 
-            return entities.Where(p => p.CanBeAccessedBy(user.AccessLevel))
+            return entities.Where(p => user == null || p.CanBeAccessedBy(user.AccessLevel))
                 .Select(entity =>
                 {
                     var mapped = Map(entity);
