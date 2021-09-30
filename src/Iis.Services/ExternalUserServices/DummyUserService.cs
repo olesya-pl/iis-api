@@ -1,39 +1,53 @@
 ﻿using Iis.Interfaces.Users;
 using Iis.Services.Contracts.ExternalUserServices;
 using Iis.Services.Contracts.Interfaces;
-using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace Iis.Services.ExternalUserServices
 {
     public class DummyUserService : IExternalUserService
     {
-        public UserSource GetUserSource() => UserSource.Dummy;
-        public List<ExternalUser> GetUsers()
+        private readonly Dictionary<string, ExternalUser> _users = new Dictionary<string, ExternalUser>
         {
-            return new List<ExternalUser>
             {
+                "ExternalUser1",
                 new ExternalUser
                 {
                     UserName = "ExternalUser1",
                     Roles = new List<ExternalRole>
                     {
-                        new ExternalRole { Name = "Оператор"},
-                        new ExternalRole { Name = "Аналітик 1"}
+                        ExternalRole.CreateFrom("Оператор"),
+                        ExternalRole.CreateFrom("Аналітик 1")
                     }
-                },
+                }
+            },
+            {
+                "ExternalUser2",
                 new ExternalUser
                 {
                     UserName = "ExternalUser2",
                     Roles = new List<ExternalRole>
                     {
-                        new ExternalRole { Name = "Оператор"},
-                        new ExternalRole { Name = "Аналітик 2"}
+                        ExternalRole.CreateFrom("Оператор"),
+                        ExternalRole.CreateFrom("Аналітик 1")
                     }
-                },
-            };
+                }
+            }
+        };
+
+        public UserSource GetUserSource() => UserSource.Dummy;
+
+        public IEnumerable<ExternalUser> GetUsers()
+        {
+            return _users.Values;
         }
+
         public bool ValidateCredentials(string username, string password) => password == "123";
+
+        public ExternalUser GetUser(string username)
+        {
+            _users.TryGetValue(username, out var user);
+            return user;
+        }
     }
 }

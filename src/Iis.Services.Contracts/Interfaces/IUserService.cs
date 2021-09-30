@@ -26,5 +26,6 @@ namespace Iis.Services.Contracts.Interfaces
         Task<string> ImportUsersFromExternalSourceAsync(IEnumerable<string> userNames = null, CancellationToken cancellationToken = default);
         Task<string> GetUserMatrixInfoAsync();
         Task<string> CreateMatrixUsersAsync(List<string> userNames = null);
+        Task SynchronizeUserAsync(string userName, CancellationToken cancellationToken = default);
     }
 }

@@ -34,7 +34,7 @@ namespace IIS.Core.GraphQL.Users
             [Required] string username,
             [Required] string password)
         {
-            var user = await _userService.ValidateAndGetUserAsync(username, password);
+            var user = await _userService.ValidateAndGetUserAsync(username, password, context.RequestAborted);
 
             return new LoginResponse
             {
