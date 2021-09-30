@@ -29,14 +29,6 @@ namespace Iis.OntologySchema.DataTypes
         #region Obsolete Fields
 
         [Obsolete]
-        bool Editable { get; }
-        [Obsolete]
-        bool? ExposeOnApi { get; }
-        [Obsolete]
-        bool? HasFewEntities { get; }
-        [Obsolete]
-        string Type { get; }
-        [Obsolete]
         IValidation Validation { get; }
         
         #endregion
