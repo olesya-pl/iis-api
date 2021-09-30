@@ -65,14 +65,14 @@ namespace Iis.Api
         {
             var context = serviceProvider.GetService<TDbContext>();
             var defaultCommandTimeout = context.Database.GetCommandTimeout();
-            if (commandTimeout is not null)
+            if (commandTimeout != null)
             {
                 context.Database.SetCommandTimeout(commandTimeout.Value);
             }
 
             await context.Database.MigrateAsync();
 
-            if (commandTimeout is not null)
+            if (commandTimeout != null)
             {
                 context.Database.SetCommandTimeout(defaultCommandTimeout);
             }
