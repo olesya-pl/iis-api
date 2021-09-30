@@ -2,7 +2,6 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
-    <LangVersion>latest</LangVersion>
     <AspNetCoreHostingModel>InProcess</AspNetCoreHostingModel>
     <SourceRevisionId Condition="'$(IIS_SOURCE_REVISION_ID)' != ''">$(IIS_SOURCE_REVISION_ID)</SourceRevisionId>
     <UserSecretsId>7fbdec57-37c4-4ac5-bbe0-b67a05e1794d</UserSecretsId>
