@@ -101,7 +101,7 @@ namespace Iis.DbLayer.Extensions
                 return query;
 
             foreach (var include in includes.Distinct())
-                query.Include(include);
+                query = query.Include(include);
 
             return query;
         }
