@@ -143,7 +143,7 @@ namespace Iis.Services
             updatedEntity.Source = userEntity.Source;
 
             var newUserRolesEntitiesList = updatedUser.Roles.Select(role => UserRoleEntity.CreateFrom(updatedUser.Id, role.Id));
-            var removed = _context.UserRoles.Where(ur => ur.UserId == userEntity.Id).ToArrayAsync(cancellationToken);
+            var removed = await _context.UserRoles.Where(ur => ur.UserId == userEntity.Id).ToArrayAsync(cancellationToken);
 
             _mapper.Map(updatedEntity, userEntity);
 
