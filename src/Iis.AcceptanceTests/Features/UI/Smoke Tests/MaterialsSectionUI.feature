@@ -46,14 +46,14 @@ Feature: MaterialsSectionUI - Smoke
 		| FileName              | тестовий матеріал                          |
 		| SourceReliabilityText | Здебільшого надійне                        |
 		| ReliabilityText       | Достовірна                                 |
-		| Content               | таємний контент                            |
+		| Content               | Просто контент                            |
 		| AccessLevel           | 0                                          |
 		| LoadedBy              | автотест                                   |
 		| MetaData              | {"type":"document","source":"contour.doc"} |
         When I navigated to Materials page
         And Loading icon is not displayed
         And I clicked search button in the Materials section
-        And I searched таємн data in the materials
+        And I searched Просто data in the materials
         And Loading icon is not displayed
         And I clicked on the first material in the Materials list
         Then I must see relevance drop down in the materials card

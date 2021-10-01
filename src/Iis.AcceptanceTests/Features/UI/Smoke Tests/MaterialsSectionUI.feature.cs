@@ -324,7 +324,7 @@ namespace AcceptanceTests.Features.UI.SmokeTests
                             "Достовірна"});
                 table9.AddRow(new string[] {
                             "Content",
-                            "таємний контент"});
+                            "Просто контент"});
                 table9.AddRow(new string[] {
                             "AccessLevel",
                             "0"});
@@ -347,7 +347,7 @@ namespace AcceptanceTests.Features.UI.SmokeTests
         testRunner.And("I clicked search button in the Materials section", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
 #line 56
-        testRunner.And("I searched таємн data in the materials", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+        testRunner.And("I searched Просто data in the materials", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
 #line 57
         testRunner.And("Loading icon is not displayed", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
