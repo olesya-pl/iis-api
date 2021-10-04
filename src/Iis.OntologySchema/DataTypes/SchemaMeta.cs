@@ -11,14 +11,11 @@ namespace Iis.OntologySchema.DataTypes
     public class SchemaMeta : ISchemaMeta
     {
         public int? SortOrder { get; set; }
-        public bool? ExposeOnApi { get; set; }
-        public bool? HasFewEntities { get; set; }
         public string Title { get; set; }
         public bool Multiple { get; set; }
         public string Formula { get; set; }
         public string Format { get; set; }
         public EntityOperation[] AcceptsEntityOperations { get; set; } 
-        public string Type { get; set; }
         public string[] TargetTypes { get; set; }
         public IFormField FormField { get; set; }
         public IContainerMeta Container { get; set; }
@@ -28,7 +25,6 @@ namespace Iis.OntologySchema.DataTypes
         public bool? IsImportantRelation { get; set; }
         public string Code { get; set; }
         public bool? Hidden { get; set; }
-        public bool Editable { get; set; }
 
         public SchemaMeta() { }
         public SchemaMeta(string json)
@@ -43,14 +39,6 @@ namespace Iis.OntologySchema.DataTypes
             {
                 Multiple = bool.Parse(jObj["Multiple"].ToString());
             }
-            if (KeyExists(jObj, "ExposeOnApi"))
-            {
-                ExposeOnApi = bool.Parse(jObj["ExposeOnApi"].ToString());
-            }
-            if (KeyExists(jObj, "HasFewEntities"))
-            {
-                HasFewEntities = bool.Parse(jObj["HasFewEntities"].ToString());
-            }
             if (KeyExists(jObj, "IsAggregated"))
             {
                 IsAggregated = bool.Parse(jObj["IsAggregated"].ToString());
@@ -62,10 +50,6 @@ namespace Iis.OntologySchema.DataTypes
             if (KeyExists(jObj, "Title"))
             {
                 Title = jObj["Title"].ToString();
-            }
-            if (KeyExists(jObj, "Type"))
-            {
-                Type = jObj["Type"].ToString();
             }
             if (KeyExists(jObj, "Formula"))
             {

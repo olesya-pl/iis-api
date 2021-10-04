@@ -82,7 +82,6 @@ using System.Security.Authentication;
 using System.Threading.Tasks;
 using Iis.CoordinatesEventHandler.DependencyInjection;
 using Iis.Utility.Logging;
-using Iis.Services.Materials;
 
 namespace IIS.Core
 {
@@ -125,8 +124,6 @@ namespace IIS.Core
             services.AddTransient(provider => new DbContextOptionsBuilder().UseNpgsql(dbConnectionString).Options);
             if (enableContext)
             {
-                MigrateOntologyContext(OntologyContext.GetContext(dbConnectionString));
-
                 services.AddDbContext<OntologyContext>(
                     options => options
                         .UseNpgsql(dbConnectionString)
@@ -223,15 +220,14 @@ namespace IIS.Core
             // todo: remake graphql engine registration in DI
             //services.AddGraphQL(schema);
 
-
             var publiclyAccesible = new HashSet<string> { "login", "__schema" };
 
             QueryExecutionBuilder.New()
-                .Use(next => context =>
+                .Use(next => async context =>
                 {
                     try
                     {
-                        _authenticate(context, publiclyAccesible);
+                        await AuthenticateAsync(context, publiclyAccesible);
                     }
                     catch (Exception e)
                     {
@@ -245,11 +241,9 @@ namespace IIS.Core
                             .Build();
                         context.Exception = e;
                         context.Result = QueryResult.CreateError(errorHandler.Handle(error));
-
-                        return Task.FromResult(context);
                     }
 
-                    return next(context);
+                    await next(context);
                 })
                 .UseDefaultPipeline()
                 .AddErrorFilter<AppErrorFilter>()
@@ -269,13 +263,11 @@ namespace IIS.Core
             services.RegisterMqFactory(Configuration, out string mqConnectionString)
                     .RegisterMaterialEventServices(Configuration);
 
-
             ElasticConfiguration elasticConfiguration = Configuration.GetSection("elasticSearch").Get<ElasticConfiguration>();
             var maxOperatorsConfig = Configuration.GetSection("maxMaterialsPerOperator").Get<MaxMaterialsPerOperatorConfig>();
             services.AddSingleton(maxOperatorsConfig);
 
             services.RegisterFlightRadarServices(Configuration);
-
 
             if (enableContext)
             {
@@ -330,16 +322,20 @@ namespace IIS.Core
             services.Configure<FormOptions>(options => options.MultipartBodyLengthLimit = long.MaxValue);
         }
 
-        private void _authenticate(IQueryContext context, HashSet<string> publiclyAccesible)
+        private async Task AuthenticateAsync(IQueryContext context, HashSet<string> publiclyAccesible)
         {
             // TODO: remove this method when hotchocolate will allow to add attribute for authentication
             var qd = context.Request.Query as QueryDocument;
             if (qd == null || qd.Document == null)
+            {
                 throw new InvalidOperationException("Cannot find query in document");
+            }
 
             var odn = qd.Document.Definitions[0] as OperationDefinitionNode;
             if (odn.SelectionSet?.Selections.Count != 1)
+            {
                 throw new InvalidOperationException("Does not support multiple selections in query");
+            }
 
             var fieldNode = (FieldNode)odn.SelectionSet.Selections[0];
 
@@ -347,7 +343,9 @@ namespace IIS.Core
             {
                 var httpContext = (HttpContext)context.ContextData["HttpContext"];
                 if (!httpContext.Request.Headers.TryGetValue("Authorization", out var token))
+                {
                     throw new AuthenticationException("Requires \"Authorization\" header to contain a token");
+                }
 
                 var userService = context.Services.GetService<IUserService>();
                 var graphQLAccessList = context.Services.GetService<GraphQLAccessList>();
@@ -356,7 +354,7 @@ namespace IIS.Core
 
                 var graphQLAccessItems = graphQLAccessList.GetAccessItem(operationName, context.Request.VariableValues);
 
-                var validatedToken = TokenHelper.ValidateToken(token, Configuration, userService);
+                var validatedToken = await TokenHelper.ValidateTokenAsync(token, Configuration, userService);
 
                 foreach (var graphQLAccessItem in graphQLAccessItems)
                 {
@@ -380,7 +378,6 @@ namespace IIS.Core
             {
                 app.UseDeveloperExceptionPage();
             }
-            UpdateDatabase(app);
 
             app.UpdateMartialStatus();
             app.ReloadElasticFieldsConfiguration();
@@ -403,7 +400,6 @@ namespace IIS.Core
             app.UseGraphQL();
             app.UsePlayground();
             LoadHotChockolateSchema(app);
-            app.SeedExternalUsers();
             app.UseHealthChecks("/api/server-health", new HealthCheckOptions { ResponseWriter = ReportHealthCheck });
 
             app.UseRouting();
@@ -420,47 +416,6 @@ namespace IIS.Core
             .CreateScope();
             var schemaProvider = serviceScope.ServiceProvider.GetRequiredService<ISchemaProvider>();
             schemaProvider.GetSchema();
-        }
-
-        private void UpdateDatabase(IApplicationBuilder app)
-        {
-            using (var serviceScope = app.ApplicationServices
-                .GetRequiredService<IServiceScopeFactory>()
-                .CreateScope())
-            {
-                try
-                {
-                    using (var context = serviceScope.ServiceProvider.GetService<FlightsContext>())
-                    {
-                        context.Database.Migrate();
-                    }
-                }
-                catch { }
-                try
-                {
-                    using (var context = serviceScope.ServiceProvider.GetService<AssignmentConfigContext>())
-                    {
-                        context.Database.Migrate();
-                    }
-                }
-                catch { }
-
-                var modifyDataRunner = serviceScope.ServiceProvider.GetService<ModifyDataRunner>();
-                if (modifyDataRunner.Run())
-                {
-                    var host = serviceScope.ServiceProvider.GetService<IHost>();
-                    Program.NeedToStart = true;
-                    host.StopAsync().Wait();
-                }
-            }
-        }
-
-        private void MigrateOntologyContext(OntologyContext context)
-        {
-            var defaultCommandTimeout = context.Database.GetCommandTimeout();
-            context.Database.SetCommandTimeout(TimeSpan.FromMinutes(10));
-            context.Database.Migrate();
-            context.Database.SetCommandTimeout(defaultCommandTimeout);
         }
 
         private static async Task ReportHealthCheck(HttpContext c, HealthReport r)

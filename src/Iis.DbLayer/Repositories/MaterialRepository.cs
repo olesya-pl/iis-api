@@ -181,11 +181,14 @@ namespace Iis.DbLayer.Repositories
 
         public async Task<IReadOnlyCollection<MaterialEntity>> GetMaterialCollectionByNodeIdAsync(IReadOnlyCollection<Guid> nodeIdCollection, params MaterialIncludeEnum[] includes)
         {
-            return await GetMaterialsQueryAsNoTracking(includes)
+            return (await GetMaterialsQueryAsNoTracking(includes)
                 .JoinMaterialFeaturesAsNoTracking(Context)
                 .Where(m => nodeIdCollection.Contains(m.MaterialFeature.NodeId))
                 .Select(m => m.MaterialInfoJoined.Material)
-                .ToArrayAsync();
+                .ToArrayAsync())
+                .Distinct(new EqualityByIdComparer())
+                .Select(baseEntity => (MaterialEntity)baseEntity)
+                .ToList();
         }
 
         public async Task<IReadOnlyCollection<Guid>> GetMaterialIdCollectionByNodeIdCollectionAsync(IReadOnlyCollection<Guid> nodeIdCollection)

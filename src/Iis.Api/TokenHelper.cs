@@ -8,18 +8,21 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.Extensions.Configuration;
 using Iis.Services.Contracts.Interfaces;
 using Iis.Domain.Users;
+using System.Threading.Tasks;
+using System.Threading;
 
 namespace IIS.Core
 {
     public static class TokenHelper
     {
+        private static JwtSecurityTokenHandler _securityTokenHandler = new JwtSecurityTokenHandler();
         public static string CLAIM_TYPE_UID = "uid";
 
         public static SymmetricSecurityKey GetSymmetricSecurityKey(string key)
         {
             return new SymmetricSecurityKey(Encoding.ASCII.GetBytes(key));
         }
-        static JwtSecurityTokenHandler _securityTokenHandler = new JwtSecurityTokenHandler();
+
         public static string NewToken(string issuer, string audiene, string securityKey, TimeSpan lifetime, IEnumerable<Claim> claims)
         {
             DateTime expires = DateTime.Now.Add(lifetime);
@@ -32,6 +35,7 @@ namespace IIS.Core
                     new SigningCredentials(GetSymmetricSecurityKey(securityKey), SecurityAlgorithms.HmacSha256));
             return _securityTokenHandler.WriteToken(token);
         }
+
         public static string NewToken(IConfiguration configuration, Guid userId)
         {
             return NewToken(
@@ -45,14 +49,17 @@ namespace IIS.Core
             );
         }
 
-        public static TokenPayload ValidateToken(string token, IConfiguration config, IUserService userService)
+        public static async Task<TokenPayload> ValidateTokenAsync(string token, IConfiguration config, IUserService userService, CancellationToken cancellationToken = default)
         {
             if (!_securityTokenHandler.CanReadToken(token))
+            {
                 throw new AuthenticationException("Unable to read token");
+            }
 
             try
             {
-                var validationParameters = new TokenValidationParameters {
+                var validationParameters = new TokenValidationParameters
+                {
                     ValidIssuer = config.GetValue<string>("jwt:issuer"),
                     ValidAudience = config.GetValue<string>("jwt:audience"),
                     IssuerSigningKey = GetSymmetricSecurityKey(config.GetValue<string>("jwt:signingKey")),
@@ -65,9 +72,12 @@ namespace IIS.Core
 
                 var userId = TokenPayload.GetUserId(validatedToken as JwtSecurityToken);
 
-                var user = userService.GetUser(userId);
+                var user = await userService.GetUserAsync(userId);
 
-                if (user is null) throw new SecurityTokenException();
+                if (user is null)
+                {
+                    throw new SecurityTokenException();
+                }
 
                 return TokenPayload.From(validatedToken as JwtSecurityToken, user);
             }
@@ -91,12 +101,13 @@ namespace IIS.Core
             return new TokenPayload(user.Id, user);
         }
 
-        public static Guid GetUserId(JwtSecurityToken token) 
+        public static Guid GetUserId(JwtSecurityToken token)
         {
             var userId = Guid.Parse(token.Payload[TokenHelper.CLAIM_TYPE_UID] as string);
 
             return userId;
         }
+
         public TokenPayload(Guid userId, User user)
         {
             UserId = userId;

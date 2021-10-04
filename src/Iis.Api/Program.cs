@@ -1,5 +1,6 @@
 using System;
 using System.Threading.Tasks;
+using Iis.Api;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
@@ -18,9 +19,15 @@ namespace IIS.Core
             {
                 try
                 {
-                    NeedToStart = false;
-                    IHost host = CreateWebHostBuilder(args).Build();
-                    host.Run();
+                    var host = CreateWebHostBuilder(args).Build();
+
+                    await host.MigrateDatabaseAsync();
+
+                    NeedToStart = host.RunModifyDataScripts();
+
+                    await host.SeedExternalUsersAsync();
+
+                    await host.RunAsync();
                 }
                 catch (Exception ex)
                 {

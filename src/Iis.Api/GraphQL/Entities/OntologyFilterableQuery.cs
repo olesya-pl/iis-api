@@ -48,9 +48,12 @@ namespace IIS.Core.GraphQL.Entities
             var mapped = mapper.Map<OntologyFilterableQueryResponse>(response);
             EnrichWithSelectedFilteredItems(mapped.Aggregations, elasticFilter);
             mapped.Aggregations = EnrichWithNodeTypeNames(nodesData, mapped.Aggregations);
+
             var nodeTypeAggregations = GetNodeTypeAggregations(nodesData.Schema, types,
                 mapped.Aggregations.GetValueOrDefault(ElasticConfigConstants.NodeTypeTitleAlias)?.Buckets);
             mapped.NodeTypeAggregations = nodeTypeAggregations.Select(_ => JObject.FromObject(_)).ToList();
+
+            RemoveObsoleteAggregation(mapped);
 
             return mapped;
         }
@@ -204,6 +207,14 @@ namespace IIS.Core.GraphQL.Entities
             aggregations.MergeBuckets(buckets);
 
             return aggregations.Items;
+        }
+
+        private void RemoveObsoleteAggregation(OntologyFilterableQueryResponse response)
+        {
+            if (response.Aggregations.ContainsKey(ElasticConfigConstants.NodeTypeTitleAlias))
+            {
+                response.Aggregations.Remove(ElasticConfigConstants.NodeTypeTitleAlias);
+            }
         }
     }
 }

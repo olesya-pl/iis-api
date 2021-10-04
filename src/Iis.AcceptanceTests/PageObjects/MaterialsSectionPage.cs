@@ -66,7 +66,7 @@ namespace AcceptanceTests.PageObjects
         [CacheLookup]
         public IWebElement AuthenticityDropDown;
 
-        [FindsBy(How = How.CssSelector, Using = ".material-general .material-intelligence .action-select--relevance")]
+        [FindsBy(How = How.CssSelector, Using = ".material-general .material-intelligence .material-group-info__row")]
         [CacheLookup]
         public IWebElement RelevanceDropDown;
 

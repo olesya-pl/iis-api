@@ -233,7 +233,6 @@ namespace IIS.Core.Materials.EntityFramework
                             material.ImportanceSignId,
                             nameof(material.Importance),
                             p, username, changeRequestId, changesList);
-                        material.Importance = null;
                         material.ImportanceSignId = p;
                     });
 
@@ -243,7 +242,6 @@ namespace IIS.Core.Materials.EntityFramework
                             material.ReliabilitySignId,
                             nameof(material.Reliability),
                             p, username, changeRequestId, changesList);
-                        material.Reliability = null;
                         material.ReliabilitySignId = p;
                     });
 
@@ -253,7 +251,6 @@ namespace IIS.Core.Materials.EntityFramework
                             material.RelevanceSignId,
                             nameof(material.Relevance),
                             p, username, changeRequestId, changesList);
-                        material.Relevance = null;
                         material.RelevanceSignId = p;
                     });
 
@@ -263,7 +260,6 @@ namespace IIS.Core.Materials.EntityFramework
                             material.CompletenessSignId,
                             nameof(material.Completeness),
                             p, username, changeRequestId, changesList);
-                        material.Completeness = null;
                         material.CompletenessSignId = p;
                     });
 
@@ -273,7 +269,6 @@ namespace IIS.Core.Materials.EntityFramework
                             material.SourceReliabilitySignId,
                             nameof(material.SourceReliability),
                             p, username, changeRequestId, changesList);
-                        material.SourceReliability = null;
                         material.SourceReliabilitySignId = p;
                     });
 
@@ -283,7 +278,6 @@ namespace IIS.Core.Materials.EntityFramework
                             material.ProcessedStatusSignId,
                             nameof(material.ProcessedStatus),
                             p, username, changeRequestId, changesList);
-                        material.ProcessedStatus = null;
                         material.ProcessedStatusSignId = p;
                     });
 
@@ -293,7 +287,6 @@ namespace IIS.Core.Materials.EntityFramework
                             material.SessionPriorityId,
                             nameof(material.SessionPriority),
                             p, username, changeRequestId, changesList);
-                        material.SessionPriority = null;
                         material.SessionPriorityId = p;
                     });
 
@@ -328,7 +321,7 @@ namespace IIS.Core.Materials.EntityFramework
                             UserName = username
                         });
 
-                        material.Content = input.Content ?? string.Empty;
+                        material.Content = input.Content ?? material.Content;
 
                         if (input.Objects != null) loadData.Objects = new List<string>(input.Objects);
                         if (input.Tags != null) loadData.Tags = new List<string>(input.Tags);

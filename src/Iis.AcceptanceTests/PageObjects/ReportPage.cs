@@ -15,7 +15,7 @@ namespace AcceptanceTests.PageObjects
             PageFactory.InitElements(driver, this);
         }
 
-        [FindsBy(How = How.CssSelector, Using = ".reports-table .p-datatable-tbody > tr")]
+        [FindsBy(How = How.CssSelector, Using = ".reports-table .p-datatable .p-datatable-scrollable-wrapper")]
         public IWebElement FirstReportInTheReportList;
 
         [FindsBy(How = How.XPath, Using = "//span[contains(text(),'Нове зведення')]")]
