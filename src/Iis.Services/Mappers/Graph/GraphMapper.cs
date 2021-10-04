@@ -91,7 +91,7 @@ namespace Iis.Services.Mappers.Graph
             };
         }
 
-        public static GraphNode MapMaterialToGraphNode(Material material, Guid fromNodeId)
+        public static GraphNode MapMaterialToGraphNode(Material material, bool? hasLinks = null, Guid fromNodeId = default)
         {
             if(material is null) return null;
 
@@ -102,14 +102,13 @@ namespace Iis.Services.Mappers.Graph
             metaDataObject.Add(GraphTypeExtraPropNames.Type, material.Type);
             metaDataObject.Add(GraphTypeExtraPropNames.Source, material.Source);
 
-            extraObject.Add(GraphTypeExtraPropNames.HasLinks, DoesMaterialHaveLinks(material, fromNodeId));
+            extraObject.Add(GraphTypeExtraPropNames.HasLinks, hasLinks ?? DoesMaterialHaveLinks(material, fromNodeId));
             extraObject.Add(GraphTypeExtraPropNames.Type, GraphTypePropValues.MaterialGraphNodeTypePropValue);
             extraObject.Add(GraphTypeExtraPropNames.Name, material.File?.Name ?? GraphTypePropValues.MaterialGraphNodeNamePropValue);
             extraObject.Add(GraphTypeExtraPropNames.NodeType, GraphNodeNodeTypeNames.Material);
             extraObject.Add(GraphTypeExtraPropNames.ImportanceCode, null);
             extraObject.Add(GraphTypeExtraPropNames.IconName, material.Type);
             extraObject.Add(GraphTypeExtraPropNames.MetaData, metaDataObject);
-
 
             return new GraphNode
             {

@@ -113,7 +113,7 @@ namespace Iis.Services
             if(!materialList.Any()) return Array.Empty<GraphNode>();
 
             return materialList
-                .Select(e => GraphTypeMapper.MapMaterialToGraphNode(e, node.Id))
+                .Select(e => GraphTypeMapper.MapMaterialToGraphNode(e, null, node.Id))
                 .ToArray();
         }
 
@@ -146,6 +146,8 @@ namespace Iis.Services
                 .Select(f => f.Node.OriginalNode);
 
             var exclusionNodeIdList = new Guid[] { };
+
+            graphData.AddNode(GraphTypeMapper.MapMaterialToGraphNode(material, false));
 
             foreach (var node in nodes)
             {
