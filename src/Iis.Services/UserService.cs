@@ -25,11 +25,14 @@ using System.Security.Cryptography;
 using System.Text;
 using Iis.Services.Contracts.Materials.Distribution;
 using Iis.Services.Contracts.Extensions;
+using Microsoft.Extensions.Logging;
+using Iis.Services.Contracts.ExternalUserServices;
 
 namespace Iis.Services
 {
     public class UserService<TUnitOfWork> : BaseService<TUnitOfWork>, IUserService where TUnitOfWork : IIISUnitOfWork
     {
+        private readonly ILogger<UserService<TUnitOfWork>> _logger;
         private readonly OntologyContext _context;
         private readonly MaxMaterialsPerOperatorConfig _maxMaterialsConfig;
         private readonly IMapper _mapper;
@@ -39,6 +42,7 @@ namespace Iis.Services
         private IMatrixService _matrixService;
 
         public UserService(
+            ILogger<UserService<TUnitOfWork>> logger,
             OntologyContext context,
             MaxMaterialsPerOperatorConfig maxMaterialsConfig,
             IUserElasticService userElasticService,
@@ -48,6 +52,7 @@ namespace Iis.Services
             IExternalUserService externalUserService,
             IMatrixService matrixService) : base(unitOfWorkFactory)
         {
+            _logger = logger;
             _context = context;
             _maxMaterialsConfig = maxMaterialsConfig;
             _mapper = mapper;
@@ -113,10 +118,10 @@ namespace Iis.Services
             var mapping = await _context.MaterialChannelMappings.ToArrayAsync();
             var allOperators = await RunWithoutCommitAsync(_ => _.UserRepository.GetOperatorsAsync());
             var distributions = from op in allOperators
-                join ci in chargedInfo
-                    on op.Id equals ci.UserId
-                where ci.FreeSlots > 0
-                select new UserDistributionItem(op.Id, ci.FreeSlots, GetRoles(op, mapping), GetChannels(op, mapping), op.AccessLevel);
+                                join ci in chargedInfo
+                                    on op.Id equals ci.UserId
+                                where ci.FreeSlots > 0
+                                select new UserDistributionItem(op.Id, ci.FreeSlots, GetRoles(op, mapping), GetChannels(op, mapping), op.AccessLevel);
             var allDistributions = allOperators
                 .Where(op => !chargedInfo.Any(ci => ci.UserId == op.Id))
                 .Select(op => new UserDistributionItem(op.Id, maxMaterialsCount, GetRoles(op, mapping), GetChannels(op, mapping), op.AccessLevel))
@@ -174,7 +179,13 @@ namespace Iis.Services
 
         public async Task<User> ValidateAndGetUserAsync(string username, string password, CancellationToken cancellationToken = default)
         {
-            var userEntity = await RunWithoutCommitAsync(_ => _.UserRepository.GetByUserNameAsync(username, cancellationToken));
+            var userSource = _externalUserService.GetUserSource();
+            if (userSource == UserSource.ActiveDirectory)
+            {
+                await SynchronizeActiveDirectoryUserAsync(username, cancellationToken);
+            }
+
+            var userEntity = await RunWithoutCommitAsync(uow => uow.UserRepository.GetByUserNameAsync(username, cancellationToken));
             var user = Map(userEntity);
 
             if (user == null)
@@ -435,12 +446,108 @@ namespace Iis.Services
                 }
                 var msg = await _matrixService.CreateUserAsync(user.UserName, user.Id.ToString("N"));
                 if (msg == null)
+                {
                     sb.AppendLine($"{user.UserName}\t\t\tsuccessfully created");
+                }
                 else
+                {
                     sb.AppendLine($"{user.UserName}\t\t\t{msg}");
+                }
 
             }
             return sb.ToString();
+        }
+
+        private async Task SynchronizeActiveDirectoryUserAsync(string userName, CancellationToken cancellationToken = default)
+        {
+            var externalUser = _externalUserService.GetUser(userName);
+            var userEntity = await _context.Users
+                .Include(u => u.UserRoles)
+                .ThenInclude(ur => ur.Role)
+                .SingleOrDefaultAsync(_ => _.Username == userName, cancellationToken);
+            if (externalUser is null)
+            {
+                OnExternalUserNotFound(userEntity);
+                await _context.SaveChangesAsync(cancellationToken);
+                return;
+            }
+
+            userEntity = userEntity is null
+                ? await CreateUserAsync(externalUser)
+                : UpdateUser(userEntity, externalUser);
+
+            await UpdateUserRolesAsync(externalUser, userEntity, cancellationToken);
+            await _context.SaveChangesAsync(cancellationToken);
+        }
+
+        private void OnExternalUserNotFound(UserEntity userEntity)
+        {
+            if (userEntity is null) return;
+
+            userEntity.IsBlocked = true;
+
+            if (_matrixService?.AutoCreateUsers == true)
+            {
+                //TODO: remove from matrix service
+            }
+        }
+
+        private UserEntity UpdateUser(UserEntity userEntity, ExternalUser externalUser)
+        {
+            userEntity.FirstName = externalUser.FirstName;
+            userEntity.Patronymic = externalUser.SecondName;
+            userEntity.LastName = externalUser.LastName;
+            userEntity.IsBlocked = false;
+
+            return userEntity;
+        }
+
+        private async Task<UserEntity> CreateUserAsync(ExternalUser externalUser)
+        {
+            var userEntity = new UserEntity
+            {
+                Id = Guid.NewGuid(),
+                Username = externalUser.UserName,
+                FirstName = externalUser.FirstName,
+                Patronymic = externalUser.SecondName,
+                LastName = externalUser.LastName,
+                Source = _externalUserService.GetUserSource(),
+                UserRoles = new List<UserRoleEntity>()
+            };
+            _context.Users.Add(userEntity);
+
+            if (_matrixService?.AutoCreateUsers == true)
+            {
+                try
+                {
+                    await _matrixService.CreateUserAsync(userEntity.Username, userEntity.Id.ToString("N"));
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogWarning(ex, "Create matrix user failed");
+                }
+            }
+
+            return userEntity;
+        }
+
+        private async Task UpdateUserRolesAsync(ExternalUser externalUser, UserEntity userEntity, CancellationToken cancellationToken)
+        {
+            var roles = await _context.Roles
+                .AsNoTracking()
+                .ToDictionaryAsync(_ => _.Name, cancellationToken);
+
+            foreach (var externalRole in externalUser.Roles)
+            {
+                if (userEntity.UserRoles.Any(_ => _.Role.Name == externalRole.Name)
+                    || !roles.TryGetValue(externalRole.Name, out var role))
+                {
+                    continue;
+                }
+
+                var userRole = UserRoleEntity.CreateFrom(userEntity.Id, role.Id);
+                _context.Add(userRole);
+            }
         }
 
         private List<User> GetActiveUsers() =>

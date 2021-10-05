@@ -241,6 +241,7 @@ namespace IIS.Core
                             .Build();
                         context.Exception = e;
                         context.Result = QueryResult.CreateError(errorHandler.Handle(error));
+                        return;
                     }
 
                     await next(context);
