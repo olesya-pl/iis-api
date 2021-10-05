@@ -2,102 +2,137 @@
 using Iis.Interfaces.Users;
 using Iis.Services.Contracts.ExternalUserServices;
 using Iis.Services.Contracts.Interfaces;
-using Microsoft.AspNetCore.Authentication;
 using Novell.Directory.Ldap;
 using System;
 using System.Collections.Generic;
 using System.DirectoryServices.AccountManagement;
 using System.Linq;
-using System.Reflection.PortableExecutable;
-using System.Text;
+using System.Text.RegularExpressions;
 
 namespace Iis.Services.ExternalUserServices
 {
     public class ActiveDirectoryUserService : IExternalUserService
     {
+        private const string UserFilter = "(objectClass=user)";
+        private const int OneResult = 1;
+        private const string GroupNameRegex = @"=(?'groupName'\S*)\,";
+        private const string GroupNameMatch = "groupName";
+
         ExternalUserServiceConfiguration _configuration;
-        
+
         public ActiveDirectoryUserService(ExternalUserServiceConfiguration configuration)
         {
             _configuration = configuration;
         }
+
         public UserSource GetUserSource() => UserSource.ActiveDirectory;
-        private LdapConnection GetLdapConnection()
-        {
-            var connection = new LdapConnection();
-            connection.Connect(_configuration.Server, _configuration.Port);
-            connection.Bind(_configuration.Username, _configuration.Password);
-            return connection;
-        }
+
         public bool ValidateCredentials(string username, string password)
         {
-            using (var ctx = GetPrincipalContext())
-            {
-                return ctx.ValidateCredentials(username, password);
-            }
-
+            using var context = ConfigurePrincipalContext(_configuration);
+            return context.ValidateCredentials(username, password);
         }
-        private PrincipalContext GetPrincipalContext() =>
-            new PrincipalContext(ContextType.Domain, _configuration.Server, _configuration.Username, _configuration.Password);
 
-        private ILdapSearchResults MakeRequest(
-            LdapConnection connection, 
-            string filter, 
-            string[] includedFields)
+        public IEnumerable<ExternalUser> GetUsers()
         {
-            return connection.Search(
-                _configuration.Domain, 
-                LdapConnection.ScopeSub, 
-                filter, 
-                includedFields, 
+            using var connection = ConfigureLdapConnection(_configuration);
+            var response = connection.Search(
+                _configuration.Domain,
+                LdapConnection.ScopeSub,
+                UserFilter,
+                UserAttributes.All,
                 false);
-        }
-
-        public List<ExternalUser> GetUsers()
-        {
-            using var ldapConn = GetLdapConnection();
-            
-            var includedFields = new string[] { "samAccountName", "givenname", "middlename", "sn", "memberOf" };
-            var response = MakeRequest(ldapConn, "(objectClass=user)", includedFields);
-            var result = new List<ExternalUser>();
 
             while (response.HasMore())
             {
-                try
-                {
-                    LdapEntry nextEntry = response.Next();
-                    var attributes = nextEntry.GetAttributeSet();
-                    var username = attributes["samAccountName"].StringValue;
-                    
-                    var externalUser = new ExternalUser
-                    {
-                        UserName = username,
-                        FirstName = attributes.GetValueOrDefault("givenname")?.StringValue,
-                        SecondName = attributes.GetValueOrDefault("middlename")?.StringValue,
-                        LastName = attributes.GetValueOrDefault("sn")?.StringValue,
-                        Roles = GetExternalRoles(attributes.GetValueOrDefault("memberOf")?.StringValueArray)
-                    };
-                    
-                    result.Add(externalUser);
-                }
-                catch (LdapException)
-                {
+                if (!TryReadExternalUser(response, out var externalUser))
                     break;
-                }
+
+                yield return externalUser;
+            }
+        }
+
+        public ExternalUser GetUser(string username)
+        {
+            using var connection = ConfigureLdapConnection(_configuration);
+            var cons = new LdapSearchConstraints { MaxResults = OneResult };
+            string filter = $"(&{UserFilter}({UserAttributes.UserName}={username}))";
+            var response = connection.Search(
+                _configuration.Domain,
+                LdapConnection.ScopeSub,
+                UserFilter,
+                UserAttributes.All,
+                false,
+                cons);
+
+            TryReadExternalUser(response, out var externalUser);
+
+            return externalUser;
+        }
+
+        private LdapConnection ConfigureLdapConnection(ExternalUserServiceConfiguration configuration)
+        {
+            var connection = new LdapConnection();
+            connection.Connect(configuration.Server, configuration.Port);
+            connection.Bind(configuration.Username, configuration.Password);
+            return connection;
+        }
+
+        private PrincipalContext ConfigurePrincipalContext(ExternalUserServiceConfiguration configuration)
+        {
+            return new PrincipalContext(ContextType.Domain, configuration.Server, configuration.Username, configuration.Password);
+        }
+
+        private bool TryReadExternalUser(ILdapSearchResults results, out ExternalUser externalUser)
+        {
+            if (!results.HasMore())
+            {
+                externalUser = null;
+                return false;
             }
 
-            return result;
+            try
+            {
+                LdapEntry nextEntry = results.Next();
+                var attributes = nextEntry.GetAttributeSet();
+                string username = attributes[UserAttributes.UserName].StringValue;
+                string[] memberOfArray = GetValueArray(attributes, UserAttributes.MemberOf);
+
+                externalUser = new ExternalUser
+                {
+                    UserName = username,
+                    FirstName = GetValue(attributes, UserAttributes.GivenName),
+                    SecondName = GetValue(attributes, UserAttributes.MiddleName),
+                    LastName = GetValue(attributes, UserAttributes.Cn),
+                    Roles = GetExternalRoles(memberOfArray)
+                };
+
+                return true;
+            }
+            catch (LdapReferralException)
+            {
+                externalUser = null;
+                return false;
+            }
         }
 
-        private string ExtractGroupName(string str)
+        private string GetValue(LdapAttributeSet attributes, string attribute) => attributes.GetValueOrDefault(attribute)?.StringValue;
+
+        private string[] GetValueArray(LdapAttributeSet attributes, string attribute) => attributes.GetValueOrDefault(attribute)?.StringValueArray;
+
+        private List<ExternalRole> GetExternalRoles(string[] memberOf) => memberOf is null
+            ? new List<ExternalRole>()
+            : memberOf.Select(_ => ExtractGroupName(_))
+                .Select(ExternalRole.CreateFrom)
+                .ToList();
+
+        private string ExtractGroupName(string memberOfItem)
         {
-            var rolePart = str.Split(',')[0];
-            return rolePart.Substring(rolePart.IndexOf('=') + 1);
-        }
+            var match = Regex.Match(memberOfItem, GroupNameRegex);
+            if (!match.Success)
+                throw new ArgumentException("Invalid group name format", nameof(memberOfItem));
 
-        private List<ExternalRole> GetExternalRoles(string[] memberOf) =>
-            memberOf == null ?
-                new List<ExternalRole>() :
-                memberOf.Select(s => new ExternalRole { Name = ExtractGroupName(s) }).ToList();
+            return match.Groups[GroupNameMatch].Value;
+        }
     }
 }

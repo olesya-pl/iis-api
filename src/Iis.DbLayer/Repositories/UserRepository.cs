@@ -24,7 +24,7 @@ namespace Iis.DbLayer.Repositories
         public Task<UserEntity> GetByUserNameAsync(string userName, CancellationToken cancellationToken = default)
         {
             return GetUsersQuery()
-                .SingleOrDefaultAsync(e => e.Username == userName, cancellationToken);
+                .SingleOrDefaultAsync(_ => _.Username == userName && !_.IsBlocked, cancellationToken);
         }
 
         public Task<UserEntity> GetByIdAsync(Guid userId, CancellationToken ct)
