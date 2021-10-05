@@ -20,8 +20,19 @@ namespace AcceptanceTests.PageObjects
 			_tableRowElement = webElement;
 		}
 
-		public string Title => _tableRowElement.FindElement(By.TagName("b")).Text;
-
+		public string Title {
+			get
+            {
+				try
+                {
+					return _tableRowElement.FindElement(By.TagName("b")).Text;
+				}
+				catch (NoSuchElementException)
+                {
+					return string.Empty;
+                }
+			}
+		} 
 		public IWebElement DeleteRelationButton => _deleteButtonElement;
 
 		public void DeleteRelation()
@@ -33,8 +44,8 @@ namespace AcceptanceTests.PageObjects
 		public MaterialRelatedItems(IWebDriver driver, string value)
 		{
 			_driver = driver;
-			_tableRowElement = driver.FindElement(By.XPath($@"//div[@class='material-objects']//div[@class='el-table__body-wrapper is-scrolling-none']//tr//b[contains(text(), '{value}')]//ancestor::tr"));
-			_deleteButtonElement = _driver.FindElement(By.XPath($"//div[@class='material-objects']//b[.='{value}']//following::button"));
+			_tableRowElement = driver.FindElement(By.XPath($@"//div[contains(@class, 'el-table__body-wrapper')]//tr//b[contains(text(), '{value}')]"));
+			_deleteButtonElement = _driver.FindElement(By.XPath($@"//div[contains(@class, 'el-table__body-wrapper')]//tr//b[contains(text(), '{value}')]//following::button"));
 		}
 	}
 }

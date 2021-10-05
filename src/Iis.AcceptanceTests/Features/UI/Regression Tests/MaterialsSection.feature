@@ -12,7 +12,7 @@ Background:
 Scenario: IIS-6109 - Indicate a phone number pattern of a cell voice material
 	When I navigated to Materials page
 	And I clicked search button in the Materials section
-	And I searched Voice_01-07-2017 21-34-38 (257) data in the materials
+	And I searched таємний data in the materials
 	And I clicked on the first search result in the Materials section
 	When I clicked on the pattern tab
 	Then I must see that phone number pattern is equal to value
@@ -26,7 +26,7 @@ Scenario: IIS-6109 - Indicate a phone number pattern of a cell voice material
 Scenario: IIS-6048 - Change a material priority by clicking on the Processed button
 	When I navigated to Materials page
 	And I clicked search button in the Materials section
-	And I searched Voice_01-07-2017 21-34-38 (257) data in the materials
+	And I searched таємний data in the materials
 	And I clicked on the first search result in the Materials section
 	And I set the session priority to Important
 	And I pressed Processed button
@@ -45,7 +45,7 @@ Scenario: IIS-6048 - Change a material priority by clicking on the Processed but
 Scenario: IIS-6045 - Change a material reliability by clicking on the Processed button
 	When I navigated to Materials page
 	And I clicked search button in the Materials section
-	And I searched Voice_01-07-2017 21-34-38 (257) data in the materials
+	And I searched таємний data in the materials
 	And I clicked on the first search result in the Materials section
 	And I set the source credibility Повністю надійне value
 	And I pressed Processed button
@@ -76,13 +76,11 @@ Scenario: IIS-6045 - Change a material reliability by clicking on the Processed 
 Scenario: IIS-6052 - Ability to lose the connection between a material and an event from a material
 	When I navigated to Events page
 	And I created a new Тестова подія event
-	When I searched for the Тестова подія created event
-	Then I must see the Тестова подія event in the event search results
 	When I navigated to Materials page
 	And I clicked search button in the Materials section
-	And I searched Voice_01-07-2017 21-34-38 (257) data in the materials
+	And I searched таємний data in the materials
 	And I clicked on the first search result in the Materials section
-	And I clicked on the relations tab
+	And I clicked on the relations tab in the material card
 	And I binded the Тестова подія event to the material
 	And I clicked on the delete button to destroy relation between the material and the Тестова подія event
 	When I pressed the confirm button
@@ -92,12 +90,11 @@ Scenario: IIS-6052 - Ability to lose the connection between a material and an ev
 Scenario: IIS-6051 - Ability to connect the material to an event from a material section
 	When I navigated to Events page
 	And I created a new Тестова подія event
-	When I searched for the Тестова подія created event
-	Then I must see the Тестова подія event in the event search results
 	When I navigated to Materials page
 	And I clicked search button in the Materials section
-	And I searched Voice_01-07-2017 21-34-38 (257) data in the materials
+	And I searched таємний data in the materials
 	And I clicked on the first search result in the Materials section
+	And I clicked on the relations tab in the material card
 	When I binded the Тестова подія event to the material
 	Then I must see Тестова подія as the related event to the material
 	When I clicked on the delete button to destroy relation between the material and the Тестова подія event
