@@ -7,6 +7,7 @@ using Iis.Interfaces.Materials;
 using Iis.MaterialLoader.Automapper.Resolvers;
 using Iis.MaterialLoader.Models;
 using Iis.Services.Contracts.Dtos;
+using Iis.Utility.Automapper;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -37,7 +38,7 @@ namespace Iis.MaterialLoader
 
             CreateMap<MaterialInput, Iis.Domain.Materials.Material>()
                 .ForMember(dest => dest.Id, opts => opts.MapFrom(src => Guid.NewGuid()))
-                .ForMember(dest => dest.Metadata, opts => opts.MapFrom(src => JObject.Parse(src.Metadata)))
+                .ForMember(dest => dest.Metadata, opts => opts.MapFrom<MaterialMetadataResolver<MaterialInput, Iis.Domain.Materials.Material>, string>(_ => _.Metadata))
                 .ForMember(dest => dest.Data, opts => opts.MapFrom(src => src.Data == null ? null : JArray.FromObject(src.Data)))
                 .ForMember(dest => dest.File, opts => opts.MapFrom(src => src.FileId.HasValue ? new File((Guid)src.FileId) : null))
                 .ForMember(dest => dest.ParentId, opts => opts.MapFrom(src => src.ParentId))

@@ -37,6 +37,8 @@ using Iis.DataModel.ChangeHistory;
 using Iis.Elastic;
 using Iis.Domain.Users;
 using Iis.Utility;
+using Iis.Utility.Automapper;
+using Iis.DbLayer.Repositories;
 
 namespace Iis.Api
 {
@@ -243,7 +245,7 @@ namespace Iis.Api
                 .ForMember(dest => dest.CreatedDate, opts => opts.MapFrom(src => src.CreatedDate.ToString(Iso8601DateFormat, CultureInfo.InvariantCulture)))
                 .ForMember(dest => dest.UpdatedAt, opts => opts.MapFrom(src => src.UpdatedAt.ToString(Iso8601DateFormat, CultureInfo.InvariantCulture)))
                 .ForMember(dest => dest.RegistrationDate, opts => opts.MapFrom(src => src.RegistrationDate.ToString(Iso8601DateFormat, CultureInfo.InvariantCulture)))
-                .ForMember(dest => dest.Metadata, opts => opts.MapFrom(src => src.Metadata == null ? null : JObject.Parse(src.Metadata)))
+                .ForMember(dest => dest.Metadata, opts => opts.MapFrom<MaterialMetadataResolver<MaterialEntity, MaterialDocument>, string>(_ => _.Metadata))
                 .ForMember(dest => dest.FileName, opts => opts.MapFrom(src => src.File == null ? null : src.File.Name))
                 .ForPath(dest => dest.SecurityAttributes.AccessLevel, opts => opts.MapFrom(src => src.AccessLevel))
                 .ForMember(dest => dest.Importance, src => src.MapFrom((MaterialEntity, Material, MaterialSign, context) =>
