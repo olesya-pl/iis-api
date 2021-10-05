@@ -8,6 +8,7 @@ using Iis.RabbitMq.DependencyInjection;
 using Iis.Services;
 using Iis.Services.Contracts.Configurations;
 using Iis.Services.Contracts.Interfaces;
+using Iis.Utility.Csv;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -48,7 +49,7 @@ namespace Iis.MaterialLoader
             services.AddTransient<IMaterialService, MaterialService>();
             services.AddTransient<IChangeHistoryService, ChangeHistoryService>();
 
-            services.AddAutoMapper(typeof(Startup));
+            services.AddAutoMapper(typeof(Startup), typeof(CsvDataItem));
             services.AddScoped<IFileService, FileService<IIISUnitOfWork>>();
             services.AddTransient<IFileRepository, FileRepository>();
             services.AddSingleton(Configuration.GetSection("files").Get<FilesConfiguration>());

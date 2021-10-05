@@ -81,6 +81,7 @@ using System.Reflection;
 using System.Security.Authentication;
 using System.Threading.Tasks;
 using Iis.CoordinatesEventHandler.DependencyInjection;
+using Iis.Utility.Csv;
 using Iis.Utility.Logging;
 
 namespace IIS.Core
@@ -298,7 +299,7 @@ namespace IIS.Core
             services.AddServices();
 
             services.AddControllers();
-            services.AddAutoMapper(typeof(Startup));
+            services.AddAutoMapper(typeof(Startup), typeof(CsvDataItem));
             services.AddTransient<GraphQLAccessList>();
 
             services.RegisterRepositories();
