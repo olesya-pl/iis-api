@@ -128,6 +128,16 @@ namespace IIS.Core.GraphQL.Users
             {
                 throw new ArgumentException("Cannot update Roles for external user");
             }
+
+            if (userInput.AccessLevel != user.AccessLevel)
+            {
+                throw new ArgumentException("Cannot update AccessLevel for external user");
+            }
+
+            if (!IsEqual(userInput.UserName, user.UserName))
+            {
+                throw new ArgumentException("Cannot update username for external user");
+            }
         }
     }
 }
