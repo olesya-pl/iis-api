@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using HotChocolate;
 using HotChocolate.Types;
 
@@ -19,16 +20,18 @@ namespace Iis.Api.GraphQL.RadioElectronicSituation
 
     public class Attributes
     {
-        public ObjectNode ObjectOfStudy { get; set; }
-        public SignNode Sign { get; set; }
-        public MaterialNode Material { get; set; }
-        public string RegisteredAt { get; set; }
+        public IReadOnlyCollection<ObjectNode> ObjectOfStudyCollection { get; set; }
+        public IReadOnlyCollection<SignNode> SignCollection { get; set; }
+        public IReadOnlyCollection<MaterialNode> MaterialCollection { get; set; }
     }
 
     public class ObjectNode : BaseObjectNode
     {
         public string Title { get; set; }
         public string Sidc { get; set; }
+        public string NickName { get; set; }
+        [GraphQLType(typeof(UuidType))]
+        public Guid SignId { get; }
     }
 
     public class SignNode : BaseObjectNode
@@ -53,5 +56,8 @@ namespace Iis.Api.GraphQL.RadioElectronicSituation
         public Guid Id { get; set; }
         public string TypeTitle { get; set; }
         public string TypeName { get; set; }
+        [GraphQLType(typeof(UuidType))]
+        public Guid? MaterialId { get; set; }
+        public string MaterialRegistrationDate { get; set; }
     }
 }
