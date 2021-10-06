@@ -49,7 +49,7 @@ namespace Iis.UnitTests.Roles
             }));
             //act
             var sut = _serviceProvider.GetRequiredService<RoleService>();
-            var result = await sut.CreateRoleAsync(role);
+            var (obtainedRole, alreadyExists) = await sut.CreateRoleAsync(role);
 
             //assert
             Assert.Equal(existingAccesses.Count, context.AccessObjects.Count());
@@ -60,7 +60,41 @@ namespace Iis.UnitTests.Roles
 
             var roleEntity = context.Roles.Include(x => x.RoleGroups).Single(x => x.Id == role.Id);
             Assert.Equal(roleEntity.RoleGroups.Count, role.ActiveDirectoryGroupIds.Count);
-        }        
+            Assert.Equal(role.Id, obtainedRole.Id);
+            Assert.Equal(false, alreadyExists);
+        }
+
+        [Theory, RecursiveAutoData]
+        public async Task Create_RoleExists_Should_DoNothing(RoleEntity role, RoleEntity existedRole, string roleName)
+        {
+            //arrange
+            var context = _serviceProvider.GetRequiredService<OntologyContext>();
+            InitRoleEntity(role);
+            InitRoleEntity(existedRole);
+            existedRole.Name = roleName;
+            context.Roles.Add(existedRole);
+            context.SaveChanges();
+
+            //act
+            var sut = _serviceProvider.GetRequiredService<RoleService>();
+
+            var (obtainedRole, alreadyExists) = await sut.CreateRoleAsync(new Role
+            {
+                Id = role.Id,
+                Description = role.Description,
+                Name = roleName,
+                IsAdmin = false,
+                ActiveDirectoryGroupIds = new List<Guid>
+                {
+                    Guid.Parse("79F363CD-D2F5-4D19-B0EE-ACA8E6872746")
+                },
+                AccessGrantedItems = new AccessGrantedList()
+            });
+
+            //assert
+            Assert.Equal(null, obtainedRole);
+            Assert.Equal(true, alreadyExists);
+        }
 
         [Theory, RecursiveAutoData]
         public async Task Update_UpdatedOnlyOneAccess(RoleEntity role,
@@ -86,7 +120,7 @@ namespace Iis.UnitTests.Roles
             //act
             var sut = _serviceProvider.GetRequiredService<RoleService>();
 
-            var result = await sut.UpdateRoleAsync(new Role
+            var (result, alreadyExists) = await sut.UpdateRoleAsync(new Role
             {
                 Id = role.Id,
                 Description = "updated",
@@ -112,6 +146,7 @@ namespace Iis.UnitTests.Roles
 
             Assert.Equal("updated", result.Description);
             Assert.Equal("updated_name", result.Name);
+            Assert.Equal(false, alreadyExists);
         }
 
         [Theory, RecursiveAutoData]
@@ -119,22 +154,14 @@ namespace Iis.UnitTests.Roles
         {
             //arrange
             var context = _serviceProvider.GetRequiredService<OntologyContext>();
-            role.RoleAccessEntities = new List<RoleAccessEntity>();
-            role.RoleGroups = new List<RoleActiveDirectoryGroupEntity> 
-            {
-                new RoleActiveDirectoryGroupEntity
-                {
-                    Id = Guid.NewGuid(),
-                    GroupId = Guid.Parse("60B3A3A7-12BC-41AF-9C25-502E594A775F")
-                }
-            };
+            InitRoleEntity(role);
             context.Roles.Add(role);
             context.SaveChanges();
 
             //act
             var sut = _serviceProvider.GetRequiredService<RoleService>();
 
-            var result = await sut.UpdateRoleAsync(new Role
+            var (obtainedRole, alreadyExists) = await sut.UpdateRoleAsync(new Role
             {
                 Id = role.Id,
                 Description = "updated",
@@ -148,9 +175,56 @@ namespace Iis.UnitTests.Roles
             });
 
             //assert
-            Assert.Single(result.ActiveDirectoryGroupIds);
-            Assert.Contains(Guid.Parse("79F363CD-D2F5-4D19-B0EE-ACA8E6872746"), result.ActiveDirectoryGroupIds);
-            Assert.DoesNotContain(Guid.Parse("60B3A3A7-12BC-41AF-9C25-502E594A775F"), result.ActiveDirectoryGroupIds);
+            Assert.Single(obtainedRole.ActiveDirectoryGroupIds);
+            Assert.Contains(Guid.Parse("79F363CD-D2F5-4D19-B0EE-ACA8E6872746"), obtainedRole.ActiveDirectoryGroupIds);
+            Assert.DoesNotContain(Guid.Parse("60B3A3A7-12BC-41AF-9C25-502E594A775F"), obtainedRole.ActiveDirectoryGroupIds);
+        }
+
+        [Theory, RecursiveAutoData]
+        public async Task Update_RoleNameExisted_Should_DoNoChanges(RoleEntity role, RoleEntity existedRole, string roleName)
+        {
+            //arrange
+            var context = _serviceProvider.GetRequiredService<OntologyContext>();
+            InitRoleEntity(role);
+            InitRoleEntity(existedRole);
+            existedRole.Name = roleName;
+            context.Roles.AddRange(role, existedRole);
+            context.SaveChanges();
+
+            //act
+            var sut = _serviceProvider.GetRequiredService<RoleService>();
+
+            var (obtainedRole, alreadyExists) = await sut.UpdateRoleAsync(new Role
+            {
+                Id = role.Id,
+                Description = "updated",
+                Name = roleName,
+                IsAdmin = false,
+                ActiveDirectoryGroupIds = new List<Guid>
+                {
+                    Guid.Parse("79F363CD-D2F5-4D19-B0EE-ACA8E6872746")
+                },
+                AccessGrantedItems = new AccessGrantedList()
+            });
+
+            //assert
+            Assert.Equal(role.Id, obtainedRole.Id);
+            Assert.Equal(role.Name, obtainedRole.Name);
+            Assert.Equal(role.Description, obtainedRole.Description);
+            Assert.Equal(true, alreadyExists);
+        }
+
+        private void InitRoleEntity(RoleEntity role)
+        {
+            role.RoleAccessEntities = new List<RoleAccessEntity>();
+            role.RoleGroups = new List<RoleActiveDirectoryGroupEntity>
+            {
+                new RoleActiveDirectoryGroupEntity
+                {
+                    Id = Guid.NewGuid(),
+                    GroupId = Guid.Parse("60B3A3A7-12BC-41AF-9C25-502E594A775F")
+                }
+            };
         }
     }
 }

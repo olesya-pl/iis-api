@@ -13,6 +13,10 @@ namespace Iis.DataModel.Roles
                 .Property(p => p.Id)
                 .ValueGeneratedNever();
 
+            builder
+                .HasIndex(_ => _.Name)
+                .IsUnique(true);
+
             builder.HasMany(r => r.RoleAccessEntities)
                 .WithOne(ra => ra.Role)
                 .HasForeignKey(ra => ra.RoleId);
