@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 namespace Iis.Services.Contracts.Dtos
 {
     public class SituationNodeDto
@@ -12,7 +13,7 @@ namespace Iis.Services.Contracts.Dtos
         }
     }
 
-    public class GeometryDto
+    public class GeometryDto : IEquatable<GeometryDto>
     {
         public decimal Latitude { get; }
         public decimal Longitude { get; }
@@ -21,32 +22,46 @@ namespace Iis.Services.Contracts.Dtos
             Latitude = latitude;
             Longitude = longitude;
         }
+
+        public bool Equals(GeometryDto other)
+        {
+            if (other is null) return false;
+
+            return Latitude.Equals(other.Latitude) && Longitude.Equals(other.Longitude);
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(Latitude, Longitude);
+        }
     }
 
     public class AttributesDto
     {
-        public ObjectDto ObjectOfStudy { get; }
-        public SignDto Sign { get; }
-        public MaterialDto Material { get; }
-        public DateTime RegisteredAt { get; }
-        public AttributesDto(ObjectDto objectOfStudy, SignDto sign, MaterialDto material, DateTime registeredAt)
+        public IReadOnlyCollection<ObjectDto> ObjectOfStudyCollection { get; }
+        public IReadOnlyCollection<SignDto> SignCollection { get; }
+        public IReadOnlyCollection<MaterialDto> MaterialCollection { get; }
+        public AttributesDto(IReadOnlyCollection<ObjectDto> objectOfStudyCollection, IReadOnlyCollection<SignDto> signCollection, IReadOnlyCollection<MaterialDto> materialCollection)
         {
-            ObjectOfStudy = objectOfStudy;
-            Sign = sign;
-            Material = material;
-            RegisteredAt = registeredAt;
+            ObjectOfStudyCollection = objectOfStudyCollection;
+            SignCollection = signCollection;
+            MaterialCollection = materialCollection;
         }
     }
 
     public class ObjectDto : BaseObjectDto
     {
         public string Title { get; }
-        public string Sidc { get; set; }
-        public ObjectDto(Guid id, string typeName, string typeTitle, string title, string sidc)
-        : base(id, typeName, typeTitle)
+        public string Sidc { get; }
+        public string NickName { get; }
+        public Guid SignId { get; }
+        public ObjectDto(Guid id, string typeName, string typeTitle, string title, string sidc, string nickName, Guid signId, Guid? materialId, DateTime? materialRegistrationDate)
+        : base(id, typeName, typeTitle, materialId, materialRegistrationDate)
         {
             Title = title;
             Sidc = sidc;
+            NickName = nickName;
+            SignId = signId;
         }
 
     }
@@ -55,8 +70,8 @@ namespace Iis.Services.Contracts.Dtos
     {
         public string Value { get; }
 
-        public SignDto(Guid id, string typeName, string typeTitle, string value)
-        : base(id, typeName, typeTitle)
+        public SignDto(Guid id, string typeName, string typeTitle, string value, Guid? materialId, DateTime? materialRegistrationDate)
+        : base(id, typeName, typeTitle, materialId, materialRegistrationDate)
         {
             Value = value;
         }
@@ -86,11 +101,15 @@ namespace Iis.Services.Contracts.Dtos
         public Guid Id { get; }
         public string TypeTitle { get; }
         public string TypeName { get; }
-        protected BaseObjectDto(Guid id, string typeName, string typeTitle)
+        public Guid? MaterialId { get; }
+        public DateTime? MaterialRegistrationDate { get; }
+        protected BaseObjectDto(Guid id, string typeName, string typeTitle, Guid? materialId, DateTime? materialRegistrationDate)
         {
             Id = id;
             TypeName = typeName;
             TypeTitle = typeTitle;
+            MaterialId = materialId;
+            MaterialRegistrationDate = materialRegistrationDate;
         }
     }
 }
