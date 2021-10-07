@@ -5,7 +5,6 @@ using Iis.Services.Contracts.Interfaces;
 using Novell.Directory.Ldap;
 using System;
 using System.Collections.Generic;
-using System.DirectoryServices.AccountManagement;
 using System.Linq;
 using System.Text.RegularExpressions;
 
@@ -29,13 +28,25 @@ namespace Iis.Services.ExternalUserServices
 
         public bool ValidateCredentials(string username, string password)
         {
-            using var context = ConfigurePrincipalContext(_configuration);
-            return context.ValidateCredentials(username, password);
+            try
+            {
+                using var connection = ConfigureLdapConnection();
+                var dn = GetUserDn(connection, username);
+                if (dn is null) return false;
+
+                connection.Bind(dn, password);
+
+                return true;
+            }
+            catch (LdapException)
+            {
+                return false;
+            }
         }
 
         public IEnumerable<ExternalUser> GetUsers()
         {
-            using var connection = ConfigureLdapConnection(_configuration);
+            using var connection = ConfigureLdapConnection();
             var response = connection.Search(
                 _configuration.Domain,
                 LdapConnection.ScopeSub,
@@ -54,13 +65,13 @@ namespace Iis.Services.ExternalUserServices
 
         public ExternalUser GetUser(string username)
         {
-            using var connection = ConfigureLdapConnection(_configuration);
+            using var connection = ConfigureLdapConnection();
             var cons = new LdapSearchConstraints { MaxResults = OneResult };
             string filter = $"(&{UserFilter}({UserAttributes.UserName}={username}))";
             var response = connection.Search(
                 _configuration.Domain,
                 LdapConnection.ScopeSub,
-                UserFilter,
+                filter,
                 UserAttributes.All,
                 false,
                 cons);
@@ -70,17 +81,12 @@ namespace Iis.Services.ExternalUserServices
             return externalUser;
         }
 
-        private LdapConnection ConfigureLdapConnection(ExternalUserServiceConfiguration configuration)
+        private LdapConnection ConfigureLdapConnection()
         {
             var connection = new LdapConnection();
-            connection.Connect(configuration.Server, configuration.Port);
-            connection.Bind(configuration.Username, configuration.Password);
+            connection.Connect(_configuration.Server, _configuration.Port);
+            connection.Bind(_configuration.Username, _configuration.Password);
             return connection;
-        }
-
-        private PrincipalContext ConfigurePrincipalContext(ExternalUserServiceConfiguration configuration)
-        {
-            return new PrincipalContext(ContextType.Domain, configuration.Server, configuration.Username, configuration.Password);
         }
 
         private bool TryReadExternalUser(ILdapSearchResults results, out ExternalUser externalUser)
@@ -133,6 +139,32 @@ namespace Iis.Services.ExternalUserServices
                 throw new ArgumentException("Invalid group name format", nameof(memberOfItem));
 
             return match.Groups[GroupNameMatch].Value;
+        }
+
+        private string GetUserDn(LdapConnection ldapConnection, string username)
+        {
+            try
+            {
+                var cons = new LdapSearchConstraints { MaxResults = OneResult };
+                string filter = $"(&{UserFilter}({UserAttributes.UserName}={username}))";
+                var response = ldapConnection.Search(
+                    _configuration.Domain,
+                    LdapConnection.ScopeSub,
+                    filter,
+                    new string[] { },
+                    false,
+                    cons);
+                if (!response.HasMore())
+                    return null;
+
+                var nextEntry = response.Next();
+
+                return nextEntry.Dn;
+            }
+            catch (LdapException)
+            {
+                return null;
+            }
         }
     }
 }
