@@ -291,7 +291,7 @@ this.FeatureBackground();
  testRunner.When("I clicked on search button in the Object of study section", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
 #line 34
- testRunner.And("I searched в/ч 85683-А data in the Objects of study section", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+ testRunner.And("I searched в/ч 85683-А військовий підрозділ data in the Objects of study section", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
 #line 35
  testRunner.Then("I must see object of study радіотехнічний батальойн в/ч 85683-А as first search r" +

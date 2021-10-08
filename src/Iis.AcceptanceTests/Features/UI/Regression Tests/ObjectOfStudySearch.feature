@@ -31,7 +31,7 @@ Scenario: IIS-6138 - Search by two criteria by using AND operator
 @functional @sanity @UI @ObjectsOfStudySearchUI
 Scenario: IIS-6082 - Search object of study by full name
 	When I clicked on search button in the Object of study section
-	And I searched в/ч 85683-А data in the Objects of study section
+	And I searched в/ч 85683-А військовий підрозділ data in the Objects of study section
 	Then I must see object of study радіотехнічний батальойн в/ч 85683-А as first search result
 
 @smoke @UI @ObjectOfStudySmallCardUI
