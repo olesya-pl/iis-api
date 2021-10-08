@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading;
@@ -32,6 +32,8 @@ namespace Iis.Services
 {
     public class UserService<TUnitOfWork> : BaseService<TUnitOfWork>, IUserService where TUnitOfWork : IIISUnitOfWork
     {
+        private const string DefaultRoleName = "Користувач";
+
         private readonly ILogger<UserService<TUnitOfWork>> _logger;
         private readonly OntologyContext _context;
         private readonly MaxMaterialsPerOperatorConfig _maxMaterialsConfig;
@@ -334,6 +336,7 @@ namespace Iis.Services
             var roles = await _context.Roles
                 .AsNoTracking()
                 .ToArrayAsync(cancellationToken);
+            var defaultRole = GetDefaultRole(roles);
             var sb = new StringBuilder();
 
             foreach (var externalUser in externalUsers)
@@ -377,6 +380,12 @@ namespace Iis.Services
                     sb.AppendLine($"User {user.Username} already exists");
                 }
 
+                if (!user.UserRoles.Any(_ => _.RoleId == defaultRole.Id))
+                {
+                    var userRole = UserRoleEntity.CreateFrom(user.Id, defaultRole.Id);
+                    _context.Add(userRole);
+                }
+
                 foreach (var externalRole in externalUser.Roles)
                 {
                     if (!user.UserRoles.Any(ur => ur.Role.Name == externalRole.Name))
@@ -385,11 +394,7 @@ namespace Iis.Services
 
                         if (role != null)
                         {
-                            var userRole = new UserRoleEntity
-                            {
-                                UserId = user.Id,
-                                RoleId = role.Id
-                            };
+                            var userRole = UserRoleEntity.CreateFrom(user.Id, role.Id);
                             _context.Add(userRole);
                             sb.AppendLine($"... {externalRole.Name} is successfully assigned");
                         }
@@ -456,6 +461,18 @@ namespace Iis.Services
 
             }
             return sb.ToString();
+        }
+
+        private RoleEntity GetDefaultRole(IEnumerable<RoleEntity> roles)
+        {
+            var defaultRole = roles.SingleOrDefault(_ => _.Name == DefaultRoleName);
+            if (defaultRole is null)
+            {
+                defaultRole = new RoleEntity { Id = Guid.NewGuid(), Name = DefaultRoleName, Description = DefaultRoleName };
+                _context.Add(defaultRole);
+            }
+
+            return defaultRole;
         }
 
         private async Task SynchronizeActiveDirectoryUserAsync(string userName, CancellationToken cancellationToken = default)
@@ -538,6 +555,12 @@ namespace Iis.Services
             var roles = await _context.Roles
                 .AsNoTracking()
                 .ToDictionaryAsync(_ => _.Name, cancellationToken);
+            var defaultRole = GetDefaultRole(roles.Values);
+            if (!userEntity.UserRoles.Any(_ => _.RoleId == defaultRole.Id))
+            {
+                var userRole = UserRoleEntity.CreateFrom(userEntity.Id, defaultRole.Id);
+                _context.Add(userRole);
+            }
 
             foreach (var externalRole in externalUser.Roles)
             {
