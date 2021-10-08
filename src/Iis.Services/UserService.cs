@@ -460,11 +460,13 @@ namespace Iis.Services
 
         private async Task SynchronizeActiveDirectoryUserAsync(string userName, CancellationToken cancellationToken = default)
         {
-            var externalUser = _externalUserService.GetUser(userName);
             var userEntity = await _context.Users
                 .Include(u => u.UserRoles)
                 .ThenInclude(ur => ur.Role)
                 .SingleOrDefaultAsync(_ => _.Username == userName, cancellationToken);
+            if (userEntity.Source != UserSource.ActiveDirectory) return;
+
+            var externalUser = _externalUserService.GetUser(userName);
             if (externalUser is null)
             {
                 OnExternalUserNotFound(userEntity);
