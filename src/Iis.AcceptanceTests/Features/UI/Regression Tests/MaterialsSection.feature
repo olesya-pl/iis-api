@@ -18,7 +18,7 @@ Scenario: IIS-6109 - Indicate a phone number pattern of a cell voice material
 	Then I must see that phone number pattern is equal to value
 		"""
 
-		"380713176787"
+		"+380713176787",
 
 		"""
 
