@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using Iis.Interfaces.Elastic;
 using Iis.Services.Contracts.Params;
 using Iis.DataModel.ChangeHistory;
+using Iis.DbLayer.Repositories;
 
 namespace Iis.Services.Contracts.Interfaces
 {
@@ -17,6 +18,7 @@ namespace Iis.Services.Contracts.Interfaces
         Task<SearchResult> SearchByImageVector(Guid userId, IReadOnlyCollection<decimal[]> imageVectorList, PaginationParams page, CancellationToken ct = default);
         Task<int> CountMaterialsByConfiguredFieldsAsync(Guid userId, SearchParams searchParams, CancellationToken ct = default);
         Task<SearchResult> SearchByScroll(Guid userId, string scrollId);
+        Task<MaterialDocument> GetMaterialById(Guid userId, Guid materialId);
         bool ShouldReturnNoEntities(string queryExpression);
         Task<List<ElasticBulkResponse>> PutAllMaterialsToElasticSearchAsync(CancellationToken ct = default);
         Task<List<ElasticBulkResponse>> PutAllMaterialChangesToElasticSearchAsync(CancellationToken cancellationToken = default);
