@@ -94,7 +94,7 @@ namespace AcceptanceTests.UISteps
         public void WhenIClickedOnTheFirstSearchResultTitle()
         {
             objectsOfStudyPage.FirstSearchResultRow.Click();
-            driver.WaitFor(0.5);
+            driver.WaitFor(1);
         }
 
         [When(@"I clicked on the Edit button in the Objects of study section")]

@@ -31,7 +31,7 @@ namespace AcceptanceTests.PageObjects
 
         public IWebElement FirstSearchResultTitle;
 
-        [FindsBy(How = How.XPath, Using = "//div[@class='summary-person-row text-ellipsis']")] // fix "//div[@class='infinity-table objects-table']//tbody[@class='p-datatable-tbody']/tr[1]")]
+        [FindsBy(How = How.CssSelector, Using = ".objects-table .p-datatable-tbody tr:nth-child(1)")] 
         public IWebElement FirstSearchResultRow;
 
         [FindsBy(How = How.XPath, Using = "//div[@class='icon-wrapper icon-wrapper-edit']")]
