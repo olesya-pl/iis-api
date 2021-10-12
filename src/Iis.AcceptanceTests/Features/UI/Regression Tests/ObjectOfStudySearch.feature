@@ -51,7 +51,7 @@ Scenario: IIS-0001 - Search on object page1
 	When I clicked on the Objects section
 	And I clicked on search button in the Object of study section
 	And I searched Бонд data in the Objects of study section
-	Then I must see object of study Бонд as first search result
+	Then I must see object of study Бонд Д. as first search result
 
 	
 	#Search 
@@ -61,7 +61,7 @@ Scenario: IIS-0011 - Search on object page1
 	When I clicked on the Objects section
 	And I clicked on search button in the Object of study section
 	And I searched Бонд data in the Objects of study section
-	Then I must see object of study Бонд as first search result
+	Then I must see object of study Бонд Д. as first search result
 
 @functional @UI @ObjectsOfStudySearchUI
 Scenario: IIS-0002 - Search on object page2
