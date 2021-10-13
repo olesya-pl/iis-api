@@ -112,25 +112,8 @@ namespace IIS.Core.GraphQL.EntityTypes
         [GraphQLNonNullType] public bool IsLinkToSeparateObject => Source.TargetType.IsSeparateObject;
 
         [GraphQLType(typeof(AnyType))]
-        public FormField FormField
-        {
-            get
-            {
-                var type = GetFormFieldType(Source);
-                var hint = MetaObject?.FormField?.Hint;
-                var lines = MetaObject?.FormField?.Lines;
-                var icon = GetFormFieldIcon(Source);
+        public FormField FormField => _mapper.Map<FormField>(MetaObject?.FormField);
 
-                return type == null && hint == null && lines == null && icon == null ? null : 
-                    new FormField
-                    {
-                        Type = type,
-                        Hint = hint,
-                        Lines = lines,
-                        Icon = icon
-                    };
-            }
-        }
 
         [GraphQLType(typeof(AnyType))]
         public ContainerMeta Container => _mapper.Map<ContainerMeta>(MetaObject?.Container);
