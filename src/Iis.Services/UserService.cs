@@ -497,6 +497,15 @@ namespace Iis.Services
 
             await UpdateUserRolesAsync(externalUser, userEntity, cancellationToken);
             await _context.SaveChangesAsync(cancellationToken);
+            await PutUserToElasticSearchAsync(userEntity.Id, cancellationToken);
+        }
+
+        private async Task PutUserToElasticSearchAsync(Guid id, CancellationToken cancellationToken)
+        {
+            var user = await RunWithoutCommitAsync(uowfactory => uowfactory.UserRepository.GetByIdAsync(id, cancellationToken));
+            var elasticUser = _mapper.Map<ElasticUserDto>(user);
+
+            await _userElasticService.SaveUserAsync(elasticUser, cancellationToken);
         }
 
         private void OnExternalUserNotFound(UserEntity userEntity)
@@ -516,7 +525,6 @@ namespace Iis.Services
             userEntity.FirstName = externalUser.FirstName;
             userEntity.Patronymic = externalUser.SecondName;
             userEntity.LastName = externalUser.LastName;
-            userEntity.IsBlocked = false;
 
             return userEntity;
         }
@@ -564,7 +572,7 @@ namespace Iis.Services
 
             foreach (var externalRole in externalUser.Roles)
             {
-                if (userEntity.UserRoles.Any(_ => _.Role.Name == externalRole.Name)
+                if (userEntity.UserRoles.Any(_ => (_.Role?.Name ?? defaultRole.Name) == externalRole.Name)
                     || !roles.TryGetValue(externalRole.Name, out var role))
                 {
                     continue;
