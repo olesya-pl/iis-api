@@ -31,7 +31,7 @@ namespace AcceptanceTests.PageObjects
 
         public IWebElement FirstSearchResultTitle;
 
-        [FindsBy(How = How.CssSelector, Using = ".objects-table .p-datatable-tbody tr:nth-child(1)")] 
+        [FindsBy(How = How.XPath, Using = "//div[@class = 'summary-person-row text-ellipsis']")] 
         public IWebElement FirstSearchResultRow;
 
         [FindsBy(How = How.XPath, Using = "//div[@class='icon-wrapper icon-wrapper-edit']")]
@@ -63,7 +63,7 @@ namespace AcceptanceTests.PageObjects
         [CacheLookup]
         public IWebElement FirstSearchResultSignValue;
 
-        [FindsBy(How = How.CssSelector, Using = ".entity-search__result-counter")]
+        [FindsBy(How = How.CssSelector, Using = "entity-search__result-counter")]
         [CacheLookup]
         public IWebElement SearchCounterInOOSSearchField;
 

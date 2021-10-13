@@ -148,7 +148,7 @@ namespace AcceptanceTests.PageObjects
             actions.SendKeys(Keys.Control).SendKeys(Keys.End).Perform();
         }
 
-        public List<MaterialRelatedItems> MaterialsRelatedEvents => driver.FindElements(By.CssSelector(".material-events-table"))
+        public List<MaterialRelatedItems> MaterialsRelatedEvents => driver.FindElements(By.CssSelector(".el-table__row"))
                    .Select(_ => new MaterialRelatedItems(driver, _)).ToList();
 
         public List<MaterialRelatedItems> MaterialsRelatedObjects => driver.FindElements(By.CssSelector(".material-objects-table"))
