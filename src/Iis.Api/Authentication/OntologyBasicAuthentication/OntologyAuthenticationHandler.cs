@@ -20,6 +20,7 @@ namespace Iis.Api.Authentication.OntologyBasicAuthentication
     {
         private const int HeaderParametersCount = 2;
         private const char HeaderParameterSeparator = ':';
+        private const string AuthenticationScheme = "Basic";
 
         private readonly IUserService _userService;
 
@@ -48,10 +49,20 @@ namespace Iis.Api.Authentication.OntologyBasicAuthentication
                 return AuthenticateResult.Fail($"Missing '{HeaderNames.Authorization}' header");
             }
 
-            var (username, password, result) = TryObtainCredentials();
+            if (!TryObtainAuthHeader(out var authHeader))
+            {
+                return AuthenticateResult.Fail($"Wrong authentication header");
+            }
+
+            if (authHeader.Scheme != AuthenticationScheme)
+            {
+                return AuthenticateResult.Fail($"Wrong authentication scheme. Use '{AuthenticationScheme}' scheme");
+            }
+
+            var (username, password, result) = TryObtainCredentials(authHeader);
             if (!result)
             {
-                return AuthenticateResult.Fail($"Invalid '{HeaderNames.Authorization}' Header");
+                return AuthenticateResult.Fail($"Invalid '{HeaderNames.Authorization}' header value");
             }
 
             User user;
@@ -87,22 +98,37 @@ namespace Iis.Api.Authentication.OntologyBasicAuthentication
             return new AuthenticationTicket(principal, Scheme.Name);
         }
 
-        private (string Username, string Password, bool Result) TryObtainCredentials()
+        private (string Username, string Password, bool Result) TryObtainCredentials(AuthenticationHeaderValue authHeader)
         {
             try
             {
-                var headerDictionary = Request.Headers[HeaderNames.Authorization];
-                var authHeader = AuthenticationHeaderValue.Parse(headerDictionary);
                 var credentialBytes = Convert.FromBase64String(authHeader.Parameter);
                 var credentials = Encoding.UTF8
                     .GetString(credentialBytes)
                     .Split(HeaderParameterSeparator, HeaderParametersCount);
+                if (credentials.Length != HeaderParametersCount)
+                    return (null, null, false);
 
                 return (credentials[0], credentials[1], true);
             }
             catch
             {
                 return (null, null, false);
+            }
+        }
+
+        private bool TryObtainAuthHeader(out AuthenticationHeaderValue header)
+        {
+            try
+            {
+                var headerDictionary = Request.Headers[HeaderNames.Authorization];
+                header = AuthenticationHeaderValue.Parse(headerDictionary);
+                return true;
+            }
+            catch
+            {
+                header = null;
+                return false;
             }
         }
 
