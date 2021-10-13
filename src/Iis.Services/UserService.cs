@@ -388,7 +388,7 @@ namespace Iis.Services
 
                 foreach (var externalRole in externalUser.Roles)
                 {
-                    if (!user.UserRoles.Any(ur => ur.Role.Name == externalRole.Name))
+                    if (!user.UserRoles.Any(ur => (ur.Role?.Name ?? defaultRole.Name) == externalRole.Name))
                     {
                         var role = roles.FirstOrDefault(r => r.Name == externalRole.Name);
 
@@ -481,7 +481,7 @@ namespace Iis.Services
                 .Include(u => u.UserRoles)
                 .ThenInclude(ur => ur.Role)
                 .SingleOrDefaultAsync(_ => _.Username == userName, cancellationToken);
-            if (userEntity.Source != UserSource.ActiveDirectory) return;
+            if (userEntity != null && userEntity.Source != UserSource.ActiveDirectory) return;
 
             var externalUser = _externalUserService.GetUser(userName);
             if (externalUser is null)
