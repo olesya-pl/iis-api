@@ -163,6 +163,7 @@ namespace IIS.Core.GraphQL.EntityTypes
             var formFieldType = targetType.Name switch
             {
                 "MilitaryOrganization_parent" => "form",
+                "MilitaryOrganization" => "dropdown",
                 "FuzzyDate" => "fuzzyDate",
                 "FuzzyDateRange" => "fuzzyDateRange",
                 "Photo" => "photo",
