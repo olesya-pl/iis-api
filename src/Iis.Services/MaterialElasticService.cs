@@ -193,7 +193,7 @@ namespace Iis.Services
             
             if (!result.Items.Any()) return null;
 
-            return result.Items.First().SearchResult.ToObject<MaterialDocument>();
+            return MaterialDocument.FromJObject(result.Items.First().SearchResult);
         }
 
         public async Task<SearchResult> SearchMaterialsAsync(Guid userId,

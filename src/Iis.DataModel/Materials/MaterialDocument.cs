@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Newtonsoft.Json.Linq;
 using Iis.DataModel;
+using Newtonsoft.Json;
 
 namespace Iis.DbLayer.Repositories
 {
@@ -46,6 +47,16 @@ namespace Iis.DbLayer.Repositories
         public IReadOnlyCollection<RelatedObject> RelatedSignCollection { get; set; } = Array.Empty<RelatedObject>();
         public string RegistrationDate { get; set; }
         public SecurityAttributes SecurityAttributes { get; set; } = new SecurityAttributes();
+
+        private static readonly JsonSerializerSettings _materialDocSerializeSettings = new JsonSerializerSettings
+        {
+            DateParseHandling = DateParseHandling.None
+        };
+
+        public static MaterialDocument FromJObject(JObject json)
+        {
+            return JsonConvert.DeserializeObject<MaterialDocument>(json.ToString(), _materialDocSerializeSettings);
+        }
     }
 
     public class MaterialSign
