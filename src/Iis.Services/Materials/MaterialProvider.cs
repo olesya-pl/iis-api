@@ -157,6 +157,16 @@ namespace IIS.Services.Materials
             return Map(entity);
         }
 
+        public async Task<Material> GetMaterialFromElasticAsync(Guid id, User user)
+        {
+            var entity = await _materialElasticService.GetMaterialById(user.Id, id);
+            if (entity is null)
+            {
+                throw new ArgumentException($"{FrontEndErrorCodes.NotFound}:Матеріал не знайдено");
+            }
+            return MapMaterialDocument(entity);
+        }
+
         public async Task<Material[]> GetMaterialsByIdsAsync(ISet<Guid> ids, User user)
         {
             var entities = await RunWithoutCommitAsync(uow =>
