@@ -37,10 +37,7 @@ namespace IIS.Services.Materials
     public class MaterialProvider<TUnitOfWork> : BaseService<TUnitOfWork>, IMaterialProvider where TUnitOfWork : IIISUnitOfWork
     {
         private const string WildCart = "*";
-        private static readonly JsonSerializerSettings _materialDocSerializeSettings = new JsonSerializerSettings
-        {
-            DateParseHandling = DateParseHandling.None
-        };
+        
         private static readonly IEnumerable<Material> EmptyMaterialCollection = Array.Empty<Material>();
         private static readonly IReadOnlyCollection<string> RelationTypeNameList = new List<string>
         {
@@ -101,7 +98,7 @@ namespace IIS.Services.Materials
             var searchResult = await _materialElasticService.SearchMaterialsByConfiguredFieldsAsync(userId, searchParams);
 
             var materials = searchResult.Items.Values
-                .Select(p => JsonConvert.DeserializeObject<MaterialDocument>(p.SearchResult.ToString(), _materialDocSerializeSettings))
+                .Select(p => MaterialDocument.FromJObject(p.SearchResult))
                 .Select(MapMaterialDocument)
                 .ToArray();
 
@@ -367,7 +364,7 @@ namespace IIS.Services.Materials
             var searchResult = await _materialElasticService.SearchMoreLikeThisAsync(userId, searchParams);
 
             var materials = searchResult.Items.Values
-                    .Select(p => JsonConvert.DeserializeObject<MaterialDocument>(p.SearchResult.ToString(), _materialDocSerializeSettings))
+                    .Select(p => MaterialDocument.FromJObject(p.SearchResult))
                     .Select(MapMaterialDocument);
 
             return (materials, searchResult.Count);
@@ -389,7 +386,7 @@ namespace IIS.Services.Materials
             var searchResult = await _materialElasticService.SearchByImageVector(userId, imageVectorList, page);
 
             var materials = searchResult.Items.Values
-                    .Select(p => JsonConvert.DeserializeObject<MaterialDocument>(p.SearchResult.ToString(), _materialDocSerializeSettings))
+                    .Select(p => MaterialDocument.FromJObject(p.SearchResult))
                     .Select(MapMaterialDocument)
                     .ToList();
 
@@ -434,7 +431,7 @@ namespace IIS.Services.Materials
             var searchResult = await _materialElasticService.SearchMaterialsAsync(userId, searchParams, materialEntitiesIdList, ct);
 
             var materials = searchResult.Items.Values
-                .Select(p => JsonConvert.DeserializeObject<MaterialDocument>(p.SearchResult.ToString(), _materialDocSerializeSettings))
+                .Select(p => MaterialDocument.FromJObject(p.SearchResult))
                 .Select(MapMaterialDocument)
                 .ToList();
 
