@@ -16,7 +16,7 @@ namespace AcceptanceTests.PageObjects
             PageFactory.InitElements(driver, this);
         }
 
-        [FindsBy(How = How.CssSelector, Using = ".themes-table .p-datatable-tbody > tr")]
+        [FindsBy(How = How.CssSelector, Using = ".themes-table .p-datatable-tbody tr:nth-child(1)")]
         [CacheLookup]
         public IWebElement FirstThemeInTheThemeList;
 
