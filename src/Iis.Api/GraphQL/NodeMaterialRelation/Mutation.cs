@@ -49,7 +49,7 @@ namespace IIS.Core.GraphQL.NodeMaterialRelation
         {
             var tokenPayload = ctx.GetToken();
             await relationService.Delete(mapper.Map<Iis.Services.NodeMaterialRelation>(input), tokenPayload.User.UserName);
-            var material = await materialProvider.GetMaterialAsync(input.MaterialId, tokenPayload.User);
+            var material = await materialProvider.GetMaterialFromElasticAsync(input.MaterialId, tokenPayload.User);
             return mapper.Map<Material>(material);
         }
     }

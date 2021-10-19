@@ -130,20 +130,15 @@ namespace IIS.Services.Materials
             return material;
         }
 
-        public async Task<Material> GetMaterialAsync(Guid id, User user)
+        private Material MapMaterialDocument(MaterialDocument document, Guid userId)
         {
-            var entity = await RunWithoutCommitAsync(uow => uow.MaterialRepository.GetByIdAsync(id, MaterialIncludeEnum.WithChildren, MaterialIncludeEnum.WithFeatures));
+            var material = MapMaterialDocument(document);
 
-            if (entity is null || !entity.CanBeAccessedBy(user.AccessLevel))
-            {
-                throw new ArgumentException($"{FrontEndErrorCodes.NotFound}:Матеріал не знайдено");
-            }
+            material.CanBeEdited =
+                (document.ProcessedStatus.Id == MaterialEntity.ProcessingStatusProcessingSignId)
+                && (document.Editor == null || document.Editor.Id == userId);
 
-            var mapped = Map(entity);
-
-            mapped.CanBeEdited = entity.CanBeEdited(user.Id);
-
-            return mapped;
+            return material;
         }
 
         public async Task<Material> GetMaterialAsync(Guid id)
@@ -163,8 +158,8 @@ namespace IIS.Services.Materials
             if (entity is null)
             {
                 throw new ArgumentException($"{FrontEndErrorCodes.NotFound}:Матеріал не знайдено");
-            }
-            return MapMaterialDocument(entity);
+            }            
+            return MapMaterialDocument(entity, user.Id);
         }
 
         public async Task<Material[]> GetMaterialsByIdsAsync(ISet<Guid> ids, User user)

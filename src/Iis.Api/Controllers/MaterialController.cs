@@ -40,7 +40,7 @@ namespace Iis.Api.Controllers
 
             var tokenPayload = await TokenHelper.ValidateTokenAsync(token, _configuration, _userService);
 
-            if (await _materialProvider.GetMaterialAsync(id, tokenPayload.User) == null)
+            if (await _materialProvider.GetMaterialFromElasticAsync(id, tokenPayload.User) == null)
             {
                 return ValidationProblem("Material is not found");
             }
