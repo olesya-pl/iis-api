@@ -10,6 +10,7 @@ using Iis.OntologyManager.Dictionaries;
 using Iis.OntologyManager.Configurations;
 using Iis.Services.Contracts.Params;
 using Newtonsoft.Json;
+
 namespace Iis.OntologyManager.Helpers
 {
     public class RequestWraper
@@ -162,7 +163,7 @@ namespace Iis.OntologyManager.Helpers
 
         private static HttpClient AddAuthorizationHeader(HttpClient client, string userName, string userPassword)
         {
-            var byteArray = Encoding.ASCII.GetBytes($"{userName}:{userPassword}");
+            var byteArray = Encoding.UTF8.GetBytes($"{userName}:{userPassword}");
 
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(byteArray));
 

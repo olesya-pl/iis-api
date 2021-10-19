@@ -83,6 +83,7 @@ using System.Threading.Tasks;
 using Iis.CoordinatesEventHandler.DependencyInjection;
 using Iis.Utility.Csv;
 using Iis.Utility.Logging;
+using Iis.Api.Authentication.OntologyBasicAuthentication;
 
 namespace IIS.Core
 {
@@ -298,6 +299,10 @@ namespace IIS.Core
             services.AddHostedService<ThemeCounterBackgroundService>();
             services.AddServices();
 
+            services.AddAuthentication()
+                .AddOntologyScheme();
+            services.AddAuthorization();
+
             services.AddControllers();
             services.AddAutoMapper(typeof(Startup), typeof(CsvDataItem));
             services.AddTransient<GraphQLAccessList>();
@@ -405,6 +410,8 @@ namespace IIS.Core
             app.UseHealthChecks("/api/server-health", new HealthCheckOptions { ResponseWriter = ReportHealthCheck });
 
             app.UseRouting();
+            app.UseAuthentication();
+            app.UseAuthorization();
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();

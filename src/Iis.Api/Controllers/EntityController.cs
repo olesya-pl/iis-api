@@ -5,13 +5,14 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using MediatR;
 using Newtonsoft.Json;
-
 using Iis.Events.Entities;
 using Iis.Domain;
 using IIS.Core;
 using Iis.Interfaces.Roles;
 using Iis.Services.Contracts.Access;
 using Iis.Services.Contracts.Interfaces;
+using Microsoft.AspNetCore.Authorization;
+using Iis.Api.Authentication;
 
 namespace Iis.Api.Controllers
 {
@@ -35,6 +36,7 @@ namespace Iis.Api.Controllers
             _configuration = configuration;
         }
 
+        [Authorize(AuthenticationSchemes = AuthenticationSchemeConstants.OntologyAuthenticationScheme)]
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(Guid id)
         {
