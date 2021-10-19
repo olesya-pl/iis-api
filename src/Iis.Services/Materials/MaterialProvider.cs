@@ -134,9 +134,9 @@ namespace IIS.Services.Materials
         {
             var material = MapMaterialDocument(document);
 
-            material.CanBeEdited =
-                (document.ProcessedStatus.Id == MaterialEntity.ProcessingStatusProcessingSignId)
-                && (document.Editor == null || document.Editor.Id == userId);
+            material.CanBeEdited = document.ProcessedStatus.Id == MaterialEntity.ProcessingStatusProcessingSignId
+                ? (document.Editor == null || document.Editor.Id == userId)
+                : true;
 
             return material;
         }
