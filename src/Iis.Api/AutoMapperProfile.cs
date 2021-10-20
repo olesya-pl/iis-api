@@ -435,11 +435,8 @@ namespace Iis.Api
 
             CreateMap<SituationNodeDto, SituationNode>();
             CreateMap<GeometryDto, Geometry>();
-            CreateMap<AttributesDto, Attributes>();
-            CreateMap<BaseObjectDto, BaseObjectNode>()
-                .Include<ObjectDto, ObjectNode>()
-                .Include<SignDto, SignNode>()
-                .ForMember(_ => _.MaterialRegistrationDate, opt => opt.MapFrom(src => src.MaterialRegistrationDate.HasValue ? src.MaterialRegistrationDate.Value.ToString(Iso8601DateFormat, CultureInfo.InvariantCulture): null));
+            CreateMap<AttributesDto, Attributes>()
+                .ForMember(_ => _.RegisteredAt, opt => opt.MapFrom(src => src.RegisteredAt.ToString(Iso8601DateFormat, CultureInfo.InvariantCulture)));
             CreateMap<ObjectDto, ObjectNode>();
             CreateMap<SignDto, SignNode>();
 

@@ -11,34 +11,45 @@ namespace Iis.Services.Mappers.RadioElectronicSituation
         private const string ValuePropertyName = "value";
         private const string TitlePropertyName = "__title";
         private const string SidcPropertyName = "affiliation.sidc";
-        private const string NickNamePropertyName = "nicknameSign.value";
         private const string NoValueFound = "значення відсутне";
-
-        public static SituationNodeDto MapSituationNode(GeometryDto geometry, AttributesDto attributes)
+        public static SituationNodeDto Map(
+            LocationHistoryEntity locationEntity,
+            INode signNode,
+            INode objectNode,
+            MaterialEntity materialEntity)
         {
-            return new SituationNodeDto(geometry, attributes);
+            var geometry = new GeometryDto(locationEntity.Lat, locationEntity.Long);
+
+            var objectOfStudy = MapObjectOfStudyDto(objectNode);
+
+            var sign = MapObjectSign(signNode);
+
+            var material = MapMaterial(materialEntity);
+
+            var attributies = new AttributesDto(objectOfStudy, sign, material, locationEntity.RegisteredAt);
+
+            return new SituationNodeDto(geometry, attributies);
         }
 
-        public static ObjectDto MapObjectOfStudy(INode objectNode, INode signNode, MaterialEntity material)
+        private static ObjectDto MapObjectOfStudyDto(INode objectNode)
         {
             var title = objectNode.GetComputedValue(TitlePropertyName) ?? NoValueFound;
             var sidc = objectNode.GetSingleProperty(SidcPropertyName)?.Value ?? NoValueFound;
-            var nickName = objectNode.GetSingleProperty(NickNamePropertyName)?.Value ?? NoValueFound;
             var type = objectNode.NodeType;
 
-            return new ObjectDto(objectNode.Id, type.Name, type.Title, title, sidc, nickName, signNode.Id, material?.Id, material?.RegistrationDate);
+            return new ObjectDto(objectNode.Id, type.Name, type.Title, title, sidc);
 
         }
 
-        public static SignDto MapObjectSign(INode signNode, MaterialEntity material)
+        private static SignDto MapObjectSign(INode signNode)
         {
             var type = signNode.NodeType;
             var value = signNode.GetSingleProperty(ValuePropertyName)?.Value ?? NoValueFound;
 
-            return new SignDto(signNode.Id, type.Name, type.Title, value, material?.Id, material?.RegistrationDate);
+            return new SignDto(signNode.Id, type.Name, type.Title, value);
         }
 
-        public static MaterialDto MapMaterial(MaterialEntity entity)
+        private static MaterialDto MapMaterial(MaterialEntity entity)
         {
             if(entity is null) return null;
 
