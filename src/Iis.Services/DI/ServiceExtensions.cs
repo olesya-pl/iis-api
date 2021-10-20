@@ -32,6 +32,7 @@ namespace Iis.Services.DI
             services.AddTransient<NodeFlattener<IIISUnitOfWork>>();
             services.AddTransient<INodeSaveService, NodeSaveService>();
             services.AddTransient<IMaterialDistributionService, MaterialDistributionService>();
+            services.AddTransient<MaterialDocumentMapper>();
 
             return services;
         }
