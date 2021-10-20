@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using AcceptanceTests.PageObjects;
@@ -209,6 +210,9 @@ namespace AcceptanceTests.PageObjects
 
         [FindsBy(How = How.XPath, Using = "//span[@class='multiselect__tag-label']")]
         public IWebElement TagInTheSearchField;
+
+        [FindsBy(How = How.CssSelector, Using = ".graph-filter .graph-filter__body")]
+        public IWebElement Graph;
 
         public ObjectsSearch GetObjectByTitle(string title)
         {

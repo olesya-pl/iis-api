@@ -572,6 +572,13 @@ namespace AcceptanceTests.UISteps
             Assert.Equal(expectedSignValue, actualsignValue);
         }
 
+        [Then(@"I must see graph")]
+        public void ThenIMustSeeGraph()
+        {
+            Assert.True(objectsOfStudyPage.Graph.Displayed);
+        }
+
+
         #endregion
     }
 }
