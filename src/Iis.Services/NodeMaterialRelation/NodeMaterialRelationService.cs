@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Iis.DataModel;
 using Iis.DataModel.Materials;
@@ -115,6 +116,7 @@ namespace Iis.Services
             _context.MaterialInfos.Remove(featureToRemove.MaterialInfo);
             _context.MaterialFeatures.Remove(featureToRemove);
             await _context.SaveChangesAsync();
+            await _materialElasticService.PutMaterialToElasticSearchAsync(relation.MaterialId, CancellationToken.None, true);
 
             var changeHistoryDto = new ChangeHistoryDto
             {
