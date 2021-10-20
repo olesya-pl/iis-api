@@ -89,7 +89,7 @@ namespace IIS.Core.GraphQL.Materials
             Guid materialId)
         {
             var tokenPayload = ctx.GetToken();
-            var material = await materialProvider.GetMaterialFromElasticAsync(materialId, tokenPayload.User);
+            var material = await materialProvider.GetMaterialAsync(materialId, tokenPayload.User);
             var res = mapper.Map<Material>(material);
 
             var locationDtoList = await materialProvider.GetLocationHistoriesAsync(materialId);

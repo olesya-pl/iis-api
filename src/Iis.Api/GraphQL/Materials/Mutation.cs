@@ -23,7 +23,7 @@ namespace IIS.Core.GraphQL.Materials
             var tokenPayload = ctx.GetToken();
             var material = input.HasValue()
                 ? await materialService.UpdateMaterialAsync(input, tokenPayload.User)
-                : await materialProvider.GetMaterialFromElasticAsync(input.Id, tokenPayload.User);
+                : await materialProvider.GetMaterialAsync(input.Id, tokenPayload.User);
 
             return mapper.Map<Material>(material);
         }

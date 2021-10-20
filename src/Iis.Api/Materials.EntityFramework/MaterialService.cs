@@ -213,7 +213,7 @@ namespace IIS.Core.Materials.EntityFramework
             var includes = MaterialIncludeEnum.WithChildren.AsArray();
             var material = await RunWithoutCommitAsync(_ => _.MaterialRepository.GetByIdAsync(input.Id));
             if (!material.CanBeEdited(user.Id))
-                return await _materialProvider.GetMaterialFromElasticAsync(input.Id, user);
+                return await _materialProvider.GetMaterialAsync(input.Id, user);
 
             var changeRequestId = Guid.NewGuid();
             var username = user.UserName;
@@ -348,7 +348,7 @@ namespace IIS.Core.Materials.EntityFramework
             if (MaterialShouldBeQueuedForMachineLearning(material))
                 QueueMaterialForMachineLearning(material);
 
-            return await _materialProvider.GetMaterialFromElasticAsync(input.Id, user);
+            return await _materialProvider.GetMaterialAsync(input.Id, user);
         }
 
         private void SendMaterialUpdatedMessage(MaterialEntity material)
@@ -545,7 +545,7 @@ namespace IIS.Core.Materials.EntityFramework
 
             var changeHistoryTask = _changeHistoryService.SaveMaterialChanges(new[] { changeHistory });
 
-            var getMaterialTask = _materialProvider.GetMaterialFromElasticAsync(materialId, user);
+            var getMaterialTask = _materialProvider.GetMaterialAsync(materialId, user);
 
             await Task.WhenAll(new[] { elasticTask, changeHistoryTask, getMaterialTask });
 

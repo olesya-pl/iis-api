@@ -46,7 +46,7 @@ namespace IIS.Services.Contracts.Interfaces
         Task<bool> MaterialExists(Guid value);
         Task<IReadOnlyCollection<Guid>> GetMaterialsIdsAsync(int limit);
         Task<Material> GetMaterialAsync(Guid id);
-        Task<Material> GetMaterialFromElasticAsync(Guid id, User user);
+        Task<Material> GetMaterialAsync(Guid id, User user);
         Task<IReadOnlyCollection<LocationHistoryDto>> GetLocationHistoriesAsync(Guid materialId);
         Task<IReadOnlyList<MaterialDistributionItem>> GetMaterialsForDistribution(
             UserDistributionItem user,

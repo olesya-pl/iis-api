@@ -107,7 +107,7 @@ namespace IIS.Services.Materials
             return _materialDocumentMapper.Map(entity);
         }
 
-        public async Task<Material> GetMaterialFromElasticAsync(Guid id, User user)
+        public async Task<Material> GetMaterialAsync(Guid id, User user)
         {
             var entity = await _materialElasticService.GetMaterialById(user.Id, id);
             if (entity is null)
