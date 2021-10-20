@@ -96,6 +96,7 @@ namespace Iis.Services
                 }
             }
 
+            await _materialElasticService.PutMaterialsToElasticSearchAsync(materialIds, CancellationToken.None, true);
             await _changeHistoryService.SaveMaterialChanges(changeHistoryList);
         }
 
