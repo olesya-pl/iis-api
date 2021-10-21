@@ -66,7 +66,9 @@ namespace Iis.Services
         {
             var entity = _mapper.Map<ThemeEntity>(theme);
             
-            entity.QueryResults = entity.ReadQueryResults = (await GetQueryResultsAsync(entity.Id, entity.UserId, entity.TypeId, GetQuery(entity.QueryRequest))).Count;
+            entity.QueryResults 
+                = entity.ReadQueryResults 
+                = (await GetQueryResultsAsync(entity.Id, entity.UserId, entity.TypeId, ThemeQueryParser.Parse(entity.QueryRequest))).Count;
             entity.UnreadCount = default;
                 
             _context.Themes.Add(entity);
@@ -96,7 +98,9 @@ namespace Iis.Services
             }
             else
             {
-                entity.QueryResults = entity.ReadQueryResults = (await GetQueryResultsAsync(entity.Id, entity.UserId, entity.TypeId, GetQuery(entity.QueryRequest))).Count;
+                entity.QueryResults 
+                    = entity.ReadQueryResults 
+                    = (await GetQueryResultsAsync(entity.Id, entity.UserId, entity.TypeId, ThemeQueryParser.Parse(entity.QueryRequest))).Count;
             }
             
             entity.UnreadCount = GetUnreadQueryResult(originalEntity.QueryResults, originalEntity.ReadQueryResults);
@@ -248,7 +252,7 @@ namespace Iis.Services
             var themesByQuery = themes
                 .ToDictionary(k => k.Id, x => new {
                     x.Id,
-                    Query = GetQuery(x.QueryRequest),
+                    Query = ThemeQueryParser.Parse(x.QueryRequest),
                     x.TypeId,
                     x.UserId,
                     OriginalEntity = x
@@ -325,7 +329,7 @@ namespace Iis.Services
             };
         }
 
-        private async Task<QueryResult> GetQueryResultsAsync(Guid themeId, Guid userId, Guid typeId, Query query)
+        private async Task<QueryResult> GetQueryResultsAsync(Guid themeId, Guid userId, Guid typeId, ThemeQuery query)
         {
             _logger.LogInformation("ThemeService. Calculating query results for theme {themeId}", themeId);
             if (query == null)
@@ -497,124 +501,6 @@ namespace Iis.Services
             public int Count { get; set; }
             public Guid ThemeId { get; set; }
             public Guid TypeId { get; set; }
-        }
-
-        private Query GetQuery(string queryRequest) 
-        {
-            try
-            {
-                var queryResult = JObject.Parse(queryRequest);
-                if (queryRequest == null)
-                {
-                    return null;
-                }
-                var suggestion = string.Empty;
-                if (queryResult.ContainsKey("suggestion"))
-                {
-                    suggestion = queryResult["suggestion"].Value<string>();                    
-                }
-
-                var cherryPickedItems = Enumerable.Empty<CherryPickedItem>().ToList();
-                if (queryResult.ContainsKey("selectedEntities"))
-                {
-                    cherryPickedItems = queryResult.SelectToken("selectedEntities", false)
-                        .AsEnumerable()
-                        .Select(p => new CherryPickedItem(p.Value<string>("id"), p.Value<bool>("includeDescendants")))
-                        .ToList();
-                }
-
-                SearchByImageInput searchByImageInput = null;
-                if (queryResult.ContainsKey("searchByImageInput"))
-                {
-                    var searchByImageInputJson = queryResult["searchByImageInput"] as JObject;
-
-                    if (searchByImageInputJson != null)
-                    {
-                        searchByImageInput = searchByImageInputJson.ToObject<SearchByImageInput>();
-                    }
-                }
-
-                SearchByRelationInput searchByRelation = null;
-                if (queryResult.ContainsKey("searchByRelation"))
-                {
-                    var searchByRelationInputJson = queryResult["searchByRelation"] as JObject;
-
-                    if (searchByRelationInputJson != null)
-                    {
-                        searchByRelation = searchByRelationInputJson.ToObject<SearchByRelationInput>();
-                    }
-                }
-
-                var filteredItems = Array.Empty<FilteredItem>();
-
-                if (queryResult.ContainsKey("filteredItems"))
-                {
-                    var filteredItemsJson = queryResult["filteredItems"] as JArray;
-                    if (filteredItemsJson != null)
-                    {
-                        filteredItems = filteredItemsJson.ToObject<FilteredItem[]>();
-                    }
-                }
-
-                return new Query
-                {
-                    Suggestion = suggestion,
-                    CherryPickedItems = cherryPickedItems,
-                    SearchByImageInput = searchByImageInput,
-                    SearchByRelation = searchByRelation,
-                    FilteredItems = filteredItems
-                        .Select(item =>
-                        {
-                            var properties = new List<Property>();
-                            foreach (var value in item.Value)
-                            {
-                                properties.Add(new Property()
-                                {
-                                    Name = item.Name,
-                                    Value = value
-                                });
-                            }
-                            return properties;
-                        })
-                        .SelectMany(p => p)
-                        .ToList()
-                };
-            }
-            catch (Exception e)
-            {
-                return null;
-            }
-        }
-
-        private class Query
-        {
-            public string Suggestion { get; set; }
-            public IReadOnlyCollection<CherryPickedItem> CherryPickedItems { get; set; } = new List<CherryPickedItem>();
-            public IReadOnlyCollection<Property> FilteredItems { get; set; } = new List<Property>();
-            public SearchByImageInput SearchByImageInput { get; set; }
-            public SearchByRelationInput SearchByRelation { get; set; }
-        }
-
-        private class SearchByImageInput
-        {
-            public string Name { get; set; }
-            public string Content { get; set; }
-            [JsonIgnore]
-            public bool HasConditions => !string.IsNullOrWhiteSpace(Name) && !string.IsNullOrWhiteSpace(Content);
-        }
-
-        private class SearchByRelationInput
-        {
-            public IEnumerable<Guid> NodeIdentityList { get; set; }
-            public bool IncludeDescendants { get; set; }
-            [JsonIgnore]
-            public bool HasConditions => NodeIdentityList != null && NodeIdentityList.Any();
-        }
-
-        private class FilteredItem
-        {
-            public string Name { get; set; }
-            public string[] Value { get; set; }
-        }
+        } 
     }
 }
