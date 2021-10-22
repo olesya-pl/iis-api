@@ -45,7 +45,8 @@ namespace AcceptanceTests.Features.UI.RegressionTests
     - IIS-6138 - Search by two criteria by using AND operator
     - IIS-6082 - Search object of study by full name
     - IIS-6207 - Open a small object of study card
-	- IIS-5830 - Search object by mobile phone sign", ProgrammingLanguage.CSharp, ((string[])(null)));
+	- IIS-5830 - Search object by mobile phone sign
+	- IIS-0007 - Search militaryRank on object page", ProgrammingLanguage.CSharp, ((string[])(null)));
             testRunner.OnFeatureStart(featureInfo);
         }
         
@@ -82,9 +83,9 @@ namespace AcceptanceTests.Features.UI.RegressionTests
         
         public virtual void FeatureBackground()
         {
-#line 9
-#line hidden
 #line 10
+#line hidden
+#line 11
  testRunner.Given("I sign in with the user olya and password 123 in the Contour", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
         }
@@ -108,7 +109,7 @@ namespace AcceptanceTests.Features.UI.RegressionTests
                     "ObjectsOfStudySearchUI"};
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("IIS-6140 - Search by two criteria by using OR operator", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
-#line 13
+#line 14
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             bool isScenarioIgnored = default(bool);
@@ -128,16 +129,16 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-#line 9
+#line 10
 this.FeatureBackground();
 #line hidden
-#line 14
+#line 15
  testRunner.When("I clicked on search button in the Object of study section", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 15
+#line 16
  testRunner.And("I searched Олександр OR Іванович data in the Objects of study section", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 16
+#line 17
  testRunner.Then("I must see object of study ОТРОЩЕНКО О.І as first search result", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
@@ -158,7 +159,7 @@ this.FeatureBackground();
                     "ObjectsOfStudySearchUI"};
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("IIS-6139 - Search by two criteria by using NOT operator", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
-#line 19
+#line 20
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             bool isScenarioIgnored = default(bool);
@@ -178,16 +179,16 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-#line 9
+#line 10
 this.FeatureBackground();
 #line hidden
-#line 20
+#line 21
  testRunner.When("I clicked on search button in the Object of study section", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 21
+#line 22
  testRunner.And("I searched Олександр NOT Іванович data in the Objects of study section", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 22
+#line 23
  testRunner.Then("I must not see object of study ОТРОЩЕНКО Олександр Іванович as first search resul" +
                         "t", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
@@ -209,7 +210,7 @@ this.FeatureBackground();
                     "ObjectsOfStudySearchUI"};
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("IIS-6138 - Search by two criteria by using AND operator", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
-#line 25
+#line 26
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             bool isScenarioIgnored = default(bool);
@@ -229,19 +230,19 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-#line 9
+#line 10
 this.FeatureBackground();
 #line hidden
-#line 26
+#line 27
  testRunner.When("I clicked on search button in the Object of study section", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 27
+#line 28
  testRunner.And("I searched Ткачук AND \"3 омсбр\" data in the Objects of study section", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 28
+#line 29
  testRunner.Then("I must see object of study ТКАЧУК Р.Ю as first search result", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 29
+#line 30
  testRunner.Then("I must see search results counter value that equal to 1 value", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
@@ -264,7 +265,7 @@ this.FeatureBackground();
                     "ObjectsOfStudySearchUI"};
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("IIS-6082 - Search object of study by full name", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
-#line 32
+#line 33
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             bool isScenarioIgnored = default(bool);
@@ -284,16 +285,16 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-#line 9
+#line 10
 this.FeatureBackground();
 #line hidden
-#line 33
+#line 34
  testRunner.When("I clicked on search button in the Object of study section", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 34
+#line 35
  testRunner.And("I searched в/ч 85683-А військовий підрозділ data in the Objects of study section", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 35
+#line 36
  testRunner.Then("I must see object of study радіотехнічний батальойн в/ч 85683-А as first search r" +
                         "esult", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
@@ -315,7 +316,7 @@ this.FeatureBackground();
                     "ObjectOfStudySmallCardUI"};
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("IIS-6207 - Open a small object of study card", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
-#line 38
+#line 39
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             bool isScenarioIgnored = default(bool);
@@ -335,13 +336,13 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-#line 9
+#line 10
 this.FeatureBackground();
 #line hidden
-#line 39
+#line 40
  testRunner.When("I clicked on first object of study", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 40
+#line 41
  testRunner.Then("I must see the object of study small card", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
@@ -362,7 +363,7 @@ this.FeatureBackground();
                     "ObjectsOfStudySearchUI"};
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("IIS-5830 - Search object by mobile phone sign", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
-#line 43
+#line 44
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             bool isScenarioIgnored = default(bool);
@@ -382,19 +383,19 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-#line 9
+#line 10
 this.FeatureBackground();
 #line hidden
-#line 44
+#line 45
  testRunner.When("I clicked on search button in the Object of study section", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 45
+#line 46
  testRunner.And("I searched 0997908973 data in the Objects of study section", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 46
+#line 47
  testRunner.Then("I must see object of study Бонд as first search result", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 47
+#line 48
  testRunner.Then("I must see sign value 0997908973 in first search result", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
@@ -415,7 +416,7 @@ this.FeatureBackground();
                     "ObjectsOfStudySearchUI"};
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("IIS-0001 - Search on object page1", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
-#line 50
+#line 51
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             bool isScenarioIgnored = default(bool);
@@ -435,19 +436,19 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-#line 9
+#line 10
 this.FeatureBackground();
 #line hidden
-#line 51
+#line 52
  testRunner.When("I clicked on the Objects section", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 52
+#line 53
  testRunner.And("I clicked on search button in the Object of study section", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 53
+#line 54
  testRunner.And("I searched Бонд data in the Objects of study section", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 54
+#line 55
  testRunner.Then("I must see object of study Бонд Д. as first search result", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
@@ -468,7 +469,7 @@ this.FeatureBackground();
                     "ObjectsOfStudySearchUI"};
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("IIS-0011 - Search on object page1", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
-#line 60
+#line 61
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             bool isScenarioIgnored = default(bool);
@@ -488,19 +489,19 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-#line 9
+#line 10
 this.FeatureBackground();
 #line hidden
-#line 61
+#line 62
  testRunner.When("I clicked on the Objects section", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 62
+#line 63
  testRunner.And("I clicked on search button in the Object of study section", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 63
+#line 64
  testRunner.And("I searched Бонд data in the Objects of study section", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 64
+#line 65
  testRunner.Then("I must see object of study Бонд Д. as first search result", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
@@ -521,7 +522,7 @@ this.FeatureBackground();
                     "ObjectsOfStudySearchUI"};
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("IIS-0002 - Search on object page2", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
-#line 67
+#line 68
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             bool isScenarioIgnored = default(bool);
@@ -541,19 +542,19 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-#line 9
+#line 10
 this.FeatureBackground();
 #line hidden
-#line 68
+#line 69
  testRunner.When("I clicked on the Objects section", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 69
+#line 70
  testRunner.And("I clicked on search button in the Object of study section", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 70
+#line 71
  testRunner.And("I searched militaryRank:полковник data in the Objects of study section", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 71
+#line 72
  testRunner.Then("I must see object of study полковник as first search result", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
@@ -574,7 +575,7 @@ this.FeatureBackground();
                     "ObjectsOfStudySearchUI"};
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("IIS-0003 - Search on object page3", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
-#line 74
+#line 75
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             bool isScenarioIgnored = default(bool);
@@ -594,20 +595,20 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-#line 9
+#line 10
 this.FeatureBackground();
 #line hidden
-#line 75
+#line 76
  testRunner.When("I clicked on the Objects section", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 76
+#line 77
  testRunner.And("I clicked on search button in the Object of study section", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 77
+#line 78
  testRunner.And("I searched __title: \"ГУСЄВ С.\" AND militaryRank:полковник data in the Objects of " +
                         "study section", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 78
+#line 79
  testRunner.Then("I must see object of study Звання: полковник, __title: ГУСЄВ С., as first search " +
                         "result", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
@@ -629,7 +630,7 @@ this.FeatureBackground();
                     "ObjectsOfStudySearchUI"};
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("IIS-0004 - Search on object page4", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
-#line 81
+#line 82
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             bool isScenarioIgnored = default(bool);
@@ -649,19 +650,19 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-#line 9
+#line 10
 this.FeatureBackground();
 #line hidden
-#line 82
+#line 83
  testRunner.When("I clicked on the Objects section", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 83
+#line 84
  testRunner.And("I clicked on search button in the Object of study section", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 84
+#line 85
  testRunner.And("I searched militaryRank:полковник data in the Objects of study section", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 85
+#line 86
  testRunner.Then("I must see object of study полковник as first search result", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
@@ -682,7 +683,7 @@ this.FeatureBackground();
                     "ObjectsOfStudySearchUI"};
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("IIS-0005 - Search on object page5", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
-#line 88
+#line 89
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             bool isScenarioIgnored = default(bool);
@@ -702,19 +703,19 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-#line 9
+#line 10
 this.FeatureBackground();
 #line hidden
-#line 89
+#line 90
  testRunner.When("I clicked on the Objects section", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 90
+#line 91
  testRunner.And("I clicked on search button in the Object of study section", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 91
+#line 92
  testRunner.And("I searched militaryRank:полковник data in the Objects of study section", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 92
+#line 93
  testRunner.Then("I must see object of study полковник as first search result", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
@@ -735,7 +736,7 @@ this.FeatureBackground();
                     "ObjectsOfStudySearchUI"};
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("IIS-0006 - Search on object page6", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
-#line 95
+#line 96
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             bool isScenarioIgnored = default(bool);
@@ -755,40 +756,40 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-#line 9
+#line 10
 this.FeatureBackground();
 #line hidden
-#line 96
+#line 97
  testRunner.When("I clicked on the Objects section", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 97
+#line 98
  testRunner.And("I clicked on search button in the Object of study section", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 98
+#line 99
  testRunner.And("I searched militaryRank:полковник data in the Objects of study section", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 99
+#line 100
  testRunner.Then("I must see object of study полковник as first search result", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
             this.ScenarioCleanup();
         }
         
-        [Xunit.SkippableFactAttribute(DisplayName="IIS-0007 - Search on object page7")]
+        [Xunit.SkippableFactAttribute(DisplayName="IIS-0007 - Search militaryRank on object page")]
         [Xunit.TraitAttribute("FeatureTitle", "ObjectsOfStudySearch - functional")]
-        [Xunit.TraitAttribute("Description", "IIS-0007 - Search on object page7")]
+        [Xunit.TraitAttribute("Description", "IIS-0007 - Search militaryRank on object page")]
         [Xunit.TraitAttribute("Category", "functional")]
         [Xunit.TraitAttribute("Category", "UI")]
         [Xunit.TraitAttribute("Category", "ObjectsOfStudySearchUI")]
-        public virtual void IIS_0007_SearchOnObjectPage7()
+        public virtual void IIS_0007_SearchMilitaryRankOnObjectPage()
         {
             string[] tagsOfScenario = new string[] {
                     "functional",
                     "UI",
                     "ObjectsOfStudySearchUI"};
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("IIS-0007 - Search on object page7", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
-#line 102
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("IIS-0007 - Search militaryRank on object page", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
+#line 103
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             bool isScenarioIgnored = default(bool);
@@ -808,20 +809,20 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-#line 9
+#line 10
 this.FeatureBackground();
 #line hidden
-#line 103
+#line 104
  testRunner.When("I clicked on the Objects section", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 104
+#line 105
  testRunner.And("I clicked on search button in the Object of study section", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 105
+#line 106
  testRunner.And("I searched militaryRank:полковник data in the Objects of study section", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 106
- testRunner.Then("I must see object of study полковник as first search result", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 107
+ testRunner.Then("I must see military ranks Звання: полковник, by objects of study in result", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
             this.ScenarioCleanup();
@@ -841,7 +842,7 @@ this.FeatureBackground();
                     "ObjectsOfStudySearchUI"};
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("IIS-0008 - Search on object page8", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
-#line 109
+#line 110
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             bool isScenarioIgnored = default(bool);
@@ -861,19 +862,19 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-#line 9
+#line 10
 this.FeatureBackground();
 #line hidden
-#line 110
+#line 111
  testRunner.When("I clicked on the Objects section", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 111
+#line 112
  testRunner.And("I clicked on search button in the Object of study section", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 112
+#line 113
  testRunner.And("I searched militaryRank:полковник data in the Objects of study section", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 113
+#line 114
  testRunner.Then("I must see object of study полковник as first search result", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
@@ -894,7 +895,7 @@ this.FeatureBackground();
                     "ObjectsOfStudySearchUI"};
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("IIS-0009 - Search on object page9", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
-#line 116
+#line 117
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             bool isScenarioIgnored = default(bool);
@@ -914,19 +915,19 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-#line 9
+#line 10
 this.FeatureBackground();
 #line hidden
-#line 117
+#line 118
  testRunner.When("I clicked on the Objects section", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 118
+#line 119
  testRunner.And("I clicked on search button in the Object of study section", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 119
+#line 120
  testRunner.And("I searched militaryRank:полковник data in the Objects of study section", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 120
+#line 121
  testRunner.Then("I must see object of study полковник as first search result", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
@@ -947,7 +948,7 @@ this.FeatureBackground();
                     "ObjectsOfStudySearchUI"};
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("IIS-0010 - Search on object page10", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
-#line 123
+#line 124
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             bool isScenarioIgnored = default(bool);
@@ -967,19 +968,19 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-#line 9
+#line 10
 this.FeatureBackground();
 #line hidden
-#line 124
+#line 125
  testRunner.When("I clicked on the Objects section", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 125
+#line 126
  testRunner.And("I clicked on search button in the Object of study section", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 126
+#line 127
  testRunner.And("I searched militaryRank:полковник data in the Objects of study section", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 127
+#line 128
  testRunner.Then("I must see object of study полковник as first search result", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }

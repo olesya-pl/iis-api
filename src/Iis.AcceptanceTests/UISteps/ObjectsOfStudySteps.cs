@@ -578,6 +578,14 @@ namespace AcceptanceTests.UISteps
             Assert.True(objectsOfStudyPage.Graph.Displayed);
         }
 
+        [Then(@"I must see military ranks (.*) by objects of study in result")]
+        public void IMustSeeMilitaryRanksByObjectOfStudyInTheSearchResults(string objectOfStudyMilitaryRank)
+        {
+            var actualMilitaryRank = objectsOfStudyPage.SearchMilitaryRank.Text;
+            Assert.Equal(objectOfStudyMilitaryRank, actualMilitaryRank);
+        }
+
+
 
         #endregion
     }

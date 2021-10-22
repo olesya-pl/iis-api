@@ -239,5 +239,8 @@ namespace AcceptanceTests.PageObjects
             elementToClick.Click();
         }
 
+        [FindsBy(How = How.CssSelector, Using = ".objects-table .p-datatable-tbody .object-summary .highlight")]
+        public IWebElement SearchMilitaryRank;
+
     }
 }

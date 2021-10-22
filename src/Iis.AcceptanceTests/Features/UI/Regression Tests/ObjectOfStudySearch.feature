@@ -5,6 +5,7 @@ Feature: ObjectsOfStudySearch - functional
     - IIS-6082 - Search object of study by full name
     - IIS-6207 - Open a small object of study card
 	- IIS-5830 - Search object by mobile phone sign
+	- IIS-0007 - Search militaryRank on object page
 
 Background:
 	Given I sign in with the user olya and password 123 in the Contour
@@ -99,11 +100,11 @@ Scenario: IIS-0006 - Search on object page6
 	Then I must see object of study полковник as first search result
 	
 @functional @UI @ObjectsOfStudySearchUI
-Scenario: IIS-0007 - Search on object page7
+Scenario: IIS-0007 - Search militaryRank on object page
 	When I clicked on the Objects section
 	And I clicked on search button in the Object of study section
 	And I searched militaryRank:полковник data in the Objects of study section
-	Then I must see object of study полковник as first search result
+	Then I must see military ranks Звання: полковник, by objects of study in result
 	
 @functional @UI @ObjectsOfStudySearchUI
 Scenario: IIS-0008 - Search on object page8
