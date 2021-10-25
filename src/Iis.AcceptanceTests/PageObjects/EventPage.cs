@@ -85,7 +85,7 @@ namespace AcceptanceTests.PageObjects
 
         public bool IsMaterialVisible(string materialName)
         {
-            var bindedMaterial = driver.FindElement(By.XPath($"//span[contains(text(),'{materialName}')]"));
+            var bindedMaterial = driver.FindElement(By.XPath($"//*[contains(@class, 'event-card__linked-materials')]//*[contains(@class, 'wrapper')]//*[text()]"));
             return bindedMaterial.Displayed;
         }
 
