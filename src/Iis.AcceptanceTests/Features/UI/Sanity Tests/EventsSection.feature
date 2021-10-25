@@ -9,15 +9,24 @@ Feature: EventsSection - sanity
 
     @sanity @EventsSectionSanity @UI
     Scenario: IIS-6364 - Bind a material to an event in the event section
+        Given I upload a new docx material via API
+		| Field                 | Value                                      |
+		| FileName              | тестовий матеріал                          |
+		| SourceReliabilityText | Здебільшого надійне                        |
+		| ReliabilityText       | Достовірна                                 |
+		| Content               | таємний контент                           |
+		| AccessLevel           | 0                                          |
+		| LoadedBy              | автотест                                   |
+		| MetaData              | {"type":"document","source":"contour.doc"} |
         When I navigated to Events page
         And I created a new Тестова подія event
         And I searched for the Тестова подія created event
         And I pressed the review event button
         And I pressed the edit event button
-        And I binded a 130403-Project_Application_Guidelines.docx material to the event
+        And I binded a  таємн  material to the event
         And I pressed the save event changes button
         When I reloaded the event page
-        Then I must see the 130403-Project_Application_Guidelines.docx material binded to the event
+        Then I must see the  таємн  material binded to the event
 
     @sanity @EventsSectionSanity @UI
     Scenario: IIS-5831 - Bind an object of study to an event in the event section
