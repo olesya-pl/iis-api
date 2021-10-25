@@ -35,9 +35,18 @@ Feature: MaterialsSectionUI - Sanity
 
     @sanity @UI @MaterialsSanityUI
     Scenario: IIS-5837- Connect a material with an object of study from material
+         Given I upload a new docx material via API
+		| Field                 | Value                                      |
+		| FileName              | тестовий матеріал                          |
+		| SourceReliabilityText | Здебільшого надійне                        |
+		| ReliabilityText       | Достовірна                                 |
+		| Content               | таємний контент                           |
+		| AccessLevel           | 0                                          |
+		| LoadedBy              | автотест                                   |
+		| MetaData              | {"type":"document","source":"contour.doc"} |
         When I navigated to Materials page
         And I clicked search button in the Materials section
-        And I searched 130403-Project_Application_Guidelines.docx data in the materials
+        And I searched таємн data in the materials
         And I clicked on the first search result in the Materials section
         And I clicked on the relations tab in the material card
         And I enter Романов value in the search object field
