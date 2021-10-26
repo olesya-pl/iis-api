@@ -283,9 +283,6 @@ namespace IIS.Services.Materials
             return (materials, materials.Count());
         }
 
-        public Task<IReadOnlyCollection<MaterialEntity>> GetMaterialsByNodeIds(IReadOnlyList<Guid> nodeIds) =>
-            RunWithoutCommitAsync(uow => uow.MaterialRepository.GetMaterialCollectionByNodeIdAsync(nodeIds, MaterialIncludeEnum.WithChildren, MaterialIncludeEnum.WithFeatures, MaterialIncludeEnum.WithFiles));
-
         public async Task<(IEnumerable<Material> Materials, int Count)> GetMaterialsByNodeIdAndRelatedEntities(Guid nodeId)
         {
             var materialsByNode = await GetMaterialCollectionByNodeIdAsync(nodeId, true);

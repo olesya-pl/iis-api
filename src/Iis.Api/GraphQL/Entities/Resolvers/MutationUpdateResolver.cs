@@ -40,7 +40,6 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
             ICommonData commonData,
             MutationCreateResolver mutationCreateResolver,
             CreateEntityService createEntityService,
-            IMaterialProvider materialProvider,
             IMaterialElasticService materialElasticService)
         {
             _mutationCreateResolver = mutationCreateResolver;
