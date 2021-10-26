@@ -197,6 +197,7 @@ namespace Iis.OntologyManager.UiControls
 
         public void CreateNew()
         {
+            _nodeType = new SchemaNodeType();
             if (cmbTargetType != null)
             {
                 cmbTargetType.DataSource = _getAllEntities();
@@ -317,10 +318,10 @@ namespace Iis.OntologyManager.UiControls
         private IFormField GetCurrentFormField()
         {
             if (_nodeType == null) return null;
-            var type = _nodeType.MetaObject?.FormField?.Type;
+            var type = GetFormFieldType();
             var hint = _nodeType.MetaObject?.FormField?.Hint;
             var lines = GetCurrentFormFieldLines();
-            var icon = _nodeType.MetaObject?.FormField?.Icon;
+            var icon = GetFormFieldIcon();
 
             return type == null && hint == null && lines == null && icon == null ? null :
                 new FormField
@@ -455,10 +456,42 @@ namespace Iis.OntologyManager.UiControls
             toolTip.SetToolTip(control, text);
         }
 
+        private INodeTypeLinked CurrentTargetType => (INodeTypeLinked)cmbTargetType.SelectedItem;
+
         private void TargetTypeChanged()
         {
-            var targetType = (INodeTypeLinked)cmbTargetType.SelectedItem;
-            FillTargetTypes(targetType, null);
+            FillTargetTypes(CurrentTargetType, null);
         }
+
+        private string GetFormFieldType()
+        {
+            var targetType = CurrentTargetType;
+
+            var formFieldType = targetType.Name switch
+            {
+                "MilitaryOrganization_parent" => "form",
+                "MilitaryOrganization" => "dropdown",
+                "FuzzyDate" => "fuzzyDate",
+                "FuzzyDateRange" => "fuzzyDateRange",
+                "Photo" => "photo",
+                "EventImportance" => "radioGroup",
+                "EventState" => "radioGroup",
+                "EventComponent" => "dropdownTree",
+                "EventType" => "dropdownTree",
+                "TaggableString" => "taggableString",
+                _ => null
+            };
+
+            if (formFieldType != null) return formFieldType;
+
+            if (targetType.IsEnum || targetType.IsObject) return "dropdown";
+
+            return formFieldType ??
+                (targetType.Kind == Kind.Entity ? "form" : null);
+        }
+
+        private string GetFormFieldIcon() =>
+            CurrentTargetType.Name == "Country" ? "flag" : null;
     }
 }
+

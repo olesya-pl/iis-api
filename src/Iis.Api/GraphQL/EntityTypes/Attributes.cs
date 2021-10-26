@@ -136,35 +136,6 @@ namespace IIS.Core.GraphQL.EntityTypes
                 return validation;
             }
         }
-
-        private string GetFormFieldIcon(INodeTypeLinked relationNodeType) =>
-            relationNodeType.RelationType.TargetType.Name == "Country" ? "flag" : null;
-        private string GetFormFieldType(INodeTypeLinked relationNodeType)
-        {
-            var targetType = relationNodeType.RelationType.TargetType;
-
-            var formFieldType = targetType.Name switch
-            {
-                "MilitaryOrganization_parent" => "form",
-                "MilitaryOrganization" => "dropdown",
-                "FuzzyDate" => "fuzzyDate",
-                "FuzzyDateRange" => "fuzzyDateRange",
-                "Photo" => "photo",
-                "EventImportance" => "radioGroup",
-                "EventState" => "radioGroup",
-                "EventComponent" => "dropdownTree",
-                "EventType" => "dropdownTree",
-                "TaggableString" => "taggableString",
-                _ => null
-            };
-
-            if (formFieldType != null) return formFieldType;
-
-            if (targetType.IsEnum || targetType.IsObject) return "dropdown";
-
-            return formFieldType ??
-                (targetType.Kind == Kind.Entity ? "form" : null);
-        }
     }
 
     public class EntityAttributePrimitive : EntityAttributeBase
