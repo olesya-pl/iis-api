@@ -18,18 +18,21 @@ namespace Iis.Services
         private readonly IChangeHistoryService _changeHistoryService;
         private readonly IFileService _fileService;
         private readonly IMediator _mediator;
+        private readonly IMaterialElasticService _materialElasticService;
 
         public CreateEntityService(IOntologySchema ontologySchema,
             IOntologyService ontologyService,
             IChangeHistoryService changeHistoryService,
             IFileService fileService,
-            IMediator mediator)
+            IMediator mediator,
+            IMaterialElasticService materialElasticService)
         {
             _ontologySchema = ontologySchema;
             _ontologyService = ontologyService;
             _changeHistoryService = changeHistoryService;
             _fileService = fileService;
             _mediator = mediator;
+            _materialElasticService = materialElasticService;
         }
 
         public async Task<Entity> CreateEntity(Guid rootEntityId,
@@ -55,6 +58,7 @@ namespace Iis.Services
             SetLastConfirmedAtIfExists(node);
             _ontologyService.SaveNode(node);
             await _mediator.Publish(new EntityCreatedEvent() { Type = type.Name, Id = node.Id });
+            await PutLinkedMaterialsToElastic(node.Id);
             return node;
         }
 
@@ -249,6 +253,14 @@ namespace Iis.Services
             }
 
             throw new ArgumentException(nameof(embed));
-        }        
+        }
+
+        private async Task PutLinkedMaterialsToElastic(Guid nodeId)
+        {
+            var signIds = _ontologyService.GetSignIds(nodeId);
+            await _materialElasticService.PutMaterialsToElasticByNodeIdsAsync(signIds);
+        }
+
+
     }
 }

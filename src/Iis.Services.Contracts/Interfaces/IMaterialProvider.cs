@@ -33,6 +33,7 @@ namespace IIS.Services.Contracts.Interfaces
         Task<List<MLResponse>> GetMLProcessingResultsAsync(Guid materialId);
         Task<MaterialsDto> GetMaterialsByImageAsync(Guid userId, PaginationParams page, string fileName, byte[] content);
         Task<(IEnumerable<Material> Materials, int Count)> GetMaterialsByNodeId(Guid nodeId);
+        Task<IReadOnlyCollection<MaterialEntity>> GetMaterialsByNodeIds(IReadOnlyList<Guid> nodeId);
         Task<(IEnumerable<Material> Materials, int Count)> GetMaterialsByNodeIdAndRelatedEntities(Guid nodeId);
         Task<MaterialsDto> GetMaterialsCommonForEntitiesAsync(Guid userId,
             IEnumerable<Guid> nodeIdList, 

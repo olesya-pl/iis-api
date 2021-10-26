@@ -532,5 +532,14 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                 .Select(r => new ObjectFeatureRelation(r.SourceNodeId, r.TargetNodeId))
                 .ToArray();
         }
+
+        public IReadOnlyCollection<Guid> GetSignIds(Guid nodeId)
+        {
+            return _data.GetNode(nodeId)
+                .GetDirectRelations()
+                .Where(_ => _.Node.NodeType.Name == "sign")
+                .Select(_ => _.TargetNodeId)
+                .ToList();
+        }
     }
 }

@@ -446,7 +446,7 @@ namespace Iis.Services
             }
         }
 
-        private async Task<bool> PutMaterialToElasticSearchAsync(MaterialEntity material, CancellationToken ct = default, bool waitForIndexing = false)
+        public async Task<bool> PutMaterialToElasticSearchAsync(MaterialEntity material, CancellationToken ct = default, bool waitForIndexing = false)
         {
             var materialDocument = MapEntityToDocument(material);
 
@@ -461,8 +461,6 @@ namespace Iis.Services
                                         .GroupBy(e => e.MaterialId)
                                         .ToDictionary(group => group.Key, group => group.ToArray());
 
-
-
             var (mlResponses, mlResponsesCount) = GetResponseJsonWithCounter(materialDocument.Id, responseDictionary);
 
             materialDocument.MLResponses = mlResponses;
@@ -476,6 +474,16 @@ namespace Iis.Services
                 JsonConvert.SerializeObject(materialDocument),
                 waitForIndexing,
                 ct);
+        }
+
+        public async Task PutMaterialsToElasticByNodeIdsAsync(IReadOnlyCollection<Guid> nodeIds, CancellationToken ct = default, bool waitForIndexing = false)
+        {
+            var materials = await RunWithoutCommitAsync(_ => _.MaterialRepository.GetMaterialCollectionByNodeIdAsync(nodeIds, MaterialIncludeEnum.WithChildren, MaterialIncludeEnum.WithFeatures, MaterialIncludeEnum.WithFiles));
+
+            foreach (var material in materials)
+            {
+                await PutMaterialToElasticSearchAsync(material, ct, waitForIndexing);
+            }
         }
 
         private static ImageVector[] GetImageVectorList(IReadOnlyCollection<Guid> materialIdList, Dictionary<Guid, MLResponseEntity[]> responseDictionary)

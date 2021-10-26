@@ -14,6 +14,7 @@ using Iis.Interfaces.Ontology.Data;
 using Iis.Interfaces.Common;
 using Iis.Services;
 using Iis.Domain.Users;
+using IIS.Services.Contracts.Interfaces;
 
 namespace IIS.Core.GraphQL.Entities.Resolvers
 {
@@ -27,6 +28,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
         private readonly CreateEntityService _createEntityService;
         private readonly IResolverContext _resolverContext;
         private readonly IAccessLevels _accessLevels;
+        private readonly IMaterialElasticService _materialElasticService;
         private Guid _rootNodeId;
 
         private const string LastConfirmedFieldName = "lastConfirmedAt";
@@ -37,7 +39,9 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
             IMediator mediator,
             ICommonData commonData,
             MutationCreateResolver mutationCreateResolver,
-            CreateEntityService createEntityService)
+            CreateEntityService createEntityService,
+            IMaterialProvider materialProvider,
+            IMaterialElasticService materialElasticService)
         {
             _mutationCreateResolver = mutationCreateResolver;
             _ontologySchema = ontologySchema;
@@ -46,6 +50,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
             _accessLevels = commonData.AccessLevels;
             _mediator = mediator;
             _createEntityService = createEntityService;
+            _materialElasticService = materialElasticService;
         }
         public MutationUpdateResolver(IResolverContext ctx)
         {
@@ -56,6 +61,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
             _mediator = ctx.Service<IMediator>();
             _accessLevels = ctx.Service<IOntologyNodesData>().GetAccessLevels();
             _createEntityService = ctx.Service<CreateEntityService>();
+            _materialElasticService = ctx.Service<IMaterialElasticService>();
             _resolverContext = ctx;
         }
 
@@ -72,7 +78,23 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
             var type = _ontologySchema.GetEntityTypeByName(typeName);
             _rootNodeId = id;
             var requestId = Guid.NewGuid();
-            return await UpdateEntity(type, id, data, string.Empty, requestId);
+
+            var oldSignIds = _ontologyService.GetSignIds(id);
+
+            var result = await UpdateEntity(type, id, data, string.Empty, requestId);
+
+            await PutChangedLinkedMaterialsToElastic(id, oldSignIds);
+
+            return result;
+        }
+
+        private async Task PutChangedLinkedMaterialsToElastic(Guid id, IReadOnlyCollection<Guid> oldSignIds)
+        {
+            var newSignIds = _ontologyService.GetSignIds(id);
+            var diff = oldSignIds.Where(os => !newSignIds.Any(ns => ns == os)).ToList();
+            diff.AddRange(newSignIds.Where(ns => !oldSignIds.Any(os => os == ns)));
+
+            await _materialElasticService.PutMaterialsToElasticByNodeIdsAsync(diff);
         }
 
         private void VerifyAccess(Guid id, Dictionary<string, object> data, User user)
