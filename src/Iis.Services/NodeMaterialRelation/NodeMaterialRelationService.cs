@@ -112,8 +112,7 @@ namespace Iis.Services
             var featureToRemove = await _context.MaterialFeatures
                 .Include(p => p.MaterialInfo)
                 .FirstOrDefaultAsync(p => p.NodeId == relation.NodeId 
-                    && p.MaterialInfo.MaterialId == relation.MaterialId
-                    && p.NodeLinkType == relation.NodeLinkType);
+                    && p.MaterialInfo.MaterialId == relation.MaterialId);
             _context.MaterialInfos.Remove(featureToRemove.MaterialInfo);
             _context.MaterialFeatures.Remove(featureToRemove);
             await _context.SaveChangesAsync();
