@@ -31,7 +31,7 @@ namespace Iis.AcceptanceTests.PageObjects.Controls
         public Event(IWebDriver driver, string value)
         {
             this.driver = driver;
-            eventElement = driver.FindElement(By.XPath($@"//span[contains(text(),'{value}')]"));
+            eventElement = driver.FindElement(By.XPath($@"//main/section/main/form/div[5]/div/div/span"));
         }
 
 
