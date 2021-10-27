@@ -402,7 +402,7 @@ namespace IIS.Core
             app.UseMiddleware<LogHeaderMiddleware>();
 
 #if !DEBUG
-            app.UseMiddleware<LoggingMiddleware>();
+            //app.UseMiddleware<LoggingMiddleware>();
 #endif
             app.UseGraphQL();
             app.UsePlayground();
