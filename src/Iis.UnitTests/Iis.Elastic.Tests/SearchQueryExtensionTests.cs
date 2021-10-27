@@ -8,7 +8,7 @@ using FluentAssertions.Json;
 using Xunit;
 using Iis.Elastic.SearchQueryExtensions;
 using Iis.Interfaces.Elastic;
-using Newtonsoft.Json;
+using Moq;
 
 namespace Iis.UnitTests.Iis.Elastic.Tests
 {
@@ -256,8 +256,9 @@ namespace Iis.UnitTests.Iis.Elastic.Tests
             actual.Should().BeEquivalentTo(expected);
         }
 
-        [Fact]
-        public void WithAggregation_WithFilter_OnlyFilteredItemsAvailable()
+        [Theory]
+        [AutoMoqData]
+        public void WithAggregation_WithFilter_OnlyFilteredItemsAvailable(IMock<ISearchParamsContext> searchContextMock)
         {
             var expected = GetActualJObject(nameof(WithAggregation_WithFilter_OnlyFilteredItemsAvailable));
             
@@ -276,13 +277,14 @@ namespace Iis.UnitTests.Iis.Elastic.Tests
                 }
             };
 
-            var actual = new JObject().WithAggregation(aggregationFieldList, filter);
+            var actual = new JObject().WithAggregation(aggregationFieldList, filter, searchContextMock.Object);
 
             actual.Should().BeEquivalentTo(expected);
         }
-        
-        [Fact]
-        public void WithAggregation_WithFilter_WithSuggestion()
+
+        [Theory]
+        [AutoMoqData]
+        public void WithAggregation_WithFilter_WithSuggestion(IMock<ISearchParamsContext> searchContextMock)
         {
             var expected = GetActualJObject(nameof(WithAggregation_WithFilter_WithSuggestion));
             
@@ -302,13 +304,14 @@ namespace Iis.UnitTests.Iis.Elastic.Tests
                 }
             };
 
-            var actual = new JObject().WithAggregation(aggregationFieldList, filter);
+            var actual = new JObject().WithAggregation(aggregationFieldList, filter, searchContextMock.Object);
 
             actual.Should().BeEquivalentTo(expected);
         }
-        
-        [Fact]
-        public void WithAggregation_WithFilter_WithOneFilteredItems()
+
+        [Theory]
+        [AutoMoqData]
+        public void WithAggregation_WithFilter_WithOneFilteredItems(IMock<ISearchParamsContext> searchContextMock)
         {
             var expected = GetActualJObject(nameof(WithAggregation_WithFilter_WithOneFilteredItems));
             
@@ -326,7 +329,7 @@ namespace Iis.UnitTests.Iis.Elastic.Tests
                 }
             };
 
-            var actual = new JObject().WithAggregation(aggregationFieldList, filter);
+            var actual = new JObject().WithAggregation(aggregationFieldList, filter, searchContextMock.Object);
 
             actual.Should().BeEquivalentTo(expected);
         }
