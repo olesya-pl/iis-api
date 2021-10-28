@@ -112,25 +112,8 @@ namespace IIS.Core.GraphQL.EntityTypes
         [GraphQLNonNullType] public bool IsLinkToSeparateObject => Source.TargetType.IsSeparateObject;
 
         [GraphQLType(typeof(AnyType))]
-        public FormField FormField
-        {
-            get
-            {
-                var type = GetFormFieldType(Source);
-                var hint = MetaObject?.FormField?.Hint;
-                var lines = MetaObject?.FormField?.Lines;
-                var icon = GetFormFieldIcon(Source);
+        public FormField FormField => _mapper.Map<FormField>(MetaObject?.FormField);
 
-                return type == null && hint == null && lines == null && icon == null ? null : 
-                    new FormField
-                    {
-                        Type = type,
-                        Hint = hint,
-                        Lines = lines,
-                        Icon = icon
-                    };
-            }
-        }
 
         [GraphQLType(typeof(AnyType))]
         public ContainerMeta Container => _mapper.Map<ContainerMeta>(MetaObject?.Container);
@@ -152,33 +135,6 @@ namespace IIS.Core.GraphQL.EntityTypes
 
                 return validation;
             }
-        }
-
-        private string GetFormFieldIcon(INodeTypeLinked relationNodeType) =>
-            relationNodeType.RelationType.TargetType.Name == "Country" ? "flag" : null;
-        private string GetFormFieldType(INodeTypeLinked relationNodeType)
-        {
-            var targetType = relationNodeType.RelationType.TargetType;
-
-            var formFieldType = targetType.Name switch
-            {
-                "FuzzyDate" => "fuzzyDate",
-                "FuzzyDateRange" => "fuzzyDateRange",
-                "Photo" => "photo",
-                "EventImportance" => "radioGroup",
-                "EventState" => "radioGroup",
-                "EventComponent" => "dropdownTree",
-                "EventType" => "dropdownTree",
-                "TaggableString" => "taggableString",
-                _ => null
-            };
-
-            if (formFieldType != null) return formFieldType;
-
-            if (targetType.IsEnum || targetType.IsObject) return "dropdown";
-
-            return formFieldType ??
-                (targetType.Kind == Kind.Entity ? "form" : null);
         }
     }
 

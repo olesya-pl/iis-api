@@ -40,8 +40,11 @@ namespace Iis.Services
             return ToRole(roleEntity, accessObjects);
         }        
 
-        public async Task<Role> CreateRoleAsync(Role role)
+        public async Task<(Role Role, bool AlreadyExists)> CreateRoleAsync(Role role)
         {
+            var roleExists = await _context.Roles.AnyAsync(_ => _.Name == role.Name);
+            if (roleExists) return (null, true);
+            
             var roleEntity = _mapper.Map<RoleEntity>(role);
             roleEntity.RoleGroups = role.ActiveDirectoryGroupIds.Select(g => new RoleActiveDirectoryGroupEntity()
             {
@@ -56,7 +59,7 @@ namespace Iis.Services
             await SaveCorresponsingTabs(role);
             await _context.SaveChangesAsync();
             roleEntity = await GetRoleEntityByIdAsync(role.Id);
-            return ToRole(roleEntity);
+            return (ToRole(roleEntity), false);
         }
 
         private void PrepareRoleAccesses(AccessGrantedList accessGrantedItems)
@@ -91,7 +94,7 @@ namespace Iis.Services
             }
         }        
 
-        public async Task<Role> UpdateRoleAsync(Role role)
+        public async Task<(Role Role, bool AlreadyExists)> UpdateRoleAsync(Role role)
         {
             var updatedRoleEntity = _mapper.Map<RoleEntity>(role);
             var roleEntity = await _context.Roles
@@ -99,6 +102,15 @@ namespace Iis.Services
                 .Include(r => r.RoleAccessEntities)
                 .ThenInclude(ra => ra.AccessObject)
                 .SingleOrDefaultAsync(x => x.Id == role.Id);
+            if (roleEntity.Name != role.Name)
+            {
+                var roleWithNewNameAlreadyExists = await _context.Roles.AnyAsync(_ => _.Name == role.Name);
+
+                if (roleWithNewNameAlreadyExists)
+                {
+                    return (ToRole(roleEntity), true);
+                }
+            }
             
             _context.Entry(roleEntity).CurrentValues.SetValues(updatedRoleEntity);
             UpdateActiveDirectoryGroups(roleEntity, role.ActiveDirectoryGroupIds);
@@ -111,7 +123,7 @@ namespace Iis.Services
             await _context.SaveChangesAsync();
 
             roleEntity = await GetRoleEntityByIdAsync(role.Id);
-            return ToRole(roleEntity);
+            return (ToRole(roleEntity), false);
         }
 
         private void UpdateRoleAccesses(RoleEntity entity, 
@@ -252,9 +264,9 @@ namespace Iis.Services
             }
         }
 
-        private async Task<RoleEntity> GetRoleEntityByIdAsync(Guid id)
+        private Task<RoleEntity> GetRoleEntityByIdAsync(Guid id)
         {
-            return await _context.Roles
+            return _context.Roles
                             .AsNoTracking()
                             .Include(r => r.RoleGroups)
                             .Include(r => r.RoleAccessEntities)

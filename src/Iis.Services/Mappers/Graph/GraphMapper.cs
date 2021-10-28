@@ -127,9 +127,11 @@ namespace Iis.Services.Mappers.Graph
 
         private static bool DoesMaterialHaveLinks(Material material, Guid nodeId)
         {
-            if(material is null) return false;
+            if (material is null) return false;
 
-            if(material.ObjectsOfStudy is null || !material.ObjectsOfStudy.HasValues) return false;
+            if (HasMaterialGraphFeatures(material)) return true;
+
+            if (material.ObjectsOfStudy is null || !material.ObjectsOfStudy.HasValues) return false;
 
             var nodeIdList = material.ObjectsOfStudy.Properties()
                                 .Select(p => p.Name)
@@ -140,6 +142,9 @@ namespace Iis.Services.Mappers.Graph
 
             return nodeIdList.Any();
         }
+
+        private static bool HasMaterialGraphFeatures(Material material) => material.Infos
+                .Any(m => m.Features.Any(f => f.Node != null && IsEligibleForGraphByNodeType(f.Node.OriginalNode)));
 
         private static string GetGraphNodeNameProperty(INode node) => node switch
         {

@@ -17,7 +17,6 @@ namespace IIS.Services.Contracts.Interfaces
 {
     public interface IMaterialProvider
     {
-        Task<Material> GetMaterialAsync(Guid id, User user);
         Task<Material[]> GetMaterialsByIdsAsync(ISet<Guid> ids, User user);
         Task<MaterialsDto> GetMaterialsAsync(Guid userId,
             string filterQuery,
@@ -29,7 +28,6 @@ namespace IIS.Services.Contracts.Interfaces
         Task<IEnumerable<MaterialEntity>> GetMaterialEntitiesAsync();
         IReadOnlyCollection<MaterialSignEntity> GetMaterialSigns(string typeName);
         MaterialSign GetMaterialSign(string signValue);
-        MaterialSign GetMaterialSign(Guid id);
         Task<List<MLResponse>> GetMLProcessingResultsAsync(Guid materialId);
         Task<MaterialsDto> GetMaterialsByImageAsync(Guid userId, PaginationParams page, string fileName, byte[] content);
         Task<(IEnumerable<Material> Materials, int Count)> GetMaterialsByNodeId(Guid nodeId);
@@ -48,6 +46,7 @@ namespace IIS.Services.Contracts.Interfaces
         Task<bool> MaterialExists(Guid value);
         Task<IReadOnlyCollection<Guid>> GetMaterialsIdsAsync(int limit);
         Task<Material> GetMaterialAsync(Guid id);
+        Task<Material> GetMaterialAsync(Guid id, User user);
         Task<IReadOnlyCollection<LocationHistoryDto>> GetLocationHistoriesAsync(Guid materialId);
         Task<IReadOnlyList<MaterialDistributionItem>> GetMaterialsForDistribution(
             UserDistributionItem user,

@@ -32,7 +32,7 @@ namespace AcceptanceTests.UISteps
         public void INavigatedToReportSection()
         {
             navigationSection.ReportsLink.Click();
-            driver.WaitFor(2);
+            driver.WaitFor(4);
         }
 
         [When(@"I pressed the Create a new report button")]

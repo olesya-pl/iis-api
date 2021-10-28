@@ -94,7 +94,7 @@ namespace AcceptanceTests.UISteps
         public void WhenIClickedOnTheFirstSearchResultTitle()
         {
             objectsOfStudyPage.FirstSearchResultRow.Click();
-            driver.WaitFor(0.5);
+            driver.WaitFor(1);
         }
 
         [When(@"I clicked on the Edit button in the Objects of study section")]
@@ -571,6 +571,21 @@ namespace AcceptanceTests.UISteps
             var actualsignValue = objectsOfStudyPage.FirstSearchResultSignValue.Text;
             Assert.Equal(expectedSignValue, actualsignValue);
         }
+
+        [Then(@"I must see graph")]
+        public void ThenIMustSeeGraph()
+        {
+            Assert.True(objectsOfStudyPage.Graph.Displayed);
+        }
+
+        [Then(@"I must see military ranks (.*) by objects of study in result")]
+        public void IMustSeeMilitaryRanksByObjectOfStudyInTheSearchResults(string objectOfStudyMilitaryRank)
+        {
+            var actualMilitaryRank = objectsOfStudyPage.SearchMilitaryRank.Text;
+            Assert.Equal(objectOfStudyMilitaryRank, actualMilitaryRank);
+        }
+
+
 
         #endregion
     }

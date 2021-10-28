@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using AcceptanceTests.PageObjects;
@@ -26,10 +27,12 @@ namespace AcceptanceTests.PageObjects
         [CacheLookup]
         public IWebElement SearchField;
 
-        [FindsBy(How = How.XPath, Using = "//div[@class='summary-person-row text-ellipsis']/span[@class='title']")]
+        [FindsBy(How = How.XPath, Using = "//div[@class='text-ellipsis title']")]
+        //div[@class='object-summary']/span[@class='title'
+
         public IWebElement FirstSearchResultTitle;
 
-        [FindsBy(How = How.XPath, Using = "//div[@class='infinity-table objects-table']//tbody[@class='p-datatable-tbody']/tr[1]")]
+        [FindsBy(How = How.CssSelector, Using = ".objects-table .p-datatable-tbody tr:nth-child(1)")] 
         public IWebElement FirstSearchResultRow;
 
         [FindsBy(How = How.XPath, Using = "//div[@class='icon-wrapper icon-wrapper-edit']")]
@@ -208,6 +211,9 @@ namespace AcceptanceTests.PageObjects
         [FindsBy(How = How.XPath, Using = "//span[@class='multiselect__tag-label']")]
         public IWebElement TagInTheSearchField;
 
+        [FindsBy(How = How.CssSelector, Using = ".graph-filter .graph-filter__body")]
+        public IWebElement Graph;
+
         public ObjectsSearch GetObjectByTitle(string title)
         {
             return new ObjectsSearch(driver, title);
@@ -232,6 +238,9 @@ namespace AcceptanceTests.PageObjects
             var elementToClick = driver.FindElement(By.XPath($"//div[contains(text(),'{relationshipLinkTitle}')]"));
             elementToClick.Click();
         }
+
+        [FindsBy(How = How.CssSelector, Using = ".objects-table .p-datatable-tbody .object-summary .highlight")]
+        public IWebElement SearchMilitaryRank;
 
     }
 }

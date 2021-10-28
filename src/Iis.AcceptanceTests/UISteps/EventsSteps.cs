@@ -136,7 +136,7 @@ namespace AcceptanceTests.UISteps
         {
             var materialInput = eventPage.BindedMaterialsField.FindElement(By.TagName("input"));
             materialInput.SendKeys(materialName);
-            driver.WaitFor(2);
+            driver.WaitFor(4);
             materialInput.SendKeys(Keys.Down);
             materialInput.SendKeys(Keys.Enter);
         }

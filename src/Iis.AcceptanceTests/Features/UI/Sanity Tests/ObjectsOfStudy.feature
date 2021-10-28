@@ -4,6 +4,7 @@ Feature: ObjectsOfStudySection - sanity
     - IIS-6211 - Search results must contain a specific result
     - IIS-6370 - View and interact with data in profile in the objects section
     - IIS-5885 - Create a military organization
+    - IIS-6373 - Display connection in the relations tab in the Objects section
 
     Background:
         Given I sign in with the user olya and password 123 in the Contour
@@ -70,7 +71,24 @@ Feature: ObjectsOfStudySection - sanity
         When I clicked on the confirm save button to create a new object of study
         Then I must see the 29-я окрема бригада РХБ захисту імені Героя Радянського Союзу генерал-полковника В. К. Пікалова, в/ч 34081 predefined title of the newely created object of study
 
+    @sanity @UI @ObjectOfStudySectionUI
+    Scenario: IIS-6373 - Display connection in the relations tab in the Objects section
+        When I clicked on first object of study
+        And I clicked on enlarge small card button
+        Then I must see these tabs in the big object of study card
 
+            | BigCardProfileTab       |
+            | BigCardMaterialsTab     |
+            | BigCardEventsTab        |
+            | BigCardChangeHistoryTab |
+            | BigCardRelationsTab     |
+
+        Then I must see the specific text blocks in big object of study card
+
+            | BigCardAffiliation |
+            | BigCardImportance  |
+        When I clicked on the relations tab
+        Then I must see graph
 
 
 

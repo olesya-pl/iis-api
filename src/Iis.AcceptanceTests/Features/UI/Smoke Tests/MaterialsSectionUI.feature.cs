@@ -310,32 +310,32 @@ namespace AcceptanceTests.Features.UI.SmokeTests
 #line 12
     this.FeatureBackground();
 #line hidden
-                TechTalk.SpecFlow.Table table9 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table11 = new TechTalk.SpecFlow.Table(new string[] {
                             "Field",
                             "Value"});
-                table9.AddRow(new string[] {
+                table11.AddRow(new string[] {
                             "FileName",
                             "тестовий матеріал"});
-                table9.AddRow(new string[] {
+                table11.AddRow(new string[] {
                             "SourceReliabilityText",
                             "Здебільшого надійне"});
-                table9.AddRow(new string[] {
+                table11.AddRow(new string[] {
                             "ReliabilityText",
                             "Достовірна"});
-                table9.AddRow(new string[] {
+                table11.AddRow(new string[] {
                             "Content",
                             "Просто контент"});
-                table9.AddRow(new string[] {
+                table11.AddRow(new string[] {
                             "AccessLevel",
                             "0"});
-                table9.AddRow(new string[] {
+                table11.AddRow(new string[] {
                             "LoadedBy",
                             "автотест"});
-                table9.AddRow(new string[] {
+                table11.AddRow(new string[] {
                             "MetaData",
                             "{\"type\":\"document\",\"source\":\"contour.doc\"}"});
 #line 44
-    testRunner.Given("I upload a new docx material via API", ((string)(null)), table9, "Given ");
+    testRunner.Given("I upload a new docx material via API", ((string)(null)), table11, "Given ");
 #line hidden
 #line 53
         testRunner.When("I navigated to Materials page", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
@@ -470,32 +470,32 @@ namespace AcceptanceTests.Features.UI.SmokeTests
 #line 12
     this.FeatureBackground();
 #line hidden
-                TechTalk.SpecFlow.Table table10 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table12 = new TechTalk.SpecFlow.Table(new string[] {
                             "Field",
                             "Value"});
-                table10.AddRow(new string[] {
+                table12.AddRow(new string[] {
                             "FileName",
                             "тестовий матеріал"});
-                table10.AddRow(new string[] {
+                table12.AddRow(new string[] {
                             "SourceReliabilityText",
                             "Здебільшого надійне"});
-                table10.AddRow(new string[] {
+                table12.AddRow(new string[] {
                             "ReliabilityText",
                             "Достовірна"});
-                table10.AddRow(new string[] {
+                table12.AddRow(new string[] {
                             "Content",
                             "таємний контент"});
-                table10.AddRow(new string[] {
+                table12.AddRow(new string[] {
                             "AccessLevel",
                             "0"});
-                table10.AddRow(new string[] {
+                table12.AddRow(new string[] {
                             "LoadedBy",
                             "автотест"});
-                table10.AddRow(new string[] {
+                table12.AddRow(new string[] {
                             "MetaData",
                             "{\"type\":\"document\",\"source\":\"contour.doc\"}"});
 #line 75
-      testRunner.Given("I upload a new docx material via API", ((string)(null)), table10, "Given ");
+      testRunner.Given("I upload a new docx material via API", ((string)(null)), table12, "Given ");
 #line hidden
 #line 84
         testRunner.When("I navigated to Materials page", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
@@ -506,18 +506,18 @@ namespace AcceptanceTests.Features.UI.SmokeTests
 #line 86
         testRunner.And("I clicked on the first material in the Materials list", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-                TechTalk.SpecFlow.Table table11 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table13 = new TechTalk.SpecFlow.Table(new string[] {
                             "ImportanceDropDown"});
-                table11.AddRow(new string[] {
+                table13.AddRow(new string[] {
                             "RelevanceDropDown"});
-                table11.AddRow(new string[] {
+                table13.AddRow(new string[] {
                             "СompletenessOfInformation"});
-                table11.AddRow(new string[] {
+                table13.AddRow(new string[] {
                             "SourceCredibility"});
-                table11.AddRow(new string[] {
+                table13.AddRow(new string[] {
                             "Originator"});
 #line 87
-        testRunner.Then("I must see these elements", ((string)(null)), table11, "Then ");
+        testRunner.Then("I must see these elements", ((string)(null)), table13, "Then ");
 #line hidden
 #line 95
         testRunner.Then("I must I must see at least one user in the originator drop down menu", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");

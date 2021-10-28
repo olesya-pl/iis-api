@@ -1,12 +1,12 @@
 Feature: ReportSection - sanity
 
-    - IIS-6408 - Create and view report
+    - IIS-6345 - Create and view report
 
     Background:
         Given I sign in with the user olya and password 123 in the Contour
 
     @sanity @UI @ReportSectionSanityUI
-    Scenario: IIS-6408 - Create and view report
+    Scenario: IIS-6345 - Create and view report
         When I navigated to Report section
         And I pressed the Create a new report button
         And I entered the Тестова тема as report title

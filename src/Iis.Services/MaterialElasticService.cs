@@ -185,6 +185,17 @@ namespace Iis.Services
             return elasticResult.ToSearchResult();
         }
 
+        public async Task<MaterialDocument> GetMaterialById(Guid userId, Guid materialId)
+        {
+            var result = await _elasticManager
+                .WithUserId(userId)
+                .GetDocumentByIdAsync(_elasticState.MaterialIndexes, materialId.ToString("N"));
+            
+            if (!result.Items.Any()) return null;
+
+            return MaterialDocument.FromJObject(result.Items.First().SearchResult);
+        }
+
         public async Task<SearchResult> SearchMaterialsAsync(Guid userId,
             SearchParams searchParams,
             IEnumerable<Guid> materialList,
@@ -614,6 +625,6 @@ namespace Iis.Services
             materialDocument.ObjectsOfStudyCount = materialDocument.RelatedObjectCollection.Count(e => e.RelationType == NoneLinkTypeValue);
 
             return materialDocument;
-        }
+        }        
     }
 }

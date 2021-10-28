@@ -46,7 +46,7 @@ namespace Iis.UnitTests.Materials
             unitOfWorkFactoryMock.Setup(x => x.Create()).Returns(unitOfWorkMock.Object);
             unitOfWorkMock.Setup(x => x.MaterialRepository).Returns(materialRepositoryMock.Object);
             materialProvider = new MaterialProvider<IIISUnitOfWork>(new Mock<IOntologyService>().Object,
-                new Mock<IOntologySchema>().Object,
+                
                 new Mock<IOntologyNodesData>().Object,
                 new Mock<IMaterialElasticService>().Object,
                 new Mock<IMLResponseRepository>().Object,
@@ -54,7 +54,11 @@ namespace Iis.UnitTests.Materials
                 new Mock<IMapper>().Object,
                 unitOfWorkFactoryMock.Object,
                 new Mock<IImageVectorizer>().Object,
-                new NodeToJObjectMapper());
+                new MaterialDocumentMapper(
+                    new Mock<IMapper>().Object,
+                    new Mock<IOntologySchema>().Object,
+                    new Mock<IOntologyService>().Object,
+                    new NodeToJObjectMapper()));
         }
         public void Dispose()
         {
