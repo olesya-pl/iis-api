@@ -12,7 +12,7 @@ Background:
 Scenario: IIS-6109 - Indicate a phone number pattern of a cell voice material
 	When I navigated to Materials page
 	And I clicked search button in the Materials section
-	And I searched таємний data in the materials
+	And I searched Voice_158 data in the materials
 	And I clicked on the first search result in the Materials section
 	When I clicked on the pattern tab
 	Then I must see that phone number pattern is equal to value
