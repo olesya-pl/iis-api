@@ -63,7 +63,7 @@ namespace Iis.RabbitMq.Channels
 
         private IModel ConfigureTopology(IModel model, ChannelConfig config)
         {
-            if(config is null) return model;
+            if(string.IsNullOrWhiteSpace(config?.ExchangeName)) return model;
 
             model.ExchangeDeclare(config.ExchangeName, config.ExchangeType ?? ExchangeType.Topic);
 
