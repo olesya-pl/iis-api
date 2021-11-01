@@ -29,17 +29,20 @@ namespace IIS.Core.Ontology.EntityFramework
         private readonly IElasticConfiguration _elasticConfiguration;
         private readonly INodeSaveService _nodeRepository;
         private readonly IElasticState _elasticState;
+        private readonly IGroupedAggregationNameGenerator _groupedAggregationNameGenerator;
 
         public ElasticService(
             IElasticManager elasticManager,
             IElasticConfiguration elasticConfiguration,
             INodeSaveService nodeRepository,
-            IElasticState elasticState)
+            IElasticState elasticState,
+            IGroupedAggregationNameGenerator groupedAggregationNameGenerator)
         {
             _elasticManager = elasticManager;
             _elasticConfiguration = elasticConfiguration;
             _nodeRepository = nodeRepository;
             _elasticState = elasticState;
+            _groupedAggregationNameGenerator = groupedAggregationNameGenerator;
         }
 
         public Task<int> CountByAllFieldsAsync(IEnumerable<string> typeNames, ElasticFilter filter, CancellationToken ct = default)
@@ -254,7 +257,7 @@ namespace IIS.Core.Ontology.EntityFramework
             return (query, context);
         }
 
-        private JObject PrepareMultiSearchQuery(IMultiElasticSearchParams multiSearchParams)
+        private JObject PrepareMultiSearchQuery(IElasticMultiSearchParams multiSearchParams)
         {
             return new MultiSearchParamsQueryBuilder(multiSearchParams.SearchParams)
                 .WithLeniency(multiSearchParams.IsLenient)
@@ -290,7 +293,7 @@ namespace IIS.Core.Ontology.EntityFramework
                 .GetOntologyIncludedFields(typeNames.Where(p => _elasticState.ObjectIndexes.Contains(p)))
                 .ToList();
             var baseParameterQuery = filter.ToQueryString();
-            var multiSearchParams = new MultiElasticSearchParams
+            var multiSearchParams = new ElasticMultiSearchParams
             {
                 BaseIndexNames = typeNames.ToList(),
                 From = filter.Offset,
@@ -314,7 +317,7 @@ namespace IIS.Core.Ontology.EntityFramework
             return MultiSearchQueryContext.CreateFrom(multiSearchParams, filter, historySearchResult);
         }
 
-        private void PopulateHistorySearchParams(IMultiElasticSearchParams multiSearchParams, IElasticSearchResult historySearchResult)
+        private void PopulateHistorySearchParams(IElasticMultiSearchParams multiSearchParams, IElasticSearchResult historySearchResult)
         {
             if (historySearchResult.Count == 0) return;
 
@@ -438,9 +441,9 @@ namespace IIS.Core.Ontology.EntityFramework
             var multiSearchAggregationQuery = aggregatesContext.IsBaseQueryMatchAll
                 ? new MatchAllQueryBuilder()
                     .WithPagination(filter.Offset, filter.Limit)
-                    .WithResultFields(aggregatesContext.MultiElasticSearchParams.ResultFields)
+                    .WithResultFields(aggregatesContext.ElasticMultiSearchParams.ResultFields)
                     .BuildSearchQuery()
-                : PrepareMultiSearchQuery(aggregatesContext.MultiElasticSearchParams);
+                : PrepareMultiSearchQuery(aggregatesContext.ElasticMultiSearchParams);
             var batchQueries = GetBatchAggregateQueries(aggregationFields, multiSearchAggregationQuery, filter, context).ToArray();
 
             _elasticManager.WithUserId(userId);
@@ -468,7 +471,7 @@ namespace IIS.Core.Ontology.EntityFramework
                        .Take(MaxAggregationsCount);
 
                 yield return multiSearchAggregationQuery
-                    .WithAggregation(fieldsToAggregate, filter, context.SearchContext)
+                    .WithAggregation(fieldsToAggregate, filter, _groupedAggregationNameGenerator, context.SearchContext)
                     .ToString();
             }
         }
@@ -491,11 +494,11 @@ namespace IIS.Core.Ontology.EntityFramework
             public IElasticSearchResult HistoricalResult { get; private set; }
             public Dictionary<string, JToken> HighlightsById { get; private set; }
             public ISearchParamsContext SearchContext { get; private set; }
-            public IMultiElasticSearchParams MultiSearchParams => SearchContext.MultiElasticSearchParams;
+            public IElasticMultiSearchParams MultiSearchParams => SearchContext.ElasticMultiSearchParams;
             public bool HasHistoricalResult => HistoricalResult != null && HistoricalResult.Count > 0;
 
             public static MultiSearchQueryContext CreateFrom(
-                IMultiElasticSearchParams multiElasticSearchParams,
+                IElasticMultiSearchParams elasticMultiSearchParams,
                 ElasticFilter filter,
                 IElasticSearchResult historicalResult = default)
             {
@@ -509,7 +512,7 @@ namespace IIS.Core.Ontology.EntityFramework
                 {
                     HistoricalResult = historicalResult,
                     HighlightsById = highlightsById,
-                    SearchContext = SearchParamsContext.CreateFrom(multiElasticSearchParams, aggregateHistoryResultIds)
+                    SearchContext = SearchParamsContext.CreateFrom(elasticMultiSearchParams, aggregateHistoryResultIds)
                 };
             }
 

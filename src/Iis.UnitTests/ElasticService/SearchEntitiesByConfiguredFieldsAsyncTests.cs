@@ -34,6 +34,7 @@ namespace Iis.UnitTests.Iis.Elastic.Tests
             resultMock.Setup(e => e.Aggregations).Returns(new Dictionary<string, AggregationItem>());
             resultMock.Setup(e => e.Count).Returns(0);
             resultMock.Setup(e => e.Items).Returns(Array.Empty<ElasticSearchResultItem>());
+            var aggregationNameGeneratorMock = new Mock<IGroupedAggregationNameGenerator>();
 
             elasticServiceMock
                 .Setup(e => e.SearchAsync(It.IsAny<string>(), It.IsAny<IEnumerable<string>>(), It.IsAny<CancellationToken>()))
@@ -47,7 +48,8 @@ namespace Iis.UnitTests.Iis.Elastic.Tests
                 elasticServiceMock.Object,
                 elasticConfigurationMock.Object,
                 nodeRepositoryMock.Object,
-                new ElasticState(ontologySchemaMock.Object));
+                new ElasticState(ontologySchemaMock.Object),
+                aggregationNameGeneratorMock.Object);
 
             var res = await sut.SearchEntitiesByConfiguredFieldsAsync(new[] { indexName }, new ElasticFilter
             {
