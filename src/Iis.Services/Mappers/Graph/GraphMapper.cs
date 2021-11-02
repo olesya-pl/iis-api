@@ -59,7 +59,7 @@ namespace Iis.Services.Mappers.Graph
 
             var extraObject = new JObject();
 
-            extraObject.Add(GraphTypeExtraPropNames.Type, GetGraphLinkTypePropertyForMaterialFeatureNodeType(node.NodeType));
+            extraObject.Add(GraphTypeExtraPropNames.Type, GetTypePropertyForRelatedFromMaterialNode(node));
             extraObject.Add(GraphTypeExtraPropNames.Name, node.NodeType.Title);
 
             return new GraphLink
@@ -193,10 +193,10 @@ namespace Iis.Services.Mappers.Graph
             _ => relation.Node.NodeType.Title
         };
 
-        private static string GetGraphLinkTypePropertyForMaterialFeatureNodeType(INodeTypeLinked nodeType) => nodeType switch
+        private static string GetTypePropertyForRelatedFromMaterialNode(INode node) => node.NodeType switch
         {
             { IsObjectSign: true } => GraphNodeNodeTypeNames.Sign,
-            _ => $"related{nodeType.Name}"
+            _ => $"related{node.NodeType.Name}"
         };
     }
 }
