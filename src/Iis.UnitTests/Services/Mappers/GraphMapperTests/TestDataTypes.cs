@@ -9,7 +9,6 @@ namespace Iis.UnitTests.Services.Mappers.GraphMapperTests
 {
     public class CustomNode : NodeData
     {
-
         public static NodeData Create(string typeName, string typeTitle)
         {
             var resultNode = new CustomNode();
