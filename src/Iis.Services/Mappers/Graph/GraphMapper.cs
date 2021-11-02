@@ -5,6 +5,7 @@ using Newtonsoft.Json.Linq;
 using Iis.Domain.Graph;
 using Iis.Domain.Materials;
 using Iis.Interfaces.Ontology.Data;
+using Iis.Interfaces.Ontology.Schema;
 using Iis.Utility;
 
 namespace Iis.Services.Mappers.Graph
@@ -34,7 +35,7 @@ namespace Iis.Services.Mappers.Graph
             };
         }
 
-        public static GraphLink MapMaterialToGraphLink(Material material, Guid fromNodeId)
+        public static GraphLink MapRelatedMaterialGraphLink(Material material, Guid fromNodeId)
         {
             if (material is null) return null;
 
@@ -52,13 +53,13 @@ namespace Iis.Services.Mappers.Graph
             };
         }
 
-        public static GraphLink MapMaterialToNodeGraphLink(Material material, INode node)
+        public static GraphLink MapRelatedFromMaterialNodeGraphLink(Material material, INode node)
         {
-            if (material is null) return null;
+            if (material is null || node is null) return null;
 
             var extraObject = new JObject();
 
-            extraObject.Add(GraphTypeExtraPropNames.Type, node.NodeType.Name);
+            extraObject.Add(GraphTypeExtraPropNames.Type, GetGraphLinkTypePropertyForMaterialFeatureNodeType(node.NodeType));
             extraObject.Add(GraphTypeExtraPropNames.Name, node.NodeType.Title);
 
             return new GraphLink
@@ -93,7 +94,7 @@ namespace Iis.Services.Mappers.Graph
 
         public static GraphNode MapMaterialToGraphNode(Material material, bool? hasLinks = null, Guid fromNodeId = default)
         {
-            if(material is null) return null;
+            if (material is null) return null;
 
             var extraObject = new JObject();
 
@@ -119,7 +120,7 @@ namespace Iis.Services.Mappers.Graph
 
         private static bool DoesNodeHaveLinks(INode node, IReadOnlyCollection<Guid> exclusionNodeIdList)
         {
-            if(node is null) return false;
+            if (node is null) return false;
 
             return node.IncomingRelations.Any(e => IsEligibleForGraphByNodeType(e.SourceNode) && !exclusionNodeIdList.Contains(e.SourceNodeId))
                 || node.OutgoingRelations.Any(e => IsEligibleForGraphByNodeType(e.TargetNode) && !exclusionNodeIdList.Contains(e.TargetNodeId));
@@ -129,7 +130,7 @@ namespace Iis.Services.Mappers.Graph
         {
             if (material is null) return false;
 
-            if (HasMaterialGraphFeatures(material)) return true;
+            if (DoesMaterialHaveGraphFeatures(material)) return true;
 
             if (material.ObjectsOfStudy is null || !material.ObjectsOfStudy.HasValues) return false;
 
@@ -143,8 +144,8 @@ namespace Iis.Services.Mappers.Graph
             return nodeIdList.Any();
         }
 
-        private static bool HasMaterialGraphFeatures(Material material) => material.Infos
-                .Any(m => m.Features.Any(f => f.Node != null && IsEligibleForGraphByNodeType(f.Node.OriginalNode)));
+        private static bool DoesMaterialHaveGraphFeatures(Material material) => material.Infos
+                .SelectMany(m => m.Features).Any(f => f.Node != null && IsEligibleForGraphByNodeType(f.Node.OriginalNode));
 
         private static string GetGraphNodeNameProperty(INode node) => node switch
         {
@@ -190,6 +191,12 @@ namespace Iis.Services.Mappers.Graph
         {
             { TargetNode: { NodeType: { IsObjectSign: true } } } => relation.TargetNode.NodeType.Title,
             _ => relation.Node.NodeType.Title
+        };
+
+        private static string GetGraphLinkTypePropertyForMaterialFeatureNodeType(INodeTypeLinked nodeType) => nodeType switch
+        {
+            { IsObjectSign: true } => GraphNodeNodeTypeNames.Sign,
+            _ => $"related{nodeType.Name}"
         };
     }
 }

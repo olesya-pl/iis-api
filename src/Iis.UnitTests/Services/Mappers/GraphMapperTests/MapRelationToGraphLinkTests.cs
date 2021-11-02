@@ -13,6 +13,10 @@ namespace Iis.UnitTests.Services.Mappers.GraphMapperTests
 {
     public class MapRelationToGraphLinkTests
     {
+        private const string SignPropertyName = "sign";
+        private const string SignPropertyTitle = "Ознаки";
+        private const string SatellitePhonePropertyTitle = "Супутниковий телефон";
+
         [Fact]
         public void Should_ReturnNull_WhenRelationIsNull()
         {
@@ -27,9 +31,10 @@ namespace Iis.UnitTests.Services.Mappers.GraphMapperTests
         [RecursiveAutoData]
         public void Should_MapToGraphLink_WhenTargetNodeIsObjectSign(RelationData relation)
         {
-            relation._targetNode = CustomNode.Create(EntityTypeNames.ObjectSign);
-            relation._node = CustomNode.Create(EntityTypeNames.ObjectSign);
-            var expected = CreateGraphLink(relation, _ => _.TargetNode.NodeType.Title);
+            relation._targetNode = CustomNode.Create(EntityTypeNames.ObjectSign, SatellitePhonePropertyTitle);
+            relation._node = CustomNode.Create(SignPropertyName, SignPropertyTitle);
+
+            var expected = CreateGraphLink(relation, SatellitePhonePropertyTitle);
 
             var result = GraphTypeMapper.MapRelationToGraphLink(relation);
 
@@ -47,21 +52,23 @@ namespace Iis.UnitTests.Services.Mappers.GraphMapperTests
         [InlineAutoData(EntityTypeNames.Wiki)]
         public void Should_MapToGraphLink_WhenTargetNodeIsNotObjectSign(EntityTypeNames typeName, RelationData relation)
         {
+            var nodeTypeTitle = $"linked{typeName}";
             relation._targetNode = CustomNode.Create(typeName);
-            relation._node = CustomNode.Create(typeName);
-            var expected = CreateGraphLink(relation, _ => _.Node.NodeType.Title);
+            relation._node = CustomNode.Create(typeName, nodeTypeTitle);
+
+            var expected = CreateGraphLink(relation, nodeTypeTitle);
 
             var result = GraphTypeMapper.MapRelationToGraphLink(relation);
 
             result.Should().BeEquivalentTo(expected);
         }
 
-        private static GraphLink CreateGraphLink(IRelation relation, Func<IRelation, string> nameFunc)
+        private static GraphLink CreateGraphLink(IRelation relation, string linkName)
         {
             var extra = new JObject();
 
             extra.Add(GraphTypeExtraPropNames.Type, relation.RelationTypeName);
-            extra.Add(GraphTypeExtraPropNames.Name, nameFunc(relation));
+            extra.Add(GraphTypeExtraPropNames.Name, linkName);
 
             return new GraphLink
             {

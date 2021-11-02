@@ -9,12 +9,27 @@ namespace Iis.UnitTests.Services.Mappers.GraphMapperTests
 {
     public class CustomNode : NodeData
     {
+
+        public static NodeData Create(string typeName, string typeTitle)
+        {
+            var resultNode = new CustomNode();
+
+            resultNode.NodeType = new SchemaNodeType
+            {
+                Name = typeName,
+                Title = typeTitle
+            };
+
+            return resultNode;
+        }
+        public static NodeData Create(EntityTypeNames typeName, string typeTitle)
+        {
+            return Create(typeName.ToString(), typeTitle);
+        }
+
         public static NodeData Create(EntityTypeNames typeName)
         {
-            var node = new CustomNode();
-            node.NodeType = new SchemaNodeType() { Name = typeName.ToString() };
-
-            return node;
+            return Create(typeName.ToString(), null);
         }
     }
 
