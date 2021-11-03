@@ -6,12 +6,13 @@ namespace Iis.Elastic.ElasticMappingProperties
     {
         private IntegerProperty() { }
 
+        public override ElasticMappingPropertyType Type => ElasticMappingPropertyType.Integer;
+
         public static ElasticMappingProperty Create(string propertyName)
         {
             return CreateWithNestedProperty(propertyName, (propName) => new IntegerProperty { Name = propName }, (propName) => Create(propName));
         }
 
-        public override ElasticMappingPropertyType Type => ElasticMappingPropertyType.Integer;
         protected override void PopulatePropertyIntoJObject(JObject result) { }
     }
 }

@@ -71,7 +71,7 @@ namespace Iis.UnitTests.Iis.DbLayer.Repositories.Helpers
         {
             var actualContent = "{ 'time': 300, 'result': [ { 'location': [ [ 165, 65 ], [ 208, 108 ] ], 'encoding': [ -0.08116906136274338, -0.027682635933160782, 0.06678098440170288 ] }, { 'location': [ [ 233, 61 ], [ 285, 113 ] ], 'encoding': [ -0.014624187722802162, 0.0325000174343586, 0.04493800178170204 ] } ] }";
 
-            var expected = new decimal[]{-0.08116906136274338M,-0.027682635933160782M,0.06678098440170288M};
+            var expected = new decimal[] { -0.08116906136274338M, -0.027682635933160782M, 0.06678098440170288M };
 
             FaceAPIResponseParser.GetFaceVector(actualContent)
                 .Should()

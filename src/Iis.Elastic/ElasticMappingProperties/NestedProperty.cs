@@ -5,9 +5,9 @@ namespace Iis.Elastic.ElasticMappingProperties
 {
     public class NestedProperty : ElasticMappingProperty
     {
-        public override ElasticMappingPropertyType Type => ElasticMappingPropertyType.Nested;
-
         private NestedProperty() { }
+
+        public override ElasticMappingPropertyType Type => ElasticMappingPropertyType.Nested;
 
         public static ElasticMappingProperty Create(string name, List<ElasticMappingProperty> properties)
         {
@@ -22,7 +22,7 @@ namespace Iis.Elastic.ElasticMappingProperties
         {
             var result = new NestedProperty { Name = propertyName };
 
-            if(nestedProperty != null)
+            if (nestedProperty != null)
             {
                 result.Properties.Add(nestedProperty);
             }

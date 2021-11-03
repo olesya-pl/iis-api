@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Iis.DbLayer.Repositories;
 using Iis.Elastic.SearchQueryExtensions;
+
 namespace Iis.Elastic.ElasticMappingProperties
 {
     public static class ElasticMappingPropertyFactory

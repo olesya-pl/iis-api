@@ -1,6 +1,7 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using Iis.Elastic.Dictionaries;
 using Iis.Utility;
-using Iis.Elastic.Dictionaries;
+using Newtonsoft.Json.Linq;
+
 namespace Iis.Elastic.ElasticMappingProperties
 {
     public class TextProperty : ElasticMappingProperty
@@ -11,16 +12,16 @@ namespace Iis.Elastic.ElasticMappingProperties
         private TextTermVectorsEnum _termVector;
         private bool _useNestedKeyword;
 
-        public override ElasticMappingPropertyType Type => ElasticMappingPropertyType.Text;
         private TextProperty() { }
+
+        public override ElasticMappingPropertyType Type => ElasticMappingPropertyType.Text;
 
         public static ElasticMappingProperty Create(string propertyName, TextTermVectorsEnum termVector, bool useNestedKeyword = false)
         {
             return CreateWithNestedProperty(
                 propertyName,
-                (propName) => new TextProperty{ Name = propName, _termVector = termVector, _useNestedKeyword = useNestedKeyword},
-                (propName) => Create(propName, termVector, useNestedKeyword)
-            );
+                (propName) => new TextProperty { Name = propName, _termVector = termVector, _useNestedKeyword = useNestedKeyword },
+                (propName) => Create(propName, termVector, useNestedKeyword));
         }
 
         public static ElasticMappingProperty Create(string propertyName, bool useNestedKeyword = false)
@@ -35,14 +36,12 @@ namespace Iis.Elastic.ElasticMappingProperties
                 result[TermVectorPropName] = _termVector.ToString().ToUnderscore();
             }
 
-            if(_useNestedKeyword)
+            if (_useNestedKeyword)
             {
                 var field = new JObject(
                     new JProperty("keyword", new JObject(
-                        new JProperty("type","keyword"),
-                        new JProperty(IgnoreAbovePropName, IgnoreAbove)
-                    ))
-                );
+                        new JProperty("type", "keyword"),
+                        new JProperty(IgnoreAbovePropName, IgnoreAbove))));
                 result.Add("fields", field);
             }
         }

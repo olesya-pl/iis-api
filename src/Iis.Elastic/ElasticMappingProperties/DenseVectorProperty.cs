@@ -6,11 +6,11 @@ namespace Iis.Elastic.ElasticMappingProperties
     {
         private const string DimensionsPropName = "dims";
 
+        private DenseVectorProperty() { }
+
         public override ElasticMappingPropertyType Type => ElasticMappingPropertyType.DenseVector;
 
         public int Dimensions { get; private set; }
-
-        private DenseVectorProperty() { }
 
         public static ElasticMappingProperty Create(string propertyName, int dimensions)
         {
