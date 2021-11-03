@@ -7,6 +7,6 @@ namespace Iis.Services.Contracts.Configurations
     /// </summary>
     public class MaterialEventConfiguration
     {
-        public ChannelConfig TargetChannel {get;set;}
+        public ChannelConfig TargetChannel { get; set; }
     }
 }

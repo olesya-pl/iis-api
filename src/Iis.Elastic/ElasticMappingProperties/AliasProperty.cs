@@ -5,11 +5,12 @@ namespace Iis.Elastic.ElasticMappingProperties
     public class AliasProperty : ElasticMappingProperty
     {
         private const string PathPropertyName = "path";
+
+        private AliasProperty() { }
+
         public override ElasticMappingPropertyType Type => ElasticMappingPropertyType.Alias;
 
         public string Path { get; private set; }
-
-        private AliasProperty() { }
 
         public static ElasticMappingProperty Create(string name, string path)
         {
