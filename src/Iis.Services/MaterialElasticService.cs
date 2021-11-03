@@ -490,11 +490,7 @@ namespace Iis.Services
         public async Task PutMaterialsToElasticByNodeIdsAsync(IReadOnlyCollection<Guid> nodeIds, CancellationToken ct = default, bool waitForIndexing = false)
         {
             var materials = await RunWithoutCommitAsync(_ => _.MaterialRepository.GetMaterialCollectionByNodeIdAsync(nodeIds, MaterialIncludeEnum.WithChildren, MaterialIncludeEnum.WithFeatures, MaterialIncludeEnum.WithFiles));
-
-            foreach (var material in materials)
-            {
-                await PutMaterialToElasticSearchAsync(material, ct, waitForIndexing);
-            }
+            await Task.WhenAll(materials.Select(_ => PutMaterialToElasticSearchAsync(_, ct, waitForIndexing)));
         }
 
         private static ImageVector[] GetImageVectorList(IReadOnlyCollection<Guid> materialIdList, Dictionary<Guid, MLResponseEntity[]> responseDictionary)

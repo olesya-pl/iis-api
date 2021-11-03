@@ -90,8 +90,10 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
         private async Task PutChangedLinkedMaterialsToElastic(Guid id, IReadOnlyCollection<Guid> oldSignIds)
         {
             var newSignIds = _ontologyService.GetSignIds(id);
-            var diff = oldSignIds.Where(os => !newSignIds.Any(ns => ns == os)).ToList();
-            diff.AddRange(newSignIds.Where(ns => !oldSignIds.Any(os => os == ns)));
+            var diff = oldSignIds
+                .Where(os => !newSignIds.Any(ns => ns == os))
+                .Concat(newSignIds.Where(ns => !oldSignIds.Any(os => os == ns)))
+                .ToList();
 
             await _materialElasticService.PutMaterialsToElasticByNodeIdsAsync(diff);
         }
@@ -127,7 +129,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
             }
         }
 
-        public Task<Entity> UpdateEntity(INodeTypeLinked type, Guid id, Dictionary<string, object> properties)
+        public Task<Entity> UpdateEntityAsync(INodeTypeLinked type, Guid id, Dictionary<string, object> properties)
         {
             _rootNodeId = id;
             var requestId = Guid.NewGuid();

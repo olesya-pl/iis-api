@@ -58,7 +58,7 @@ namespace Iis.Services
             SetLastConfirmedAtIfExists(node);
             _ontologyService.SaveNode(node);
             await _mediator.Publish(new EntityCreatedEvent() { Type = type.Name, Id = node.Id });
-            await PutLinkedMaterialsToElastic(node.Id);
+            await PutLinkedMaterialsToElasticAsync(node.Id);
             return node;
         }
 
@@ -255,7 +255,7 @@ namespace Iis.Services
             throw new ArgumentException(nameof(embed));
         }
 
-        private async Task PutLinkedMaterialsToElastic(Guid nodeId)
+        private async Task PutLinkedMaterialsToElasticAsync(Guid nodeId)
         {
             var signIds = _ontologyService.GetSignIds(nodeId);
             await _materialElasticService.PutMaterialsToElasticByNodeIdsAsync(signIds);

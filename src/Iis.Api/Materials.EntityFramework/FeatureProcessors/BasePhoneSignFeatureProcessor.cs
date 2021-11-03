@@ -80,7 +80,7 @@ namespace IIS.Core.Materials.EntityFramework.FeatureProcessors
                     {
                         var properties = GetPropertiesFromFeature(updatesResult.updates);
 
-                        var entity = await _updateResolver.UpdateEntity(signType, searchResult.featureId.Value, properties);
+                        var entity = await _updateResolver.UpdateEntityAsync(signType, searchResult.featureId.Value, properties);
 
                         originalFeature[FeatureFields.featureId] = entity.Id.ToString();
 
@@ -90,7 +90,7 @@ namespace IIS.Core.Materials.EntityFramework.FeatureProcessors
                                 .Where(pair => !properties.ContainsKey(pair.Key))
                                 .ToDictionary(pair => pair.Key, pair => pair.Value);
 
-                            await _updateResolver.UpdateEntity(signType, entity.Id, propertiesToAdd);
+                            await _updateResolver.UpdateEntityAsync(signType, entity.Id, propertiesToAdd);
                         }
                     }
                 }
