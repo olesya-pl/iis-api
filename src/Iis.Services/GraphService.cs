@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using Iis.Domain.Graph;
 using Iis.Domain.Materials;
 using Iis.Interfaces.Ontology.Data;
+using Iis.Interfaces.Ontology.Comparers;
 using Iis.Services.Mappers.Graph;
 using Iis.Services.Contracts.Interfaces;
 using IIS.Services.Contracts.Interfaces;
@@ -104,7 +105,7 @@ namespace Iis.Services
             if(!materialList.Any()) return Array.Empty<GraphLink>();
 
             return materialList
-                .Select(e => GraphTypeMapper.MapMaterialToGraphLink(e, node.Id))
+                .Select(e => GraphTypeMapper.MapRelatedMaterialGraphLink(e, node.Id))
                 .ToArray();
         }
 
@@ -143,15 +144,16 @@ namespace Iis.Services
             var nodes = material.Infos
                 .SelectMany(m => m.Features)
                 .Where(f => f.Node != null && GraphTypeMapper.IsEligibleForGraphByNodeType(f.Node.OriginalNode))
-                .Select(f => f.Node.OriginalNode);
+                .Select(f => f.Node.OriginalNode)
+                .Distinct(NodeByIdComparer.Instance);
 
-            var exclusionNodeIdList = new Guid[] { };
+            var exclusionNodeIdList = Array.Empty<Guid>();
 
             graphData.AddNode(GraphTypeMapper.MapMaterialToGraphNode(material, false));
 
             foreach (var node in nodes)
             {
-                graphData.AddLink(GraphTypeMapper.MapMaterialToNodeGraphLink(material, node));
+                graphData.AddLink(GraphTypeMapper.MapRelatedFromMaterialNodeGraphLink(material, node));
                 graphData.AddNode(GraphTypeMapper.MapNodeToGraphNode(node, exclusionNodeIdList));
             }
 

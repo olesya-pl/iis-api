@@ -7,21 +7,16 @@ using Iis.Messages.Materials;
 using Iis.RabbitMq.Helpers;
 using Iis.RabbitMq.Channels;
 using Iis.Services.Contracts.Configurations;
-using Iis.RabbitMq.Helpers;
-using Iis.RabbitMq.Channels;
-using Iis.Services.Contracts.Configurations;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using RabbitMQ.Client;
-using RabbitMQ.Client.Events;
 
 namespace Iis.Api.Materials
 {
     public class MaterialConsumer : BackgroundService
     {
         private const int RetryIntervalSec = 5;
-        private const int PrefetchCount = 5;
         private readonly ILogger<MaterialConsumer> _logger;
         private IConnection _connection;
         private IConnectionFactory _connectionFactory;
@@ -78,14 +73,8 @@ namespace Iis.Api.Materials
             using (var scope = _serviceProvider.CreateScope())
             {
                 var eventProducer = scope.ServiceProvider.GetService<IMaterialEventProducer>();
+
                 ThemeCounterBackgroundService.SignalMaterialUpdateNeeded();
-
-                eventProducer.SaveMaterialToElastic(message.MaterialId);
-
-                if (!message.ParentId.HasValue)
-                {
-                    eventProducer.SendAvailableForOperatorEvent(message.MaterialId);
-                }
 
                 var materialEvent = new MaterialProcessingEventMessage
                 {
@@ -94,7 +83,12 @@ namespace Iis.Api.Materials
                     Type = message.Type
                 };
 
-                eventProducer.SendMaterialProcessingEvent(materialEvent);
+                eventProducer.SendMaterialToElastic(materialEvent);
+
+                if (!message.ParentId.HasValue)
+                {
+                    eventProducer.SendAvailableForOperatorEvent(message.MaterialId);
+                }
 
                 return Task.CompletedTask;
             }

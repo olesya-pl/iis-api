@@ -10,7 +10,8 @@ namespace Iis.MaterialLoader.Helpers.RegistrationDateResolvers
             {
                 Material.Sources.CellVoice => new CellVoiceRegistrationDateResolver(),
                 Material.Sources.SatVoice => new SatVoiceRegistrationDateResolver(),
-                Material.Sources.SatIridiumVoice => new SatIridiumVoiceRegistrationDateResolver(),
+                Material.Sources.SatIridiumVoice => new SatIridiumRegistrationDateResolver(),
+                Material.Sources.SatIridiumPaging => new SatIridiumRegistrationDateResolver(),
                 Material.Sources.HfVoice => new HfVoiceRegistrationDateResolver(),
                 _ => new DummyRegistrationDateResolver()
             };

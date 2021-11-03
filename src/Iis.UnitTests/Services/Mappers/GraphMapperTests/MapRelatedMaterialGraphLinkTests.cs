@@ -8,14 +8,14 @@ using Newtonsoft.Json.Linq;
 
 namespace Iis.UnitTests.Services.Mappers.GraphMapperTests
 {
-    public class MapMaterialToGraphLinkTests
+    public class MapRelatedMaterialGraphLinkTests
     {
         [Fact]
         public void Should_ReturnNull_WhenMaterialIsNull()
         {
             Material material = null;
 
-            var result = GraphTypeMapper.MapMaterialToGraphLink(material, Guid.NewGuid());
+            var result = GraphTypeMapper.MapRelatedMaterialGraphLink(material, Guid.NewGuid());
 
             result.Should().BeNull();
         }
@@ -26,11 +26,9 @@ namespace Iis.UnitTests.Services.Mappers.GraphMapperTests
         {
             var expected = CreateGraphLink(material, fromNodeId);
 
-            var result = GraphTypeMapper.MapMaterialToGraphLink(material, fromNodeId);
+            var result = GraphTypeMapper.MapRelatedMaterialGraphLink(material, fromNodeId);
 
-            result.From.Should().Be(expected.From);
-            result.To.Should().Be(expected.To);
-            result.Extra.Should().BeEquivalentTo(expected.Extra);
+            result.Should().BeEquivalentTo(expected, opt => opt.Excluding(_ => _.Id));
         }
 
         private static GraphLink CreateGraphLink(Material material, Guid fromNodeId)
