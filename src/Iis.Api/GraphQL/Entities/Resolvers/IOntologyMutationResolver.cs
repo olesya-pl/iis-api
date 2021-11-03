@@ -33,7 +33,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
 
         public Task<Entity> UpdateEntity(IResolverContext ctx, string typeName)
         {
-            return new MutationUpdateResolver(ctx).UpdateEntity(ctx, typeName);
+            return new MutationUpdateResolver(ctx).UpdateEntityAsync(ctx, typeName);
         }
 
         public Task<Entity> DeleteEntity(IResolverContext ctx, string typeName)

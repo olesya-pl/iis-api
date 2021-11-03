@@ -181,7 +181,7 @@ namespace Iis.Services
 
         public async Task<User> ValidateAndGetUserAsync(string username, string password, CancellationToken cancellationToken = default)
         {
-            var userSource = _externalUserService.GetUserSource();
+            var userSource = _externalUserService?.GetUserSource();
             if (userSource == UserSource.ActiveDirectory)
             {
                 await SynchronizeActiveDirectoryUserAsync(username, cancellationToken);
@@ -206,7 +206,7 @@ namespace Iis.Services
             }
 
             if (user.Source == UserSource.Internal && !ValidateCredentials(user, password) ||
-                user.Source == _externalUserService.GetUserSource() && !_externalUserService.ValidateCredentials(username, password))
+                user.Source == _externalUserService?.GetUserSource() && _externalUserService?.ValidateCredentials(username, password) == false)
             {
                 throw new InvalidCredentialException($"Wrong password");
             }
@@ -316,7 +316,7 @@ namespace Iis.Services
 
             await _userElasticService.SaveAllUsersAsync(elasticUsers, cancellationToken);
         }
-
+        
         public string GetPasswordHashAsBase64String(string password)
         {
             var salt = _configuration.GetValue("salt", string.Empty);
@@ -325,6 +325,8 @@ namespace Iis.Services
 
         public async Task<string> ImportUsersFromExternalSourceAsync(IEnumerable<string> userNames = null, CancellationToken cancellationToken = default)
         {
+            if (_externalUserService == null) return null;
+
             var externalUsers = _externalUserService.GetUsers()
                 .Where(eu => userNames == null || userNames.Contains(eu.UserName)
                     && !eu.UserName.Contains('$'));

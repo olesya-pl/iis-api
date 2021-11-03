@@ -35,5 +35,6 @@ namespace Iis.Domain
         Task<SearchEntitiesByConfiguredFieldsResult> SearchEventsAsync(ElasticFilter filter, User user);
         TreeResultList GetEventTypes(string suggestion);
         IReadOnlyCollection<ObjectFeatureRelation> GetObjectFeatureRelationCollection(IReadOnlyCollection<Guid> nodeIdCollection);
+        IReadOnlyCollection<Guid> GetSignIds(Guid nodeId);
     }
 }
