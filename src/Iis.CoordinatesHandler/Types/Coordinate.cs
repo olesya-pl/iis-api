@@ -5,11 +5,6 @@ namespace Iis.CoordinatesEventHandler.Types
 {
     public class Coordinate
     {
-        public DateTime RegisteredAt { get; } = DateTime.UtcNow;
-        public decimal Latitude { get; }
-        public decimal Longitude { get; }
-        public bool IsValid { get; }
-
         public Coordinate(string coordinates)
         {
             if (string.IsNullOrWhiteSpace(coordinates)) return;
@@ -21,8 +16,8 @@ namespace Iis.CoordinatesEventHandler.Types
 
             if (valueList.Length != 2) return;
 
-            var parseResult = Decimal.TryParse(valueList[0], out decimal latitude)
-                            & Decimal.TryParse(valueList[1], out decimal longitude);
+            var parseResult = decimal.TryParse(valueList[0], out decimal latitude)
+                            & decimal.TryParse(valueList[1], out decimal longitude);
 
             if (!parseResult) return;
 
@@ -30,5 +25,10 @@ namespace Iis.CoordinatesEventHandler.Types
             Latitude = latitude;
             Longitude = longitude;
         }
+
+        public DateTime RegisteredAt { get; } = DateTime.UtcNow;
+        public decimal Latitude { get; }
+        public decimal Longitude { get; }
+        public bool IsValid { get; }
     }
 }

@@ -1,8 +1,8 @@
+using Iis.CoordinatesEventHandler.Configurations;
+using Iis.CoordinatesEventHandler.Handlers;
+using Iis.CoordinatesEventHandler.Processors;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Iis.CoordinatesEventHandler.Handlers;
-using Iis.CoordinatesEventHandler.Configurations;
-using Iis.CoordinatesEventHandler.Processors;
 namespace Iis.CoordinatesEventHandler.DependencyInjection
 {
     public static class RegistrationModule

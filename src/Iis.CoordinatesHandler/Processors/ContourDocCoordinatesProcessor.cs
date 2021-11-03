@@ -1,11 +1,10 @@
 using System;
-using System.Linq;
-using System.Threading.Tasks;
 using System.Collections.Generic;
+using System.Threading.Tasks;
+using Iis.CoordinatesEventHandler.Types;
 using Iis.Domain.Materials;
 using Iis.Interfaces.Enums;
 using Iis.Services.Contracts.Dtos;
-using Iis.CoordinatesEventHandler.Types;
 
 namespace Iis.CoordinatesEventHandler.Processors
 {
@@ -26,7 +25,7 @@ namespace Iis.CoordinatesEventHandler.Processors
             {
                 var coordinate = new Coordinate(coordinates);
 
-                if(!coordinate.IsValid) continue;
+                if (!coordinate.IsValid) continue;
 
                 var dto = new LocationHistoryDto
                 {

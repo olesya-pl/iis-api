@@ -1,17 +1,17 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Iis.CoordinatesEventHandler.Configurations;
+using Iis.CoordinatesEventHandler.Processors;
+using Iis.Messages.Materials;
+using Iis.RabbitMq.Channels;
+using Iis.RabbitMq.Helpers;
+using Iis.Services.Contracts.Interfaces;
+using IIS.Services.Contracts.Interfaces;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.DependencyInjection;
 using RabbitMQ.Client;
-using IIS.Services.Contracts.Interfaces;
-using Iis.Services.Contracts.Interfaces;
-using Iis.RabbitMq.Helpers;
-using Iis.RabbitMq.Channels;
-using Iis.Messages.Materials;
-using Iis.CoordinatesEventHandler.Processors;
-using Iis.CoordinatesEventHandler.Configurations;
 
 namespace Iis.CoordinatesEventHandler.Handlers
 {
