@@ -39,6 +39,8 @@ Feature: EventsSection - sanity
         And I pressed the save event changes button
         And I pressed the confirm save changes in the event
         And I reloaded the event page
+        And I searched for the Тестова подія created event
+        When I pressed the review event button
         And I clicked on the Попов binded object of study in the event
         And I clicked on enlarge small card button
         When I navigated to the Events tab in the big object of study card
