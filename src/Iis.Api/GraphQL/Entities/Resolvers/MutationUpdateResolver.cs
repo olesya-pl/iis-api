@@ -64,7 +64,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
             _resolverContext = ctx;
         }
 
-        public async Task<Entity> UpdateEntity(IResolverContext ctx, string typeName)
+        public async Task<Entity> UpdateEntityAsync(IResolverContext ctx, string typeName)
         {
             var id = ctx.Argument<Guid>("id");
             var data = ctx.Argument<Dictionary<string, object>>("data");
@@ -80,18 +80,20 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
 
             var oldSignIds = _ontologyService.GetSignIds(id);
 
-            var result = await UpdateEntity(type, id, data, string.Empty, requestId);
+            var result = await UpdateEntityAsync(type, id, data, string.Empty, requestId);
 
-            await PutChangedLinkedMaterialsToElastic(id, oldSignIds);
+            await PutChangedLinkedMaterialsToElasticAsync(id, oldSignIds);
 
             return result;
         }
 
-        private async Task PutChangedLinkedMaterialsToElastic(Guid id, IReadOnlyCollection<Guid> oldSignIds)
+        private async Task PutChangedLinkedMaterialsToElasticAsync(Guid id, IReadOnlyCollection<Guid> oldSignIds)
         {
             var newSignIds = _ontologyService.GetSignIds(id);
-            var diff = oldSignIds.Where(os => !newSignIds.Any(ns => ns == os)).ToList();
-            diff.AddRange(newSignIds.Where(ns => !oldSignIds.Any(os => os == ns)));
+            var diff = oldSignIds
+                .Where(os => !newSignIds.Any(ns => ns == os))
+                .Concat(newSignIds.Where(ns => !oldSignIds.Any(os => os == ns)))
+                .ToList();
 
             await _materialElasticService.PutMaterialsToElasticByNodeIdsAsync(diff);
         }
@@ -127,14 +129,14 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
             }
         }
 
-        public Task<Entity> UpdateEntity(INodeTypeLinked type, Guid id, Dictionary<string, object> properties)
+        public Task<Entity> UpdateEntityAsync(INodeTypeLinked type, Guid id, Dictionary<string, object> properties)
         {
             _rootNodeId = id;
             var requestId = Guid.NewGuid();
 
-            return UpdateEntity(type, id, properties, string.Empty, requestId);
+            return UpdateEntityAsync(type, id, properties, string.Empty, requestId);
         }
-        private async Task<Entity> UpdateEntity(
+        private async Task<Entity> UpdateEntityAsync(
             INodeTypeLinked type, Guid id,
             Dictionary<string, object> properties, string dotName, Guid requestId)
         {
@@ -259,7 +261,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
                 {
                     var (typeName, targetValue) = InputTypesExtensions.ParseInputUnion(uvdict["target"]);
                     var type = _ontologySchema.GetEntityTypeByName(typeName);
-                    var updatedNode = await UpdateEntity(type, relation.Target.Id, targetValue, dotName, requestId);
+                    var updatedNode = await UpdateEntityAsync(type, relation.Target.Id, targetValue, dotName, requestId);
                     if (relation.Target.Id != updatedNode.Id)
                     {
                         node.RemoveNode(relation);
