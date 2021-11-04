@@ -10,6 +10,7 @@ using Iis.DataModel;
 using Iis.DataModel.Roles;
 using Iis.DbLayer.Extensions;
 using System.ComponentModel;
+using Iis.Interfaces.Constants;
 
 namespace Iis.DbLayer.Repositories
 {
@@ -43,7 +44,7 @@ namespace Iis.DbLayer.Repositories
         public Task<UserEntity[]> GetOperatorsAsync(CancellationToken ct = default)
         {
             return GetUsersQuery()
-                .Where(e => e.UserRoles.Any(r => r.RoleId == RoleEntity.OperatorRoleId) && !e.IsBlocked)
+                .Where(e => e.UserRoles.Any(r => r.RoleId == UserRoleConstants.OperatorRoleId) && !e.IsBlocked)
                 .ToArrayAsync(ct);
         }
 
