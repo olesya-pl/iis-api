@@ -34,5 +34,6 @@ namespace Iis.Domain.Users
         public bool IsEntitySearchGranted() => IsGranted(AccessKind.Entity, AccessOperation.Search, AccessCategory.Entity);
         public bool IsWikiReadGranted() => IsGranted(AccessKind.Wiki, AccessOperation.Read, AccessCategory.Entity);
         public bool IsWikiSearchGranted() => IsGranted(AccessKind.Wiki, AccessOperation.Search, AccessCategory.Entity);
+        public bool IsMaterialAccessLevelChangeGranted() => IsGranted(AccessKind.Material, AccessOperation.AccessLevelUpdate, AccessCategory.Entity);
     }
 }
