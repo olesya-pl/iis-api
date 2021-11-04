@@ -157,7 +157,7 @@ namespace Iis.Elastic.SearchQueryExtensions
             }
 
             queryString = PopulateFilteredItems(filteredItems, queryString);
-            return PopulateCherryPickedMaterials(cherryPickedItems, queryString);
+            return PopulateCherryPickedIds(cherryPickedItems, queryString);
         }
 
         public static string ApplyFuzzinessOperator(string input)
@@ -324,21 +324,23 @@ namespace Iis.Elastic.SearchQueryExtensions
             return result;
         }
 
-        private static string PopulateCherryPickedMaterials(IReadOnlyCollection<CherryPickedItem> cherryPickedItems, string result)
+        private static string ConvertToHypensFormat(string strId) =>
+            Guid.TryParse(strId, out Guid id) ? id.ToString() : strId;
+
+        private static string PopulateCherryPickedIds(IReadOnlyCollection<CherryPickedItem> cherryPickedItems, string result)
         {
+            if (cherryPickedItems.Count == 0) return result;
+
             var pickedQuery = new StringBuilder();
+            
             for (var i = 0; i < cherryPickedItems.Count; i++)
             {
-                var item = cherryPickedItems.ElementAt(i);
-                var lastOne = i + 1 == cherryPickedItems.Count;
-                pickedQuery.Append($"_id:{item.Item}");
-                if (lastOne)
-                {
-                    result = string.IsNullOrEmpty(result) ? $"({pickedQuery})" : $"({result} OR ({pickedQuery}))";
-                }
+                var item = cherryPickedItems.ElementAt(i).Item;
+                pickedQuery.Append($"\"{ConvertToHypensFormat(item)}\"");
+                if (i + 1 < cherryPickedItems.Count) pickedQuery.Append(" OR ");
             }
 
-            return result;
+            return string.IsNullOrEmpty(result) ? $"({pickedQuery})" : $"({result} OR ({pickedQuery}))";
         }
 
         private static string GetFieldQuery(string field, string value)

@@ -45,23 +45,6 @@ namespace IIS.Core.GraphQL.Materials
                 return (mapped, result.Aggregations, result.Count);
             }
 
-            if(searchByRelation != null && searchByRelation.HasConditions)
-            {
-                var materialsResults = await materialProvider.GetMaterialsCommonForEntitiesAsync(
-                    tokenPayload.UserId,
-                    searchByRelation.NodeIdentityList,
-                    searchByRelation.IncludeDescendants, 
-                    filterQuery,
-                    pageParam,
-                    sortingParam);
-
-                var mapped = materialsResults.Materials
-                                .Select(m => mapper.Map<Material>(m))
-                                .ToList();
-
-                return (mapped, materialsResults.Aggregations, materialsResults.Count);
-            }
-
             var materialsResult = await materialProvider
                 .GetMaterialsAsync(tokenPayload.UserId, filterQuery, filteredItems, cherryPickedItems, pageParam, sortingParam);
 
