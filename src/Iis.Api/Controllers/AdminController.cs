@@ -1,27 +1,27 @@
-﻿using Iis.DbLayer.Repositories;
-using Iis.Elastic;
-using Iis.Elastic.Dictionaries;
-using Iis.Elastic.ElasticMappingProperties;
-using Iis.Interfaces.Elastic;
-using Iis.Interfaces.Enums;
-using Iis.OntologyData.IisAccessLevels;
-using Iis.Services.Contracts.Csv;
-using Iis.Services.Contracts.Interfaces;
-using Iis.Services.Contracts.Params;
-using IIS.Core;
-using IIS.Core.Materials;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Hosting;
-using MoreLinq;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using IIS.Core;
+using IIS.Core.Materials;
+using Iis.DbLayer.Repositories;
+using Iis.Elastic;
+using Iis.Elastic.Dictionaries;
+using Iis.Elastic.ElasticMappingProperties;
+using Iis.Interfaces.Elastic;
+using Iis.Interfaces.Enums;
+using Iis.OntologyData.IisAccessLevels;
 using Iis.Services;
+using Iis.Services.Contracts.Csv;
+using Iis.Services.Contracts.Interfaces;
 using IIS.Services.Contracts.Interfaces;
+using Iis.Services.Contracts.Params;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Hosting;
+using MoreLinq;
 
 namespace Iis.Api.Controllers
 {
@@ -145,7 +145,6 @@ namespace Iis.Api.Controllers
             _adminElasticService.Logger.AppendLine($"spend: {stopwatch.ElapsedMilliseconds} ms");
 
             return Content(_adminElasticService.Logger.ToString());
-
         }
 
         [HttpGet("RecreateElasticReportIndex")]
@@ -211,7 +210,8 @@ namespace Iis.Api.Controllers
                 TextProperty.Create("MLResponses.namedEntityRecognition", ElasticConfiguration.DefaultTermVector),
                 TextProperty.Create("MLResponses.textAnnotation", ElasticConfiguration.DefaultTermVector)
             });
-            await _elasticManager.CreateIndexesAsync(new[] { materialIndex },
+            await _elasticManager.CreateIndexesAsync(
+                new[] { materialIndex },
                 mappingConfiguration.ToJObject(),
                 cancellationToken);
 
@@ -255,7 +255,8 @@ namespace Iis.Api.Controllers
                 AliasProperty.Create("Було", "OldValue"),
                 AliasProperty.Create("Стало", "NewValue")
             });
-            await _elasticManager.CreateIndexesAsync(new[] { index },
+            await _elasticManager.CreateIndexesAsync(
+                new[] { index },
                 mappingConfiguration.ToJObject(),
                 cancellationToken);
 
@@ -276,7 +277,7 @@ namespace Iis.Api.Controllers
 
             var indexSecurityParam = new List<(IReadOnlyCollection<string>, string)>{
                 (_elasticState.MaterialIndexes, "AccessLevel"),
-                (new [] { _elasticState.ReportIndex }, "AccessLevel"),
+                (new[] { _elasticState.ReportIndex }, "AccessLevel"),
                 (_elasticState.OntologyIndexes, "__accessLevel"),
                 (_elasticState.WikiIndexes, "__accessLevel"),
                 (_elasticState.EventIndexes, "__accessLevel"),
@@ -343,7 +344,7 @@ namespace Iis.Api.Controllers
             string message;
             try
             {
-                message = await _userService.ImportUsersFromExternalSourceAsync(userNames.Split(','));
+                message = await _userService.ImportUsersFromExternalSourceAsync(userNames.Split(','), ct);
             }
             catch (Exception ex)
             {
@@ -358,7 +359,7 @@ namespace Iis.Api.Controllers
             string message;
             try
             {
-                message = await _userService.ImportUsersFromExternalSourceAsync();
+                message = await _userService.ImportUsersFromExternalSourceAsync(cancellationToken: ct);
 
             }
             catch (Exception ex)
@@ -392,7 +393,7 @@ namespace Iis.Api.Controllers
             return Task.FromResult<IActionResult>(File(csv, "text/csv", $"{typeName}.csv"));
         }
 
-        private void LogElasticResult(StringBuilder log, IEnumerable<ElasticBulkResponse> response)
+        private static void LogElasticResult(StringBuilder log, IEnumerable<ElasticBulkResponse> response)
         {
             var successResponses = response.Where(x => x.IsSuccess);
             log.AppendLine($"Success operations: {successResponses.Count()}");
