@@ -14,6 +14,8 @@ namespace AcceptanceTests.UISteps
 
         private LoginPageObjects loginPageObjects;
 
+        public IWebElement VersionInfo { get; private set; }
+
         public AuthorizationSteps(ScenarioContext injectedContext, IWebDriver driver)
         {
             loginPageObjects = new LoginPageObjects(driver);
@@ -43,6 +45,17 @@ namespace AcceptanceTests.UISteps
         {
             loginPageObjects.ConfirmLogOutButton.Click();
         }
+
+        [When(@"I checked of version by product")]
+        public void WhenICheckedOfVersionByProduct()
+        {
+            VersionInfo.SendKeys(Keys.LeftAlt);
+            VersionInfo.SendKeys(Keys.LeftShift);
+            VersionInfo.SendKeys("V");
+            driver.WaitFor(2);
+        }
+
+
         #endregion
 
         #region Then
@@ -78,6 +91,13 @@ namespace AcceptanceTests.UISteps
             Assert.True(loginPageObjects.LoginField.Displayed);
             Assert.True(loginPageObjects.PasswordField.Displayed);
         }
+
+        [Then(@"I must see version by product")]
+        public void ThenIMustSeeVersionByProduct()
+        {
+            VersionInfo = driver.FindElement(By.CssSelector(".el-notification .el-notification__group .el-notification__title"));
+        }
+
         #endregion
     }
 }
