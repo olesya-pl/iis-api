@@ -56,6 +56,7 @@ namespace Iis.UnitTests.Iis.Elastic.Tests
             var materialRepositoryMock = new Mock<IMaterialRepository>();
             var elasticStateMock = new Mock<IElasticState>();
             var elasticResponseManagerFactory = new Mock<IElasticResponseManagerFactory>();
+            var aggregationNameGeneratorMock = new Mock<IGroupedAggregationNameGenerator>();
 
             var objectOfStudyTypeMock = new Mock<INodeTypeLinked>();
             ontologySchemaMock
@@ -74,7 +75,8 @@ namespace Iis.UnitTests.Iis.Elastic.Tests
                 elasticServiceMock.Object,
                 elasticConfigurationMock.Object,
                 nodeRepositoryMock.Object,
-                new ElasticState(ontologySchemaMock.Object));
+                new ElasticState(ontologySchemaMock.Object),
+                aggregationNameGeneratorMock.Object);
             return sut;
         }
     }

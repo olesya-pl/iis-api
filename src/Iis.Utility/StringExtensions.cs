@@ -9,12 +9,12 @@ namespace Iis.Utility
 {
     public static class StringExtensions
     {
-        public static string Capitalize(this string value) 
+        public static string Capitalize(this string value)
         {
             return string.IsNullOrEmpty(value)
                 ? value
                 : $"{value.Substring(0, 1).ToUpper(CultureInfo.InvariantCulture)}{value.Substring(1)}";
-        } 
+        }
 
         public static string ToLowerCamelCase(this string value)
         {
@@ -44,7 +44,7 @@ namespace Iis.Utility
                 builder.Append(ch);
             }
             return builder.ToString();
-        }        
+        }
 
         public static string EscapeSymbols(this string input, ISet<char> escapePattern)
         {
@@ -65,6 +65,18 @@ namespace Iis.Utility
             }
 
             return builder.ToString();
-        }        
+        }
+
+        public static string RemoveFromEnd(this string input, string suffix)
+        {
+            if (string.IsNullOrWhiteSpace(input)) return input;
+
+            if (input.EndsWith(suffix))
+            {
+                return input.Substring(0, input.Length - suffix.Length);
+            }
+
+            return input;
+        }
     }
 }

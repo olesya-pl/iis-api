@@ -1,12 +1,9 @@
+﻿using Iis.Interfaces.Elastic;
 using System.Collections.Generic;
-using FluentAssertions;
-using Iis.Elastic.SearchQueryExtensions;
-using Iis.Interfaces.Elastic;
-using Xunit;
 
-namespace Iis.UnitTests.Iis.Elastic.Tests
+namespace Iis.UnitTests.Iis.Elastic.Tests.SearchQueryExtensionTests
 {
-    public class SearchQueryExtensionToQueryStringTests
+    public static class ElasticFilterData
     {
         public static IEnumerable<object[]> GetElasticFilterData()
         {
@@ -121,13 +118,44 @@ namespace Iis.UnitTests.Iis.Elastic.Tests
             };
         }
 
-        [Theory]
-        [MemberData(nameof(GetElasticFilterData))]
-        public void ToQueryString_ShouldReturnValidQuery(ElasticFilter filter, string expected)
+        public static IEnumerable<object[]> GetElasticFilterDataWithEscape()
         {
-            var actual = filter.ToQueryString();
-
-            actual.Should().Be(expected);
+            yield return new object[]
+            {
+                new ElasticFilter()
+                {
+                    Suggestion = "омсбр№^:{}[]/!"
+                },
+                false,
+                "омсбр\\^\\:\\{\\}\\[\\]\\/\\!"
+            };
+            yield return new object[]
+            {
+                new ElasticFilter()
+                {
+                    Suggestion = "ом№^:{}[]/!сбр"
+                },
+                false,
+                "ом\\^\\:\\{\\}\\[\\]\\/\\!сбр"
+            };
+            yield return new object[]
+            {
+                new ElasticFilter()
+                {
+                    Suggestion = "омсбр№^:{}[]/!"
+                },
+                true,
+                "\"омсбр\\^\\:\\{\\}\\[\\]\\/\\!\" OR омсбр\\^\\:\\{\\}\\[\\]\\/\\!~"
+            };
+            yield return new object[]
+            {
+                new ElasticFilter()
+                {
+                    Suggestion = "ом№^:{}[]/!сбр"
+                },
+                true,
+                "\"ом\\^\\:\\{\\}\\[\\]\\/\\!сбр\" OR ом\\^\\:\\{\\}\\[\\]\\/\\!сбр~"
+            };
         }
     }
 }
