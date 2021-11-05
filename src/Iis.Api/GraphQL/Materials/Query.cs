@@ -45,7 +45,7 @@ namespace IIS.Core.GraphQL.Materials
                 return (mapped, result.Aggregations, result.Count);
             }
 
-            if (searchByRelation != null && searchByRelation.HasConditions && searchByRelation.IncludeDescendants)
+            if (searchByRelation != null && searchByRelation.HasConditions)
             {
                 var materialsResults = await materialProvider.GetMaterialsCommonForEntitiesAsync(
                     tokenPayload.UserId,
