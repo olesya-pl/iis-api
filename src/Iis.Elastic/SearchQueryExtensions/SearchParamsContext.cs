@@ -9,7 +9,7 @@ namespace Iis.Elastic.SearchQueryExtensions
 {
     public interface ISearchParamsContext
     {
-        IMultiElasticSearchParams MultiElasticSearchParams { get; }
+        IElasticMultiSearchParams ElasticMultiSearchParams { get; }
         (string Query, List<IIisElasticField> Fields) BaseSearchParameter { get; }
         (string Query, List<IIisElasticField> Fields) HistorySearchParameter { get; }
         IReadOnlyDictionary<string, string> AggregateHistoryResultQueries { get; }
@@ -22,9 +22,9 @@ namespace Iis.Elastic.SearchQueryExtensions
             if (aggregationField == default
                 || (!AggregateHistoryResultQueries.TryGetValue(aggregationField.Name, out var aggregateQuery)
                 && !AggregateHistoryResultQueries.TryGetValue(aggregationField.Alias, out aggregateQuery)))
-                return SearchParamsQueryHelper.CreateMultiFieldShouldSection(HistorySearchParameter.Query, HistorySearchParameter.Fields, MultiElasticSearchParams.IsLenient);
+                return SearchParamsQueryHelper.CreateMultiFieldShouldSection(HistorySearchParameter.Query, HistorySearchParameter.Fields, ElasticMultiSearchParams.IsLenient);
 
-            return SearchParamsQueryHelper.CreateMultiFieldShouldSection(aggregateQuery, HistorySearchParameter.Fields, MultiElasticSearchParams.IsLenient);
+            return SearchParamsQueryHelper.CreateMultiFieldShouldSection(aggregateQuery, HistorySearchParameter.Fields, ElasticMultiSearchParams.IsLenient);
         }
     }
 
@@ -33,33 +33,33 @@ namespace Iis.Elastic.SearchQueryExtensions
         private const int BaseParametersCount = 1;
 
         private SearchParamsContext(
-            IMultiElasticSearchParams multiElasticSearchParams,
+            IElasticMultiSearchParams elasticMultiSearchParams,
             IReadOnlyDictionary<string, string> aggregateHistoryResultQueries)
         {
-            if (multiElasticSearchParams is null)
+            if (elasticMultiSearchParams is null)
             {
-                throw new ArgumentNullException(nameof(multiElasticSearchParams));
+                throw new ArgumentNullException(nameof(elasticMultiSearchParams));
             }
-            if (multiElasticSearchParams.SearchParams.Count < BaseParametersCount)
+            if (elasticMultiSearchParams.SearchParams.Count < BaseParametersCount)
             {
-                throw new ArgumentException("Must contain base query", nameof(multiElasticSearchParams));
+                throw new ArgumentException("Must contain base query", nameof(elasticMultiSearchParams));
             }
 
-            MultiElasticSearchParams = multiElasticSearchParams;
-            BaseSearchParameter = multiElasticSearchParams.SearchParams.First();
-            HistorySearchParameter = multiElasticSearchParams.SearchParams
+            ElasticMultiSearchParams = elasticMultiSearchParams;
+            BaseSearchParameter = elasticMultiSearchParams.SearchParams.First();
+            HistorySearchParameter = elasticMultiSearchParams.SearchParams
                 .Skip(BaseParametersCount)
                 .FirstOrDefault();
             AggregateHistoryResultQueries = aggregateHistoryResultQueries;
         }
 
-        public IMultiElasticSearchParams MultiElasticSearchParams { get; private set; }
+        public IElasticMultiSearchParams ElasticMultiSearchParams { get; private set; }
         public (string Query, List<IIisElasticField> Fields) BaseSearchParameter { get; private set; }
         public (string Query, List<IIisElasticField> Fields) HistorySearchParameter { get; private set; }
         public IReadOnlyDictionary<string, string> AggregateHistoryResultQueries { get; private set; }
 
         public static ISearchParamsContext CreateFrom(
-            IMultiElasticSearchParams multiElasticSearchParams,
+            IElasticMultiSearchParams multiElasticSearchParams,
             IReadOnlyDictionary<string, string> aggregateHistoryResultQueries)
         {
             return new SearchParamsContext(multiElasticSearchParams, aggregateHistoryResultQueries);
@@ -67,7 +67,7 @@ namespace Iis.Elastic.SearchQueryExtensions
 
         public static ISearchParamsContext CreateAggregatesContextFrom(ISearchParamsContext context, ElasticFilter filter)
         {
-            var searchParams = new List<(string Query, List<IIisElasticField> Fields)>(context.MultiElasticSearchParams.SearchParams.Count);
+            var searchParams = new List<(string Query, List<IIisElasticField> Fields)>(context.ElasticMultiSearchParams.SearchParams.Count);
             var aggregatesElasticFilter = new ElasticFilter
             {
                 CherryPickedItems = filter.CherryPickedItems,
@@ -84,17 +84,17 @@ namespace Iis.Elastic.SearchQueryExtensions
                 searchParams.Add(context.HistorySearchParameter);
             }
 
-            var multiElasticSearchParams = new MultiElasticSearchParams
+            var elasticMultiSearchParams = new ElasticMultiSearchParams
             {
-                IsLenient = context.MultiElasticSearchParams.IsLenient,
-                From = context.MultiElasticSearchParams.From,
-                Size = context.MultiElasticSearchParams.Size,
-                ResultFields = context.MultiElasticSearchParams.ResultFields.ToList(),
-                BaseIndexNames = context.MultiElasticSearchParams.BaseIndexNames.ToList(),
+                IsLenient = context.ElasticMultiSearchParams.IsLenient,
+                From = context.ElasticMultiSearchParams.From,
+                Size = context.ElasticMultiSearchParams.Size,
+                ResultFields = context.ElasticMultiSearchParams.ResultFields.ToList(),
+                BaseIndexNames = context.ElasticMultiSearchParams.BaseIndexNames.ToList(),
                 SearchParams = searchParams
             };
 
-            return new SearchParamsContext(multiElasticSearchParams, context.AggregateHistoryResultQueries);
+            return new SearchParamsContext(elasticMultiSearchParams, context.AggregateHistoryResultQueries);
         }
     }
 }

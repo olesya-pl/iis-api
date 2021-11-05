@@ -193,6 +193,7 @@ namespace IIS.Core
             services.AddTransient<IFileService, FileService<IIISUnitOfWork>>();
             services.AddScoped<IAnalyticsRepository, AnalyticsRepository>();
             services.AddTransient<IElasticService, ElasticService>();
+            services.AddSingleton<IGroupedAggregationNameGenerator, GroupedAggregationNameGenerator>();
             services.AddTransient<OntologySchemaService>();
             services.AddTransient<ExportService>();
             services.AddTransient<ExportToJsonService>();
