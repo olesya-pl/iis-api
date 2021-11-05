@@ -14,7 +14,8 @@ namespace AcceptanceTests.UISteps
 
         private LoginPageObjects loginPageObjects;
 
-        public IWebElement VersionInfo { get; private set; }
+        public IWebElement VersionInfo => 
+            driver.FindElement(By.CssSelector(".el-notification .el-notification__group .el-notification__title"));
 
         public AuthorizationSteps(ScenarioContext injectedContext, IWebDriver driver)
         {
@@ -55,7 +56,6 @@ namespace AcceptanceTests.UISteps
             driver.WaitFor(2);
         }
 
-
         #endregion
 
         #region Then
@@ -95,7 +95,7 @@ namespace AcceptanceTests.UISteps
         [Then(@"I must see version by product")]
         public void ThenIMustSeeVersionByProduct()
         {
-            VersionInfo = driver.FindElement(By.CssSelector(".el-notification .el-notification__group .el-notification__title"));
+            Assert.True(VersionInfo.Displayed);
         }
 
         #endregion

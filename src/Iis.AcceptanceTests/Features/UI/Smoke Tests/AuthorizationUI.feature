@@ -17,7 +17,7 @@
 		Then Login and password inputs are highlighted with red
 
    @smoke @UI @AuthorizationUI
-    Scenario: IIS-6566 -Check version by product
+    Scenario: IIS-6566 - Check product version 
        // Then I must see the Contour main page
         When I checked of version by product
         Then I must see version by product

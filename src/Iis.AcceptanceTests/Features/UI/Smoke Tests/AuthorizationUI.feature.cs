@@ -40,7 +40,9 @@ namespace AcceptanceTests.Features.UI.SmokeTests
         public static void FeatureSetup()
         {
             testRunner = TechTalk.SpecFlow.TestRunnerManager.GetTestRunner();
-            TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "Features/UI/Smoke Tests", "Authorization UI", "\t- Authorize by using valid credentials\r\n\t- IIS-5795 - Invalid authorization", ProgrammingLanguage.CSharp, ((string[])(null)));
+            TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "Features/UI/Smoke Tests", "Authorization UI", "\t- Authorize by using valid credentials\r\n\t- IIS-5795 - Invalid authorization\r\n\t- " +
+                    "IIS-5796 - Authorize by using valid credentials\r\n\t- IIS-6566 -Check version by p" +
+                    "roduct", ProgrammingLanguage.CSharp, ((string[])(null)));
             testRunner.OnFeatureStart(featureInfo);
         }
         
@@ -80,21 +82,21 @@ namespace AcceptanceTests.Features.UI.SmokeTests
             this.TestTearDown();
         }
         
-        [Xunit.SkippableFactAttribute(DisplayName="Authorize by using valid credentials")]
+        [Xunit.SkippableFactAttribute(DisplayName="IIS-5796 - Authorize by using valid credentials")]
         [Xunit.TraitAttribute("FeatureTitle", "Authorization UI")]
-        [Xunit.TraitAttribute("Description", "Authorize by using valid credentials")]
+        [Xunit.TraitAttribute("Description", "IIS-5796 - Authorize by using valid credentials")]
         [Xunit.TraitAttribute("Category", "smoke")]
         [Xunit.TraitAttribute("Category", "UI")]
         [Xunit.TraitAttribute("Category", "AuthorizationSmokeUI")]
-        public virtual void AuthorizeByUsingValidCredentials()
+        public virtual void IIS_5796_AuthorizeByUsingValidCredentials()
         {
             string[] tagsOfScenario = new string[] {
                     "smoke",
                     "UI",
                     "AuthorizationSmokeUI"};
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Authorize by using valid credentials", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
-#line 7
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("IIS-5796 - Authorize by using valid credentials", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
+#line 9
  this.ScenarioInitialize(scenarioInfo);
 #line hidden
             bool isScenarioIgnored = default(bool);
@@ -114,10 +116,10 @@ namespace AcceptanceTests.Features.UI.SmokeTests
             else
             {
                 this.ScenarioStart();
-#line 8
+#line 10
   testRunner.Given("I sign in with the user olya and password 123 in the Contour", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-#line 9
+#line 11
   testRunner.Then("I redirected to objects page", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
@@ -138,7 +140,7 @@ namespace AcceptanceTests.Features.UI.SmokeTests
                     "AuthorizationSmokeUI"};
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("IIS-5795 - Try to authorize by using invalid credentials", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
-#line 12
+#line 14
  this.ScenarioInitialize(scenarioInfo);
 #line hidden
             bool isScenarioIgnored = default(bool);
@@ -158,14 +160,58 @@ namespace AcceptanceTests.Features.UI.SmokeTests
             else
             {
                 this.ScenarioStart();
-#line 13
+#line 15
   testRunner.Given("I sign in with the user olya and password hammer691 in the Contour", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-#line 14
+#line 16
   testRunner.Then("Login button is active", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 15
+#line 17
   testRunner.Then("Login and password inputs are highlighted with red", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+            }
+            this.ScenarioCleanup();
+        }
+        
+        [Xunit.SkippableFactAttribute(DisplayName="IIS-6566 - Check product version")]
+        [Xunit.TraitAttribute("FeatureTitle", "Authorization UI")]
+        [Xunit.TraitAttribute("Description", "IIS-6566 - Check product version")]
+        [Xunit.TraitAttribute("Category", "smoke")]
+        [Xunit.TraitAttribute("Category", "UI")]
+        [Xunit.TraitAttribute("Category", "AuthorizationUI")]
+        public virtual void IIS_6566_CheckProductVersion()
+        {
+            string[] tagsOfScenario = new string[] {
+                    "smoke",
+                    "UI",
+                    "AuthorizationUI"};
+            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("IIS-6566 - Check product version", "       // Then I must see the Contour main page", tagsOfScenario, argumentsOfScenario, this._featureTags);
+#line 20
+    this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            bool isScenarioIgnored = default(bool);
+            bool isFeatureIgnored = default(bool);
+            if ((tagsOfScenario != null))
+            {
+                isScenarioIgnored = tagsOfScenario.Where(__entry => __entry != null).Where(__entry => String.Equals(__entry, "ignore", StringComparison.CurrentCultureIgnoreCase)).Any();
+            }
+            if ((this._featureTags != null))
+            {
+                isFeatureIgnored = this._featureTags.Where(__entry => __entry != null).Where(__entry => String.Equals(__entry, "ignore", StringComparison.CurrentCultureIgnoreCase)).Any();
+            }
+            if ((isScenarioIgnored || isFeatureIgnored))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                this.ScenarioStart();
+#line 22
+        testRunner.When("I checked of version by product", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+#line hidden
+#line 23
+        testRunner.Then("I must see version by product", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
             this.ScenarioCleanup();
