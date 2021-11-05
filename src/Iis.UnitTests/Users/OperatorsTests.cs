@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Iis.DataModel;
 using Iis.DataModel.Roles;
+using Iis.Interfaces.Constants;
 using Iis.Services.Contracts.Interfaces;
 using Iis.UnitTests.TestHelpers;
 using Microsoft.Extensions.DependencyInjection;
@@ -37,7 +38,7 @@ namespace Iis.UnitTests.Users
             foreach (var user in data)
             {
                 user.UserRoles.Add(new UserRoleEntity {
-                    RoleId = RoleEntity.OperatorRoleId,
+                    RoleId = UserRoleConstants.OperatorRoleId,
                     User = user
                 });
                 user.IsBlocked = false;

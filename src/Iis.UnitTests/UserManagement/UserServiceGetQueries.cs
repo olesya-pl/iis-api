@@ -12,6 +12,7 @@ using Iis.Services.Contracts.Interfaces;
 using Iis.Services.Contracts.Params;
 using AutoFixture;
 using Iis.DbLayer.MaterialDictionaries;
+using Iis.Interfaces.Constants;
 
 namespace Iis.UnitTests.UserManagement
 {
@@ -454,7 +455,7 @@ namespace Iis.UnitTests.UserManagement
 
             var operatorRoleEntity = new RoleEntity
             {
-                Id = RoleEntity.OperatorRoleId,
+                Id = UserRoleConstants.OperatorRoleId,
                 UserRoles = null,
                 RoleAccessEntities = new List<RoleAccessEntity>()
             };

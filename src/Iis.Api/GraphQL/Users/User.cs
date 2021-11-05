@@ -6,6 +6,8 @@ using HotChocolate.Types;
 using IIS.Core.GraphQL.Roles;
 using Iis.Interfaces.Enums;
 using Iis.Interfaces.Users;
+using System.Linq;
+using Iis.Interfaces.Constants;
 
 namespace IIS.Core.GraphQL.Users
 {
@@ -25,6 +27,7 @@ namespace IIS.Core.GraphQL.Users
         public string UserNameActiveDirectory { get; set; }
         public bool IsBlocked { get; set; }
         public bool IsAdmin { get; set; }
+        public bool IsOperator => Roles.Any(_ => _.Id == UserRoleConstants.OperatorRoleId);
         public int AccessLevel { get; set; }
         public UserSource Source { get; set; }
         public bool IsExternalUser => Source != UserSource.Internal;
