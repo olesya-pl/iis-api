@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
@@ -10,15 +9,15 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
-using RabbitMQ.Client.Exceptions;
+using Iis.RabbitMq.Helpers;
 
 namespace Iis.EventMaterialAutoAssignment
 {
     public class MaterialMessageHandler : BackgroundService
     {
+        private const int RetryIntervalSec = 5;
         private readonly ILogger<MaterialMessageHandler> _logger;
         private readonly MaterialMessageHandlerConfiguration _configuration;
         private readonly IServiceScopeFactory _serviceScopeFactory;
@@ -36,20 +35,7 @@ namespace Iis.EventMaterialAutoAssignment
             _configuration = configuration;
             _serviceScopeFactory = serviceScopeFactory;
 
-            while (true)
-            {
-                try
-                {
-                    _connection = connectionFactory.CreateConnection();
-                    break;
-                }
-                catch (BrokerUnreachableException e)
-                {
-                    var timeout = 5000;
-                    _logger.LogError($"Attempting to connect again in {timeout / 1000} sec.");
-                    Thread.Sleep(timeout);
-                }
-            }
+            _connection = connectionFactory.CreateAndWaitConnection(RetryIntervalSec, _logger, "TermCheck.MaterialMessageHandler");
 
             _incommingChannel = _connection.CreateModel();
             _incommingChannel.QueueDeclare(
@@ -69,7 +55,7 @@ namespace Iis.EventMaterialAutoAssignment
 
             _outgoingChannel.QueueBind(_configuration.OutgoingQueueName, _configuration.OutgoingExchangeName, _configuration.OutgoingRoutingKey);
         }
-        
+
         protected override Task ExecuteAsync(CancellationToken stoppingToken)
         {
             var channelConsumer = new AsyncEventingBasicConsumer(_incommingChannel);
@@ -84,9 +70,9 @@ namespace Iis.EventMaterialAutoAssignment
                         var configs = await context.AssignmentConfigs
                             .AsNoTracking()
                             .Include(p => p.Keywords)
-                            .Select(p => new { p.Keywords, p.Id})
+                            .Select(p => new { p.Keywords, p.Id })
                             .ToArrayAsync();
-                        
+
                         var json = Encoding.UTF8.GetString(args.Body);
                         var materialIds = JsonConvert.DeserializeObject<List<Guid>>(json);
 
@@ -109,11 +95,11 @@ namespace Iis.EventMaterialAutoAssignment
                         }
 
                         _incommingChannel.BasicAck(args.DeliveryTag, false);
-                    }                    
+                    }
                 }
                 catch (Exception e)
                 {
-                    _logger.LogError("MaterialMessageHandler. Exception {e}", e);
+                    _logger.LogError("TermCheck.MaterialMessageHandler. Exception {e}", e);
                     _incommingChannel.BasicReject(args.DeliveryTag, false);
                 }
             };
