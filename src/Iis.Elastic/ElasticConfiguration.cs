@@ -12,6 +12,6 @@ namespace Iis.Elastic
         public string DefaultPassword { get; set; }
         public int ScrollDurationMinutes { get; set; }
         public const TextTermVectorsEnum DefaultTermVector = TextTermVectorsEnum.WithPositionsOffsets;
-        public static IReadOnlyCollection<string> DefaultDateFormats { get; } = new[] { "date_optional_time", "dd.MM.yyyy, HH:mm:ss", "dd.MM.yyyy", "dd,MM,yyyy", "yyyy.MM.dd", "yyyy,MM,dd", "HH:mm:ss" };
+        public static IReadOnlyCollection<string> DefaultDateFormats { get; } = new[] { "date_optional_time", "dd.MM.yyyy, HH:mm:ss", "dd.MM.yyyy", "dd,MM,yyyy", "yyyy.MM.dd", "yyyy,MM,dd", "HH:mm:ss", "HH:mm" };
     }
 }

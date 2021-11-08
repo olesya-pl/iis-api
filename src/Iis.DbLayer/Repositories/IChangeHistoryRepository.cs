@@ -17,5 +17,7 @@ namespace Iis.DbLayer.Repositories
         Task<IReadOnlyCollection<ChangeHistoryEntity>> GetAllAsync(int limit, int offset, Expression<Func<ChangeHistoryEntity, bool>> predicate = null, CancellationToken cancellationToken = default);
         Task<int> GetTotalCountAsync(Expression<Func<ChangeHistoryEntity, bool>> predicate = null, CancellationToken cancellationToken = default);
         void AddRange(IReadOnlyCollection<ChangeHistoryEntity> changes);
+        Task<ChangeHistoryEntity> GetLatestByIdAndPropertyWithNewValueAsync(Guid targetId, string propertyName, string expectedNewValue, CancellationToken ct = default);
+        Task<ChangeHistoryEntity[]> GetManyLatestByIdAndPropertyWithNewValueAsync(IReadOnlyCollection<Guid> targetIdCollection, string propertyName, string expectedNewValue, CancellationToken ct = default);
     }
 }

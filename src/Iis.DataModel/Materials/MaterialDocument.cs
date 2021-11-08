@@ -46,6 +46,7 @@ namespace Iis.DbLayer.Repositories
         public IReadOnlyCollection<RelatedObject> RelatedEventCollection { get; set; } = Array.Empty<RelatedObject>();
         public IReadOnlyCollection<RelatedObject> RelatedSignCollection { get; set; } = Array.Empty<RelatedObject>();
         public string RegistrationDate { get; set; }
+        public string ProcessedAt { get; set; }
         public SecurityAttributes SecurityAttributes { get; set; } = new SecurityAttributes();
 
         private static readonly JsonSerializerSettings _materialDocSerializeSettings = new JsonSerializerSettings

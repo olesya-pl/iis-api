@@ -92,6 +92,33 @@ namespace Iis.DbLayer.Repositories
             Context.AddRange(entities);
         }
 
+        public Task<ChangeHistoryEntity> GetLatestByIdAndPropertyWithNewValueAsync(Guid targetId, string propertyName, string expectedNewValue, CancellationToken ct = default)
+        {
+            return Context.ChangeHistory
+                .OrderByDescending(_ => _.Date)
+                .FirstOrDefaultAsync(
+                    _ => _.TargetId == targetId
+                    && _.PropertyName == propertyName
+                    && _.NewValue == expectedNewValue,
+                    ct);
+        }
+
+        public Task<ChangeHistoryEntity[]> GetManyLatestByIdAndPropertyWithNewValueAsync(IReadOnlyCollection<Guid> targetIdCollection, string propertyName, string expectedNewValue, CancellationToken ct = default)
+        {
+            if (!targetIdCollection.Any()) return Task.FromResult(Array.Empty<ChangeHistoryEntity>());
+
+            var listValue = string.Join(',', targetIdCollection.Select(e => $"'{e.ToString("N")}'"));
+
+            var query = "select \"Id\", \"TargetId\", \"UserName\", \"PropertyName\", \"Date\", \"OldValue\", \"NewValue\", \"RequestId\", \"Type\", \"ParentTypeName\", \"NewTitle\", \"OldTitle\"" +
+                        " from public.\"ChangeHistory\" ch" +
+                        " join (select distinct first_value(\"Id\") over (partition by \"TargetId\" order by \"Date\" desc) as \"ID\"" +
+                        " from public.\"ChangeHistory\"" +
+                        $" where \"TargetId\" in ({listValue}) and \"PropertyName\" = \'{propertyName}\' and \"NewValue\" = \'{expectedNewValue}\' ) jch" +
+                        " on ch.\"Id\" = jch.\"ID\"";
+
+            return Context.ChangeHistory.FromSqlRaw(query).ToArrayAsync(ct);
+        }
+
         private static IQueryable<ChangeHistoryEntity> AddDatePeriod(IQueryable<ChangeHistoryEntity> query, DateTime? dateFrom, DateTime? dateTo)
         {
             if (dateFrom.HasValue)
