@@ -15,16 +15,15 @@ using Iis.Services.Contracts.Interfaces;
 
 namespace Iis.UnitTests.Materials
 {
-    
-    
+
+
     public class MaterialRepositoryTests : IDisposable
     {
         private ServiceProvider _serviceProvider;
+        private static readonly MaterialSignEntity ProcessedSign = CreateProcessedMaterialSign();
 
-        public MaterialRepositoryTests()
-        {
-            
-        }
+        public MaterialRepositoryTests() { }
+
         public void Dispose()
         {
             var context = _serviceProvider.GetRequiredService<OntologyContext>();
@@ -53,6 +52,11 @@ namespace Iis.UnitTests.Materials
             mlRepoMock.Setup(e => e.GetAllForMaterialListAsync(It.IsAny<IReadOnlyCollection<Guid>>()))
                 .ReturnsAsync(responses);
 
+            var signRepoMock = new Mock<IMaterialSignRepository>();
+
+            signRepoMock.Setup(_ => _.GetById(MaterialEntity.ProcessingStatusProcessedSignId))
+                .Returns(ProcessedSign);
+
             var expectedResponsesCount = responses.Count(e => e.MaterialId == materialId);
 
             var elasticManagerMock = new Mock<IElasticManager>();
@@ -62,6 +66,7 @@ namespace Iis.UnitTests.Materials
                 {
                     serviceCollection.AddTransient<IMLResponseRepository>(_ => mlRepoMock.Object);
                     serviceCollection.AddTransient<IElasticManager>(_ => elasticManagerMock.Object);
+                    serviceCollection.AddTransient<IMaterialSignRepository>(_ => signRepoMock.Object);
                 }) as ServiceProvider;
 
             var context = _serviceProvider.GetRequiredService<OntologyContext>();
@@ -73,12 +78,31 @@ namespace Iis.UnitTests.Materials
 
             elasticManagerMock
                 .Verify(
-                    e => e.PutDocumentAsync("Materials", 
+                    e => e.PutDocumentAsync("Materials",
                         materialId.ToString("N"),
-                        It.Is<string>(s => JObject.Parse(s).Value<int>("ProcessedMlHandlersCount") == expectedResponsesCount), 
+                        It.Is<string>(s => JObject.Parse(s).Value<int>("ProcessedMlHandlersCount") == expectedResponsesCount),
                         It.IsAny<bool>(),
-                        It.IsAny<CancellationToken>()), 
+                        It.IsAny<CancellationToken>()),
                     Times.Once);
-        } 
+        }
+
+        private static MaterialSignEntity CreateProcessedMaterialSign()
+        {
+            var singTypeId = new Guid("214ceeee-67d5-4692-a3b4-316007fa5d34");
+            return new MaterialSignEntity
+            {
+                Id = MaterialEntity.ProcessingStatusProcessedSignId,
+                MaterialSignTypeId = singTypeId,
+                ShortTitle = "1",
+                Title = "Оброблено",
+                OrderNumber = 1,
+                MaterialSignType = new MaterialSignTypeEntity
+                {
+                    Id = singTypeId,
+                    Name = "ProcessedStatus",
+                    Title = "Обробка"
+                }
+            };
+        }
     }
 }
