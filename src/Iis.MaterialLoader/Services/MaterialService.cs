@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
@@ -9,7 +8,6 @@ using Iis.Domain.Materials;
 using Iis.MaterialLoader.Models;
 using Iis.RabbitMq.Channels;
 using Iis.Messages.Materials;
-using Iis.Services.Contracts.Dtos;
 using Iis.Services.Contracts.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
@@ -19,19 +17,16 @@ namespace Iis.MaterialLoader.Services
     {
         private readonly IMapper _mapper;
         private readonly IFileService _fileService;
-        private readonly IChangeHistoryService _changeHistoryService;
         private readonly OntologyContext _dbContext;
         private readonly IPublishMessageChannel<MaterialCreatedMessage> _targetChannel;
 
         public MaterialService(IFileService fileService,
             IMapper mapper,
-            IChangeHistoryService changeHistoryService,
             IPublishMessageChannel<MaterialCreatedMessage> targetChannel,
             OntologyContext dbContext)
         {
             _fileService = fileService;
             _mapper = mapper;
-            _changeHistoryService = changeHistoryService;
             _targetChannel = targetChannel;
             _dbContext = dbContext;
         }
@@ -47,7 +42,6 @@ namespace Iis.MaterialLoader.Services
             await _dbContext.SaveChangesAsync();
 
             var requestId = changeRequestId.GetValueOrDefault(Guid.NewGuid());
-            await SaveMaterialChangeHistory(material, requestId);
             await SaveMaterialChildren(material, requestId);
             await SaveMaterialInfoEntities(material);
 
@@ -97,47 +91,6 @@ namespace Iis.MaterialLoader.Services
                 .FirstOrDefault(x => x.Title == signValue);
 
             return entity is null ? null : _mapper.Map<MaterialSign>(entity);
-        }
-
-        private Task SaveMaterialChangeHistory(Material material, Guid changeRequestId)
-        {
-            var timeStamp = DateTime.UtcNow;
-            var changeItems = new List<ChangeHistoryDto>
-            {
-                new ChangeHistoryDto
-                {
-                    Date = timeStamp,
-                    NewValue = material.Id.ToString(),
-                    PropertyName = nameof(material.Id),
-                    RequestId = changeRequestId,
-                    TargetId = material.Id,
-                },
-                new ChangeHistoryDto
-                {
-                    Date = timeStamp,
-                    NewValue = material.Source,
-                    PropertyName = nameof(material.Source),
-                    RequestId = changeRequestId,
-                    TargetId = material.Id,
-                },
-                new ChangeHistoryDto
-                {
-                    Date = timeStamp,
-                    NewValue = material.LoadData.LoadedBy,
-                    PropertyName = nameof(material.LoadData.LoadedBy),
-                    RequestId = changeRequestId,
-                    TargetId = material.Id,
-                },
-                new ChangeHistoryDto
-                {
-                    Date = timeStamp,
-                    NewValue = material.AccessLevel.ToString("D"),
-                    PropertyName = nameof(material.AccessLevel),
-                    RequestId = changeRequestId,
-                    TargetId = material.Id,
-                }
-            };
-            return _changeHistoryService.SaveMaterialChanges(changeItems);
         }
 
         private async Task MakeFilePermanent(Material material)
@@ -210,5 +163,5 @@ namespace Iis.MaterialLoader.Services
                     .ThenInclude(m => m.Assignee)
                 .AsNoTracking();
         }
-    }    
+    }
 }
