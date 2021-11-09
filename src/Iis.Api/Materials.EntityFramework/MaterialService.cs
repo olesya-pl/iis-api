@@ -435,7 +435,13 @@ namespace IIS.Core.Materials.EntityFramework
 
         public async Task RemoveMaterialAsync(Guid materialId, CancellationToken cancellationToken)
         {
-            //todo
+            var materialEntity = await RunWithoutCommitAsync(uow => uow.MaterialRepository.GetByIdAsync(materialId));
+            if (materialEntity == null) return;
+            if (materialEntity.FileId.HasValue)
+            {
+                _fileService.RemoveFiles(new List<Guid> { materialEntity.FileId.Value });
+            }
+            Run(uow => uow.MaterialRepository.RemoveMaterialAndRelatedData(materialId));
         }
 
         private static MaterialCreatedMessage CreatedMessage(Material material)

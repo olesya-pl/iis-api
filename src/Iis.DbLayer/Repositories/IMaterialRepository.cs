@@ -67,8 +67,10 @@ namespace Iis.DbLayer.Repositories
 
         Task<int> GetTotalCountAsync(CancellationToken cancellationToken);
         Task<IReadOnlyList<MaterialChannelMappingEntity>> GetChannelMappingsAsync();
-        Task<IReadOnlyList<MaterialDistributionItem>> GetMaterialsForDistribution(UserDistributionItem user,
+        Task<IReadOnlyList<MaterialDistributionItem>> GetMaterialsForDistribution(
+            UserDistributionItem user,
             Expression<Func<MaterialEntity, bool>> filter);
         Task SaveDistributionResult(DistributionResult distributionResult);
+        void RemoveMaterialAndRelatedData(Guid materialId);
     }
 }

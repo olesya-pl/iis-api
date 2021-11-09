@@ -340,6 +340,13 @@ namespace Iis.Api.Controllers
             return Ok();
         }
 
+        [HttpDelete("RemoveMaterial/{materialId}")]
+        public async Task<IActionResult> RemoveMaterial(Guid materialId, CancellationToken cancellationToken)
+        {
+            await _materialService.RemoveMaterialAsync(materialId, cancellationToken);
+            return Ok();
+        }
+
         [HttpGet("ImportExternalUsers/{userNames}")]
         public async Task<IActionResult> ImportExternalUsers(string userNames, CancellationToken ct)
         {
