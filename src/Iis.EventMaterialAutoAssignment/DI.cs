@@ -7,12 +7,12 @@ namespace Iis.EventMaterialAutoAssignment
     {
         public static IServiceCollection RegisterEventMaterialAutoAssignment(this IServiceCollection services, IConfiguration configuration)
         {
-            const string assignerSectionName = "eventMaterialsAssigner";
-            const string messageHandlerSectionName = "materialMessageHandler";
+            const string AssignerSectionName = "eventMaterialsAssigner";
+            const string MessageHandlerSectionName = "materialMessageHandler";
 
-            var assignerConfig = configuration.GetSection(assignerSectionName)
+            var assignerConfig = configuration.GetSection(AssignerSectionName)
                                             .Get<EventMaterialAssignerConfiguration>();
-            var messageHandlerConfig = configuration.GetSection(messageHandlerSectionName)
+            var messageHandlerConfig = configuration.GetSection(MessageHandlerSectionName)
                                             .Get<MaterialMessageHandlerConfiguration>();
 
            return services.AddSingleton(messageHandlerConfig)
