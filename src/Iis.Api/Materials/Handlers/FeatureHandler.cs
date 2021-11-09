@@ -20,6 +20,7 @@ using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using Iis.Messages.Materials;
 using Iis.Interfaces.Ontology.Data;
+using Iis.Services.Contracts.Interfaces;
 
 namespace Iis.Api.Materials.Handlers
 {
@@ -30,9 +31,10 @@ namespace Iis.Api.Materials.Handlers
         private const bool autoDeleteQueue = false;
         private const int ReConnectTimeoutSec = 5;
         private readonly ILogger<FeatureHandler> _logger;
-        private readonly FeatureHandlerConfig _сonfig;
+        private readonly FeatureHandlerConfig _config;
         private readonly IServiceProvider _provider;
         private readonly IUnitOfWorkFactory<IIISUnitOfWork> _unitOfWorkFactory;
+        private readonly IMaterialElasticService _materialElasticService;
         private IConnection _connection;
         private IModel _channel;
         private readonly JsonSerializerOptions options;
@@ -41,13 +43,14 @@ namespace Iis.Api.Materials.Handlers
             IConnectionFactory connectionFactory,
             FeatureHandlerConfig configuration,
             IServiceProvider provider,
-            IUnitOfWorkFactory<IIISUnitOfWork> unitOfWorkFactory)
+            IUnitOfWorkFactory<IIISUnitOfWork> unitOfWorkFactory,
+            IMaterialElasticService materialElasticService)
         {
             _logger = logger;
-            _сonfig = configuration;
+            _config = configuration;
             _provider = provider;
             _unitOfWorkFactory = unitOfWorkFactory;
-
+            _materialElasticService = materialElasticService;
             _connection = connectionFactory.CreateAndWaitConnection(ReConnectTimeoutSec, logger);
 
             _channel = _connection.CreateModel();
@@ -60,11 +63,11 @@ namespace Iis.Api.Materials.Handlers
 
         protected override Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            ConfigureExchange(_channel, _сonfig.SourceChannel);
+            ConfigureExchange(_channel, _config.SourceChannel);
 
-            ConfigureQueue(_channel, _сonfig.SourceChannel);
+            ConfigureQueue(_channel, _config.SourceChannel);
 
-            ConfigureConsumer(_channel, _сonfig.SourceChannel, ProcessMessage);
+            ConfigureConsumer(_channel, _config.SourceChannel, ProcessMessage);
 
             return Task.CompletedTask;
         }
@@ -110,7 +113,7 @@ namespace Iis.Api.Materials.Handlers
             var featureIdList = GetNodeIdentitiesFromFeatures(metadata);
             featureIdList = processor.GetValidFeatureIds(featureIdList);
 
-            await RunWithCommitAsync( _ =>
+            await RunWithCommitAsync(_ =>
             {
                 _.MaterialRepository.AddFeatureIdList(material.Id, featureIdList);
 
@@ -121,6 +124,8 @@ namespace Iis.Api.Materials.Handlers
                         material.Metadata = metadata.ToString(Newtonsoft.Json.Formatting.None);
                     });
             });
+
+            await _materialElasticService.PutMaterialToElasticSearchAsync(material.Id);
         }
 
         private IEnumerable<Guid> GetNodeIdentitiesFromFeatures(JObject metadata)
