@@ -58,6 +58,7 @@ namespace Iis.Services
             new AggregationField(MaterialAliases.SourceReliability.Path, MaterialAliases.SourceReliability.Alias, MaterialAliases.SourceReliability.Path),
             new AggregationField(MaterialAliases.Type.Path, MaterialAliases.Type.Alias, MaterialAliases.Type.Path),
             new AggregationField(MaterialAliases.Source.Path, MaterialAliases.Source.Alias, MaterialAliases.Source.Path),
+            new AggregationField(nameof(MaterialDocument.Channel), null, nameof(MaterialDocument.Channel))
         };
         private static readonly List<ElasticBulkResponse> EmptyElasticBulkResponseList = new List<ElasticBulkResponse>();
         private readonly IElasticManager _elasticManager;
