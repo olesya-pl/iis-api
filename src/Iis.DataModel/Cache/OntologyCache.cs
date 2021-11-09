@@ -1,17 +1,15 @@
-﻿using Iis.DataModel.Materials;
-using Microsoft.EntityFrameworkCore;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Text;
+using Iis.DataModel.Materials;
+using Microsoft.EntityFrameworkCore;
 
 namespace Iis.DataModel.Cache
 {
     public class OntologyCache : IOntologyCache
     {
-        OntologyContext _context;
-        Dictionary<Guid, MaterialSignEntity> _materialSignsDict;
-        Dictionary<string, IReadOnlyCollection<string>> _fieldNamesByType = new Dictionary<string, IReadOnlyCollection<string>>();
-        public IReadOnlyCollection<MaterialSignEntity> MaterialSigns => _materialSignsDict.Values;
+        private readonly OntologyContext _context;
+        private readonly Dictionary<Guid, MaterialSignEntity> _materialSignsDict;
+
         public OntologyCache(OntologyContext context)
         {
             if (context == null) return;
@@ -22,9 +20,11 @@ namespace Iis.DataModel.Cache
                 .Result;
         }
 
+        public IReadOnlyCollection<MaterialSignEntity> MaterialSigns => _materialSignsDict.Values;
+
         public MaterialSignEntity GetMaterialSign(Guid id)
         {
             return _materialSignsDict[id];
-        }        
+        }
     }
 }
