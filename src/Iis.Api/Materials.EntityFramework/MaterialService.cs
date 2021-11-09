@@ -442,6 +442,7 @@ namespace IIS.Core.Materials.EntityFramework
                 _fileService.RemoveFiles(new List<Guid> { materialEntity.FileId.Value });
             }
             Run(uow => uow.MaterialRepository.RemoveMaterialAndRelatedData(materialId));
+            await _materialElasticService.RemoveMaterial(materialId, cancellationToken);
         }
 
         private static MaterialCreatedMessage CreatedMessage(Material material)

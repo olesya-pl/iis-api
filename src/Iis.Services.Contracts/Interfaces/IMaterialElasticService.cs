@@ -29,5 +29,6 @@ namespace Iis.Services.Contracts.Interfaces
         Task PutMaterialsToElasticSearchAsync(IEnumerable<Guid> materialIds, CancellationToken ct = default, bool waitForIndexing = false);
         Task<bool> PutMaterialToElasticSearchAsync(MaterialEntity material, CancellationToken ct = default, bool waitForIndexing = false);
         Task PutMaterialsToElasticByNodeIdsAsync(IReadOnlyCollection<Guid> nodeIds, CancellationToken ct = default, bool waitForIndexing = false);
+        Task RemoveMaterial(Guid materialId, CancellationToken cancellationToken);
     }
 }
