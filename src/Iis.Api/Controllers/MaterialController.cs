@@ -63,14 +63,14 @@ namespace Iis.Api.Controllers
             return Content(json);
         }
 
-        [HttpDelete("RemoveMaterials")]
+        [HttpPost("RemoveMaterials")]
         public async Task<IActionResult> RemoveMaterials()
         {
             await _materialService.RemoveMaterials();
             return Ok();
         }
 
-        [HttpDelete("{materialId}")]
+        [HttpGet("RemoveMaterial/{materialId}")]
         public async Task<IActionResult> RemoveMaterial(Guid materialId, CancellationToken cancellationToken)
         {
             await _materialService.RemoveMaterialAsync(materialId, cancellationToken);
