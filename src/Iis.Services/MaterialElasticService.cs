@@ -146,7 +146,7 @@ namespace Iis.Services
             return searchResult;
         }
 
-        public Task RemoveMaterial(Guid materialId, CancellationToken cancellationToken)
+        public Task RemoveMaterialAsync(Guid materialId, CancellationToken cancellationToken)
         {
             return _elasticManager.DeleteDocumentAsync(_elasticState.MaterialIndexes.First(), materialId.ToString("N"), cancellationToken);
         }

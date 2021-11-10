@@ -438,7 +438,7 @@ namespace IIS.Core.Materials.EntityFramework
             var fileIds = GetFileIds(materialEntity);
             _fileService.RemoveFiles(fileIds);
             Run(uow => uow.MaterialRepository.RemoveMaterialAndRelatedData(materialId));
-            await _materialElasticService.RemoveMaterial(materialId, cancellationToken);
+            await _materialElasticService.RemoveMaterialAsync(materialId, cancellationToken);
         }
 
         private static List<Guid> GetFileIds(MaterialEntity materialEntity)
