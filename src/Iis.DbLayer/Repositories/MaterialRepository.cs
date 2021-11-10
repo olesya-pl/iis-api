@@ -321,6 +321,10 @@ namespace Iis.DbLayer.Repositories
             {
                 Context.Materials.RemoveRange(materials);
             }
+            var changeHistory = Context.ChangeHistory.Where(p => p.TargetId == materialId);
+            if (changeHistory.Any()) {
+                Context.ChangeHistory.RemoveRange(changeHistory);
+            }
         }
 
         private Task<PaginatedCollection<MaterialEntity>> GetAllWithPredicateAsync(
