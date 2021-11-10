@@ -138,6 +138,7 @@ namespace Iis.DataModel.Materials
         public virtual ICollection<MaterialEntity> Children { get; set; } = new List<MaterialEntity>();
         public virtual ICollection<MaterialInfoEntity> MaterialInfos { get; set; } = new List<MaterialInfoEntity>();
         public virtual List<MaterialAssigneeEntity> MaterialAssignees { get; set; } = new List<MaterialAssigneeEntity>();
+        public virtual ICollection<MLResponseEntity> MLResponses { get; set; } = new List<MLResponseEntity>();
         public int MlHandlersCount { get; set; }
 
         public DateTime? RegistrationDate { get; set; }
