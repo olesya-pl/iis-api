@@ -440,7 +440,7 @@ namespace IIS.Services.Materials
             return entity != null;
         }
 
-        public Task<IReadOnlyList<MaterialDistributionItem>> GetMaterialsForDistribution(
+        public Task<IReadOnlyList<MaterialDistributionItem>> GetMaterialsForDistributionAsync(
             UserDistributionItem user,
             Expression<Func<MaterialEntity, bool>> filter)
         {

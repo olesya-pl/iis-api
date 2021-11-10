@@ -48,7 +48,7 @@ namespace IIS.Services.Contracts.Interfaces
         Task<Material> GetMaterialAsync(Guid id);
         Task<Material> GetMaterialAsync(Guid id, User user);
         Task<IReadOnlyCollection<LocationHistoryDto>> GetLocationHistoriesAsync(Guid materialId);
-        Task<IReadOnlyList<MaterialDistributionItem>> GetMaterialsForDistribution(
+        Task<IReadOnlyList<MaterialDistributionItem>> GetMaterialsForDistributionAsync(
             UserDistributionItem user,
             Expression<Func<MaterialEntity, bool>> filter);
     }
