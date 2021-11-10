@@ -1,14 +1,16 @@
 using System;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
 using System.Security.Authentication;
+using System.Threading.Tasks;
 using IIS.Core;
+using Iis.Interfaces.Roles;
 using Iis.Services.Contracts.Access;
 using Iis.Services.Contracts.Interfaces;
 using IIS.Services.Contracts.Interfaces;
-using Iis.Interfaces.Roles;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
+using IIS.Core.Materials;
+using System.Threading;
 
 namespace Iis.Api.Controllers
 {
@@ -19,15 +21,18 @@ namespace Iis.Api.Controllers
         private readonly IUserService _userService;
         private readonly IConfiguration _configuration;
         private readonly IMaterialProvider _materialProvider;
+        private readonly IMaterialService _materialService;
 
         public MaterialController(
             IUserService userService,
             IConfiguration configuration,
-            IMaterialProvider materialProvider)
+            IMaterialProvider materialProvider,
+            IMaterialService materialService)
         {
             _userService = userService;
             _configuration = configuration;
             _materialProvider = materialProvider;
+            _materialService = materialService;
         }
 
         [HttpGet("GetAccess/{id}")]
@@ -56,6 +61,20 @@ namespace Iis.Api.Controllers
             var json = JsonConvert.SerializeObject(objectAccess);
 
             return Content(json);
+        }
+
+        [HttpPost("RemoveMaterials")]
+        public async Task<IActionResult> RemoveMaterials()
+        {
+            await _materialService.RemoveMaterials();
+            return Ok();
+        }
+
+        [HttpDelete("RemoveMaterial/{materialId}")]
+        public async Task<IActionResult> RemoveMaterial(Guid materialId, CancellationToken cancellationToken)
+        {
+            await _materialService.RemoveMaterialAsync(materialId, cancellationToken);
+            return Ok();
         }
     }
 }
