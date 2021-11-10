@@ -448,13 +448,7 @@ namespace IIS.Core.Materials.EntityFramework
             {
                 fileIds.Add(materialEntity.FileId.Value);
             }
-            foreach (var child in materialEntity.Children)
-            {
-                if (child.FileId.HasValue)
-                {
-                    fileIds.Add(child.FileId.Value);
-                }
-            }
+            fileIds.AddRange(materialEntity.Children.Where(_ => _.FileId.HasValue).Select(_ => _.FileId.Value));
 
             return fileIds;
         }
