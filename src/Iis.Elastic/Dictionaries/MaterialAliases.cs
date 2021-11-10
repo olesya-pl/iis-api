@@ -55,5 +55,12 @@ namespace Iis.Elastic.Dictionaries
             public const string Alias = "Пріоритет_сесії";
             public const string Path = "SessionPriority.Title";
         }
+
+        public class Assignees
+        {
+            public const string Alias = "Призначення";
+            public const string Path = "Assignees.Id";
+            public const string AliasForSingleItem = "Призначено мені";
+        }
     }
 }

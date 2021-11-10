@@ -208,7 +208,9 @@ namespace Iis.Api.Controllers
                 IntegerProperty.Create("NodesCount"),
                 DenseVectorProperty.Create("ImageVectors.Vector", MaterialDocument.ImageVectorDimensionsCount),
                 TextProperty.Create("MLResponses.namedEntityRecognition", ElasticConfiguration.DefaultTermVector),
-                TextProperty.Create("MLResponses.textAnnotation", ElasticConfiguration.DefaultTermVector)
+                TextProperty.Create("MLResponses.textAnnotation", ElasticConfiguration.DefaultTermVector),
+                KeywordProperty.Create(MaterialAliases.Assignees.Path, false),
+                AliasProperty.Create(MaterialAliases.Assignees.Alias, MaterialAliases.Assignees.Path),
             });
             await _elasticManager.CreateIndexesAsync(
                 new[] { materialIndex },

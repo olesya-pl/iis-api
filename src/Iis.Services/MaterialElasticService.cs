@@ -56,6 +56,7 @@ namespace Iis.Services
             new AggregationField(MaterialAliases.SourceReliability.Path, MaterialAliases.SourceReliability.Alias, MaterialAliases.SourceReliability.Path),
             new AggregationField(MaterialAliases.Type.Path, MaterialAliases.Type.Alias, MaterialAliases.Type.Path),
             new AggregationField(MaterialAliases.Source.Path, MaterialAliases.Source.Alias, MaterialAliases.Source.Path),
+            new AggregationField(MaterialAliases.Assignees.Path, MaterialAliases.Assignees.Alias, MaterialAliases.Assignees.Path),
         };
 
         private readonly IElasticManager _elasticManager;
@@ -99,7 +100,7 @@ namespace Iis.Services
 
             var queryString = SearchQueryExtension.CreateMaterialsQueryString(
                 searchParams.Suggestion,
-                searchParams.FilteredItems,
+                ChangeAssigneeFiltered(searchParams.FilteredItems, userId),
                 searchParams.CherryPickedItems);
 
             var query = new ExactQueryBuilder()
@@ -125,8 +126,10 @@ namespace Iis.Services
             {
                 if (item.Value.Highlight is null) continue;
 
-                item.Value.Highlight = await _elasticResponseManagerFactory.Create(SearchType.Material)
-                 .GenerateHighlightsWithoutDublications(item.Value.SearchResult, item.Value.Highlight);
+                var highlight = await _elasticResponseManagerFactory.Create(SearchType.Material)
+                    .GenerateHighlightsWithoutDublications(item.Value.SearchResult, item.Value.Highlight);
+
+                item.Value.Highlight = ChangeAssigneeHighlight(highlight, userId);
             }
 
             if (ItemsCountPossiblyExceedsMaxThreshold(searchResult))
@@ -140,6 +143,7 @@ namespace Iis.Services
                     .CountAsync(countQuery, _elasticState.MaterialIndexes, ct);
             }
 
+            ChangeAssigneeAggregations(searchResult.Aggregations, userId);
             return searchResult;
         }
 
@@ -621,6 +625,46 @@ namespace Iis.Services
             materialDocument.ObjectsOfStudyCount = materialDocument.RelatedObjectCollection.Count(e => e.RelationType == NoneLinkTypeValue);
 
             return materialDocument;
-        }        
+        }
+
+        private void ChangeAssigneeAggregations(Dictionary<string, AggregationItem> aggregations, Guid userId)
+        {
+            var item = aggregations.GetValueOrDefault(MaterialAliases.Assignees.Alias);
+            if (item == null) return;
+
+            item.Buckets = item.Buckets.Where(_ => _.Key == userId.ToString()).ToArray();
+            if (item.Buckets.Length == 0) return;
+
+            item.Buckets[0].Key = MaterialAliases.Assignees.AliasForSingleItem;
+        }
+
+        private IReadOnlyCollection<Property> ChangeAssigneeFiltered(IReadOnlyCollection<Property> items, Guid userId)
+        {
+            var result = new List<Property>(items.Select(_ => new Property(_.Name, _.Value)));
+            var assigneeProperty = result.FirstOrDefault(_ => _.Name == MaterialAliases.Assignees.Alias);
+            if (assigneeProperty?.Value == MaterialAliases.Assignees.AliasForSingleItem)
+            {
+                assigneeProperty.Value = userId.ToString();
+            }
+
+            return result;
+        }
+
+        private JObject ChangeAssigneeHighlight(JObject highlight, Guid userId)
+        {
+            if (highlight.ContainsKey(MaterialAliases.Assignees.Path))
+            {
+                highlight.Remove(MaterialAliases.Assignees.Path);
+            }
+            if (highlight.ContainsKey(MaterialAliases.Assignees.Alias))
+            {
+                var baseValue = highlight.GetValue(MaterialAliases.Assignees.Alias).ToString();
+                if (baseValue.Contains(userId.ToString()))
+                {
+                    highlight[MaterialAliases.Assignees.Alias] = baseValue.Replace(userId.ToString(), MaterialAliases.Assignees.AliasForSingleItem);
+                }
+            }
+            return highlight;
+        }
     }
 }
