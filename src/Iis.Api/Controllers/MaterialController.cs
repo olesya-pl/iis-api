@@ -1,7 +1,9 @@
 using System;
 using System.Security.Authentication;
+using System.Threading;
 using System.Threading.Tasks;
 using IIS.Core;
+using IIS.Core.Materials;
 using Iis.Interfaces.Roles;
 using Iis.Services.Contracts.Access;
 using Iis.Services.Contracts.Interfaces;
@@ -9,8 +11,6 @@ using IIS.Services.Contracts.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
-using IIS.Core.Materials;
-using System.Threading;
 
 namespace Iis.Api.Controllers
 {
@@ -63,14 +63,14 @@ namespace Iis.Api.Controllers
             return Content(json);
         }
 
-        [HttpPost("RemoveMaterials")]
+        [HttpDelete("RemoveMaterials")]
         public async Task<IActionResult> RemoveMaterials()
         {
             await _materialService.RemoveMaterials();
             return Ok();
         }
 
-        [HttpDelete("RemoveMaterial/{materialId}")]
+        [HttpDelete("{materialId}")]
         public async Task<IActionResult> RemoveMaterial(Guid materialId, CancellationToken cancellationToken)
         {
             await _materialService.RemoveMaterialAsync(materialId, cancellationToken);
