@@ -9,6 +9,7 @@ using Iis.Domain;
 using Iis.Interfaces.Ontology.Data;
 using Iis.Interfaces.Ontology.Schema;
 using Iis.Services;
+using Iis.RabbitMq.Helpers;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -16,12 +17,12 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
-using RabbitMQ.Client.Exceptions;
 
 namespace Iis.EventMaterialAutoAssignment
 {
     public class EventMaterialAssigner : BackgroundService
     {
+        private const int RetryIntervalSec = 5;
         private readonly ILogger<EventMaterialAssigner> _logger;
         private readonly EventMaterialAssignerConfiguration _configuration;
         private readonly IServiceScopeFactory _serviceScopeFactory;
@@ -53,20 +54,7 @@ namespace Iis.EventMaterialAutoAssignment
             _eventStateType = ontologyData.Schema.GetEntityTypeByName("EventState");
             _accessLevelType = ontologyData.Schema.GetEntityTypeByName("AccessLevel");
 
-            while (true)
-            {
-                try
-                {
-                    _connection = connectionFactory.CreateConnection();
-                    break;
-                }
-                catch (BrokerUnreachableException e)
-                {
-                    var timeout = 5000;
-                    _logger.LogError($"Attempting to connect again in {timeout / 1000} sec.");
-                    Thread.Sleep(timeout);
-                }
-            }
+            _connection = connectionFactory.CreateAndWaitConnection(RetryIntervalSec, _logger, nameof(EventMaterialAssigner));
 
             _incommingChannel = _connection.CreateModel();
             _incommingChannel.QueueDeclare(
@@ -156,12 +144,12 @@ namespace Iis.EventMaterialAutoAssignment
                                         .FirstOrDefaultAsync(p => p.Id == message.ConfigId);
         }
 
-        private static Dictionary<string, object> GenerateEventProperties(AssignmentConfig config, 
-            Guid? componentId, 
-            Guid? typeId, 
-            Guid? importanceId, 
-            Guid? countryId, 
-            Guid? stateId, 
+        private static Dictionary<string, object> GenerateEventProperties(AssignmentConfig config,
+            Guid? componentId,
+            Guid? typeId,
+            Guid? importanceId,
+            Guid? countryId,
+            Guid? stateId,
             Guid? accessLevelId)
         {
             var properties = new Dictionary<string, object>();

@@ -7,9 +7,11 @@ namespace Iis.Api.FlightRadar
 {
     public static class FlightRadarRegistrationModule
     {
+        private const string DataReaderSectionName = "flightRadarDataReader";
+
         public static IServiceCollection RegisterFlightRadarServices(this IServiceCollection services, IConfiguration configuration)
         {
-            var flightRadarDataReaderConfig = configuration.GetSection("flightRadarDataReader").Get<FlightRadarDataReaderConfig>();
+            var flightRadarDataReaderConfig = configuration.GetSection(DataReaderSectionName).Get<FlightRadarDataReaderConfig>();
             services.AddSingleton(flightRadarDataReaderConfig);
 
             services.AddTransient<IFlightRadarService, FlightRadarService<IIISUnitOfWork>>();

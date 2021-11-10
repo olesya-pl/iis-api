@@ -191,6 +191,7 @@ namespace Iis.Api.Controllers
                 KeywordProperty.Create(MaterialAliases.ProcessedStatus.Path, false),
                 AliasProperty.Create(MaterialAliases.ProcessedStatus.Alias, MaterialAliases.ProcessedStatus.Path),
                 ByteProperty.Create("ProcessedStatus.OrderNumber"),
+                DateProperty.Create("ProcessedAt", ElasticConfiguration.DefaultDateFormats),
                 KeywordProperty.Create(MaterialAliases.Completeness.Path, false),
                 AliasProperty.Create(MaterialAliases.Completeness.Alias, MaterialAliases.Completeness.Path),
                 KeywordProperty.Create(MaterialAliases.Importance.Path, false),

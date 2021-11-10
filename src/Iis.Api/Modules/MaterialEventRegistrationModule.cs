@@ -1,6 +1,5 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-
 using IIS.Core.Materials;
 using IIS.Core.Materials.Handlers.Configurations;
 using Iis.Api.Materials;
@@ -11,20 +10,20 @@ namespace Iis.Api.Modules
 {
     internal static class MaterialEventRegistrationModule
     {
-        private const string eventSectionName = "materialEventPublisher";
-        private const string assignerSectionName = "operatorAssigner";
-        private const string featureHandlerSectionName = "featureHandler";
-        private const string elasticSaverSectionName = "elasticSaver";
+        private const string EventSectionName = "materialEventPublisher";
+        private const string AssignerSectionName = "operatorAssigner";
+        private const string FeatureHandlerSectionName = "featureHandler";
+        private const string ElasticSaverSectionName = "elasticSaver";
         private const string MaterialConsumerSectionName = "materialConsumer";
         public static IServiceCollection RegisterMaterialEventServices(this IServiceCollection services, IConfiguration configuration)
         {
-            var meConfig = configuration.GetSection(eventSectionName)
+            var meConfig = configuration.GetSection(EventSectionName)
                                             .Get<MaterialEventConfiguration>();
-            var assignerConfig = configuration.GetSection(assignerSectionName)
+            var assignerConfig = configuration.GetSection(AssignerSectionName)
                                             .Get<MaterialOperatorAssignerConfiguration>();
-            var featureHandlerConfig = configuration.GetSection(featureHandlerSectionName)
+            var featureHandlerConfig = configuration.GetSection(FeatureHandlerSectionName)
                                                     .Get<FeatureHandlerConfig>();
-            var elasticSaver = configuration.GetSection(elasticSaverSectionName)
+            var elasticSaver = configuration.GetSection(ElasticSaverSectionName)
                                                     .Get<MaterialElasticSaverConfiguration>();
             var materialConsumerConfig = configuration.GetSection(MaterialConsumerSectionName)
                                                     .Get<MaterialConsumerConfiguration>();

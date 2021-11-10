@@ -1,18 +1,18 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Collections.Generic;
-using Microsoft.EntityFrameworkCore;
 using Iis.DataModel;
 using Iis.DataModel.Materials;
+using Iis.DbLayer.Common;
 using Iis.DbLayer.Extensions;
 using Iis.DbLayer.MaterialEnum;
 using Iis.Domain.Materials;
 using IIS.Repository;
 using Iis.Services.Contracts.Materials.Distribution;
-using Iis.DbLayer.Common;
+using Microsoft.EntityFrameworkCore;
 
 namespace Iis.DbLayer.Repositories
 {
@@ -105,7 +105,7 @@ namespace Iis.DbLayer.Repositories
             int limit,
             int offset,
             string sortColumnName = null,
-            string sortOrder = null) => 
+            string sortOrder = null) =>
             GetAllWithPredicateAsync(limit, offset, e => types.Contains(e.Type), sortColumnName, sortOrder);
 
         public async Task<IEnumerable<MaterialEntity>> GetAllByAssigneeIdAsync(Guid assigneeId)
@@ -138,9 +138,9 @@ namespace Iis.DbLayer.Repositories
             Context.Materials.Add(materialEntity);
         }
 
-        public void AddMaterialInfos(IEnumerable<MaterialInfoEntity> materialEntity)
+        public void AddMaterialInfos(IEnumerable<MaterialInfoEntity> materialEntities)
         {
-            Context.MaterialInfos.AddRange(materialEntity);
+            Context.MaterialInfos.AddRange(materialEntities);
         }
 
         public void AddMaterialFeatures(IEnumerable<MaterialFeatureEntity> materialFeatureEntities)
@@ -331,10 +331,16 @@ namespace Iis.DbLayer.Repositories
         private IQueryable<MaterialEntity> GetOnlyMaterialsForNodeIdListQuery(IEnumerable<Guid> nodeIdList)
         {
             return Context.Materials
-                        .Join(Context.MaterialInfos, m => m.Id, mi => mi.MaterialId,
-                            (Material, MaterialInfo) => new { Material, MaterialInfo })
-                        .Join(Context.MaterialFeatures, m => m.MaterialInfo.Id, mf => mf.MaterialInfoId,
-                            (MaterialInfoJoined, MaterialFeature) => new { MaterialInfoJoined, MaterialFeature })
+                        .Join(
+                            Context.MaterialInfos,
+                            m => m.Id,
+                            mi => mi.MaterialId,
+                            (material, materialInfo) => new { Material = material, MaterialInfo = materialInfo })
+                        .Join(
+                            Context.MaterialFeatures,
+                            m => m.MaterialInfo.Id,
+                            mf => mf.MaterialInfoId,
+                            (materialInfoJoined, materialFeature) => new { MaterialInfoJoined = materialInfoJoined, MaterialFeature = materialFeature })
                         .Where(m => nodeIdList.Contains(m.MaterialFeature.NodeId))
                         .Select(m => m.MaterialInfoJoined.Material);
         }
