@@ -69,6 +69,7 @@ namespace IIS.Services.Materials
         public async Task<MaterialsDto> GetMaterialsAsync(
             Guid userId,
             string filterQuery,
+            RelationsState? materialRelationsState,
             IReadOnlyCollection<Property> filteredItems,
             IReadOnlyCollection<string> cherryPickedItems,
             PaginationParams page,
@@ -86,7 +87,7 @@ namespace IIS.Services.Materials
                 Sorting = sorting
             };
 
-            var searchResult = await _materialElasticService.SearchMaterialsByConfiguredFieldsAsync(userId, searchParams, ct);
+            var searchResult = await _materialElasticService.SearchMaterialsByConfiguredFieldsAsync(userId, searchParams, materialRelationsState, ct);
 
             var materials = searchResult.Items.Values
                 .Select(p => MaterialDocument.FromJObject(p.SearchResult))

@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-
 using Iis.Interfaces.Elastic;
 
 namespace Iis.Services.Contracts.Params

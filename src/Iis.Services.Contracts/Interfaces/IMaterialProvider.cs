@@ -20,6 +20,7 @@ namespace IIS.Services.Contracts.Interfaces
         Task<Material[]> GetMaterialsByIdsAsync(ISet<Guid> ids, User user);
         Task<MaterialsDto> GetMaterialsAsync(Guid userId,
             string filterQuery,
+            RelationsState? materialRelationsState,
             IReadOnlyCollection<Property> filteredItems,
             IReadOnlyCollection<string> cherryPickedItems,
             PaginationParams page,
