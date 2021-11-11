@@ -10,5 +10,6 @@ namespace Iis.DataModel.Materials
         public string HandlerVersion { get; set; }
         public DateTime ProcessingDate { get; set; }
         public string OriginalResponse { get; set; }
+        public virtual MaterialEntity Material { get; set; }
     }
 }
