@@ -99,10 +99,18 @@ namespace AcceptanceTests.UISteps
         {
             var uniqueSuffix = Guid.NewGuid().ToString();
             var materialModel = table.CreateInstance<MaterialModel>();
-            materialModel.FileName = materialModel.FileName + uniqueSuffix;
-            materialModel.Content = materialModel.Content + uniqueSuffix;
+            materialModel.FileName += uniqueSuffix;
+            materialModel.Content += uniqueSuffix;
             context.Set(materialModel.FileName, "uploadedMaterial");
-            await MaterialsHelper.UploadDocxMaterial(materialModel);
+            var response = await MaterialsHelper.UploadDocxMaterial(materialModel);
+            context.Set(response, "uploadedMaterial.Id");
+        }
+
+        [When(@"I clean up uploaded material via API")]
+        public async Task WhenICleanUpUploadedMaterialViaAPI()
+        {
+            var id = context.Get<Guid>("uploadedMaterial.Id");
+            await MaterialsHelper.RemoveMaterial(id);
         }
 
         [When(@"I set importance (.*) value")]

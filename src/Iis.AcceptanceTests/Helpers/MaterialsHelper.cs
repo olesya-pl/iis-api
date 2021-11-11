@@ -101,9 +101,9 @@ namespace AcceptanceTests.Helpers
             return fileResult;
         }
 
-        public static async Task UploadDocxMaterial(MaterialModel materialModel)
+        public static async Task<Guid> UploadDocxMaterial(MaterialModel materialModel)
         {
-            var material = MaterialsHelper.GenerateDocxMaterial(materialModel.FileName, materialModel.Content);
+            var material = GenerateDocxMaterial(materialModel.FileName, materialModel.Content);
             var materialInput = Create(material.Item1,
                 null, materialModel.Content,
                 materialModel.SourceReliabilityText,
@@ -111,7 +111,17 @@ namespace AcceptanceTests.Helpers
                 materialModel.MetaData,
                 materialModel.LoadedBy,
                 materialModel.AccessLevel);
-            await AddMaterialAsync(materialInput, materialModel.FileName + ".docx", material.Item2, CancellationToken.None);
+            var response = await AddMaterialAsync(materialInput, materialModel.FileName + ".docx", material.Item2, CancellationToken.None);
+            return response.Id;
+        }
+
+        internal static Task RemoveMaterial(Guid id)
+        {
+            var httpClient = new HttpClient
+            {
+                BaseAddress = new Uri(TestData.BaseApiAddress)
+            };
+            return httpClient.GetAsync($"api/material/RemoveMaterial/{id}");
         }
     }
 }
