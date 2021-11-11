@@ -8,7 +8,6 @@ namespace Iis.DataModel.ChangeHistory
         Material = 1
     }
 
-
     public class ChangeHistoryEntity : BaseEntity
     {
         public Guid TargetId { get; set; }
