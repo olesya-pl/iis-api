@@ -146,6 +146,11 @@ namespace Iis.Services
             return searchResult;
         }
 
+        public Task RemoveMaterialAsync(Guid materialId, CancellationToken cancellationToken)
+        {
+            return _elasticManager.DeleteDocumentAsync(_elasticState.MaterialIndexes.First(), materialId.ToString("N"), cancellationToken);
+        }
+
         private static bool ItemsCountPossiblyExceedsMaxThreshold(SearchResult searchResult)
         {
             return searchResult.Count == ElasticConstants.MaxItemsCount;

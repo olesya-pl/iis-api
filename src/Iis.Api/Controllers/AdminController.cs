@@ -6,7 +6,6 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using IIS.Core;
-using IIS.Core.Materials;
 using Iis.DbLayer.Repositories;
 using Iis.Elastic;
 using Iis.Elastic.Dictionaries;
@@ -30,7 +29,6 @@ namespace Iis.Api.Controllers
     public class AdminController : Controller
     {
         private const string AllIndexes = "all";
-        private readonly IMaterialService _materialService;
         private readonly IMaterialElasticService _materialElasticService;
         private readonly IElasticManager _elasticManager;
         private readonly INodeSaveService _nodeSaveService;
@@ -47,7 +45,6 @@ namespace Iis.Api.Controllers
         private readonly NodeMaterialRelationService<IIISUnitOfWork> _nodeMaterialRelationService;
 
         public AdminController(
-            IMaterialService materialService,
             IMaterialElasticService materialElasticService,
             IElasticManager elasticManager,
             INodeSaveService nodeSaveService,
@@ -63,7 +60,6 @@ namespace Iis.Api.Controllers
             IMaterialProvider materialProvider,
             NodeMaterialRelationService<IIISUnitOfWork> nodeMaterialRelationService)
         {
-            _materialService = materialService;
             _materialElasticService = materialElasticService;
             _elasticManager = elasticManager;
             _nodeSaveService = nodeSaveService;
@@ -331,13 +327,6 @@ namespace Iis.Api.Controllers
             var newAccessLevels = new AccessLevels(param.AccessLevelList);
             await _accessLevelService.ChangeAccessLevels(newAccessLevels, param.DeletedMappings, ct);
             await ReInitializeOntologyIndexes("all", ct);
-        }
-
-        [HttpPost("RemoveMaterials")]
-        public async Task<IActionResult> RemoveMaterials()
-        {
-            await _materialService.RemoveMaterials();
-            return Ok();
         }
 
         [HttpGet("ImportExternalUsers/{userNames}")]

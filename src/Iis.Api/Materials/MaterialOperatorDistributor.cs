@@ -94,7 +94,7 @@ namespace Iis.Api.Materials
 
             foreach (var rule in _rules.OrderByDescending(_ => _.Priority))
             {
-                var materials = await _materialProvider.GetMaterialsForDistribution(user, rule.Filter);
+                var materials = await _materialProvider.GetMaterialsForDistributionAsync(user, rule.Filter);
                 list.AddRange(materials.Select(_ => new DistributionResultItem(_.Id, user.Id, rule.GetChannel(_))));
                 user.FreeSlots -= materials.Count();
                 if (user.FreeSlots == 0) break;
