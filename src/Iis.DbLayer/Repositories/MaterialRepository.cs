@@ -314,6 +314,19 @@ namespace Iis.DbLayer.Repositories
             }
         }
 
+        public void RemoveMaterialAndRelatedData(Guid materialId)
+        {
+            var materials = Context.Materials.Where(p => p.Id == materialId || p.ParentId == materialId);
+            if (materials.Any())
+            {
+                Context.Materials.RemoveRange(materials);
+            }
+            var changeHistory = Context.ChangeHistory.Where(p => p.TargetId == materialId);
+            if (changeHistory.Any()) {
+                Context.ChangeHistory.RemoveRange(changeHistory);
+            }
+        }
+
         private Task<PaginatedCollection<MaterialEntity>> GetAllWithPredicateAsync(
             int limit,
             int offset,

@@ -13,7 +13,6 @@ using Iis.Domain.Materials;
 using Iis.Domain.Users;
 using Iis.Interfaces.Common;
 using Iis.Interfaces.Materials;
-using Iis.Interfaces.Roles;
 using Iis.Messages.Materials;
 using IIS.Repository;
 using IIS.Repository.Factories;
@@ -22,7 +21,6 @@ using Iis.Services.Contracts.Interfaces;
 using IIS.Services.Contracts.Interfaces;
 using Iis.Services.Contracts.Materials.Distribution;
 using Iis.Utility;
-using MediatR;
 using Microsoft.Extensions.Logging;
 using MaterialLoadData = Iis.Domain.Materials.MaterialLoadData;
 
@@ -435,7 +433,24 @@ namespace IIS.Core.Materials.EntityFramework
 
         public async Task RemoveMaterialAsync(Guid materialId, CancellationToken cancellationToken)
         {
-            //todo
+            var materialEntity = await RunWithoutCommitAsync(uow => uow.MaterialRepository.GetByIdAsync(materialId, MaterialIncludeEnum.WithChildren));
+            if (materialEntity == null) return;
+            var fileIds = GetFileIds(materialEntity);
+            _fileService.RemoveFiles(fileIds);
+            Run(uow => uow.MaterialRepository.RemoveMaterialAndRelatedData(materialId));
+            await _materialElasticService.RemoveMaterialAsync(materialId, cancellationToken);
+        }
+
+        private static List<Guid> GetFileIds(MaterialEntity materialEntity)
+        {
+            var fileIds = new List<Guid>(materialEntity.Children.Count + 1);
+            if (materialEntity.FileId.HasValue)
+            {
+                fileIds.Add(materialEntity.FileId.Value);
+            }
+            fileIds.AddRange(materialEntity.Children.Where(_ => _.FileId.HasValue).Select(_ => _.FileId.Value));
+
+            return fileIds;
         }
 
         private static MaterialCreatedMessage CreatedMessage(Material material)
