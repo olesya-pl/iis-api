@@ -11,12 +11,14 @@ using Iis.Api.GraphQL.Entities;
 using HotChocolate.Resolvers;
 using Iis.Services.Contracts.Params;
 using IIS.Services.Contracts.Interfaces;
+using Iis.Services.Contracts.Elastic;
+using Newtonsoft.Json.Linq;
+using IIS.Services.Contracts.Materials;
 
 namespace IIS.Core.GraphQL.Materials
 {
     public class Query
     {
-
         [GraphQLType(typeof(AggregatedMaterialCollection))]
         public async Task<(IEnumerable<Material> materials, Dictionary<string, AggregationItem> aggregations, int totalCount)> GetMaterials(
             IResolverContext ctx,
@@ -33,7 +35,7 @@ namespace IIS.Core.GraphQL.Materials
             var filterQuery = filter?.Suggestion;
             var sortingParam = mapper.Map<SortingParams>(sorting) ?? SortingParams.Default;
             var pageParam = new PaginationParams(pagination.Page, pagination.PageSize);
-            var filteredItems = filter?.FilteredItems ?? new List<Property>();
+            var filteredItems = ChangeAssigneeFiltered(filter?.FilteredItems ?? new List<Property>(), tokenPayload.UserId);
             var cherryPickedItems = filter?.CherryPickedItems ?? new List<string>();
 
             if (searchByImageInput != null && searchByImageInput.HasConditions)
@@ -45,29 +47,26 @@ namespace IIS.Core.GraphQL.Materials
                 return (mapped, result.Aggregations, result.Count);
             }
 
-            if (searchByRelation != null && searchByRelation.HasConditions)
-            {
-                var materialsResults = await materialProvider.GetMaterialsCommonForEntitiesAsync(
+            MaterialsDto materialsResult = searchByRelation != null && searchByRelation.HasConditions ?
+                await materialProvider.GetMaterialsCommonForEntitiesAsync(
                     tokenPayload.UserId,
                     searchByRelation.NodeIdentityList,
                     searchByRelation.IncludeDescendants,
                     filterQuery,
                     pageParam,
+                    sortingParam) :
+                await materialProvider.GetMaterialsAsync(
+                    tokenPayload.UserId,
+                    filterQuery,
+                    filteredItems,
+                    cherryPickedItems,
+                    pageParam,
                     sortingParam);
 
-                var mapped = materialsResults.Materials
-                                .Select(m => mapper.Map<Material>(m))
-                                .ToList();
-
-                return (mapped, materialsResults.Aggregations, materialsResults.Count);
-            }
-
-            var materialsResult = await materialProvider
-                .GetMaterialsAsync(tokenPayload.UserId, filterQuery, filteredItems, cherryPickedItems, pageParam, sortingParam);
-
+            ChangeAssigneeHighlight(materialsResult.Highlights, tokenPayload.UserId);
+            ChangeAssigneeAggregations(materialsResult.Aggregations, tokenPayload.UserId);
             var materials = materialsResult.Materials.Select(m => mapper.Map<Material>(m)).ToList();
             MapHighlights(materials, materialsResult.Highlights);
-
             return (materials, materialsResult.Aggregations, materialsResult.Count);
         }
 
@@ -205,6 +204,50 @@ namespace IIS.Core.GraphQL.Materials
                                 .ToList();
 
             return (materials, materialsResult.Count);
+        }
+
+        private static void ChangeAssigneeAggregations(Dictionary<string, AggregationItem> aggregations, Guid userId)
+        {
+            var item = aggregations.GetValueOrDefault(MaterialAliases.Assignees.Alias);
+            if (item == null) return;
+
+            item.Buckets = item.Buckets.Where(_ => _.Key == userId.ToString()).ToArray();
+            if (item.Buckets.Length == 0) return;
+
+            item.Buckets[0].Key = MaterialAliases.Assignees.AliasForSingleItem;
+        }
+
+        private static IReadOnlyCollection<Property> ChangeAssigneeFiltered(IReadOnlyCollection<Property> items, Guid userId)
+        {
+            var result = items.Select(_ => new Property(_.Name, _.Value)).ToArray();
+            var assigneeProperty = result.FirstOrDefault(_ => _.Name == MaterialAliases.Assignees.Alias);
+            if (assigneeProperty?.Value == MaterialAliases.Assignees.AliasForSingleItem)
+            {
+                assigneeProperty.Value = userId.ToString();
+            }
+
+            return result;
+        }
+
+        private static void ChangeAssigneeHighlight(Dictionary<Guid, SearchResultItem> searchResultItems, Guid userId)
+        {
+            foreach (var item in searchResultItems.Values)
+            {
+                if (item.Highlight == null) continue;
+                var highlight = (JObject)item.Highlight;
+
+                if (highlight.ContainsKey(MaterialAliases.Assignees.Path))
+                {
+                    highlight.Remove(MaterialAliases.Assignees.Path);
+                }
+
+                if (highlight.ContainsKey(MaterialAliases.Assignees.Alias))
+                {
+                    var value = highlight.GetValue(MaterialAliases.Assignees.Alias).ToString()
+                        .Replace(userId.ToString(), MaterialAliases.Assignees.AliasForSingleItem, StringComparison.OrdinalIgnoreCase);
+                    highlight[MaterialAliases.Assignees.Alias] = JToken.Parse(value);
+                }
+            }
         }
     }
 }

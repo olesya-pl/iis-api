@@ -10,7 +10,6 @@ using Iis.Services.Contracts.Params;
 using Iis.Services.Contracts.Interfaces;
 using Iis.Services.Contracts.Interfaces.Elastic;
 using Iis.Elastic;
-using Iis.Elastic.Dictionaries;
 using Iis.Elastic.SearchQueryExtensions;
 using System.Linq;
 using Iis.DbLayer.Repositories;
@@ -29,6 +28,7 @@ using IIS.Repository;
 using IIS.Repository.Factories;
 using System.Diagnostics;
 using Microsoft.Extensions.Logging;
+using Iis.Services.Contracts.Elastic;
 
 namespace Iis.Services
 {
@@ -103,7 +103,7 @@ namespace Iis.Services
 
             var queryString = SearchQueryExtension.CreateMaterialsQueryString(
                 searchParams.Suggestion,
-                ChangeAssigneeFiltered(searchParams.FilteredItems, userId),
+                searchParams.FilteredItems,
                 searchParams.CherryPickedItems);
 
             var query = new ExactQueryBuilder()
@@ -129,10 +129,8 @@ namespace Iis.Services
             {
                 if (item.Value.Highlight is null) continue;
 
-                var highlight = await _elasticResponseManagerFactory.Create(SearchType.Material)
+                item.Value.Highlight = await _elasticResponseManagerFactory.Create(SearchType.Material)
                     .GenerateHighlightsWithoutDublications(item.Value.SearchResult, item.Value.Highlight);
-
-                item.Value.Highlight = ChangeAssigneeHighlight(highlight, userId);
             }
 
             if (ItemsCountPossiblyExceedsMaxThreshold(searchResult))
@@ -146,7 +144,6 @@ namespace Iis.Services
                     .CountAsync(countQuery, _elasticState.MaterialIndexes, ct);
             }
 
-            ChangeAssigneeAggregations(searchResult.Aggregations, userId);
             return searchResult;
         }
 
@@ -710,11 +707,9 @@ namespace Iis.Services
             }
             if (highlight.ContainsKey(MaterialAliases.Assignees.Alias))
             {
-                var baseValue = highlight.GetValue(MaterialAliases.Assignees.Alias).ToString();
-                if (baseValue.Contains(userId.ToString()))
-                {
-                    highlight[MaterialAliases.Assignees.Alias] = baseValue.Replace(userId.ToString(), MaterialAliases.Assignees.AliasForSingleItem);
-                }
+                var value = highlight.GetValue(MaterialAliases.Assignees.Alias).ToString()
+                    .Replace(userId.ToString(), MaterialAliases.Assignees.AliasForSingleItem);
+                highlight[MaterialAliases.Assignees.Alias] = JToken.Parse(value);
             }
             return highlight;
         }
