@@ -10,10 +10,10 @@ namespace Iis.Elastic.SearchQueryExtensions
     public interface ISearchParamsContext
     {
         IElasticMultiSearchParams ElasticMultiSearchParams { get; }
-        (string Query, List<IIisElasticField> Fields) BaseSearchParameter { get; }
-        (string Query, List<IIisElasticField> Fields) HistorySearchParameter { get; }
+        SearchParameter BaseSearchParameter { get; }
+        SearchParameter HistorySearchParameter { get; }
         IReadOnlyDictionary<string, string> AggregateHistoryResultQueries { get; }
-        public bool HasAdditionalParameters => HistorySearchParameter.Query != null && HistorySearchParameter.Fields != null;
+        public bool HasAdditionalParameters => HistorySearchParameter != null;
         public bool IsBaseQueryExact => SearchQueryExtension.IsExactQuery(BaseSearchParameter.Query);
         public bool IsBaseQueryMatchAll => SearchQueryExtension.IsMatchAll(BaseSearchParameter.Query);
 
@@ -54,8 +54,8 @@ namespace Iis.Elastic.SearchQueryExtensions
         }
 
         public IElasticMultiSearchParams ElasticMultiSearchParams { get; private set; }
-        public (string Query, List<IIisElasticField> Fields) BaseSearchParameter { get; private set; }
-        public (string Query, List<IIisElasticField> Fields) HistorySearchParameter { get; private set; }
+        public SearchParameter BaseSearchParameter { get; private set; }
+        public SearchParameter HistorySearchParameter { get; private set; }
         public IReadOnlyDictionary<string, string> AggregateHistoryResultQueries { get; private set; }
 
         public static ISearchParamsContext CreateFrom(
@@ -67,7 +67,7 @@ namespace Iis.Elastic.SearchQueryExtensions
 
         public static ISearchParamsContext CreateAggregatesContextFrom(ISearchParamsContext context, ElasticFilter filter)
         {
-            var searchParams = new List<(string Query, List<IIisElasticField> Fields)>(context.ElasticMultiSearchParams.SearchParams.Count);
+            var searchParams = new List<SearchParameter>(context.ElasticMultiSearchParams.SearchParams.Count);
             var aggregatesElasticFilter = new ElasticFilter
             {
                 CherryPickedItems = filter.CherryPickedItems,
@@ -76,8 +76,9 @@ namespace Iis.Elastic.SearchQueryExtensions
                 Suggestion = filter.Suggestion
             };
             var baseSearchQuery = aggregatesElasticFilter.ToQueryString(context.IsBaseQueryExact);
+            var searchParameter = new SearchParameter(baseSearchQuery, context.BaseSearchParameter.Fields, aggregatesElasticFilter.IsExact);
 
-            searchParams.Add((baseSearchQuery, context.BaseSearchParameter.Fields));
+            searchParams.Add(searchParameter);
 
             if (context.HasAdditionalParameters)
             {

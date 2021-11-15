@@ -13,5 +13,6 @@ namespace Iis.Interfaces.Elastic
         string SortColumn { get; }
         string SortOrder { get; }
         bool IsLenient { get; }
+        bool IsExact { get; }
     }
 }

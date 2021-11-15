@@ -8,13 +8,13 @@ namespace Iis.Elastic.SearchQueryExtensions
 {
     public static class SearchParamsQueryHelper
     {
-        public static JArray AsQueries(IEnumerable<(string Query, List<IIisElasticField> Fields)> searchParams, bool? isLenient)
+        public static JArray AsQueries(IEnumerable<SearchParameter> searchParams, bool? isLenient)
         {
             var queries = new JArray();
 
             foreach (var searchItem in searchParams)
             {
-                if (SearchQueryExtension.IsExactQuery(searchItem.Query))
+                if (searchItem.IsExact)
                 {
                     var shouldSection = CreateExactShouldSection(searchItem.Query, isLenient);
                     queries.Add(shouldSection);
@@ -42,7 +42,9 @@ namespace Iis.Elastic.SearchQueryExtensions
             {
                 var querySection = new JObject();
                 var queryString = new JObject();
-                queryString["query"] = SearchQueryExtension.ApplyFuzzinessOperator(query);
+                queryString["query"] = SearchQueryExtension.IsExactQuery(query) || SearchQueryExtension.IsMatchAll(query)
+                    ? query
+                    : SearchQueryExtension.ApplyFuzzinessOperator(query);
                 queryString["fuzziness"] = searchFieldGroup.Key.Fuzziness;
                 queryString["boost"] = searchFieldGroup.Key.Boost;
                 queryString["lenient"] = isLenient;

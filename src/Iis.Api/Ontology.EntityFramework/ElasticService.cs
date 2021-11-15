@@ -52,7 +52,8 @@ namespace IIS.Core.Ontology.EntityFramework
             var searchParams = new IisElasticSearchParams
             {
                 BaseIndexNames = typeNames.ToList(),
-                Query = SearchQueryExtension.IsExactQuery(queryExpression) ? queryExpression : $"*{queryExpression}*"
+                Query = SearchQueryExtension.IsExactQuery(queryExpression) ? queryExpression : $"*{queryExpression}*",
+                IsExact = filter.IsExact
             };
 
             return _elasticManager.CountAsync(searchParams, ct);
@@ -71,7 +72,8 @@ namespace IIS.Core.Ontology.EntityFramework
                 Size = filter.Limit,
                 SearchFields = ontologyFields,
                 SortColumn = filter.SortColumn,
-                SortOrder = filter.SortOrder
+                SortOrder = filter.SortOrder,
+                IsExact = filter.IsExact
             };
 
             var searchResult = await _elasticManager.WithUserId(userId).SearchAsync(searchParams, ct);
@@ -96,7 +98,8 @@ namespace IIS.Core.Ontology.EntityFramework
                 Query = string.IsNullOrEmpty(filter.Suggestion) ? SearchQueryExtension.Wildcard : $"{filter.Suggestion}",
                 From = filter.Offset,
                 Size = filter.Limit,
-                SearchFields = ontologyFields
+                SearchFields = ontologyFields,
+                IsExact = filter.IsExact
             };
             return _elasticManager.CountAsync(searchParams, ct);
         }
@@ -205,7 +208,8 @@ namespace IIS.Core.Ontology.EntityFramework
                 BaseIndexNames = typeNames,
                 Query = query,
                 Size = size,
-                SearchFields = fieldNames.Select(x => new IisElasticField { Name = x }).ToArray()
+                SearchFields = fieldNames.Select(x => new IisElasticField { Name = x }).ToArray(),
+                IsExact = SearchQueryExtension.IsExactQuery(query)
             };
             var searchResult = await _elasticManager
                 .WithUserId(userId)
@@ -298,9 +302,9 @@ namespace IIS.Core.Ontology.EntityFramework
                 BaseIndexNames = typeNames.ToList(),
                 From = filter.Offset,
                 Size = filter.Limit,
-                SearchParams = new List<(string Query, List<IIisElasticField> Fields)>
+                SearchParams = new List<SearchParameter>
                 {
-                    (baseParameterQuery, searchFields)
+                    new SearchParameter(baseParameterQuery, searchFields, filter.IsExact)
                 }
             };
             var useHistoricalSearch = !string.IsNullOrEmpty(filter.Suggestion);
@@ -329,8 +333,9 @@ namespace IIS.Core.Ontology.EntityFramework
                 new IisElasticField { Name = IdField, Boost = HistoricalSearchBoost }
             };
             var query = string.Join(IdFieldSeparator, entityIds);
+            var historySearchParameter = new SearchParameter(query, historySearchQueryFields);
 
-            multiSearchParams.SearchParams.Add((query, historySearchQueryFields));
+            multiSearchParams.SearchParams.Add(historySearchParameter);
         }
 
         private async Task<IElasticSearchResult> GetHistorySearchResultAsync(
@@ -342,7 +347,7 @@ namespace IIS.Core.Ontology.EntityFramework
             var historicalIndexes = typeNames.Select(GetHistoricalIndex);
             var resultFields = new List<string> { IdField };
 
-            if (SearchQueryExtension.IsExactQuery(filter.Suggestion))
+            if (filter.IsExact)
             {
                 var exactQuery = new ExactQueryBuilder()
                     .WithResultFields(resultFields)
@@ -360,7 +365,8 @@ namespace IIS.Core.Ontology.EntityFramework
                 Query = filter.ToQueryString(),
                 Size = filter.Limit,
                 SearchFields = searchFields,
-                ResultFields = resultFields
+                ResultFields = resultFields,
+                IsExact = filter.IsExact
             };
 
             return await _elasticManager.SearchAsync(historySearchParams, ct);
@@ -520,13 +526,16 @@ namespace IIS.Core.Ontology.EntityFramework
                 IReadOnlyDictionary<string, JToken> highlightsById,
                 ElasticFilter filter)
             {
-                if (highlightsById.Count == 0) return new Dictionary<string, string>();
+                if (highlightsById.Count == 0
+                    || filter.FilteredItems.Count == 0) return new Dictionary<string, string>();
 
                 var results = new Dictionary<string, string>(filter.FilteredItems.Count);
                 var groupedByAggregation = filter.FilteredItems
                     .GroupBy(_ => _.Name)
                     .ToDictionary(_ => _.Key, _ => _.ToArray());
-                var highlights = highlightsById.ToDictionary(
+                var highlights = highlightsById
+                    .Where(_ => _.Value != null)
+                    .ToDictionary(
                     _ => _.Key,
                     _ => ((JObject)_.Value).Properties()
                         .ToDictionary(_ => _.Name, _ => _.Value.Values<string>().ToArray()));
@@ -535,8 +544,8 @@ namespace IIS.Core.Ontology.EntityFramework
                 {
                     var highlightName = name.RemoveFromEnd(SearchQueryExtension.AggregateSuffix);
                     var ids = highlights
-                        .Where(_ => _.Value.ContainsKey(highlightName)
-                            && ContainsHighlightFilteredValue(_.Value[highlightName], filteredItems))
+                        .Where(_ => (_.Value.TryGetValue(highlightName, out var highlight) || _.Value.TryGetValue(name, out highlight))
+                            && ContainsHighlightFilteredValue(highlight, filteredItems))
                         .Select(_ => _.Key)
                         .ToArray();
                     var query = string.Join(IdFieldSeparator, ids);

@@ -13,8 +13,8 @@ namespace Iis.UnitTests.Iis.Elastic.Tests
         [Fact]
         public void ExactIds_QueryString()
         {
-            var sut = new MultiSearchParamsQueryBuilder(new List<(string Query, List<IIisElasticField> Fields)> {
-                ("__coordinates:* AND тестовий підрозділ 452", new List<IIisElasticField> {
+            var sut = new MultiSearchParamsQueryBuilder(new List<SearchParameter> {
+                new SearchParameter("__coordinates:* AND тестовий підрозділ 452", new List<IIisElasticField> {
                     new IisElasticField
                     {
                         Name = "purpose"
@@ -23,8 +23,8 @@ namespace Iis.UnitTests.Iis.Elastic.Tests
                     {
                         Name = "destination"
                     }
-                }),
-                ("1911159e0fb345fb9c8ac941ef674b5c 1a28d7a1dc1b476aa1fc10799ecf1a33", new List<IIisElasticField> {
+                }, true),
+                new SearchParameter("1911159e0fb345fb9c8ac941ef674b5c 1a28d7a1dc1b476aa1fc10799ecf1a33", new List<IIisElasticField> {
                     new IisElasticField
                     {
                         Name = "Id",
@@ -73,8 +73,8 @@ namespace Iis.UnitTests.Iis.Elastic.Tests
         [Fact]
         public void ExactIds_QueryString_CountQuery()
         {
-            var sut = new MultiSearchParamsQueryBuilder(new List<(string Query, List<IIisElasticField> Fields)> {
-                ("__coordinates:* AND тестовий підрозділ 452", new List<IIisElasticField> {
+            var sut = new MultiSearchParamsQueryBuilder(new List<SearchParameter> {
+                new SearchParameter("__coordinates:* AND тестовий підрозділ 452", new List<IIisElasticField> {
                     new IisElasticField
                     {
                         Name = "purpose"
@@ -83,8 +83,8 @@ namespace Iis.UnitTests.Iis.Elastic.Tests
                     {
                         Name = "destination"
                     }
-                }),
-                ("1911159e0fb345fb9c8ac941ef674b5c 1a28d7a1dc1b476aa1fc10799ecf1a33", new List<IIisElasticField> {
+                }, true),
+                new SearchParameter("1911159e0fb345fb9c8ac941ef674b5c 1a28d7a1dc1b476aa1fc10799ecf1a33", new List<IIisElasticField> {
                     new IisElasticField
                     {
                         Name = "Id",
@@ -125,8 +125,8 @@ namespace Iis.UnitTests.Iis.Elastic.Tests
         [Fact]
         public void ExactIds_QueryString_Highlights_Aggregations()
         {
-            var sut = new MultiSearchParamsQueryBuilder(new List<(string Query, List<IIisElasticField> Fields)> { 
-                ("__coordinates:* AND тестовий підрозділ 452", new List<IIisElasticField> { 
+            var sut = new MultiSearchParamsQueryBuilder(new List<SearchParameter> {
+                new SearchParameter("__coordinates:* AND тестовий підрозділ 452", new List<IIisElasticField> {
                     new IisElasticField
                     {
                         Name = "purpose"
@@ -135,8 +135,8 @@ namespace Iis.UnitTests.Iis.Elastic.Tests
                     {
                         Name = "destination"
                     }
-                }),
-                ("1911159e0fb345fb9c8ac941ef674b5c 1a28d7a1dc1b476aa1fc10799ecf1a33", new List<IIisElasticField> { 
+                }, true),
+                new SearchParameter("1911159e0fb345fb9c8ac941ef674b5c 1a28d7a1dc1b476aa1fc10799ecf1a33", new List<IIisElasticField> {
                     new IisElasticField
                     {
                         Name = "Id",
@@ -149,7 +149,7 @@ namespace Iis.UnitTests.Iis.Elastic.Tests
                 .WithResultFields(new[] { "*" })
                 .BuildSearchQuery()
                 .WithHighlights()
-                .WithAggregation(new[] { 
+                .WithAggregation(new[] {
                     new AggregationField("affiliation.name", "Приналежність", "affiliation.nameAggregate"),
                     new AggregationField("importance.name", null, "importance.nameAggregate")
                 });
@@ -209,6 +209,6 @@ namespace Iis.UnitTests.Iis.Elastic.Tests
 }");
             sut.Should().BeEquivalentTo(expected);
         }
-        
+
     }
 }
