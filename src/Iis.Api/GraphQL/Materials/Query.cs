@@ -14,6 +14,7 @@ using IIS.Services.Contracts.Interfaces;
 using Iis.Services.Contracts.Elastic;
 using Newtonsoft.Json.Linq;
 using IIS.Services.Contracts.Materials;
+using Iis.Domain.Materials;
 
 namespace IIS.Core.GraphQL.Materials
 {
@@ -47,6 +48,7 @@ namespace IIS.Core.GraphQL.Materials
                 return (mapped, result.Aggregations, result.Count);
             }
 
+            var relationsState = ParseRelationsState(filter.RelationsState);
             MaterialsDto materialsResult = searchByRelation != null && searchByRelation.HasConditions ?
                 await materialProvider.GetMaterialsCommonForEntitiesAsync(
                     tokenPayload.UserId,
@@ -58,6 +60,7 @@ namespace IIS.Core.GraphQL.Materials
                 await materialProvider.GetMaterialsAsync(
                     tokenPayload.UserId,
                     filterQuery,
+                    relationsState,
                     filteredItems,
                     cherryPickedItems,
                     pageParam,
@@ -249,5 +252,10 @@ namespace IIS.Core.GraphQL.Materials
                 }
             }
         }
+
+        private RelationsState? ParseRelationsState(string relationsState) => !string.IsNullOrWhiteSpace(relationsState)
+                && Enum.TryParse<RelationsState>(relationsState.Trim(), true, out var value)
+                ? value
+                : default(RelationsState?);
     }
 }

@@ -28,6 +28,9 @@ using IIS.Repository;
 using IIS.Repository.Factories;
 using System.Diagnostics;
 using Microsoft.Extensions.Logging;
+using Iis.Domain.Materials;
+using Iis.Elastic.SearchQueryExtensions.CompositeBuilders.BoolQuery;
+using Iis.Domain;
 using Iis.Services.Contracts.Elastic;
 
 namespace Iis.Services
@@ -97,21 +100,18 @@ namespace Iis.Services
             return queryExpression?.Trim() == ExclamationMark;
         }
 
-        public async Task<SearchResult> SearchMaterialsByConfiguredFieldsAsync(Guid userId, SearchParams searchParams, CancellationToken ct = default)
+        public async Task<SearchResult> SearchMaterialsByConfiguredFieldsAsync(
+            Guid userId,
+            SearchParams searchParams,
+            RelationsState? materialRelationsState,
+            CancellationToken ct = default)
         {
             var (from, size) = searchParams.Page.ToElasticPage();
-
             var queryString = SearchQueryExtension.CreateMaterialsQueryString(
                 searchParams.Suggestion,
                 searchParams.FilteredItems,
                 searchParams.CherryPickedItems);
-
-            var query = new ExactQueryBuilder()
-                .WithPagination(from, size)
-                .WithQueryString(queryString)
-                .BuildSearchQuery()
-                .WithAggregation(AggregationsFieldList)
-                .WithHighlights();
+            var query = BuildMaterialsQuery(queryString, from, size, materialRelationsState);
 
             if (searchParams.Sorting != null)
             {
@@ -718,5 +718,43 @@ namespace Iis.Services
             }
             return highlight;
         }
+
+        private JObject BuildMaterialsQuery(
+            string queryString,
+            int from,
+            int size,
+            RelationsState? materialRelationsState)
+        {
+            if (!materialRelationsState.HasValue)
+            {
+                return new ExactQueryBuilder()
+                    .WithPagination(from, size)
+                    .WithQueryString(queryString)
+                    .BuildSearchQuery()
+                    .WithAggregation(AggregationsFieldList)
+                    .WithHighlights();
+            }
+
+            var builder = new CompositeBoolQueryBuilder()
+                .WithPagination(from, size)
+                .WithCondition<ExactQueryConditionBuilder>(_ => _.WithQuery(queryString));
+
+            builder = WithRelationsStateCondition(builder, materialRelationsState);
+
+            return builder.BuildSearchQuery()
+                    .WithAggregation(AggregationsFieldList)
+                    .WithHighlights();
+        }
+
+        private CompositeBoolQueryBuilder WithRelationsStateCondition(CompositeBoolQueryBuilder builder, RelationsState? relationsState) => relationsState switch
+        {
+            RelationsState.Empty => builder.WithCondition<ExistsQueryConditionBuilder>(_ => _.MustNot().Exist(nameof(MaterialDocument.RelatedObjectCollection))),
+            RelationsState.Exists => builder.WithCondition<ExistsQueryConditionBuilder>(_ => _.Must().Exist(nameof(MaterialDocument.RelatedObjectCollection))),
+            RelationsState.HasFeature => builder.WithCondition<MatchQueryConditionBuilder>(_ => _.Must().Match(GetRelationTypeFieldName(), EntityMaterialRelation.Feature)),
+            RelationsState.HasDirect => builder.WithCondition<MatchQueryConditionBuilder>(_ => _.Must().Match(GetRelationTypeFieldName(), EntityMaterialRelation.Direct)),
+            _ => builder
+        };
+
+        private string GetRelationTypeFieldName() => $"{nameof(MaterialDocument.RelatedObjectCollection)}.{nameof(DbLayer.Repositories.RelatedObject.RelationCreatingType)}";
     }
 }
