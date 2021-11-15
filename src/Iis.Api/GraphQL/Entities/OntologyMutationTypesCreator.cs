@@ -63,7 +63,7 @@ namespace IIS.Core.GraphQL.Entities
                 type = TypeRepository.GetEntityRelationToInputType(Operation.Create, relationType.EntityType)
                     .WrapInputType(relationType);
 
-            if (relationType.IsMultiple)
+            if (relationType.IsMultiple && relationType.IsAttributeType)
                 type = TypeRepository.GetMultipleInputType(Operation.Create, relationType.AttributeTypeModel)
                     .WrapInputType(relationType);
 
