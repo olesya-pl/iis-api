@@ -3,6 +3,7 @@ Feature: EventsSection - sanity
     - IIS-6364 - Bind a material to an event in the event section
     - IIS-5831 - Bind an object of study to an event in the event section
     - IIS-6158 - Create an event in the event section
+    - IIS-5826 - Change event in the event section
 
     Background: Authorize
         Given I sign in with the user olya and password 123 in the Contour
@@ -50,3 +51,16 @@ Feature: EventsSection - sanity
         And I created a new Тестова подія event
         When I searched for the Тестова подія created event
         Then I must see the Тестова подія event in the event search results
+
+          @sanity @EventsSectionSanity @UI
+    Scenario: IIS-5826 - Edit event in the event section
+        When I navigated to Events page
+        And I created a new Тестова подія event
+        And I searched for the Тестова подія created event
+        And I pressed the review event button
+        And I pressed the edit event button
+        And I entered Додаткові дані text in the addition data text field
+        And I pressed the save event changes button
+        And I pressed the confirm save changes in the event
+        And I reloaded the event page
+        Then I must see the Додаткові дані text in the additional data text field

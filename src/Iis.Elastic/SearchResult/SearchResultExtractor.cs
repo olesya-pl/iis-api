@@ -2,7 +2,6 @@
 using System.Linq;
 using Elasticsearch.Net;
 using Iis.Elastic.Converters;
-using Iis.Elastic.SearchQueryExtensions;
 using Iis.Interfaces.Elastic;
 using Iis.Interfaces.Ontology.Schema;
 using Newtonsoft.Json;
@@ -136,7 +135,7 @@ namespace Iis.Elastic.SearchResult
         {
             foreach (var pair in aggregations)
             {
-                if (pair.Key.IsGroupedAggregateName())
+                if (GroupedAggregationNameGenerator.IsGroupedAggregateName(pair.Key))
                 {
                     foreach (var aggregationItem in pair.Value.GroupedSubAggs)
                     {

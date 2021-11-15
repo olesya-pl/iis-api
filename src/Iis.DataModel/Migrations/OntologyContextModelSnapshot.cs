@@ -360,6 +360,8 @@ namespace Iis.DataModel.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("MaterialId");
+
                     b.ToTable("MLResponses");
                 });
 
@@ -1449,6 +1451,15 @@ namespace Iis.DataModel.Migrations
                     b.HasOne("Iis.DataModel.NodeEntity", "Node")
                         .WithMany()
                         .HasForeignKey("NodeId");
+                });
+
+            modelBuilder.Entity("Iis.DataModel.Materials.MLResponseEntity", b =>
+                {
+                    b.HasOne("Iis.DataModel.Materials.MaterialEntity", "Material")
+                        .WithMany("MLResponses")
+                        .HasForeignKey("MaterialId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Iis.DataModel.Materials.MaterialAssigneeEntity", b =>

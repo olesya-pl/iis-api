@@ -1,27 +1,26 @@
-﻿using Iis.DbLayer.Repositories;
-using Iis.Elastic;
-using Iis.Elastic.Dictionaries;
-using Iis.Elastic.ElasticMappingProperties;
-using Iis.Interfaces.Elastic;
-using Iis.Interfaces.Enums;
-using Iis.OntologyData.IisAccessLevels;
-using Iis.Services.Contracts.Csv;
-using Iis.Services.Contracts.Interfaces;
-using Iis.Services.Contracts.Params;
-using IIS.Core;
-using IIS.Core.Materials;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Hosting;
-using MoreLinq;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using IIS.Core;
+using Iis.DbLayer.Repositories;
+using Iis.Elastic;
+using Iis.Elastic.Dictionaries;
+using Iis.Elastic.ElasticMappingProperties;
+using Iis.Interfaces.Elastic;
+using Iis.Interfaces.Enums;
+using Iis.OntologyData.IisAccessLevels;
 using Iis.Services;
+using Iis.Services.Contracts.Csv;
+using Iis.Services.Contracts.Interfaces;
 using IIS.Services.Contracts.Interfaces;
+using Iis.Services.Contracts.Params;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Hosting;
+using MoreLinq;
 
 namespace Iis.Api.Controllers
 {
@@ -30,7 +29,6 @@ namespace Iis.Api.Controllers
     public class AdminController : Controller
     {
         private const string AllIndexes = "all";
-        private readonly IMaterialService _materialService;
         private readonly IMaterialElasticService _materialElasticService;
         private readonly IElasticManager _elasticManager;
         private readonly INodeSaveService _nodeSaveService;
@@ -47,7 +45,6 @@ namespace Iis.Api.Controllers
         private readonly NodeMaterialRelationService<IIISUnitOfWork> _nodeMaterialRelationService;
 
         public AdminController(
-            IMaterialService materialService,
             IMaterialElasticService materialElasticService,
             IElasticManager elasticManager,
             INodeSaveService nodeSaveService,
@@ -63,7 +60,6 @@ namespace Iis.Api.Controllers
             IMaterialProvider materialProvider,
             NodeMaterialRelationService<IIISUnitOfWork> nodeMaterialRelationService)
         {
-            _materialService = materialService;
             _materialElasticService = materialElasticService;
             _elasticManager = elasticManager;
             _nodeSaveService = nodeSaveService;
@@ -145,7 +141,6 @@ namespace Iis.Api.Controllers
             _adminElasticService.Logger.AppendLine($"spend: {stopwatch.ElapsedMilliseconds} ms");
 
             return Content(_adminElasticService.Logger.ToString());
-
         }
 
         [HttpGet("RecreateElasticReportIndex")]
@@ -192,6 +187,7 @@ namespace Iis.Api.Controllers
                 KeywordProperty.Create(MaterialAliases.ProcessedStatus.Path, false),
                 AliasProperty.Create(MaterialAliases.ProcessedStatus.Alias, MaterialAliases.ProcessedStatus.Path),
                 ByteProperty.Create("ProcessedStatus.OrderNumber"),
+                DateProperty.Create("ProcessedAt", ElasticConfiguration.DefaultDateFormats),
                 KeywordProperty.Create(MaterialAliases.Completeness.Path, false),
                 AliasProperty.Create(MaterialAliases.Completeness.Alias, MaterialAliases.Completeness.Path),
                 KeywordProperty.Create(MaterialAliases.Importance.Path, false),
@@ -209,9 +205,11 @@ namespace Iis.Api.Controllers
                 IntegerProperty.Create("NodesCount"),
                 DenseVectorProperty.Create("ImageVectors.Vector", MaterialDocument.ImageVectorDimensionsCount),
                 TextProperty.Create("MLResponses.namedEntityRecognition", ElasticConfiguration.DefaultTermVector),
-                TextProperty.Create("MLResponses.textAnnotation", ElasticConfiguration.DefaultTermVector)
+                TextProperty.Create("MLResponses.textAnnotation", ElasticConfiguration.DefaultTermVector),
+                KeywordProperty.Create(nameof(MaterialDocument.Channel), false)
             });
-            await _elasticManager.CreateIndexesAsync(new[] { materialIndex },
+            await _elasticManager.CreateIndexesAsync(
+                new[] { materialIndex },
                 mappingConfiguration.ToJObject(),
                 cancellationToken);
 
@@ -255,7 +253,8 @@ namespace Iis.Api.Controllers
                 AliasProperty.Create("Було", "OldValue"),
                 AliasProperty.Create("Стало", "NewValue")
             });
-            await _elasticManager.CreateIndexesAsync(new[] { index },
+            await _elasticManager.CreateIndexesAsync(
+                new[] { index },
                 mappingConfiguration.ToJObject(),
                 cancellationToken);
 
@@ -276,7 +275,7 @@ namespace Iis.Api.Controllers
 
             var indexSecurityParam = new List<(IReadOnlyCollection<string>, string)>{
                 (_elasticState.MaterialIndexes, "AccessLevel"),
-                (new [] { _elasticState.ReportIndex }, "AccessLevel"),
+                (new[] { _elasticState.ReportIndex }, "AccessLevel"),
                 (_elasticState.OntologyIndexes, "__accessLevel"),
                 (_elasticState.WikiIndexes, "__accessLevel"),
                 (_elasticState.EventIndexes, "__accessLevel"),
@@ -330,20 +329,13 @@ namespace Iis.Api.Controllers
             await ReInitializeOntologyIndexes("all", ct);
         }
 
-        [HttpPost("RemoveMaterials")]
-        public async Task<IActionResult> RemoveMaterials()
-        {
-            await _materialService.RemoveMaterials();
-            return Ok();
-        }
-
         [HttpGet("ImportExternalUsers/{userNames}")]
         public async Task<IActionResult> ImportExternalUsers(string userNames, CancellationToken ct)
         {
             string message;
             try
             {
-                message = await _userService.ImportUsersFromExternalSourceAsync(userNames.Split(','));
+                message = await _userService.ImportUsersFromExternalSourceAsync(userNames.Split(','), ct);
             }
             catch (Exception ex)
             {
@@ -358,7 +350,7 @@ namespace Iis.Api.Controllers
             string message;
             try
             {
-                message = await _userService.ImportUsersFromExternalSourceAsync();
+                message = await _userService.ImportUsersFromExternalSourceAsync(cancellationToken: ct);
 
             }
             catch (Exception ex)
@@ -392,7 +384,7 @@ namespace Iis.Api.Controllers
             return Task.FromResult<IActionResult>(File(csv, "text/csv", $"{typeName}.csv"));
         }
 
-        private void LogElasticResult(StringBuilder log, IEnumerable<ElasticBulkResponse> response)
+        private static void LogElasticResult(StringBuilder log, IEnumerable<ElasticBulkResponse> response)
         {
             var successResponses = response.Where(x => x.IsSuccess);
             log.AppendLine($"Success operations: {successResponses.Count()}");

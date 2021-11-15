@@ -7,41 +7,23 @@ namespace Iis.UnitTests.Services.Mappers.GraphMapperTests
 {
     public class IsEligibleForGraphByNodeTypeTests
     {
-        [Fact]
-        public void Should_BeTrue_WhenNodeIsObject()
-        {
-            var node = CustomNode.Create(EntityTypeNames.Object);
-
-            var result = GraphTypeMapper.IsEligibleForGraphByNodeType(node);
-
-            result.Should().BeTrue();
-        }
-
-        [Fact]
-        public void Should_BeTrue_WhenNodeIsObjectSign()
-        {
-            var node = CustomNode.Create(EntityTypeNames.ObjectSign);
-
-            var result = GraphTypeMapper.IsEligibleForGraphByNodeType(node);
-
-            result.Should().BeTrue();
-        }
-
         [Theory]
-        [InlineData(EntityTypeNames.ObjectOfStudy)]
-        [InlineData(EntityTypeNames.AccessLevel)]
-        [InlineData(EntityTypeNames.Enum)]
-        [InlineData(EntityTypeNames.Event)]
-        [InlineData(EntityTypeNames.FuzzyDate)]
-        [InlineData(EntityTypeNames.Photo)]
-        [InlineData(EntityTypeNames.Wiki)]
-        public void Should_BeFalse_WhenOtherTypes(EntityTypeNames typeName)
+        [InlineData(EntityTypeNames.ObjectOfStudy, false)]
+        [InlineData(EntityTypeNames.FuzzyDate, false)]
+        [InlineData(EntityTypeNames.ObjectSign, true)]
+        [InlineData(EntityTypeNames.Event, false)]
+        [InlineData(EntityTypeNames.Enum, false)]
+        [InlineData(EntityTypeNames.Wiki, false)]
+        [InlineData(EntityTypeNames.Object, true)]
+        [InlineData(EntityTypeNames.AccessLevel, false)]
+        [InlineData(EntityTypeNames.Photo, false)]
+        public void CheckEligibilityDependingOnEntityTypeName(EntityTypeNames typeName, bool expectedState)
         {
             var node = CustomNode.Create(typeName);
 
             var result = GraphTypeMapper.IsEligibleForGraphByNodeType(node);
 
-            result.Should().BeFalse();
+            result.Should().Be(expectedState);
         }
     }
 }

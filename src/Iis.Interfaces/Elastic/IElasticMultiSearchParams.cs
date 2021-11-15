@@ -2,7 +2,7 @@
 
 namespace Iis.Interfaces.Elastic
 {
-    public interface IMultiElasticSearchParams
+    public interface IElasticMultiSearchParams
     {
         List<string> BaseIndexNames { get; set; }
         int From { get; set; }

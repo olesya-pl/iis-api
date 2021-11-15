@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using Iis.Interfaces.Elastic;
 using Iis.Services.Contracts.Params;
 using Iis.DataModel.ChangeHistory;
+using Iis.DataModel.Materials;
 using Iis.DbLayer.Repositories;
 
 namespace Iis.Services.Contracts.Interfaces
@@ -26,5 +27,8 @@ namespace Iis.Services.Contracts.Interfaces
         Task<List<ElasticBulkResponse>> PutCreatedMaterialsToElasticSearchAsync(IReadOnlyCollection<Guid> materialIds, bool waitForIndexing = false, CancellationToken token = default);
         Task<bool> PutMaterialToElasticSearchAsync(Guid materialId, CancellationToken ct = default, bool waitForIndexing = false);
         Task PutMaterialsToElasticSearchAsync(IEnumerable<Guid> materialIds, CancellationToken ct = default, bool waitForIndexing = false);
+        Task<bool> PutMaterialToElasticSearchAsync(MaterialEntity material, CancellationToken ct = default, bool waitForIndexing = false);
+        Task PutMaterialsToElasticByNodeIdsAsync(IReadOnlyCollection<Guid> nodeIds, CancellationToken ct = default, bool waitForIndexing = false);
+        Task RemoveMaterialAsync(Guid materialId, CancellationToken cancellationToken);
     }
 }

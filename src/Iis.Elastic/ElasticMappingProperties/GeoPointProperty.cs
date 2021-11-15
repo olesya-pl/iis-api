@@ -4,9 +4,9 @@ namespace Iis.Elastic.ElasticMappingProperties
 {
     public class GeoPointProperty : ElasticMappingProperty
     {
-        public override ElasticMappingPropertyType Type => ElasticMappingPropertyType.GeoPoint;
-
         private GeoPointProperty() { }
+
+        public override ElasticMappingPropertyType Type => ElasticMappingPropertyType.GeoPoint;
 
         public static ElasticMappingProperty Create(string propertyName)
         {

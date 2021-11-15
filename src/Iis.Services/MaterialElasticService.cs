@@ -1,5 +1,6 @@
 using System;
 using System.Threading;
+using System.Globalization;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using Newtonsoft.Json;
@@ -34,10 +35,11 @@ namespace Iis.Services
     public class MaterialElasticService<TUnitOfWork> : BaseService<TUnitOfWork>, IMaterialElasticService
          where TUnitOfWork : IIISUnitOfWork
     {
-        public const int MaterialsBatchSize = 5000;
-        public const int MaterialChangesBatchSize = 5000;
+        private const int MaxDegreeOfParallelism = 8;
+        private const int MaterialsBatchSize = 5000;
+        private const int MaterialChangesBatchSize = 5000;
         private const string ExclamationMark = "!";
-
+        private const string Iso8601DateFormat = "yyyy-MM-dd'T'HH:mm:ssZ";
         private static readonly string[] IgnoreDocumentPropertyNames = new[] { "Content" };
         private static readonly string NoneLinkTypeValue = MaterialNodeLinkType.None.ToString();
         private static readonly MaterialIncludeEnum[] IncludeAll = new[]
@@ -56,8 +58,9 @@ namespace Iis.Services
             new AggregationField(MaterialAliases.SourceReliability.Path, MaterialAliases.SourceReliability.Alias, MaterialAliases.SourceReliability.Path),
             new AggregationField(MaterialAliases.Type.Path, MaterialAliases.Type.Alias, MaterialAliases.Type.Path),
             new AggregationField(MaterialAliases.Source.Path, MaterialAliases.Source.Alias, MaterialAliases.Source.Path),
+            new AggregationField(nameof(MaterialDocument.Channel), null, nameof(MaterialDocument.Channel))
         };
-
+        private static readonly List<ElasticBulkResponse> EmptyElasticBulkResponseList = new List<ElasticBulkResponse>();
         private readonly IElasticManager _elasticManager;
         private readonly IElasticState _elasticState;
         private readonly IElasticResponseManagerFactory _elasticResponseManagerFactory;
@@ -143,6 +146,11 @@ namespace Iis.Services
             return searchResult;
         }
 
+        public Task RemoveMaterialAsync(Guid materialId, CancellationToken cancellationToken)
+        {
+            return _elasticManager.DeleteDocumentAsync(_elasticState.MaterialIndexes.First(), materialId.ToString("N"), cancellationToken);
+        }
+
         private static bool ItemsCountPossiblyExceedsMaxThreshold(SearchResult searchResult)
         {
             return searchResult.Count == ElasticConstants.MaxItemsCount;
@@ -190,7 +198,7 @@ namespace Iis.Services
             var result = await _elasticManager
                 .WithUserId(userId)
                 .GetDocumentByIdAsync(_elasticState.MaterialIndexes, materialId.ToString("N"));
-            
+
             if (!result.Items.Any()) return null;
 
             return MaterialDocument.FromJObject(result.Items.First().SearchResult);
@@ -301,33 +309,55 @@ namespace Iis.Services
 
         public async Task<List<ElasticBulkResponse>> PutAllMaterialsToElasticSearchAsync(CancellationToken cancellationToken = default)
         {
-            const int MaxDegreeOfParallelism = 8;
             int materialsCount = await RunWithoutCommitAsync(_ => _.MaterialRepository.GetTotalCountAsync(cancellationToken));
-            if (materialsCount == 0)
-                return new List<ElasticBulkResponse>();
+
+            if (materialsCount == 0) return EmptyElasticBulkResponseList;
 
             var responses = new List<ElasticBulkResponse>(materialsCount);
+
+            var processedSign = RunWithoutCommit(_ => _.MaterialSignRepository.GetById(MaterialEntity.ProcessingStatusProcessedSignId));
 
             for (var batchIndex = 0; batchIndex < (materialsCount / MaterialsBatchSize) + 1; batchIndex++)
             {
                 cancellationToken.ThrowIfCancellationRequested();
 
-                var sw = new Stopwatch();
-                sw.Start();
-                _logger.LogInformation("PutAllMaterialsToElasticSearchAsync. Indexing batch {batchIndex}", batchIndex);
+                var sw = Stopwatch.StartNew();
+
+                _logger.LogDebug("PutAllMaterialsToElasticSearchAsync. Indexing batch {batchIndex}", batchIndex);
 
                 var materialEntities = await RunWithoutCommitAsync(_ => _.MaterialRepository.GetAllAsync(MaterialsBatchSize, batchIndex * MaterialsBatchSize, IncludeAll));
-                _logger.LogInformation("PutAllMaterialsToElasticSearchAsync. Obtained materials from Postgre. Elapsed {elapsed}", sw.ElapsedMilliseconds);
+
+                _logger.LogDebug("PutAllMaterialsToElasticSearchAsync. Obtained materials from Postgre. Elapsed {elapsed}", sw.ElapsedMilliseconds);
+
                 var materialIds = materialEntities
                     .Select(_ => _.Id)
                     .ToArray();
-                _logger.LogInformation("PutAllMaterialsToElasticSearchAsync. Selected material ids. Elapsed {elapsed}", sw.ElapsedMilliseconds);
-                var mlResponsesList = await _mLResponseRepository.GetAllForMaterialListAsync(materialIds);
-                _logger.LogInformation("PutAllMaterialsToElasticSearchAsync. Obtained ML responses from Postgre. Elapsed {elapsed}", sw.ElapsedMilliseconds);
+
+                _logger.LogDebug("PutAllMaterialsToElasticSearchAsync. Selected material ids. Elapsed {elapsed}", sw.ElapsedMilliseconds);
+
+                var getChangeHistoryCollection = RunWithoutCommitAsync(_ => _.ChangeHistoryRepository.GetManyLatestByIdAndPropertyWithNewValueAsync(materialIds, processedSign.MaterialSignType.Name, processedSign.Title, cancellationToken));
+
+                var getMLResponsesList = _mLResponseRepository.GetAllForMaterialListAsync(materialIds);
+
+                await Task.WhenAll(getChangeHistoryCollection, getMLResponsesList);
+
+                var changeHistoryCollection = await getChangeHistoryCollection;
+
+                var mlResponsesList = await getMLResponsesList;
+
+                _logger.LogDebug("PutAllMaterialsToElasticSearchAsync. Obtained ML responses & ChangeHistory records from DB. Elapsed {elapsed}", sw.ElapsedMilliseconds);
+
                 var mlResponseDictionary = mlResponsesList
                     .GroupBy(p => p.MaterialId)
                     .ToDictionary(k => k.Key, p => p.ToArray());
-                _logger.LogInformation("PutAllMaterialsToElasticSearchAsync. Group by material id. Elapsed {elapsed}", sw.ElapsedMilliseconds);
+
+                _logger.LogDebug("PutAllMaterialsToElasticSearchAsync. Group by material id and create dictionaies for ML responses. Elapsed {elapsed}", sw.ElapsedMilliseconds);
+
+                var changeHistoryDictionary = changeHistoryCollection
+                    .ToDictionary(_ => _.TargetId);
+
+                _logger.LogDebug("PutAllMaterialsToElasticSearchAsync. Group by material id and create dictionaies for ChangeHistory. Elapsed {elapsed}", sw.ElapsedMilliseconds);
+
                 var materialDocuments = materialEntities
                     .AsParallel()
                     .WithDegreeOfParallelism(MaxDegreeOfParallelism)
@@ -347,15 +377,24 @@ namespace Iis.Services
 
                         p.ImageVectors = GetImageVectorList(materialIdList, mlResponseDictionary);
 
+                        p.ProcessedAt = GetProcessedAtFromChangeHistoryDictionary(p.Id, changeHistoryDictionary);
+
                         return p;
                     })
                     .ToDictionary(_ => _.Id);
-                _logger.LogInformation("PutAllMaterialsToElasticSearchAsync. Mapped materials to elastic documents. Elapsed {elapsed}", sw.ElapsedMilliseconds);
+
+                _logger.LogDebug("PutAllMaterialsToElasticSearchAsync. Mapped materials to elastic documents. Elapsed {elapsed}", sw.ElapsedMilliseconds);
+
                 string json = materialDocuments.ConvertToJson();
-                _logger.LogInformation("PutAllMaterialsToElasticSearchAsync. Generated json query. Elapsed {elapsed}", sw.ElapsedMilliseconds);
+
+                _logger.LogDebug("PutAllMaterialsToElasticSearchAsync. Generated json query. Elapsed {elapsed}", sw.ElapsedMilliseconds);
+
                 var response = await _elasticManager.PutDocumentsAsync(_elasticState.MaterialIndexes.FirstOrDefault(), json, false, cancellationToken);
-                _logger.LogInformation("PutAllMaterialsToElasticSearchAsync. Persisted materials to elastic. Elapsed {elapsed}", sw.ElapsedMilliseconds);
+
+                _logger.LogDebug("PutAllMaterialsToElasticSearchAsync. Persisted materials to elastic. Elapsed {elapsed}", sw.ElapsedMilliseconds);
+
                 responses.AddRange(response);
+
                 sw.Stop();
             }
 
@@ -457,7 +496,7 @@ namespace Iis.Services
             }
         }
 
-        private async Task<bool> PutMaterialToElasticSearchAsync(MaterialEntity material, CancellationToken ct = default, bool waitForIndexing = false)
+        public async Task<bool> PutMaterialToElasticSearchAsync(MaterialEntity material, CancellationToken ct = default, bool waitForIndexing = false)
         {
             var materialDocument = MapEntityToDocument(material);
 
@@ -466,13 +505,20 @@ namespace Iis.Services
                                 .Union(new[] { material.Id })
                                 .ToArray();
 
-            var responseList = await _mLResponseRepository.GetAllForMaterialListAsync(materialIdList);
+            var processedSign = RunWithoutCommit(_ => _.MaterialSignRepository.GetById(MaterialEntity.ProcessingStatusProcessedSignId));
+
+            var getChangeHistoryEntity = RunWithoutCommitAsync(_ => _.ChangeHistoryRepository.GetLatestByIdAndPropertyWithNewValueAsync(material.Id, processedSign.MaterialSignType.Name, processedSign.Title));
+
+            var getResponseList = _mLResponseRepository.GetAllForMaterialListAsync(materialIdList);
+
+            await Task.WhenAll(getChangeHistoryEntity, getResponseList);
+
+            var changeHistoryEntity = await getChangeHistoryEntity;
+            var responseList = await getResponseList;
 
             var responseDictionary = responseList
                                         .GroupBy(e => e.MaterialId)
                                         .ToDictionary(group => group.Key, group => group.ToArray());
-
-
 
             var (mlResponses, mlResponsesCount) = GetResponseJsonWithCounter(materialDocument.Id, responseDictionary);
 
@@ -482,11 +528,19 @@ namespace Iis.Services
 
             materialDocument.ImageVectors = GetImageVectorList(materialIdList, responseDictionary);
 
+            materialDocument.ProcessedAt = changeHistoryEntity?.Date.ToString(Iso8601DateFormat, CultureInfo.InvariantCulture);
+
             return await _elasticManager.PutDocumentAsync(_elasticState.MaterialIndexes.FirstOrDefault(),
                 material.Id.ToString("N"),
                 JsonConvert.SerializeObject(materialDocument),
                 waitForIndexing,
                 ct);
+        }
+
+        public async Task PutMaterialsToElasticByNodeIdsAsync(IReadOnlyCollection<Guid> nodeIds, CancellationToken ct = default, bool waitForIndexing = false)
+        {
+            var materials = await RunWithoutCommitAsync(_ => _.MaterialRepository.GetMaterialCollectionByNodeIdAsync(nodeIds, MaterialIncludeEnum.WithChildren, MaterialIncludeEnum.WithFeatures, MaterialIncludeEnum.WithFiles));
+            await Task.WhenAll(materials.Select(_ => PutMaterialToElasticSearchAsync(_, ct, waitForIndexing)));
         }
 
         private static ImageVector[] GetImageVectorList(IReadOnlyCollection<Guid> materialIdList, Dictionary<Guid, MLResponseEntity[]> responseDictionary)
@@ -534,6 +588,13 @@ namespace Iis.Services
             }
 
             return (new JObject(), 0);
+        }
+
+        private string GetProcessedAtFromChangeHistoryDictionary(Guid materialId, Dictionary<Guid, ChangeHistoryEntity> changeHistoryDictionary)
+        {
+            return changeHistoryDictionary.TryGetValue(materialId, out var changeHistory)
+                ? changeHistory.Date.ToString(Iso8601DateFormat, CultureInfo.InvariantCulture)
+                : null;
         }
 
         private static JObject ConvertMLResponsesToJson(IReadOnlyCollection<MLResponseEntity> mlResponses)
@@ -617,6 +678,6 @@ namespace Iis.Services
             materialDocument.ObjectsOfStudyCount = materialDocument.RelatedObjectCollection.Count(e => e.RelationType == NoneLinkTypeValue);
 
             return materialDocument;
-        }        
+        }
     }
 }

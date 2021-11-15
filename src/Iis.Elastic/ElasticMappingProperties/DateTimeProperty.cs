@@ -29,9 +29,14 @@ namespace Iis.Elastic.ElasticMappingProperties
 
         public static ElasticMappingProperty Create(string propertyName, IReadOnlyCollection<string> formats = null)
         {
-            Func<string, ElasticMappingProperty> newPropFunc = (propName) => {
-                var property = new DateProperty{ Name = propName};
-                if(formats != null && formats.Any()) property.Formats.AddRange(formats);
+            Func<string, ElasticMappingProperty> newPropFunc = (propName) =>
+            {
+                var property = new DateProperty { Name = propName };
+                if (formats != null && formats.Any())
+                {
+                    property.Formats.AddRange(formats);
+                }
+
                 return property;
             };
 
@@ -51,7 +56,8 @@ namespace Iis.Elastic.ElasticMappingProperties
 
         public static ElasticMappingProperty Create(string propertyName, IReadOnlyCollection<string> formats = null)
         {
-            Func<string, ElasticMappingProperty> newPropFunc = (propName) => {
+            Func<string, ElasticMappingProperty> newPropFunc = (propName) =>
+            {
                 var property = new DateRangeProperty { Name = propName };
                 if (formats != null && formats.Any()) property.Formats.AddRange(formats);
                 return property;

@@ -22,7 +22,7 @@ namespace EmlJsonUploader
             var filePath = args[2];
             var text = File.ReadAllText(filePath);
             var jo = JObject.Parse(text);
-            var nodes = (JArray) jo["Metadata"]["Features"]["Nodes"];
+            var nodes = (JArray)jo["Metadata"]["Features"]["Nodes"];
             var toRemove = nodes.Where(n => excludeNodes.Contains(n["Relation"].Value<string>())).ToList();
             foreach (var rn in toRemove)
                 nodes.Remove(rn);
@@ -41,9 +41,9 @@ namespace EmlJsonUploader
         private static void ChangePropertiesToLowerCase(JToken jToken)
         {
             if (jToken.Type == JTokenType.Object)
-                ChangePropertiesToLowerCase((JObject) jToken);
+                ChangePropertiesToLowerCase((JObject)jToken);
             if (jToken.Type == JTokenType.Array)
-                ChangePropertiesToLowerCase((JArray) jToken);
+                ChangePropertiesToLowerCase((JArray)jToken);
         }
 
         private static void ChangePropertiesToLowerCase(JObject jsonObject)

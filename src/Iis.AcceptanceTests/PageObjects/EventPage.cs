@@ -23,7 +23,7 @@ namespace AcceptanceTests.PageObjects
         [FindsBy(How = How.XPath, Using = "//textarea[@name='name']")]
         public IWebElement EventTitle;
 
-        [FindsBy(How = How.XPath, Using = "//textarea[@name='description']")]
+        [FindsBy(How = How.CssSelector, Using = ".event__body .event-card__description .view-text")]
         public IWebElement DescriptionField;
 
         [FindsBy(How = How.CssSelector, Using = ".normal .el-radio__inner")]

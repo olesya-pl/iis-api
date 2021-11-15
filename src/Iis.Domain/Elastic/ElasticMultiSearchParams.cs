@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Iis.Domain.Elastic
 {
-    public class MultiElasticSearchParams : IMultiElasticSearchParams
+    public class ElasticMultiSearchParams : IElasticMultiSearchParams
     {
         public List<string> BaseIndexNames { get; set; } = new List<string>();
         public List<string> ResultFields { get; set; } = new List<string> { "*" };

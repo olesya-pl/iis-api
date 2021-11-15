@@ -89,7 +89,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             if (node == null) return 0;
 
             return node.IncomingRelations.Count(r => r.RelationKind == RelationKind.Embedding)
-                + node.OutgoingRelations.Count(r => r.RelationKind == RelationKind.Embedding && r.IsLinkToSeparateObject);
+                + node.OutgoingRelations.Count(r => r.RelationKind == RelationKind.Embedding && r.IsLinkToExternalObject);
         }
 
         public Dictionary<Guid, int> GetRelationsCount(HashSet<Guid> entityIds)
@@ -531,6 +531,15 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                 .SelectMany(n => n.OutgoingRelations.Where(r => r.TargetNode.NodeType.IsObjectSign))
                 .Select(r => new ObjectFeatureRelation(r.SourceNodeId, r.TargetNodeId))
                 .ToArray();
+        }
+
+        public IReadOnlyCollection<Guid> GetSignIds(Guid nodeId)
+        {
+            return _data.GetNode(nodeId)
+                .GetDirectRelations()
+                .Where(_ => _.Node.NodeType.Name == "sign")
+                .Select(_ => _.TargetNodeId)
+                .ToList();
         }
     }
 }

@@ -17,8 +17,9 @@ namespace IIS.Core.Materials
     {
         void SendMaterialEvent(MaterialProcessingEventMessage eventMessage);
         void SendMaterialProcessingEvent(MaterialProcessingEventMessage eventMessage);
+        void SendMaterialProcessingEvents(IReadOnlyCollection<MaterialProcessingEventMessage> eventMessageCollection);
+        void SendMaterialToElastic(MaterialProcessingEventMessage eventMessage);
         void SendAvailableForOperatorEvent(Guid materialId);
-        void SaveMaterialToElastic(Guid id);
         void SendMaterialSavedToElastic(List<Guid> ids);
         void PublishMaterialCreatedMessage(MaterialCreatedMessage message);
     }
@@ -32,6 +33,7 @@ namespace IIS.Core.Materials
         private readonly IModel _materialEventChannel;
         private readonly IPublishMessageChannel<MaterialProcessingEventMessage> _eventPublishChannel;
         private readonly IPublishMessageChannel<MaterialCreatedMessage> _materialCreatedChannel;
+        private readonly IPublishMessageChannel<MaterialProcessingEventMessage> _elasticSaverChannel;
         private readonly MaterialEventConfiguration _eventConfiguration;
         private readonly MaterialOperatorAssignerConfiguration _assignerConfiguration;
         private readonly MaterialElasticSaverConfiguration _elasticSaverConfiguration;
@@ -57,6 +59,7 @@ namespace IIS.Core.Materials
 
             _eventPublishChannel = new PublishMessageChannel<MaterialProcessingEventMessage>(_connection, _eventConfiguration.TargetChannel);
             _materialCreatedChannel = new PublishMessageChannel<MaterialCreatedMessage>(_connection, new ChannelConfig { ExchangeName = MaterialRabbitConsts.DefaultExchangeName, RoutingKeys = new[] { MaterialRabbitConsts.QueueName } });
+            _elasticSaverChannel = new PublishMessageChannel<MaterialProcessingEventMessage>(_connection, new ChannelConfig { ExchangeName = MaterialRabbitConsts.DefaultExchangeName, RoutingKeys = new[] { _elasticSaverConfiguration.QueueName } });
         }
 
         public void SendMaterialEvent(MaterialProcessingEventMessage eventMessage)
@@ -82,6 +85,14 @@ namespace IIS.Core.Materials
             _logger.LogInformation($"sending material with id {eventMessage.Id} for processing: ML key:[{mlRoutingKey}], Features key:[{featuresRoutingKey}], Coordinates key:[{coordinatesRoutingKey}]");
         }
 
+        public void SendMaterialProcessingEvents(IReadOnlyCollection<MaterialProcessingEventMessage> eventMessageCollection)
+        {
+            foreach (var eventMessage in eventMessageCollection)
+            {
+                SendMaterialProcessingEvent(eventMessage);
+            }
+        }
+
         private IModel ConfigChannel(IModel channel, ChannelConfig config)
         {
             if (config is null) return channel;
@@ -97,6 +108,7 @@ namespace IIS.Core.Materials
             _materialEventChannel.Dispose();
             _eventPublishChannel.Dispose();
             _materialCreatedChannel.Dispose();
+            _elasticSaverChannel.Dispose();
             _connection.Dispose();
         }
         public void SendAvailableForOperatorEvent(Guid materialId)
@@ -115,20 +127,9 @@ namespace IIS.Core.Materials
                                 body: body);
         }
 
-        public void SaveMaterialToElastic(Guid materialId)
+        public void SendMaterialToElastic(MaterialProcessingEventMessage eventMessage)
         {
-            _channel.QueueDeclare(
-                queue: _elasticSaverConfiguration.QueueName,
-                durable: true,
-                exclusive: false,
-                autoDelete: false);
-
-            var body = Encoding.UTF8.GetBytes(materialId.ToString());
-
-            _channel.BasicPublish(exchange: "",
-                                routingKey: _elasticSaverConfiguration.QueueName,
-                                basicProperties: null,
-                                body: body);
+            _elasticSaverChannel.Send(eventMessage);
         }
 
         public void PublishMaterialCreatedMessage(MaterialCreatedMessage message)
