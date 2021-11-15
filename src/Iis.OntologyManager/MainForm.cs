@@ -65,7 +65,7 @@ namespace Iis.OntologyManager
         Panel pnlTop;
         Dictionary<NodeViewType, IUiNodeTypeControl> _nodeTypeControls = new Dictionary<NodeViewType, IUiNodeTypeControl>();
         Dictionary<string, IDataViewControl> _dataViewControls = new Dictionary<string, IDataViewControl>();
-        const string VERSION = "1.40";
+        const string VERSION = "1.41";
         Button btnMigrate;
         Button btnDuplicates;
         ILogger _logger;
