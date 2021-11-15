@@ -67,7 +67,6 @@ namespace Iis.Interfaces.Ontology.Schema
         bool IsComputed { get; }
         string Formula { get; }
         string TitleAttributeName { get; }
-        EmbeddingOptions EmbeddingOptions { get; }
         ScalarType ScalarTypeEnum { get; }
         INodeTypeLinked EntityType { get; }
         bool IsAttributeType { get; }
@@ -77,6 +76,8 @@ namespace Iis.Interfaces.Ontology.Schema
         bool AcceptsScalar(object value);
         bool AcceptsOperation(EntityOperation create);
         string GetIconName();
+        bool IsMultiple { get; }
+        bool IsRequired { get; }
     }
 
     public class NodeAggregationInfo

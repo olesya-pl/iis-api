@@ -63,6 +63,8 @@ namespace Iis.OntologySchema.DataTypes
         public EmbeddingOptions EmbeddingOptions => RelationType?.EmbeddingOptions ?? EmbeddingOptions.None;
         private string _titleAttributeName;
         public string TitleAttributeName => _titleAttributeName ?? (_titleAttributeName = GetTitleAttributeName());
+        public bool IsMultiple => EmbeddingOptions == EmbeddingOptions.Multiple;
+        public bool IsRequired => EmbeddingOptions == EmbeddingOptions.Required;
 
         public string GetMetaDeep()
         {

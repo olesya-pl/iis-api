@@ -187,17 +187,13 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
             Node node, INodeTypeLinked embed,
             object value, string dotName, Guid requestId)
         {
-            switch (embed.EmbeddingOptions)
+            if (embed.IsMultiple)
             {
-                case EmbeddingOptions.Optional:
-                case EmbeddingOptions.Required:
-                    await UpdateSingleProperty(node, embed, value, dotName, requestId);
-                    break;
-                case EmbeddingOptions.Multiple:
-                    await UpdateMultipleProperties(node, embed, value, dotName, requestId);
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(embed));
+                await UpdateMultipleProperties(node, embed, value, dotName, requestId);
+            }
+            else
+            {
+                await UpdateSingleProperty(node, embed, value, dotName, requestId);
             }
         }
 
@@ -245,7 +241,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
         {
             var uvdict = (Dictionary<string, object>)uv; // RelationTo_U_Entity
             Relation relation;
-            if (embed.EmbeddingOptions == EmbeddingOptions.Multiple)
+            if (embed.IsMultiple)
             {
                 var relationId = InputTypesExtensions.ParseGuid(uvdict["id"]); // this is NOT target entity id, but relation id
                 relation = node.GetRelation(embed, relationId);

@@ -106,7 +106,7 @@ namespace IIS.Core.GraphQL.EntityTypes
         public bool IsInversed => Source.IsInversed;
         public bool IsComputed => Source.IsComputed;
 
-        public bool Multiple => Source.EmbeddingOptions == EmbeddingOptions.Multiple;
+        public bool Multiple => Source.IsMultiple;
         public string Format => MetaObject?.Format;
         [GraphQLNonNullType] public bool IsLinkToObjectOfStudy => Source.TargetType.IsObjectOfStudy;
         [GraphQLNonNullType] public bool IsLinkToSeparateObject => Source.TargetType.IsSeparateObject;
@@ -127,7 +127,7 @@ namespace IIS.Core.GraphQL.EntityTypes
             get {
                 var validation = _mapper.Map<Validation>(MetaObject?.Validation);
 
-                if (Source.EmbeddingOptions == EmbeddingOptions.Required)
+                if (Source.IsRequired)
                 {
                     validation = validation ?? new Validation();
                     validation.Required = true;
