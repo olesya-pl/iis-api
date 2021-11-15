@@ -31,7 +31,7 @@ namespace Iis.Domain
         {
             var embed = GetRelationType(relationName);
             var nodes = GetRelations(embed.Name).Select(r => r.Target);
-            if (embed.EmbeddingOptions == EmbeddingOptions.Multiple)
+            if (embed.IsMultiple)
             {
                 if (embed.IsAttributeType)
                     return nodes.Cast<Attribute>().Select(a => a.Value).ToList();
@@ -52,7 +52,7 @@ namespace Iis.Domain
             {
                 targets = new List<object>(); // empty list of targets
             }
-            else if (embed.EmbeddingOptions == EmbeddingOptions.Multiple)
+            else if (embed.IsMultiple)
             {
                 if (!(value is IEnumerable<object> enumerable))
                     throw new ArgumentException($"Can not assign single value to multiple relation {Type.Name}.{embed.Name}");

@@ -25,32 +25,18 @@ namespace IIS.Core.GraphQL
         {
             if (relationType.IsComputed)
                 return type;
-            switch (relationType.EmbeddingOptions)
-            {
-                case EmbeddingOptions.Optional:
-                    return type;
-                case EmbeddingOptions.Required:
-                    return new NonNullType(type);
-                case EmbeddingOptions.Multiple:
-                    return new NonNullType(new ListType(new NonNullType(type)));
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
+            if (relationType.IsRequired)
+                return new NonNullType(type);
+            if (relationType.IsMultiple)
+                return new NonNullType(new ListType(new NonNullType(type)));
+            return type;
         }
 
         public static IInputType WrapInputType(this IInputType type, INodeTypeLinked relationType)
         {
-            switch (relationType.EmbeddingOptions)
-            {
-                case EmbeddingOptions.Optional:
-                    return type;
-                case EmbeddingOptions.Required:
-                    return new NonNullType(type);
-                case EmbeddingOptions.Multiple:
-                    return new ListType(new NonNullType(type)); // Input arrays are optional, opposed to output type
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
+            if (relationType.IsRequired) return new NonNullType(type);
+            if (relationType.IsMultiple) return new ListType(new NonNullType(type));
+            return type;
         }
 
         public static IObjectFieldDescriptor ResolverNotImplemented(this IObjectFieldDescriptor d)

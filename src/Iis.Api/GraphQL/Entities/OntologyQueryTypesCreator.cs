@@ -48,7 +48,7 @@ namespace IIS.Core.GraphQL.Entities
             var fd = objectTypeDescriptor.Field(relationType.Name).Type(type.WrapOutputType(relationType));
             if (relationType.IsAttributeType)
             {
-                if (relationType.EmbeddingOptions == EmbeddingOptions.Multiple)
+                if (relationType.IsMultiple)
                     fd.Resolver(ctx => ctx.Service<IOntologyQueryResolver>().ResolveMultipleAttributeRelation(ctx, relationType));
                 else
                     fd.Resolver(ctx => ctx.Service<IOntologyQueryResolver>().ResolveAttributeRelation(ctx, relationType));
@@ -140,7 +140,7 @@ namespace IIS.Core.GraphQL.Entities
         private IOutputType GetAttributeType(INodeTypeLinked relationType)
         {
             var type = relationType.AttributeTypeModel;
-            if (relationType.EmbeddingOptions == EmbeddingOptions.Multiple)
+            if (relationType.IsMultiple)
                 return _repository.GetMultipleOutputType(type.ScalarTypeEnum);
             return _repository.GetScalarOutputType(type.ScalarTypeEnum);
         }

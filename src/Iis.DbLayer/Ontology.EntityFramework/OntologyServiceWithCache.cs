@@ -268,7 +268,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
         {
             foreach (INodeTypeLinked relationType in source.Type.AllProperties)
             {
-                if (relationType.EmbeddingOptions != EmbeddingOptions.Multiple)
+                if (!relationType.IsMultiple)
                 {
                     Relation sourceRelation = source.Nodes.OfType<Relation>().SingleOrDefault(e => e.Type.Id == relationType.Id);
                     IRelation existingRelation = existing.OutgoingRelations
