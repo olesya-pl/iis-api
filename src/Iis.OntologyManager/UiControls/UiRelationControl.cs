@@ -317,7 +317,7 @@ namespace Iis.OntologyManager.UiControls
 
         private IFormField GetCurrentFormField()
         {
-            if (_nodeType == null) return null;
+            if (_nodeType == null || cmbTargetType == null) return null;
             var type = GetFormFieldType();
             var hint = _nodeType.MetaObject?.FormField?.Hint;
             var lines = GetCurrentFormFieldLines();
@@ -456,7 +456,7 @@ namespace Iis.OntologyManager.UiControls
             toolTip.SetToolTip(control, text);
         }
 
-        private INodeTypeLinked CurrentTargetType => (INodeTypeLinked)cmbTargetType.SelectedItem;
+        private INodeTypeLinked CurrentTargetType => (INodeTypeLinked)cmbTargetType?.SelectedItem;
 
         private void TargetTypeChanged()
         {

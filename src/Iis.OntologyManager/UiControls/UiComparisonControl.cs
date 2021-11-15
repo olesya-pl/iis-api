@@ -58,7 +58,8 @@ namespace Iis.OntologyManager.UiControls
                 BackColor = panels.panelTop.BackColor
             };
             var src = new List<IOntologySchemaSource>(_schemaSources);
-            cmbSchemaSourcesCompare.DataSource = src;
+            cmbSchemaSourcesCompare.Items.Add(string.Empty);
+            cmbSchemaSourcesCompare.Items.AddRange(src.ToArray());
             cmbSchemaSourcesCompare.SelectedIndexChanged += (sender, e) => { CompareSchemas(); };
             container.Add(cmbSchemaSourcesCompare);
 
@@ -73,7 +74,15 @@ namespace Iis.OntologyManager.UiControls
             panels.panelBottom.Controls.Add(grid);
 
             MainPanel.ResumeLayout();
-            CompareSchemas(src.FirstOrDefault());
+            if (_schema.SchemaSource.SourceKind == SchemaSourceKind.Database)
+            {
+                _uiControlsCreator.SetSelectedValue(cmbSchemaSourcesCompare, _schema.SchemaSource.Title);
+                CompareSchemas(_schema.SchemaSource);
+            }
+            else
+            {
+                grid.DataSource = new List<CompareResultForGridItem>();
+            }
         }
         private void CreateCheckBoxes(UiContainerManager container)
         {
@@ -177,6 +186,8 @@ namespace Iis.OntologyManager.UiControls
         {
             var row = grid.Rows[e.RowIndex];
             var item = (CompareResultForGridItem)row.DataBoundItem;
+
+            if (item == null) return;
 
             var color = item.Operation switch
             {
