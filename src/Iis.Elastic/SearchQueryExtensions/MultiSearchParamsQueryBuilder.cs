@@ -6,10 +6,10 @@ namespace Iis.Elastic.SearchQueryExtensions
 {
     public class MultiSearchParamsQueryBuilder : BaseQueryBuilder<MultiSearchParamsQueryBuilder>
     {
-        private List<(string Query, List<IIisElasticField> Fields)> _searchParams;
+        private IReadOnlyCollection<SearchParameter> _searchParams;
         private bool? _isLenient;
 
-        public MultiSearchParamsQueryBuilder(List<(string Query, List<IIisElasticField> Fields)> searchParams) 
+        public MultiSearchParamsQueryBuilder(IReadOnlyCollection<SearchParameter> searchParams)
         {
             _searchParams = searchParams;
         }

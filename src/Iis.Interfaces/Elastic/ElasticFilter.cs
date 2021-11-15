@@ -12,6 +12,16 @@ namespace Iis.Interfaces.Elastic
         public string SortOrder { get; set; }
         public List<CherryPickedItem> CherryPickedItems { get; set; } = new List<CherryPickedItem>();
         public List<Property> FilteredItems { get; set; } = new List<Property>();
+        public bool IsExact => IsExactQuery(Suggestion);
+
+        private static bool IsExactQuery(string query)
+        {
+            if (string.IsNullOrWhiteSpace(query)) return false;
+
+            return query.Contains(":", StringComparison.Ordinal)
+                   || query.Contains(" AND ", StringComparison.Ordinal)
+                   || query.Contains(" OR ", StringComparison.Ordinal);
+        }
     }
 
     public class CherryPickedItem

@@ -430,7 +430,7 @@ namespace Iis.Elastic
                 };
             }
 
-            if (SearchQueryExtension.IsExactQuery(searchParams.Query) && !searchParams.SearchFields.Any())
+            if (searchParams.IsExact && searchParams.SearchFields.Count == 0)
             {
                 PopulateExactQuery(searchParams, json);
             }
@@ -451,7 +451,7 @@ namespace Iis.Elastic
             var json = new JObject();
             json["query"] = new JObject();
 
-            if (SearchQueryExtension.IsExactQuery(searchParams.Query) && !searchParams.SearchFields.Any())
+            if (searchParams.IsExact && searchParams.SearchFields.Count == 0)
             {
                 PopulateExactQuery(searchParams, json);
             }
@@ -492,7 +492,9 @@ namespace Iis.Elastic
             {
                 var query = new JObject();
                 var queryString = new JObject();
-                queryString["query"] = SearchQueryExtension.ApplyFuzzinessOperator(searchParams.Query);
+                queryString["query"] = SearchQueryExtension.IsExactQuery(searchParams.Query) || SearchQueryExtension.IsMatchAll(searchParams.Query)
+                    ? searchParams.Query
+                    : SearchQueryExtension.ApplyFuzzinessOperator(searchParams.Query);
                 queryString["fuzziness"] = searchFieldGroup.Key.Fuzziness;
                 queryString["boost"] = searchFieldGroup.Key.Boost;
                 queryString["lenient"] = searchParams.IsLenient;
