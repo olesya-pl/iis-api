@@ -1,12 +1,14 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using Iis.Utility;
+using Newtonsoft.Json.Linq;
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 
 namespace Iis.MaterialLoader.Helpers.RegistrationDateResolvers
 {
     public abstract class SeparatedDateTimeResolver : IMaterialRegistrationDateResolver
     {
-        private readonly string _dateFormat;
+        private readonly IReadOnlyCollection<string> _dateFormats;
         private readonly string _timePropertyName;
         private readonly string _datePropertyName;
 
@@ -15,7 +17,17 @@ namespace Iis.MaterialLoader.Helpers.RegistrationDateResolvers
             string timePropertyName = "regTime",
             string datePropertyName = "regDate")
         {
-            _dateFormat = dateFormat;
+            _dateFormats = dateFormat.AsArray();
+            _timePropertyName = timePropertyName;
+            _datePropertyName = datePropertyName;
+        }
+
+        protected SeparatedDateTimeResolver(
+            IReadOnlyCollection<string> dateFormats,
+            string timePropertyName = "regTime",
+            string datePropertyName = "regDate")
+        {
+            _dateFormats = dateFormats;
             _timePropertyName = timePropertyName;
             _datePropertyName = datePropertyName;
         }
@@ -32,12 +44,32 @@ namespace Iis.MaterialLoader.Helpers.RegistrationDateResolvers
             if (string.IsNullOrWhiteSpace(registrationTimeString)
                 || string.IsNullOrWhiteSpace(registrationDateString)
                 || !TimeSpan.TryParse(registrationTimeString, out TimeSpan registrationTime)
-                || !DateTime.TryParseExact(registrationDateString, _dateFormat, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind, out DateTime registrationDatePart))
+                || !TryParseDate(registrationDateString, out var registrationDatePart))
                 return false;
 
             registrationDate = registrationDatePart.Add(registrationTime);
 
             return true;
+        }
+
+        private bool TryParseDate(string registrationDateString, out DateTime date)
+        {
+            date = default;
+
+            foreach (var dateFormat in _dateFormats)
+            {
+                if (DateTime.TryParseExact(
+                    registrationDateString,
+                    dateFormat,
+                    CultureInfo.InvariantCulture,
+                    DateTimeStyles.RoundtripKind,
+                    out date))
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
     }
 }
