@@ -12,7 +12,6 @@ using Iis.Interfaces.Elastic;
 using System.Linq.Expressions;
 using Iis.Services.Contracts.Materials.Distribution;
 using Iis.Interfaces.Common;
-using Iis.Interfaces.Materials;
 
 namespace IIS.Services.Contracts.Interfaces
 {

@@ -26,7 +26,7 @@ using Iis.Services.Contracts.Materials.Distribution;
 using Iis.Services.Contracts.Extensions;
 using Microsoft.Extensions.Logging;
 using Iis.Services.Contracts.ExternalUserServices;
-using Iis.Interfaces.Materials;
+using Iis.Interfaces.Elastic;
 
 namespace Iis.Services
 {

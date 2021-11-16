@@ -1,5 +1,5 @@
 using System;
-namespace Iis.Interfaces.Materials
+namespace Iis.Interfaces.Elastic
 {
     public class PaginationParams
     {

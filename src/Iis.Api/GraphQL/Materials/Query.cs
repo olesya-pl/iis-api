@@ -15,7 +15,6 @@ using Newtonsoft.Json.Linq;
 using IIS.Services.Contracts.Materials;
 using Iis.Domain.Materials;
 using Iis.Interfaces.Common;
-using Iis.Interfaces.Materials;
 
 namespace IIS.Core.GraphQL.Materials
 {

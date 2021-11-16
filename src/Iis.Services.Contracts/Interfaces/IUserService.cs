@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Iis.Domain.Users;
-using Iis.Interfaces.Materials;
+using Iis.Interfaces.Elastic;
 using Iis.Services.Contracts.Enums;
 using Iis.Services.Contracts.Materials.Distribution;
 

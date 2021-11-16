@@ -14,7 +14,6 @@ using IIS.Core.GraphQL.Entities.InputTypes;
 using Iis.Utility;
 using Newtonsoft.Json.Linq;
 using HotChocolate.Resolvers;
-using Iis.Interfaces.Materials;
 
 namespace IIS.Core.GraphQL.Entities
 {

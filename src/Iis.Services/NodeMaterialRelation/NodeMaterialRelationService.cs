@@ -9,6 +9,7 @@ using Iis.DbLayer.MaterialEnum;
 using Iis.DbLayer.Repositories;
 using Iis.Elastic;
 using Iis.Interfaces.Common;
+using Iis.Interfaces.Elastic;
 using Iis.Interfaces.Materials;
 using Iis.Interfaces.Ontology.Data;
 using Iis.Services.Contracts.Dtos;

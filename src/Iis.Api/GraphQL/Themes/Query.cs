@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 using System.Linq;
 using HotChocolate.Resolvers;
 using Iis.Api.GraphQL.Common;
-using Iis.Interfaces.Materials;
+using Iis.Interfaces.Elastic;
 
 namespace IIS.Core.GraphQL.Themes
 {

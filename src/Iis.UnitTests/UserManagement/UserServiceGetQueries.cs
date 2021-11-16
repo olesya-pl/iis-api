@@ -12,7 +12,7 @@ using Iis.Services.Contracts.Interfaces;
 using AutoFixture;
 using Iis.DbLayer.MaterialDictionaries;
 using Iis.Interfaces.Constants;
-using Iis.Interfaces.Materials;
+using Iis.Interfaces.Elastic;
 
 namespace Iis.UnitTests.UserManagement
 {

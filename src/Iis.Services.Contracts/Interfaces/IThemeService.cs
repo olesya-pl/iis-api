@@ -1,4 +1,4 @@
-﻿using Iis.Interfaces.Materials;
+﻿using Iis.Interfaces.Elastic;
 using Iis.Services.Contracts.Dtos;
 using System;
 using System.Collections.Generic;
