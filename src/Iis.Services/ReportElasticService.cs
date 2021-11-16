@@ -1,5 +1,6 @@
 ﻿using Iis.Domain.Elastic;
 using Iis.Domain.Users;
+using Iis.Elastic.SearchQueryExtensions;
 using Iis.Interfaces.Elastic;
 using Iis.Services.Contracts.Dtos;
 using Iis.Services.Contracts.Interfaces;
@@ -44,6 +45,7 @@ namespace Iis.Services
                 Query = string.IsNullOrEmpty(search.Suggestion) ? "*" : $"{search.Suggestion}",
                 From = search.Offset,
                 Size = search.PageSize,
+                IsExact = SearchQueryExtension.IsExactQuery(search.Suggestion)
             };
 
             if (!string.IsNullOrEmpty(search.SortColumn) && !string.IsNullOrEmpty(search.SortOrder)) 
@@ -61,7 +63,8 @@ namespace Iis.Services
             var searchParams = new IisElasticSearchParams
             {
                 BaseIndexNames = new List<string> { _elasticIndex },
-                Query = string.IsNullOrEmpty(search.Suggestion) ? "*" : $"{search.Suggestion}"
+                Query = string.IsNullOrEmpty(search.Suggestion) ? "*" : $"{search.Suggestion}",
+                IsExact = SearchQueryExtension.IsExactQuery(search.Suggestion)
             };
 
             return await _elasticManager.CountAsync(searchParams);

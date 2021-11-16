@@ -63,7 +63,7 @@ namespace IIS.Core.GraphQL.Entities
                 type = TypeRepository.GetEntityRelationToInputType(Operation.Create, relationType.EntityType)
                     .WrapInputType(relationType);
 
-            if (relationType.EmbeddingOptions == EmbeddingOptions.Multiple && relationType.IsAttributeType)
+            if (relationType.IsMultiple && relationType.IsAttributeType)
                 type = TypeRepository.GetMultipleInputType(Operation.Create, relationType.AttributeTypeModel)
                     .WrapInputType(relationType);
 
@@ -86,7 +86,7 @@ namespace IIS.Core.GraphQL.Entities
             IInputObjectTypeDescriptor objectTypeDescriptor = null)
         {
             IInputType type;
-            if (relationType.EmbeddingOptions == EmbeddingOptions.Multiple)
+            if (relationType.IsMultiple)
                 type = TypeRepository.GetRelationPatchType(relationType);
             else if (relationType.IsAttributeType)
                 type = TypeRepository.GetInputAttributeType(relationType.AttributeTypeModel);

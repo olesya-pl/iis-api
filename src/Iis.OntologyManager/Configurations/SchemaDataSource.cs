@@ -33,5 +33,7 @@ namespace Iis.OntologyManager.Configurations
                 AppAddress = appAddress
             };
         }
+
+        public override string ToString() => Title;
     }
 }

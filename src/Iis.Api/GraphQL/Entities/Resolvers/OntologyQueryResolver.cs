@@ -126,7 +126,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
                 return relations.Select(r => r.EntityTarget); // Non-unique targets breaks our _relation !!!
             var relationsInfo = relations.ToDictionary(r => r.EntityTarget);
             SetRelationInfo(ctx, relationsInfo); // pass info to _relation
-            if (relationType.EmbeddingOptions == EmbeddingOptions.Multiple)
+            if (relationType.IsMultiple)
                 return relationsInfo.Keys;
             return relationsInfo.Keys.SingleOrDefault();
         }

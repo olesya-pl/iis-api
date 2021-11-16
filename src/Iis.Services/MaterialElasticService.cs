@@ -6,11 +6,9 @@ using System.Collections.Generic;
 using Newtonsoft.Json;
 using Iis.Interfaces.Elastic;
 using Iis.Services.Contracts.Enums;
-using Iis.Services.Contracts.Params;
 using Iis.Services.Contracts.Interfaces;
 using Iis.Services.Contracts.Interfaces.Elastic;
 using Iis.Elastic;
-using Iis.Elastic.Dictionaries;
 using Iis.Elastic.SearchQueryExtensions;
 using System.Linq;
 using Iis.DbLayer.Repositories;
@@ -29,6 +27,11 @@ using IIS.Repository;
 using IIS.Repository.Factories;
 using System.Diagnostics;
 using Microsoft.Extensions.Logging;
+using Iis.Domain.Materials;
+using Iis.Elastic.SearchQueryExtensions.CompositeBuilders.BoolQuery;
+using Iis.Domain;
+using Iis.Services.Contracts.Elastic;
+using Iis.Interfaces.Materials;
 
 namespace Iis.Services
 {
@@ -58,6 +61,7 @@ namespace Iis.Services
             new AggregationField(MaterialAliases.SourceReliability.Path, MaterialAliases.SourceReliability.Alias, MaterialAliases.SourceReliability.Path),
             new AggregationField(MaterialAliases.Type.Path, MaterialAliases.Type.Alias, MaterialAliases.Type.Path),
             new AggregationField(MaterialAliases.Source.Path, MaterialAliases.Source.Alias, MaterialAliases.Source.Path),
+            new AggregationField(MaterialAliases.Assignees.Path, MaterialAliases.Assignees.Alias, MaterialAliases.Assignees.Path),
             new AggregationField(nameof(MaterialDocument.Channel), null, nameof(MaterialDocument.Channel))
         };
         private static readonly List<ElasticBulkResponse> EmptyElasticBulkResponseList = new List<ElasticBulkResponse>();
@@ -96,21 +100,15 @@ namespace Iis.Services
             return queryExpression?.Trim() == ExclamationMark;
         }
 
-        public async Task<SearchResult> SearchMaterialsByConfiguredFieldsAsync(Guid userId, SearchParams searchParams, CancellationToken ct = default)
+        public async Task<SearchResult> SearchMaterialsByConfiguredFieldsAsync(
+            Guid userId,
+            SearchParams searchParams,
+            RelationsState? materialRelationsState,
+            CancellationToken ct = default)
         {
             var (from, size) = searchParams.Page.ToElasticPage();
-
-            var queryString = SearchQueryExtension.CreateMaterialsQueryString(
-                searchParams.Suggestion,
-                searchParams.FilteredItems,
-                searchParams.CherryPickedItems);
-
-            var query = new ExactQueryBuilder()
-                .WithPagination(from, size)
-                .WithQueryString(queryString)
-                .BuildSearchQuery()
-                .WithAggregation(AggregationsFieldList)
-                .WithHighlights();
+            var queryString = SearchQueryExtension.CreateMaterialsQueryString(searchParams);
+            var query = BuildMaterialsQuery(queryString, from, size, materialRelationsState);
 
             if (searchParams.Sorting != null)
             {
@@ -129,7 +127,7 @@ namespace Iis.Services
                 if (item.Value.Highlight is null) continue;
 
                 item.Value.Highlight = await _elasticResponseManagerFactory.Create(SearchType.Material)
-                 .GenerateHighlightsWithoutDublications(item.Value.SearchResult, item.Value.Highlight);
+                    .GenerateHighlightsWithoutDublications(item.Value.SearchResult, item.Value.Highlight);
             }
 
             if (ItemsCountPossiblyExceedsMaxThreshold(searchResult))
@@ -160,10 +158,7 @@ namespace Iis.Services
         {
             var (from, size) = searchParams.Page.ToElasticPage();
 
-            var queryString = SearchQueryExtension.CreateMaterialsQueryString(
-                searchParams.Suggestion,
-                searchParams.FilteredItems,
-                searchParams.CherryPickedItems);
+            var queryString = SearchQueryExtension.CreateMaterialsQueryString(searchParams);
 
             var scrollDuration = _elasticConfiguration.ScrollDurationMinutes == default(int)
                 ? ElasticConstants.DefaultScrollDurationMinutes
@@ -289,10 +284,7 @@ namespace Iis.Services
 
         public Task<int> CountMaterialsByConfiguredFieldsAsync(Guid userId, SearchParams searchParams, CancellationToken ct = default)
         {
-            var queryString = SearchQueryExtension.CreateMaterialsQueryString(
-                searchParams.Suggestion,
-                searchParams.FilteredItems,
-                searchParams.CherryPickedItems);
+            var queryString = SearchQueryExtension.CreateMaterialsQueryString(searchParams);
 
             var pagination = searchParams.Page.ToEFPage();
 
@@ -679,5 +671,81 @@ namespace Iis.Services
 
             return materialDocument;
         }
+
+        private void ChangeAssigneeAggregations(Dictionary<string, AggregationItem> aggregations, Guid userId)
+        {
+            var item = aggregations.GetValueOrDefault(MaterialAliases.Assignees.Alias);
+            if (item == null) return;
+
+            item.Buckets = item.Buckets.Where(_ => _.Key == userId.ToString()).ToArray();
+            if (item.Buckets.Length == 0) return;
+
+            item.Buckets[0].Key = MaterialAliases.Assignees.AliasForSingleItem;
+        }
+
+        private IReadOnlyCollection<Property> ChangeAssigneeFiltered(IReadOnlyCollection<Property> items, Guid userId)
+        {
+            var result = new List<Property>(items.Select(_ => new Property(_.Name, _.Value)));
+            var assigneeProperty = result.FirstOrDefault(_ => _.Name == MaterialAliases.Assignees.Alias);
+            if (assigneeProperty?.Value == MaterialAliases.Assignees.AliasForSingleItem)
+            {
+                assigneeProperty.Value = userId.ToString();
+            }
+
+            return result;
+        }
+
+        private JObject ChangeAssigneeHighlight(JObject highlight, Guid userId)
+        {
+            if (highlight.ContainsKey(MaterialAliases.Assignees.Path))
+            {
+                highlight.Remove(MaterialAliases.Assignees.Path);
+            }
+            if (highlight.ContainsKey(MaterialAliases.Assignees.Alias))
+            {
+                var value = highlight.GetValue(MaterialAliases.Assignees.Alias).ToString()
+                    .Replace(userId.ToString(), MaterialAliases.Assignees.AliasForSingleItem);
+                highlight[MaterialAliases.Assignees.Alias] = JToken.Parse(value);
+            }
+            return highlight;
+        }
+
+        private JObject BuildMaterialsQuery(
+            string queryString,
+            int from,
+            int size,
+            RelationsState? materialRelationsState)
+        {
+            if (!materialRelationsState.HasValue)
+            {
+                return new ExactQueryBuilder()
+                    .WithPagination(from, size)
+                    .WithQueryString(queryString)
+                    .BuildSearchQuery()
+                    .WithAggregation(AggregationsFieldList)
+                    .WithHighlights();
+            }
+
+            var builder = new CompositeBoolQueryBuilder()
+                .WithPagination(from, size)
+                .WithCondition<ExactQueryConditionBuilder>(_ => _.WithQuery(queryString));
+
+            builder = WithRelationsStateCondition(builder, materialRelationsState);
+
+            return builder.BuildSearchQuery()
+                    .WithAggregation(AggregationsFieldList)
+                    .WithHighlights();
+        }
+
+        private CompositeBoolQueryBuilder WithRelationsStateCondition(CompositeBoolQueryBuilder builder, RelationsState? relationsState) => relationsState switch
+        {
+            RelationsState.Empty => builder.WithCondition<ExistsQueryConditionBuilder>(_ => _.MustNot().Exist(nameof(MaterialDocument.RelatedObjectCollection))),
+            RelationsState.Exists => builder.WithCondition<ExistsQueryConditionBuilder>(_ => _.Must().Exist(nameof(MaterialDocument.RelatedObjectCollection))),
+            RelationsState.HasFeature => builder.WithCondition<MatchQueryConditionBuilder>(_ => _.Must().Match(GetRelationTypeFieldName(), EntityMaterialRelation.Feature)),
+            RelationsState.HasDirect => builder.WithCondition<MatchQueryConditionBuilder>(_ => _.Must().Match(GetRelationTypeFieldName(), EntityMaterialRelation.Direct)),
+            _ => builder
+        };
+
+        private string GetRelationTypeFieldName() => $"{nameof(MaterialDocument.RelatedObjectCollection)}.{nameof(DbLayer.Repositories.RelatedObject.RelationCreatingType)}";
     }
 }

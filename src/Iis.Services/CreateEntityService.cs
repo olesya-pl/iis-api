@@ -141,16 +141,9 @@ namespace Iis.Services
             Guid requestId,
             User currentUser)
         {
-            switch (embed.EmbeddingOptions)
-            {
-                case EmbeddingOptions.Optional:
-                case EmbeddingOptions.Required:
-                    return new[] { await CreateSinglePropertyAsync(entityId, embed, value, string.Empty, dotName, requestId, currentUser) };
-                case EmbeddingOptions.Multiple:
-                    return await CreateMultipleProperties(entityId, embed, value, string.Empty, dotName, requestId, currentUser);
-                default:
-                    throw new NotImplementedException();
-            }
+            return embed.IsMultiple ?
+                await CreateMultipleProperties(entityId, embed, value, string.Empty, dotName, requestId, currentUser) :
+                new[] { await CreateSinglePropertyAsync(entityId, embed, value, string.Empty, dotName, requestId, currentUser) };
         }
 
         private void SetCreatedByIfExists(Entity entity, User currentUser)

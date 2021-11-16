@@ -44,7 +44,7 @@ namespace AcceptanceTests.PageObjects
         [FindsBy(How = How.CssSelector, Using = ".action-tab--features")]
         public IWebElement PatternTab;
 
-        [FindsBy(How = How.XPath, Using = "//span[contains(text(),'PhoneNumber')]/following-sibling::span[1]")]
+        [FindsBy(How = How.XPath, Using = "//span[contains(text(),'value')]/following-sibling::span[1]")]
         public IWebElement PhoneNumberPatternNode;
 
         [FindsBy(How = How.CssSelector, Using = ".material__tabs-menu > .action-tab--ml")]

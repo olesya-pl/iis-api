@@ -1,5 +1,5 @@
-﻿using Iis.Services.Contracts.Dtos;
-using Iis.Services.Contracts.Params;
+﻿using Iis.Interfaces.Elastic;
+using Iis.Services.Contracts.Dtos;
 using System;
 using System.Collections.Generic;
 using System.Threading;

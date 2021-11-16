@@ -29,7 +29,7 @@ namespace Iis.UnitTests.Iis.Elastic.Tests.SearchParamsContextTests
             Mock<IElasticMultiSearchParams> searchParamsMock,
             Dictionary<string, string> queries)
         {
-            searchParamsMock.SetupProperty(_ => _.SearchParams, new List<(string Query, List<IIisElasticField> Fields)>());
+            searchParamsMock.SetupProperty(_ => _.SearchParams, new List<SearchParameter>());
             Func<ISearchParamsContext> func = () => SearchParamsContext.CreateFrom(null, queries);
 
             func.Should().Throw<ArgumentException>();

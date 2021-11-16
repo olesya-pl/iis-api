@@ -15,7 +15,6 @@ using Iis.Services.Contracts.Dtos;
 using Iis.Services.Contracts.Interfaces;
 using IIS.Repository;
 using IIS.Repository.Factories;
-using Iis.Services.Contracts.Params;
 using Iis.Services.Contracts.Enums;
 using Iis.Domain.Users;
 using Microsoft.Extensions.Configuration;
@@ -27,6 +26,7 @@ using Iis.Services.Contracts.Materials.Distribution;
 using Iis.Services.Contracts.Extensions;
 using Microsoft.Extensions.Logging;
 using Iis.Services.Contracts.ExternalUserServices;
+using Iis.Interfaces.Elastic;
 
 namespace Iis.Services
 {

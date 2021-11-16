@@ -25,7 +25,6 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using Iis.Services.Contracts.Dtos;
-using Iis.Services.Contracts.Params;
 using Role = Iis.Domain.Users.Role;
 using User = IIS.Core.GraphQL.Users.User;
 using DomainGraphTypes = Iis.Domain.Graph;

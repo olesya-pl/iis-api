@@ -8,7 +8,7 @@ namespace Iis.Interfaces.Elastic
         int From { get; set; }
         bool IsLenient { get; set; }
         List<string> ResultFields { get; set; }
-        List<(string Query, List<IIisElasticField> Fields)> SearchParams { get; set; }
+        List<SearchParameter> SearchParams { get; set; }
         int Size { get; set; }
     }
 }

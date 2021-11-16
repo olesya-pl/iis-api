@@ -81,10 +81,10 @@ namespace Iis.UnitTests.Iis.Elastic.Tests.SearchParamsContextTests
             {
                 From = 1,
                 Size = 10,
-                SearchParams = new List<(string Query, List<IIisElasticField> Fields)>
+                SearchParams = new List<SearchParameter>
                 {
-                    ("(\"тестовий\" OR тестовий~)", queryFields),
-                    ("85aafaebb57d4a5f86dbef6b061fa601 b1a932cf17644578a821b483918e3ef8 ed83ee39abd2431aaf246c0c6c391857", new List<IIisElasticField>{ new IisElasticField { Name = "Id", Boost = 0.05m } })
+                    new SearchParameter("(\"тестовий\" OR тестовий~)", queryFields),
+                    new SearchParameter("85aafaebb57d4a5f86dbef6b061fa601 b1a932cf17644578a821b483918e3ef8 ed83ee39abd2431aaf246c0c6c391857", new List<IIisElasticField>{ new IisElasticField { Name = "Id", Boost = 0.05m } })
                 }
             };
             var aggregateHistoryResultQueries = new Dictionary<string, string>

@@ -6,12 +6,12 @@ using Iis.Domain.Materials;
 using Iis.Domain.MachineLearning;
 using Iis.DataModel.Materials;
 using Iis.Services.Contracts.Dtos;
-using Iis.Services.Contracts.Params;
 using Iis.Domain.Users;
 using IIS.Services.Contracts.Materials;
 using Iis.Interfaces.Elastic;
 using System.Linq.Expressions;
 using Iis.Services.Contracts.Materials.Distribution;
+using Iis.Interfaces.Common;
 
 namespace IIS.Services.Contracts.Interfaces
 {
@@ -20,8 +20,10 @@ namespace IIS.Services.Contracts.Interfaces
         Task<Material[]> GetMaterialsByIdsAsync(ISet<Guid> ids, User user);
         Task<MaterialsDto> GetMaterialsAsync(Guid userId,
             string filterQuery,
+            RelationsState? materialRelationsState,
             IReadOnlyCollection<Property> filteredItems,
             IReadOnlyCollection<string> cherryPickedItems,
+            DateRange createdDateRange,
             PaginationParams page,
             SortingParams sorting,
             CancellationToken ct = default);
@@ -36,6 +38,7 @@ namespace IIS.Services.Contracts.Interfaces
             IEnumerable<Guid> nodeIdList, 
             bool includeDescendants,
             string suggestion,
+            DateRange createdDateRange,
             PaginationParams page,
             SortingParams sorting,
             CancellationToken ct = default);

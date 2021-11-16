@@ -12,6 +12,15 @@ namespace Iis.DataModel.Materials
             builder
                 .Property(p => p.Id)
                 .ValueGeneratedOnAdd();
+
+            builder
+                .HasOne(p => p.Material)
+                .WithMany(p => p.MLResponses)
+                .HasForeignKey(p => p.MaterialId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            builder
+                .HasIndex(p => p.MaterialId);
         }
     }
 }

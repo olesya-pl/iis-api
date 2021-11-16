@@ -8,7 +8,6 @@ using System.Threading.Tasks;
 using IIS.Core;
 using Iis.DbLayer.Repositories;
 using Iis.Elastic;
-using Iis.Elastic.Dictionaries;
 using Iis.Elastic.ElasticMappingProperties;
 using Iis.Interfaces.Elastic;
 using Iis.Interfaces.Enums;
@@ -21,6 +20,7 @@ using Iis.Services.Contracts.Params;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Hosting;
 using MoreLinq;
+using Iis.Services.Contracts.Elastic;
 
 namespace Iis.Api.Controllers
 {
@@ -206,7 +206,9 @@ namespace Iis.Api.Controllers
                 DenseVectorProperty.Create("ImageVectors.Vector", MaterialDocument.ImageVectorDimensionsCount),
                 TextProperty.Create("MLResponses.namedEntityRecognition", ElasticConfiguration.DefaultTermVector),
                 TextProperty.Create("MLResponses.textAnnotation", ElasticConfiguration.DefaultTermVector),
-                KeywordProperty.Create(nameof(MaterialDocument.Channel), false)
+                KeywordProperty.Create(nameof(MaterialDocument.Channel), false),
+                KeywordProperty.Create(MaterialAliases.Assignees.Path, false),
+                AliasProperty.Create(MaterialAliases.Assignees.Alias, MaterialAliases.Assignees.Path),
             });
             await _elasticManager.CreateIndexesAsync(
                 new[] { materialIndex },

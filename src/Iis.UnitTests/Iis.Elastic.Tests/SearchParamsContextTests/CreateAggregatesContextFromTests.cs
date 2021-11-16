@@ -29,10 +29,10 @@ namespace Iis.UnitTests.Iis.Elastic.Tests.SearchParamsContextTests
             {
                 From = filter.Offset,
                 Size = filter.Limit,
-                SearchParams = new List<(string Query, List<IIisElasticField> Fields)>
+                SearchParams = new List<SearchParameter>
                 {
-                    (filter.ToQueryString(), queryFields),
-                    (additionalQuery, additionalQueryFields)
+                    new SearchParameter(filter.ToQueryString(), queryFields, filter.IsExact),
+                    new SearchParameter(additionalQuery, additionalQueryFields)
                 }
             };
             var queries = fixture.Create<Dictionary<string, string>>();

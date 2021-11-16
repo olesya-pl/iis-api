@@ -7,9 +7,9 @@ using HotChocolate;
 using HotChocolate.Types;
 using IIS.Core.GraphQL.Common;
 using Iis.Services.Contracts.Enums;
-using Iis.Services.Contracts.Params;
 using Iis.Services.Contracts.Interfaces;
 using Iis.Api.GraphQL.Common;
+using Iis.Interfaces.Elastic;
 
 namespace IIS.Core.GraphQL.Users
 {

@@ -6,14 +6,15 @@ using Iis.Domain;
 using Iis.Domain.MachineLearning;
 using Iis.Domain.Materials;
 using Iis.Domain.Users;
+using Iis.Interfaces.Common;
 using Iis.Interfaces.Constants;
 using Iis.Interfaces.Elastic;
+using Iis.Interfaces.Materials;
 using Iis.Interfaces.Ontology;
 using Iis.Interfaces.Ontology.Data;
 using Iis.Services.Contracts.Dtos;
 using Iis.Services.Contracts.Interfaces;
 using Iis.Services.Contracts.Materials.Distribution;
-using Iis.Services.Contracts.Params;
 using IIS.Repository;
 using IIS.Repository.Factories;
 using IIS.Services.Contracts.Interfaces;
@@ -69,8 +70,10 @@ namespace IIS.Services.Materials
         public async Task<MaterialsDto> GetMaterialsAsync(
             Guid userId,
             string filterQuery,
+            RelationsState? materialRelationsState,
             IReadOnlyCollection<Property> filteredItems,
             IReadOnlyCollection<string> cherryPickedItems,
+            DateRange createdDateRange,
             PaginationParams page,
             SortingParams sorting,
             CancellationToken ct = default)
@@ -83,10 +86,11 @@ namespace IIS.Services.Materials
                 FilteredItems = filteredItems,
                 CherryPickedItems = cherryPickedItems.Select(p => new CherryPickedItem(p)).ToList(),
                 Page = page,
-                Sorting = sorting
+                Sorting = sorting,
+                CreatedDateRange = new DateRange(createdDateRange.From, createdDateRange.To)
             };
 
-            var searchResult = await _materialElasticService.SearchMaterialsByConfiguredFieldsAsync(userId, searchParams, ct);
+            var searchResult = await _materialElasticService.SearchMaterialsByConfiguredFieldsAsync(userId, searchParams, materialRelationsState, ct);
 
             var materials = searchResult.Items.Values
                 .Select(p => MaterialDocument.FromJObject(p.SearchResult))
@@ -321,6 +325,7 @@ namespace IIS.Services.Materials
             IEnumerable<Guid> nodeIdList,
             bool includeDescendants,
             string suggestion,
+            DateRange createdDateRange,
             PaginationParams page,
             SortingParams sorting,
             CancellationToken ct = default)

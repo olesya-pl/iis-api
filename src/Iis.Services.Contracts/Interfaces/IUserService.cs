@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Iis.Domain.Users;
+using Iis.Interfaces.Elastic;
 using Iis.Services.Contracts.Enums;
 using Iis.Services.Contracts.Materials.Distribution;
-using Iis.Services.Contracts.Params;
 
 namespace Iis.Services.Contracts.Interfaces
 {
