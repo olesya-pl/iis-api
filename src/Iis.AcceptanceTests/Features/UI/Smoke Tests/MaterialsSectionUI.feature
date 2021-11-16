@@ -61,10 +61,19 @@ Feature: MaterialsSectionUI - Smoke
 
     @smoke @UI @MaterialsCardEventsTabUI
     Scenario: IIS-6192 - Open relations tab in the materials card and ensure that events search is present
+    Given I upload a new docx material via API
+		| Field                 | Value                                      |
+		| FileName              | тестовий матеріал                          |
+		| SourceReliabilityText | Здебільшого надійне                        |
+		| ReliabilityText       | Достовірна                                 |
+		| Content               | Просто контент                            |
+		| AccessLevel           | 0                                          |
+		| LoadedBy              | автотест                                   |
+		| MetaData              | {"type":"document","source":"contour.doc"} |
         When I navigated to Materials page
         And Loading icon is not displayed
         And I clicked search button in the Materials section        
-        And I searched 20201015_Resilience_Application_Form.docx data in the materials
+        And I searched Просто data in the materials
         And Loading icon is not displayed
         And I clicked on the first material in the Materials list
         And I clicked on the relations tab in the material card
@@ -97,10 +106,19 @@ Feature: MaterialsSectionUI - Smoke
 
     @smoke @UI @MaterialsCardGeneralTabUI
     Scenario: IIS-6191 - Open relations tab in the materials card and ensure that objects search is present
+    Given I upload a new docx material via API
+		| Field                 | Value                                      |
+		| FileName              | тестовий матеріал                          |
+		| SourceReliabilityText | Здебільшого надійне                        |
+		| ReliabilityText       | Достовірна                                 |
+		| Content               | таємний контент                           |
+		| AccessLevel           | 0                                          |
+		| LoadedBy              | автотест                                   |
+		| MetaData              | {"type":"document","source":"contour.doc"} |
         When I navigated to Materials page
         And Loading icon is not displayed
         And I clicked search button in the Materials section
-        And I searched 20201015_Resilience_Application_Form.docx data in the materials
+        And I searched таємний data in the materials
         And Loading icon is not displayed
         And I clicked on the first material in the Materials list
         And I clicked on the relations tab in the material card
@@ -109,10 +127,19 @@ Feature: MaterialsSectionUI - Smoke
 
     @smoke @UI @MaterialsCardGeneralTabUI
     Scenario: IIS-6190 - Open ML tab in the materials card
+     Given I upload a new docx material via API
+		| Field                 | Value                                      |
+		| FileName              | тестовий матеріал                          |
+		| SourceReliabilityText | Здебільшого надійне                        |
+		| ReliabilityText       | Достовірна                                 |
+		| Content               | таємний контент                           |
+		| AccessLevel           | 0                                          |
+		| LoadedBy              | автотест                                   |
+		| MetaData              | {"type":"document","source":"contour.doc"} |
         When I navigated to Materials page
         And Loading icon is not displayed
         And I clicked search button in the Materials section
-        And I searched 20201015_Resilience_Application_Form.docx data in the materials
+        And I searched таємний data in the materials
         And Loading icon is not displayed
         And I clicked on the first material in the Materials list
         And I clicked on the ML tab in the material card
