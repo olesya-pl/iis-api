@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Iis.Interfaces.Common;
 using Iis.Interfaces.Elastic;
 using Iis.Utility;
 using Newtonsoft.Json.Linq;
@@ -161,21 +162,20 @@ namespace Iis.Elastic.SearchQueryExtensions
             return ToQueryStringWithFilterItems(filter);
         }
 
-        public static string CreateMaterialsQueryString(string suggestion,
+        public static string CreateMaterialsQueryString(
+            string suggestion,
             IReadOnlyCollection<Property> filteredItems,
-            IReadOnlyCollection<CherryPickedItem> cherryPickedItems)
+            IReadOnlyCollection<CherryPickedItem> cherryPickedItems,
+            DateRange createdDateRange)
         {
             var noSuggestion = string.IsNullOrEmpty(suggestion);
 
             var queryString = noSuggestion ? "(ParentId:NULL)" : $"(({suggestion}) AND ParentId:NULL)";
 
-            if (cherryPickedItems.Count == 0 && filteredItems.Count == 0)
-            {
-                return queryString;
-            }
-
             queryString = PopulateFilteredItems(filteredItems, queryString);
-            return PopulateCherryPickedIds(cherryPickedItems, queryString);
+            PopulateCherryPickedIds(cherryPickedItems, queryString);
+            queryString = PopulateDateRangeCondition("CreatedDate", createdDateRange, queryString);
+            return queryString;
         }
 
         public static string ApplyFuzzinessOperator(string input)
@@ -331,6 +331,7 @@ namespace Iis.Elastic.SearchQueryExtensions
 
         private static string PopulateFilteredItems(IReadOnlyCollection<Property> filter, string result)
         {
+            if (filter.Count == 0) return result;
             var filteredItems = filter.GroupBy(x => x.Name, x => x.Value);
             var filteredQueries = new List<string>();
             foreach (var filteredItem in filteredItems)
@@ -373,6 +374,14 @@ namespace Iis.Elastic.SearchQueryExtensions
             }
 
             return result;
+        }
+
+        private static string PopulateDateRangeCondition(string field, DateRange dateRange, string result)
+        {
+            if (dateRange == null || dateRange.IsEmpty) return result;
+            var fromStr = (dateRange.From ?? DateTime.MinValue).ToString("yyyy-MM-dd");
+            var toStr = (dateRange.To ?? DateTime.MaxValue).ToString("yyyy-MM-dd");
+            return $"({result}) AND {field}:[{fromStr} TO {toStr}]";
         }
 
         private static string ConvertToHypensFormat(string strId) =>

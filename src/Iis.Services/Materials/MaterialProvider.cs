@@ -6,6 +6,7 @@ using Iis.Domain;
 using Iis.Domain.MachineLearning;
 using Iis.Domain.Materials;
 using Iis.Domain.Users;
+using Iis.Interfaces.Common;
 using Iis.Interfaces.Constants;
 using Iis.Interfaces.Elastic;
 using Iis.Interfaces.Ontology;
@@ -72,6 +73,7 @@ namespace IIS.Services.Materials
             RelationsState? materialRelationsState,
             IReadOnlyCollection<Property> filteredItems,
             IReadOnlyCollection<string> cherryPickedItems,
+            DateRange createdDateRange,
             PaginationParams page,
             SortingParams sorting,
             CancellationToken ct = default)
@@ -84,7 +86,8 @@ namespace IIS.Services.Materials
                 FilteredItems = filteredItems,
                 CherryPickedItems = cherryPickedItems.Select(p => new CherryPickedItem(p)).ToList(),
                 Page = page,
-                Sorting = sorting
+                Sorting = sorting,
+                CreatedDateRange = new DateRange(createdDateRange.From, createdDateRange.To)
             };
 
             var searchResult = await _materialElasticService.SearchMaterialsByConfiguredFieldsAsync(userId, searchParams, materialRelationsState, ct);
@@ -322,6 +325,7 @@ namespace IIS.Services.Materials
             IEnumerable<Guid> nodeIdList,
             bool includeDescendants,
             string suggestion,
+            DateRange createdDateRange,
             PaginationParams page,
             SortingParams sorting,
             CancellationToken ct = default)

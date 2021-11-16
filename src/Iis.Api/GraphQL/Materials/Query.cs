@@ -15,6 +15,7 @@ using Iis.Services.Contracts.Elastic;
 using Newtonsoft.Json.Linq;
 using IIS.Services.Contracts.Materials;
 using Iis.Domain.Materials;
+using Iis.Interfaces.Common;
 
 namespace IIS.Core.GraphQL.Materials
 {
@@ -38,6 +39,7 @@ namespace IIS.Core.GraphQL.Materials
             var pageParam = new PaginationParams(pagination.Page, pagination.PageSize);
             var filteredItems = ChangeAssigneeFiltered(filter?.FilteredItems ?? new List<Property>(), tokenPayload.UserId);
             var cherryPickedItems = filter?.CherryPickedItems ?? new List<string>();
+            var createdDateRange = new DateRange(filter?.DateRangeFilter?.From, filter?.DateRangeFilter?.To);
 
             if (searchByImageInput != null && searchByImageInput.HasConditions)
             {
@@ -55,6 +57,7 @@ namespace IIS.Core.GraphQL.Materials
                     searchByRelation.NodeIdentityList,
                     searchByRelation.IncludeDescendants,
                     filterQuery,
+                    createdDateRange,
                     pageParam,
                     sortingParam) :
                 await materialProvider.GetMaterialsAsync(
@@ -63,6 +66,7 @@ namespace IIS.Core.GraphQL.Materials
                     relationsState,
                     filteredItems,
                     cherryPickedItems,
+                    createdDateRange,
                     pageParam,
                     sortingParam);
 

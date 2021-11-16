@@ -414,6 +414,7 @@ namespace Iis.Services
                             query.SearchByRelation.NodeIdentityList,
                             query.SearchByRelation.IncludeDescendants,
                             query.Suggestion,
+                            null,
                             new PaginationParams(1, 50),
                             null);
                         return new QueryResult

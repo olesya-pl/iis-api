@@ -12,6 +12,7 @@ using IIS.Services.Contracts.Materials;
 using Iis.Interfaces.Elastic;
 using System.Linq.Expressions;
 using Iis.Services.Contracts.Materials.Distribution;
+using Iis.Interfaces.Common;
 
 namespace IIS.Services.Contracts.Interfaces
 {
@@ -23,6 +24,7 @@ namespace IIS.Services.Contracts.Interfaces
             RelationsState? materialRelationsState,
             IReadOnlyCollection<Property> filteredItems,
             IReadOnlyCollection<string> cherryPickedItems,
+            DateRange createdDateRange,
             PaginationParams page,
             SortingParams sorting,
             CancellationToken ct = default);
@@ -37,6 +39,7 @@ namespace IIS.Services.Contracts.Interfaces
             IEnumerable<Guid> nodeIdList, 
             bool includeDescendants,
             string suggestion,
+            DateRange createdDateRange,
             PaginationParams page,
             SortingParams sorting,
             CancellationToken ct = default);

@@ -110,7 +110,8 @@ namespace Iis.Services
             var queryString = SearchQueryExtension.CreateMaterialsQueryString(
                 searchParams.Suggestion,
                 searchParams.FilteredItems,
-                searchParams.CherryPickedItems);
+                searchParams.CherryPickedItems,
+                searchParams.CreatedDateRange);
             var query = BuildMaterialsQuery(queryString, from, size, materialRelationsState);
 
             if (searchParams.Sorting != null)
@@ -164,7 +165,8 @@ namespace Iis.Services
             var queryString = SearchQueryExtension.CreateMaterialsQueryString(
                 searchParams.Suggestion,
                 searchParams.FilteredItems,
-                searchParams.CherryPickedItems);
+                searchParams.CherryPickedItems,
+                searchParams.CreatedDateRange);
 
             var scrollDuration = _elasticConfiguration.ScrollDurationMinutes == default(int)
                 ? ElasticConstants.DefaultScrollDurationMinutes
@@ -293,7 +295,8 @@ namespace Iis.Services
             var queryString = SearchQueryExtension.CreateMaterialsQueryString(
                 searchParams.Suggestion,
                 searchParams.FilteredItems,
-                searchParams.CherryPickedItems);
+                searchParams.CherryPickedItems,
+                searchParams.CreatedDateRange);
 
             var pagination = searchParams.Page.ToEFPage();
 
