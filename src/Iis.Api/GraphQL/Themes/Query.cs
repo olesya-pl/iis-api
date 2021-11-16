@@ -2,7 +2,6 @@ using AutoMapper;
 using HotChocolate;
 using HotChocolate.Types;
 using Iis.Services.Contracts.Interfaces;
-using Iis.Services.Contracts.Params;
 using IIS.Core.GraphQL.Common;
 using System;
 using System.Collections.Generic;
@@ -10,6 +9,7 @@ using System.Threading.Tasks;
 using System.Linq;
 using HotChocolate.Resolvers;
 using Iis.Api.GraphQL.Common;
+using Iis.Interfaces.Materials;
 
 namespace IIS.Core.GraphQL.Themes
 {

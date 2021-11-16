@@ -1,8 +1,8 @@
 using System;
 using Xunit;
 using FluentAssertions;
+using Iis.Interfaces.Materials;
 
-using Iis.Services.Contracts.Params;
 namespace Iis.UnitTests.Services.Params
 {
     public class SortingParamsTests

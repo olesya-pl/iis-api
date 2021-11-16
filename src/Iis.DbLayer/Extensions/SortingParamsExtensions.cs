@@ -1,5 +1,5 @@
 ﻿using Iis.DbLayer.MaterialDictionaries;
-using Iis.Services.Contracts.Params;
+using Iis.Interfaces.Materials;
 using System;
 using System.ComponentModel;
 

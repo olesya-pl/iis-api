@@ -6,13 +6,13 @@ using Iis.Domain.Materials;
 using Iis.Domain.MachineLearning;
 using Iis.DataModel.Materials;
 using Iis.Services.Contracts.Dtos;
-using Iis.Services.Contracts.Params;
 using Iis.Domain.Users;
 using IIS.Services.Contracts.Materials;
 using Iis.Interfaces.Elastic;
 using System.Linq.Expressions;
 using Iis.Services.Contracts.Materials.Distribution;
 using Iis.Interfaces.Common;
+using Iis.Interfaces.Materials;
 
 namespace IIS.Services.Contracts.Interfaces
 {

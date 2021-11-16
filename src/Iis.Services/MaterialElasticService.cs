@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using Newtonsoft.Json;
 using Iis.Interfaces.Elastic;
 using Iis.Services.Contracts.Enums;
-using Iis.Services.Contracts.Params;
 using Iis.Services.Contracts.Interfaces;
 using Iis.Services.Contracts.Interfaces.Elastic;
 using Iis.Elastic;
@@ -32,6 +31,7 @@ using Iis.Domain.Materials;
 using Iis.Elastic.SearchQueryExtensions.CompositeBuilders.BoolQuery;
 using Iis.Domain;
 using Iis.Services.Contracts.Elastic;
+using Iis.Interfaces.Materials;
 
 namespace Iis.Services
 {
@@ -107,11 +107,7 @@ namespace Iis.Services
             CancellationToken ct = default)
         {
             var (from, size) = searchParams.Page.ToElasticPage();
-            var queryString = SearchQueryExtension.CreateMaterialsQueryString(
-                searchParams.Suggestion,
-                searchParams.FilteredItems,
-                searchParams.CherryPickedItems,
-                searchParams.CreatedDateRange);
+            var queryString = SearchQueryExtension.CreateMaterialsQueryString(searchParams);
             var query = BuildMaterialsQuery(queryString, from, size, materialRelationsState);
 
             if (searchParams.Sorting != null)
@@ -162,11 +158,7 @@ namespace Iis.Services
         {
             var (from, size) = searchParams.Page.ToElasticPage();
 
-            var queryString = SearchQueryExtension.CreateMaterialsQueryString(
-                searchParams.Suggestion,
-                searchParams.FilteredItems,
-                searchParams.CherryPickedItems,
-                searchParams.CreatedDateRange);
+            var queryString = SearchQueryExtension.CreateMaterialsQueryString(searchParams);
 
             var scrollDuration = _elasticConfiguration.ScrollDurationMinutes == default(int)
                 ? ElasticConstants.DefaultScrollDurationMinutes
@@ -292,11 +284,7 @@ namespace Iis.Services
 
         public Task<int> CountMaterialsByConfiguredFieldsAsync(Guid userId, SearchParams searchParams, CancellationToken ct = default)
         {
-            var queryString = SearchQueryExtension.CreateMaterialsQueryString(
-                searchParams.Suggestion,
-                searchParams.FilteredItems,
-                searchParams.CherryPickedItems,
-                searchParams.CreatedDateRange);
+            var queryString = SearchQueryExtension.CreateMaterialsQueryString(searchParams);
 
             var pagination = searchParams.Page.ToEFPage();
 

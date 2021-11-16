@@ -1,5 +1,5 @@
 using System;
-namespace Iis.Services.Contracts.Params
+namespace Iis.Interfaces.Materials
 {
     public class PaginationParams
     {
@@ -7,8 +7,8 @@ namespace Iis.Services.Contracts.Params
         public int Size { get; }
         public PaginationParams(int page, int size)
         {
-            if(page <= 0) throw new ArgumentOutOfRangeException(nameof(page), page, "Parameter should be above zero.");
-            if(size <= 0) throw new ArgumentOutOfRangeException(nameof(size), size, "Parameter should be above zero.");
+            if (page <= 0) throw new ArgumentOutOfRangeException(nameof(page), page, "Parameter should be above zero.");
+            if (size <= 0) throw new ArgumentOutOfRangeException(nameof(size), size, "Parameter should be above zero.");
 
             Page = page;
             Size = size;

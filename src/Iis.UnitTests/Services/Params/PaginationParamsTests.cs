@@ -1,8 +1,7 @@
 using System;
 using Xunit;
 using FluentAssertions;
-
-using Iis.Services.Contracts.Params;
+using Iis.Interfaces.Materials;
 
 namespace Iis.UnitTests.Services.Params
 {

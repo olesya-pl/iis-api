@@ -9,13 +9,13 @@ using Iis.Interfaces.Elastic;
 using Iis.Api.GraphQL.Common;
 using Iis.Api.GraphQL.Entities;
 using HotChocolate.Resolvers;
-using Iis.Services.Contracts.Params;
 using IIS.Services.Contracts.Interfaces;
 using Iis.Services.Contracts.Elastic;
 using Newtonsoft.Json.Linq;
 using IIS.Services.Contracts.Materials;
 using Iis.Domain.Materials;
 using Iis.Interfaces.Common;
+using Iis.Interfaces.Materials;
 
 namespace IIS.Core.GraphQL.Materials
 {

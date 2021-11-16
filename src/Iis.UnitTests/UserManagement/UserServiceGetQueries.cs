@@ -9,10 +9,10 @@ using Iis.DataModel.Roles;
 using Iis.UnitTests.TestHelpers;
 using Iis.Services.Contracts.Enums;
 using Iis.Services.Contracts.Interfaces;
-using Iis.Services.Contracts.Params;
 using AutoFixture;
 using Iis.DbLayer.MaterialDictionaries;
 using Iis.Interfaces.Constants;
+using Iis.Interfaces.Materials;
 
 namespace Iis.UnitTests.UserManagement
 {

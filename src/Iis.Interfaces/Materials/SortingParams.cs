@@ -1,5 +1,5 @@
 using System;
-namespace Iis.Services.Contracts.Params
+namespace Iis.Interfaces.Materials
 {
     public class SortingParams
     {
@@ -18,6 +18,6 @@ namespace Iis.Services.Contracts.Params
                 _ => ASC
             };
         }
-        public static SortingParams Default => new SortingParams(null,null);
+        public static SortingParams Default => new SortingParams(null, null);
     }
 }

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using Iis.Interfaces.Common;
 using Iis.Interfaces.Elastic;
+using Iis.Interfaces.Materials;
 using Iis.Utility;
 using Newtonsoft.Json.Linq;
 
@@ -162,19 +163,15 @@ namespace Iis.Elastic.SearchQueryExtensions
             return ToQueryStringWithFilterItems(filter);
         }
 
-        public static string CreateMaterialsQueryString(
-            string suggestion,
-            IReadOnlyCollection<Property> filteredItems,
-            IReadOnlyCollection<CherryPickedItem> cherryPickedItems,
-            DateRange createdDateRange)
+        public static string CreateMaterialsQueryString(SearchParams searchParams)
         {
-            var noSuggestion = string.IsNullOrEmpty(suggestion);
+            var noSuggestion = string.IsNullOrEmpty(searchParams.Suggestion);
 
-            var queryString = noSuggestion ? "(ParentId:NULL)" : $"(({suggestion}) AND ParentId:NULL)";
+            var queryString = noSuggestion ? "(ParentId:NULL)" : $"(({searchParams.Suggestion}) AND ParentId:NULL)";
 
-            queryString = PopulateFilteredItems(filteredItems, queryString);
-            PopulateCherryPickedIds(cherryPickedItems, queryString);
-            queryString = PopulateDateRangeCondition("CreatedDate", createdDateRange, queryString);
+            queryString = PopulateFilteredItems(searchParams.FilteredItems, queryString);
+            PopulateCherryPickedIds(searchParams.CherryPickedItems, queryString);
+            queryString = PopulateDateRangeCondition("CreatedDate", searchParams.CreatedDateRange, queryString);
             return queryString;
         }
 

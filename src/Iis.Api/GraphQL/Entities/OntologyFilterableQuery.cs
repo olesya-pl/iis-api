@@ -11,10 +11,10 @@ using Iis.Interfaces.Ontology.Schema;
 using Iis.Interfaces.Elastic;
 using IIS.Core.GraphQL.Common;
 using IIS.Core.GraphQL.Entities.InputTypes;
-using Iis.Services.Contracts.Params;
 using Iis.Utility;
 using Newtonsoft.Json.Linq;
 using HotChocolate.Resolvers;
+using Iis.Interfaces.Materials;
 
 namespace IIS.Core.GraphQL.Entities
 {
