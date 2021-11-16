@@ -21,6 +21,7 @@ using Iis.Domain.Users;
 using Newtonsoft.Json;
 using IIS.Services.Contracts.Interfaces;
 using Microsoft.Extensions.Logging;
+using Iis.Interfaces.Materials;
 
 namespace Iis.Services
 {
@@ -414,6 +415,7 @@ namespace Iis.Services
                             query.SearchByRelation.NodeIdentityList,
                             query.SearchByRelation.IncludeDescendants,
                             query.Suggestion,
+                            null,
                             new PaginationParams(1, 50),
                             null);
                         return new QueryResult

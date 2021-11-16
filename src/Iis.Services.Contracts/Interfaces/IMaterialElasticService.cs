@@ -3,11 +3,11 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using Iis.Interfaces.Elastic;
-using Iis.Services.Contracts.Params;
 using Iis.DataModel.ChangeHistory;
 using Iis.DataModel.Materials;
 using Iis.DbLayer.Repositories;
 using Iis.Domain.Materials;
+using Iis.Interfaces.Materials;
 
 namespace Iis.Services.Contracts.Interfaces
 {
