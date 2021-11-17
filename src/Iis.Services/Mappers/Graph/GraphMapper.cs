@@ -2,11 +2,10 @@ using System;
 using System.Linq;
 using System.Collections.Generic;
 using Newtonsoft.Json.Linq;
+using Iis.Utility;
 using Iis.Domain.Graph;
 using Iis.Domain.Materials;
 using Iis.Interfaces.Ontology.Data;
-using Iis.Interfaces.Ontology.Schema;
-using Iis.Utility;
 
 namespace Iis.Services.Mappers.Graph
 {
@@ -189,7 +188,7 @@ namespace Iis.Services.Mappers.Graph
 
         private static string GetGraphLinkNameProperty(IRelation relation) => relation switch
         {
-            { TargetNode: { NodeType: { IsObjectSign: true } } } => relation.TargetNode.NodeType.Title,
+            { TargetNode: { NodeType: { IsObjectSign: true } } } => $"{relation.TargetNode.NodeType.Title} [{relation.Node.NodeType.Title}]",
             _ => relation.Node.NodeType.Title
         };
 
