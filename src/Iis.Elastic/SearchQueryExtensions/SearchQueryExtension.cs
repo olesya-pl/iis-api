@@ -230,8 +230,7 @@ namespace Iis.Elastic.SearchQueryExtensions
             IReadOnlyCollection<AggregationFieldContext> contexts,
             ISearchParamsContext searchParamsContext)
         {
-            var filterSection = CreateAggregationFilter(query)
-                .ApplyAdditionalAggregationQueries(searchParamsContext);
+            var filterSection = CreateAggregationFilter(query);
             var subAggsSection = new JObject();
             foreach (var context in contexts)
                 context.PopulateAggregation(subAggsSection);
@@ -314,11 +313,15 @@ namespace Iis.Elastic.SearchQueryExtensions
         private static JObject ApplyAdditionalAggregationQueries(
             this JObject aggregationFilter,
             ISearchParamsContext searchParamsContext,
-            AggregationFieldContext fieldContext = default)
+            AggregationFieldContext fieldContext)
         {
-            if (!searchParamsContext.HasAdditionalParameters) return aggregationFilter;
+            if (!searchParamsContext.HasAdditionalParameters
+                || !fieldContext.IsFilteredByField) return aggregationFilter;
 
-            var aggregateQueries = searchParamsContext.GetAdditionalQueriesForAggregate(fieldContext?.Field);
+            var aggregateQueries = SearchParamsQueryHelper.CreateMultiFieldShouldSection(
+                searchParamsContext.HistorySearchParameter.Query,
+                searchParamsContext.HistorySearchParameter.Fields,
+                searchParamsContext.ElasticMultiSearchParams.IsLenient);
             var queriesSection = aggregationFilter["bool"]["should"] as JArray;
 
             queriesSection.Merge(aggregateQueries);
