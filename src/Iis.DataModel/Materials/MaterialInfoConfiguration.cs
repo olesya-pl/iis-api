@@ -11,7 +11,7 @@ namespace Iis.DataModel.Materials
         public void Configure(EntityTypeBuilder<MaterialInfoEntity> builder)
         {
             builder
-                .HasMany(e => e.MaterialFeatures) //.HasMany(e => e.MaterialFeatures)
+                .HasMany(e => e.MaterialFeatures)
                 .WithOne(e => e.MaterialInfo)
                 .HasForeignKey(e => e.MaterialInfoId);
 

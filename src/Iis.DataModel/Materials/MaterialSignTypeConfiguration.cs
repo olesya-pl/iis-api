@@ -1,12 +1,12 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using System;
 
 namespace Iis.DataModel.Materials
 {
     [DbContext(typeof(OntologyContext))]
-    internal sealed class MaterialSignTypeConfiguration: IEntityTypeConfiguration<MaterialSignTypeEntity>
+    internal sealed class MaterialSignTypeConfiguration : IEntityTypeConfiguration<MaterialSignTypeEntity>
     {
         public void Configure(EntityTypeBuilder<MaterialSignTypeEntity> builder)
         {

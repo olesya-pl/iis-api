@@ -100,21 +100,16 @@ namespace Iis.DbLayer.Repositories
 
     public class ImageVector
     {
-        public decimal[] Vector { get; }
-
         public ImageVector(decimal[] imageVector)
         {
             Vector = imageVector;
         }
+
+        public decimal[] Vector { get; }
     }
 
     public class RelatedObject
     {
-        public Guid Id { get; }
-        public string Title { get; }
-        public string NodeType { get; }
-        public string RelationType { get; }
-        public string RelationCreatingType { get; }
         public RelatedObject(Guid id, string title, string nodeType, string relationType, string relationCreatingType)
         {
             Id = id;
@@ -123,5 +118,10 @@ namespace Iis.DbLayer.Repositories
             RelationType = relationType;
             RelationCreatingType = relationCreatingType;
         }
+        public Guid Id { get; }
+        public string Title { get; }
+        public string NodeType { get; }
+        public string RelationType { get; }
+        public string RelationCreatingType { get; }
     }
 }

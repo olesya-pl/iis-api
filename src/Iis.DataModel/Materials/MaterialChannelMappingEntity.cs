@@ -1,11 +1,9 @@
-﻿using Iis.DataModel.Roles;
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System;
+using Iis.DataModel.Roles;
 
 namespace Iis.DataModel.Materials
 {
-    public class MaterialChannelMappingEntity: BaseEntity
+    public class MaterialChannelMappingEntity : BaseEntity
     {
         public string ChannelName { get; set; }
         public Guid RoleId { get; set; }
