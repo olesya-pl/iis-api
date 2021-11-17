@@ -115,7 +115,7 @@ namespace AcceptanceTests.Helpers
             return response.Id;
         }
 
-        internal static Task RemoveMaterial(Guid id)
+        internal static Task RemoveMaterialAsync(Guid id)
         {
             var httpClient = new HttpClient
             {

@@ -110,7 +110,7 @@ namespace AcceptanceTests.UISteps
         public async Task WhenICleanUpUploadedMaterialViaAPI()
         {
             var id = context.Get<Guid>("uploadedMaterial.Id");
-            await MaterialsHelper.RemoveMaterial(id);
+            await MaterialsHelper.RemoveMaterialAsync(id);
         }
 
         [When(@"I set importance (.*) value")]
