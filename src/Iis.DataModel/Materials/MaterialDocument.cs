@@ -42,7 +42,7 @@ namespace Iis.DbLayer.Repositories
         public JObject MLResponses { get; set; }
         public string Title { get; set; }
         public ImageVector[] ImageVectors { get; set; }
-        public IReadOnlyCollection<RelatedObject> RelatedObjectCollection { get; set; } = Array.Empty<RelatedObject>();
+        public IReadOnlyCollection<RelatedObjectOfStudy> RelatedObjectCollection { get; set; } = Array.Empty<RelatedObjectOfStudy>();
         public IReadOnlyCollection<RelatedObject> RelatedEventCollection { get; set; } = Array.Empty<RelatedObject>();
         public IReadOnlyCollection<RelatedObject> RelatedSignCollection { get; set; } = Array.Empty<RelatedObject>();
         public string RegistrationDate { get; set; }
@@ -123,5 +123,19 @@ namespace Iis.DbLayer.Repositories
         public string NodeType { get; }
         public string RelationType { get; }
         public string RelationCreatingType { get; }
+    }
+
+    public class RelatedObjectOfStudy : RelatedObject
+    {
+        public RelatedObjectOfStudy(Guid id, string title, string nodeType, string relationType, string relationCreatingType, string importance, int importanceSortOrder, Guid? relatedSignId)
+        : base(id, title, nodeType, relationType, relationCreatingType)
+        {
+            Importance = importance;
+            ImportanceSortOrder = importanceSortOrder;
+            RelatedSignId = relatedSignId;
+        }
+        public string Importance { get; set; }
+        public int ImportanceSortOrder { get; set; }
+        public Guid? RelatedSignId { get; set; }
     }
 }

@@ -23,7 +23,7 @@ namespace Iis.UnitTests.Utiliity
         {
             IDictionary<int, string> actual = null;
 
-            var newCollection = new Dictionary<int, string>
+            IDictionary<int, string> newCollection = new Dictionary<int, string>
             {
                 [4] = "value_4"
             };

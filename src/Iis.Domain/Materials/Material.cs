@@ -55,7 +55,7 @@ namespace Iis.Domain.Materials
         public bool IsParentMaterial() => ParentId == null;
         public IdTitleDto Caller => GetIdTitle(MaterialNodeLinkType.Caller);
         public IdTitleDto Receiver => GetIdTitle(MaterialNodeLinkType.Receiver);
-        public IReadOnlyCollection<RelatedObject> RelatedObjectCollection { get; set; } = Array.Empty<RelatedObject>();
+        public IReadOnlyCollection<RelatedObjectOfStudy> RelatedObjectCollection { get; set; } = Array.Empty<RelatedObjectOfStudy>();
         public IReadOnlyCollection<RelatedObject> RelatedEventCollection { get; set; } = Array.Empty<RelatedObject>();
         public IReadOnlyCollection<RelatedObject> RelatedSignCollection { get; set; } = Array.Empty<RelatedObject>();
         private MaterialFeature GetFeature(MaterialNodeLinkType linkType) =>

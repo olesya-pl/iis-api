@@ -13,4 +13,12 @@ namespace IIS.Core.GraphQL.Materials
         public string RelationType { get; set; }
         public string RelationCreatingType { get; set; }
     }
+
+    public class RelatedObjectOfStudy : RelatedObject
+    {
+        public string Importance { get; set; }
+        public int ImportanceSortOrder { get; set; }
+        [GraphQLType(typeof(UuidType))]
+        public Guid? RelatedSignId { get; set; }
+    }
 }

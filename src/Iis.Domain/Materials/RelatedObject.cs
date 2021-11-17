@@ -9,4 +9,11 @@ namespace Iis.Domain.Materials
         public string RelationType { get; set; }
         public string RelationCreatingType { get; set; }
     }
+
+    public class RelatedObjectOfStudy : RelatedObject
+    {
+        public string Importance { get; set; }
+        public int ImportanceSortOrder { get; set; }
+        public Guid? RelatedSignId { get; set; }
+    }
 }
