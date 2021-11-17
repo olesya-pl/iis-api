@@ -116,3 +116,4 @@ Scenario: I can upload material and find it by its name
 	And I clicked search button in the Materials section
 	And I searched for uploaded material in the materials
 	And I clicked on the first search result in the Materials section
+	And I clean up uploaded material via API
