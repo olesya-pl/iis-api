@@ -38,7 +38,7 @@ namespace IIS.Core.GraphQL.Materials
             var pageParam = new PaginationParams(pagination.Page, pagination.PageSize);
             var filteredItems = ChangeAssigneeFiltered(filter?.FilteredItems ?? new List<Property>(), tokenPayload.UserId);
             var cherryPickedItems = filter?.CherryPickedItems ?? new List<string>();
-            var createdDateRange = new DateRange(filter?.DateRangeFilter?.From, filter?.DateRangeFilter?.To);
+            var createdDateRange = new DateRange(filter?.UploadDateRange?.From, filter?.UploadDateRange?.To);
 
             if (searchByImageInput != null && searchByImageInput.HasConditions)
             {
