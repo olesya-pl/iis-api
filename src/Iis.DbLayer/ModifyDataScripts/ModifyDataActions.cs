@@ -842,5 +842,41 @@ namespace Iis.DbLayer.ModifyDataScripts
             }
             context.SaveChanges();
         }
+
+        public void SetupObjectImportanceSortOrder(OntologyContext context, IOntologyNodesData data)
+        {
+            const string ImportanceCodePropertyName = "code";
+            const string SortOrderPropertyName = "sortOrder";
+            const string ImportanceTypeName = "ObjectImportance";
+
+            var objectImportanceType = data.Schema.GetEntityTypeByName(ImportanceTypeName);
+
+            var importanceCollection = data.GetNodesByTypeId(objectImportanceType.Id);
+
+            var sortOrderDictionary = new Dictionary<string, string>()
+            {
+                ["critical"] = "1",
+                ["high"] = "2",
+                ["medium"] = "3",
+                ["normal"] = "4",
+                ["low"] = "5",
+                ["ignore"] = "6"
+            };
+
+            data.WriteLock(() =>
+            {
+                foreach (var node in importanceCollection)
+                {
+                    var code = node.GetSingleProperty(ImportanceCodePropertyName)?.Value;
+
+                    if(code is null) continue;
+
+                    if(sortOrderDictionary.TryGetValue(code, out string sortOrder))
+                    {
+                        data.AddValueByDotName(node.Id, sortOrder, SortOrderPropertyName);
+                    }
+                }
+            });
+        }
     }
 }
