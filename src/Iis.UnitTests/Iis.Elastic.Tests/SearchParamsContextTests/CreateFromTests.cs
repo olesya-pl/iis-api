@@ -1,5 +1,4 @@
-﻿using AutoFixture.Xunit2;
-using AutoFixture;
+﻿using AutoFixture;
 using FluentAssertions;
 using Iis.Elastic.SearchQueryExtensions;
 using Iis.Interfaces.Elastic;
@@ -14,11 +13,10 @@ namespace Iis.UnitTests.Iis.Elastic.Tests.SearchParamsContextTests
 {
     public class CreateFromTests
     {
-        [Theory]
-        [AutoData]
-        public void CreateFrom_WhenElasticMultiSearchParamsIsNull_ShouldThrowArgumentNullException(Dictionary<string, string> queries)
+        [Fact]
+        public void CreateFrom_WhenElasticMultiSearchParamsIsNull_ShouldThrowArgumentNullException()
         {
-            Func<ISearchParamsContext> func = () => SearchParamsContext.CreateFrom(null, queries);
+            Func<ISearchParamsContext> func = () => SearchParamsContext.CreateFrom(null);
 
             func.Should().Throw<ArgumentNullException>();
         }
@@ -26,11 +24,11 @@ namespace Iis.UnitTests.Iis.Elastic.Tests.SearchParamsContextTests
         [Theory]
         [AutoMoqData]
         public void CreateFrom_WhenSearchParamsAreEmpty_ShouldThrowArgumentException(
-            Mock<IElasticMultiSearchParams> searchParamsMock,
-            Dictionary<string, string> queries)
+            Mock<IElasticMultiSearchParams> searchParamsMock)
         {
             searchParamsMock.SetupProperty(_ => _.SearchParams, new List<SearchParameter>());
-            Func<ISearchParamsContext> func = () => SearchParamsContext.CreateFrom(null, queries);
+
+            Func<ISearchParamsContext> func = () => SearchParamsContext.CreateFrom(searchParamsMock.Object);
 
             func.Should().Throw<ArgumentException>();
         }
@@ -40,16 +38,14 @@ namespace Iis.UnitTests.Iis.Elastic.Tests.SearchParamsContextTests
         {
             var fixture = ElasticMultiSearchParamsFixture.CreateFixture();
             var searchParams = fixture.Create<IElasticMultiSearchParams>();
-            var queries = fixture.Create<Dictionary<string, string>>();
             var expectedBaseSearchParameter = searchParams.SearchParams.First();
             var expectedHistorySearchParameter = searchParams.SearchParams.Skip(1).FirstOrDefault();
 
-            var context = SearchParamsContext.CreateFrom(searchParams, queries);
+            var context = SearchParamsContext.CreateFrom(searchParams);
 
             context.ElasticMultiSearchParams.Should().BeEquivalentTo(searchParams);
             context.BaseSearchParameter.Should().BeEquivalentTo(expectedBaseSearchParameter);
             context.HistorySearchParameter.Should().BeEquivalentTo(expectedHistorySearchParameter);
-            context.AggregateHistoryResultQueries.Should().BeEquivalentTo(queries);
         }
     }
 }
