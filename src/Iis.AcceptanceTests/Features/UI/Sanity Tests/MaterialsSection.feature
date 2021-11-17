@@ -41,6 +41,7 @@ Feature: MaterialsSectionUI - Sanity
         And I pressed Show button to show Text classifier ML output
         Then I must see Text classifier ML output form
         When I close the material card
+        And I clean up uploaded material via API
 
     @sanity @UI @MaterialsSanityUI
     Scenario: IIS-5837- Connect a material with an object of study from material
@@ -67,6 +68,7 @@ Feature: MaterialsSectionUI - Sanity
         When I pressed the confirm button
         Then I must not see the related РОМАНОВ А.Г object in the material
         When I close the material card
+        And I clean up uploaded material via API
 
     @sanity @UI @MaterialsSanityUI
     Scenario: IIS-6363 - Search a material by keyword from the material
@@ -83,6 +85,8 @@ Feature: MaterialsSectionUI - Sanity
 	And I clicked search button in the Materials section
 	And I searched таємн data in the materials
     Then I must see a material that contains таємн word in the Materials search result
+    When I clean up uploaded material via API
+
 
      @sanity @UI @MaterialsSanityUI
     Scenario: IIS-8102 - Go to Events page from the material
@@ -101,6 +105,7 @@ Feature: MaterialsSectionUI - Sanity
     And I clicked on the first material in the Materials list
     When I clicked on the Events section
 	Then I must see first event in the events list	
+    When I clean up uploaded material via API
 
 
      @sanity @UI @MaterialsSanityUI
@@ -120,6 +125,7 @@ Feature: MaterialsSectionUI - Sanity
     And I clicked on the first material in the Materials list
     When I navigated to Report section
 	Then I must see first report in the report list
+    When I clean up uploaded material via API
 
 
 
