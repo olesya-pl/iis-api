@@ -77,7 +77,7 @@ namespace AcceptanceTests.UISteps
             context.Set(eventUniqueName, eventName);
             eventsSection.CreateEventButton.Click();
             eventPage.EventTitle.SendKeys(eventUniqueName);
-            eventPage.DescriptionField.SendKeys("Додаткові тестові дані");
+            eventPage.AdditionalDataTextField.SendKeys("Додаткові тестові дані");
             eventPage.AverageImportaceRadioButton.Click();
             eventPage.NotHappenRadioButton.Click();
             eventPage.FlawRadioButton.Click();
