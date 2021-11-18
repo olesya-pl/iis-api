@@ -208,19 +208,7 @@ namespace Iis.Elastic.SearchQueryExtensions
                 return;
             }
 
-            var grouped = contexts.GroupBy(_ => _.IsFilteredByField)
-                .ToDictionary(_ => _.Key, _ => _.ToList());
-
-            foreach (var (isFilteredByField, groupedContexts) in grouped)
-            {
-                if (isFilteredByField)
-                {
-                    groupedContexts.ForEach(_ => aggregations.ProcessQueryContext(_, context));
-                    continue;
-                }
-
-                aggregations.ProcessQueryContexts(query, groupedAggregationNameGenerator.GetUniqueAggregationName(), groupedContexts, context);
-            }
+            aggregations.ProcessQueryContexts(query, groupedAggregationNameGenerator.GetUniqueAggregationName(), contexts, context);
         }
 
         private static void ProcessQueryContexts(
@@ -230,7 +218,8 @@ namespace Iis.Elastic.SearchQueryExtensions
             IReadOnlyCollection<AggregationFieldContext> contexts,
             ISearchParamsContext searchParamsContext)
         {
-            var filterSection = CreateAggregationFilter(query);
+            var filterSection = CreateAggregationFilter(query)
+                .ApplyAdditionalAggregationQueries(searchParamsContext);
             var subAggsSection = new JObject();
             foreach (var context in contexts)
                 context.PopulateAggregation(subAggsSection);
@@ -248,7 +237,7 @@ namespace Iis.Elastic.SearchQueryExtensions
             ISearchParamsContext searchParamsContext)
         {
             var filterSection = CreateAggregationFilter(context.Query)
-                .ApplyAdditionalAggregationQueries(searchParamsContext, context);
+                .ApplyAdditionalAggregationQueries(searchParamsContext);
             var subAggsSection = CreateSubAggs("sub_aggs", context.Field);
 
             aggregations[context.FieldName] = new JObject
@@ -312,11 +301,9 @@ namespace Iis.Elastic.SearchQueryExtensions
 
         private static JObject ApplyAdditionalAggregationQueries(
             this JObject aggregationFilter,
-            ISearchParamsContext searchParamsContext,
-            AggregationFieldContext fieldContext)
+            ISearchParamsContext searchParamsContext)
         {
-            if (!searchParamsContext.HasAdditionalParameters
-                || !fieldContext.IsFilteredByField) return aggregationFilter;
+            if (!searchParamsContext.HasAdditionalParameters) return aggregationFilter;
 
             var aggregateQueries = SearchParamsQueryHelper.CreateMultiFieldShouldSection(
                 searchParamsContext.HistorySearchParameter.Query,
@@ -425,7 +412,7 @@ namespace Iis.Elastic.SearchQueryExtensions
             return sortOrder == "asc" ? "_last" : "_first";
         }
 
-        private static (string Query, bool IsFilteredByField) ToQueryString(this ElasticFilter filter, AggregationField field, bool applyFuzzinessByDefault)
+        private static string ToQueryString(this ElasticFilter filter, AggregationField field, bool applyFuzzinessByDefault)
         {
             var fieldSpecificFilter = new ElasticFilter
             {
@@ -436,8 +423,8 @@ namespace Iis.Elastic.SearchQueryExtensions
             var isFilteredByField = filter.FilteredItems.Count != fieldSpecificFilter.FilteredItems.Count;
 
             return string.IsNullOrEmpty(possibleQuery)
-                ? (Wildcard, isFilteredByField)
-                : (possibleQuery, isFilteredByField);
+                ? Wildcard
+                : possibleQuery;
         }
 
         private static string GetFieldName(this AggregationField field)
@@ -468,17 +455,12 @@ namespace Iis.Elastic.SearchQueryExtensions
             {
                 FieldName = aggregationField.GetFieldName();
                 Field = aggregationField;
-
-                var (query, isfilteredByField) = filter.ToQueryString(aggregationField, context.IsBaseQueryExact);
-
-                Query = query;
-                IsFilteredByField = isfilteredByField;
+                Query = filter.ToQueryString(aggregationField, context.IsBaseQueryExact);
             }
 
             public string FieldName { get; }
             public AggregationField Field { get; }
             public string Query { get; }
-            public bool IsFilteredByField { get; }
         }
     }
 }
