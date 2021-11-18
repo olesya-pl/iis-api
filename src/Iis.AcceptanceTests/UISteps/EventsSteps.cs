@@ -235,7 +235,7 @@ namespace AcceptanceTests.UISteps
         [Then(@"I must see the (.*) text in the additional data text field")]
         public void ThenIMustSeeTheAdditionalDataInTheAdditionalTextField(string text)
         {
-            Assert.True(eventPage.DescriptionField.Displayed);
+            Assert.True(eventPage.DescriptionFieldBigCard.Displayed);
         }
 
         [Then(@"I open first event in the events list")]

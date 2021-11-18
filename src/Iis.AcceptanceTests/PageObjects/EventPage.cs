@@ -68,6 +68,9 @@ namespace AcceptanceTests.PageObjects
         [FindsBy(How = How.CssSelector, Using = "textarea[name='description']")]
         public IWebElement AdditionalDataTextField;
 
+        [FindsBy(How = How.CssSelector, Using = ".event-card .event-card__description .view-text")]
+        public IWebElement DescriptionFieldBigCard;
+
         public Event GetRelatedObjectOfStudyNameBindedToTheEvent(string title)
         {
             return new Event(driver, title);
