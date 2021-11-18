@@ -6,13 +6,6 @@ namespace Iis.DataModel.Reports
 {
     public class ReportEntity : BaseEntity
     {
-        public string Title { get; set; }
-        public string Recipient { get; set; }
-        public int AccessLevel { get; set; }
-        public DateTime CreatedAt { get; set; }
-        public string Annotation { get; set; }
-        public virtual ICollection<ReportEventEntity> ReportEvents { get; set; } = new List<ReportEventEntity>();
-
         public ReportEntity() { }
 
         public ReportEntity(ReportEntity report, Guid newId, DateTime createdAt)
@@ -34,5 +27,12 @@ namespace Iis.DataModel.Reports
                 ReportId = newId
             }));
         }
+
+        public string Title { get; set; }
+        public string Recipient { get; set; }
+        public int AccessLevel { get; set; }
+        public DateTime CreatedAt { get; set; }
+        public string Annotation { get; set; }
+        public virtual ICollection<ReportEventEntity> ReportEvents { get; set; } = new List<ReportEventEntity>();
     }
 }
