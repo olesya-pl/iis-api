@@ -34,18 +34,27 @@
 
     @regression @UI @Events
     Scenario: IIS-5992 - Ability to connect the event and a material
+        Given I upload a new docx material via API
+		| Field                 | Value                                      |
+		| FileName              | тестовий матеріал                          |
+		| SourceReliabilityText | Здебільшого надійне                        |
+		| ReliabilityText       | Достовірна                                 |
+		| Content               | таємний контент                           |
+		| AccessLevel           | 0                                          |
+		| LoadedBy              | автотест                                   |
+		| MetaData              | {"type":"document","source":"contour.doc"} |
         When I navigated to Events page
         And I created a new Тестова подія event
         When I searched for the Тестова подія created event
         Then I must see the Тестова подія event in the event search results
         Then I open first event in the events list
         When I pressed the edit event button
-        And I binded a Voice_02-05-2017 06-00-55 (78) material to the event
+        And I binded a тестовий матеріал material to the event
         When I pressed the save event changes button
-        Then I must see the Voice_02-05-2017 06-00-55 (78) material binded to the event
+        Then I must see the тестовий матеріал material binded to the event
         When I navigated to Materials page
         And I clicked search button in the Materials section
-        And I searched Voice_02-05-2017 06-00-55 (78) data in the materials
+        And I searched тестовий матеріал data in the materials
         And I clicked on the first material in the Materials list
         When I clicked on the relations tab in the material card
         Then I must see Тестова подія as the related event to the material

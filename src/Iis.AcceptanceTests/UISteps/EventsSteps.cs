@@ -135,7 +135,7 @@ namespace AcceptanceTests.UISteps
         public void WhenIBindedAMaterialToTheEvent(string materialName)
         {
             var materialInput = eventPage.BindedMaterialsField.FindElement(By.TagName("input"));
-            materialInput.SendKeys(materialName);
+            materialInput.SendKeys(context.Get<string>("uploadedMaterial"));
             driver.WaitFor(4);
             materialInput.SendKeys(Keys.Down);
             materialInput.SendKeys(Keys.Enter);
