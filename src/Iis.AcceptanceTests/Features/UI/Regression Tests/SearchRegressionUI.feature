@@ -47,7 +47,7 @@
 	Scenario: IIS-5953 - Possibility to search a material by a creation date
 		When I navigated to Materials page
 		And I clicked search button in the Materials section
-	    And I searched CreatedDate: 07.06.2021 data data in the materials
+	    And I searched CreatedDate: 07.06.2021 data in the materials
         Then I must see the NATO PUBLIC DIPLOMACY PROGRAMMES title of the material
 		When I clicked on the clear search button
 		And I clicked search button in the Materials section
