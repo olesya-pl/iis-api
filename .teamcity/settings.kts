@@ -702,6 +702,7 @@ object Tests_PrepareElasticIntegrationTestEnv : BuildType({
 
     triggers {
         finishBuildTrigger {
+            enabled = false
             buildType = "${Api_BuildDocker.id}"
         }
     }
