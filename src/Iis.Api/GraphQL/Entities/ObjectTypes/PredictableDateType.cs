@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using HotChocolate.Language;
 using HotChocolate.Types;
 
@@ -10,57 +7,60 @@ namespace Iis.Api.GraphQL.Entities.ObjectTypes
     public class PredictableDateType : ScalarType
     {
         private const string DateFormat = "yyyy-MM-ddTHH:mm:ss.fffZ";
-        
+
         public PredictableDateType() : base("PredictableDateType")
         {
         }
 
-        public override Type ClrType { get; } = typeof(DateTime);
+        public override Type RuntimeType { get; } = typeof(DateTime);
 
         // define which literals this type can be parsed from.
-        public override bool IsInstanceOfType(IValueNode literal)
+        public override bool IsInstanceOfType(IValueNode valueSyntax)
         {
-            if (literal == null)
+            if (valueSyntax == null)
             {
-                throw new ArgumentNullException(nameof(literal));
+                throw new ArgumentNullException(nameof(valueSyntax));
             }
 
-            return literal is StringValueNode
-                || literal is NullValueNode;
+            return valueSyntax is StringValueNode
+                || valueSyntax is NullValueNode;
         }
 
+        public override IValueNode ParseResult(object resultValue)
+            => ParseValue(resultValue);
+
         // define how a literal is parsed to the native .NET type.
-        public override object ParseLiteral(IValueNode literal)
+        public override object ParseLiteral(IValueNode valueSyntax)
         {
-            if (literal == null)
+            if (valueSyntax == null)
             {
-                throw new ArgumentNullException(nameof(literal));
+                throw new ArgumentNullException(nameof(valueSyntax));
             }
 
-            if (literal is StringValueNode stringLiteral)
+            if (valueSyntax is StringValueNode stringLiteral)
             {
                 return stringLiteral.Value;
             }
 
-            if (literal is NullValueNode)
+            if (valueSyntax is NullValueNode)
             {
                 return null;
             }
 
             throw new ArgumentException(
                 "The string type can only parse string literals.",
-                nameof(literal));
+                nameof(valueSyntax));
         }
 
         // define how a native type is parsed into a literal,
-        public override IValueNode ParseValue(object value)
+        public override IValueNode ParseValue(object runtimeValue)
         {
-            if (value == null)
+            if (runtimeValue == null)
             {
                 return new NullValueNode(null);
             }
 
-            if (value is DateTime s)
+            if (runtimeValue is DateTime s)
             {
                 return new StringValueNode(null, s.ToString(DateFormat), false);
             }
@@ -73,14 +73,14 @@ namespace Iis.Api.GraphQL.Entities.ObjectTypes
         // define the result serialization. A valid output must be of the following .NET types:
         // System.String, System.Char, System.Int16, System.Int32, System.Int64,
         // System.Float, System.Double, System.Decimal and System.Boolean
-        public override object Serialize(object value)
+        public override object Serialize(object runtimeValue)
         {
-            if (value == null)
+            if (runtimeValue == null)
             {
                 return null;
             }
 
-            if (value is DateTime s)
+            if (runtimeValue is DateTime s)
             {
                 return s.ToString(DateFormat);
             }
@@ -89,16 +89,16 @@ namespace Iis.Api.GraphQL.Entities.ObjectTypes
                 "The specified value cannot be serialized by the PreidictabledataTime.");
         }
 
-        public override bool TryDeserialize(object serialized, out object value)
+        public override bool TryDeserialize(object resultValue, out object runtimeValue)
         {
-            value = null;
+            runtimeValue = null;
             try
             {
-                var stringified = serialized.ToString();
+                var stringified = resultValue.ToString();
                 var success = DateTime.TryParse(stringified, out var parsed);
                 if (success)
                 {
-                    value = parsed;
+                    runtimeValue = parsed;
                 }
                 return true;
             }
@@ -108,12 +108,12 @@ namespace Iis.Api.GraphQL.Entities.ObjectTypes
             }
         }
 
-        public override bool TrySerialize(object value, out object serialized)
+        public override bool TrySerialize(object runtimeValue, out object resultValue)
         {
-            serialized = null;
+            resultValue = null;
             try
             {
-                serialized = Serialize(value);
+                resultValue = Serialize(runtimeValue);
                 return true;
             }
             catch

@@ -16,63 +16,65 @@ namespace IIS.Core.GraphQL.Scalars
         {
         }
 
-        public override Type ClrType => typeof(object);
+        public override Type RuntimeType => typeof(object);
 
-        public override bool IsInstanceOfType(IValueNode literal)
+        public override bool IsInstanceOfType(IValueNode valueSyntax)
         {
-            if (literal == null) throw new ArgumentNullException(nameof(literal));
-            return literal is NullValueNode || literal is ObjectValueNode;
+            if (valueSyntax == null) throw new ArgumentNullException(nameof(valueSyntax));
+            return valueSyntax is NullValueNode || valueSyntax is ObjectValueNode;
         }
 
-        public override object ParseLiteral(IValueNode literal)
+        public override IValueNode ParseResult(object resultValue)
+            => ParseValue(resultValue);
+
+        public override object ParseLiteral(IValueNode valueSyntax)
         {
-            if (literal is NullValueNode) // NullValueNode is present after TryDeserialize call
+            if (valueSyntax is NullValueNode) // NullValueNode is present after TryDeserialize call
                 return null;
             throw new NotImplementedException();
         }
 
-        public override IValueNode ParseValue(object value)
+        public override IValueNode ParseValue(object runtimeValue)
         {
             throw new NotImplementedException();
         }
 
-        public override object Serialize(object value)
+        public override object Serialize(object runtimeValue)
         {
-            if (!(value is JObject jo))
-                throw new ArgumentException(nameof(value));
-//                return JObject.FromObject(value);
+            if (!(runtimeValue is JObject jo))
+                throw new ArgumentException(nameof(runtimeValue));
             return jo;
         }
 
-        public override bool TrySerialize(object value, out object serialized)
+        public override bool TrySerialize(object runtimeValue, out object resultValue)
         {
             try
             {
-                serialized = JsonConvert.SerializeObject(value);
+                resultValue = JsonConvert.SerializeObject(runtimeValue);
                 return true;
             }
             catch
             {
-                serialized = null;
+                resultValue = null;
                 return false;
             }
         }
 
-        public override bool TryDeserialize(object serialized, out object value)
+        public override bool TryDeserialize(object resultValue, out object runtimeValue)
         {
-            if (serialized is Dictionary<string, object>)
+            if (resultValue is Dictionary<string, object>)
             {
-                value = JObject.FromObject(serialized);
+                runtimeValue = JObject.FromObject(resultValue);
                 return true;
             }
 
-            if (serialized is JObject)
+            if (resultValue is JObject)
             {
-                value = serialized;
+                runtimeValue = resultValue;
                 return true;
             }
 
-            value = null;
+            runtimeValue = null;
             return false;
         }
     }
