@@ -27,9 +27,7 @@ namespace AcceptanceTests.PageObjects
         [CacheLookup]
         public IWebElement SearchField;
 
-        [FindsBy(How = How.XPath, Using = "//div[@class='text-ellipsis title']")]
-        //div[@class='object-summary']/span[@class='title'
-
+        [FindsBy(How = How.CssSelector, Using = ".object-summary .text-ellipsis .title")]
         public IWebElement FirstSearchResultTitle;
 
         [FindsBy(How = How.CssSelector, Using = ".objects-table .p-datatable-tbody tr:nth-child(1)")] 
