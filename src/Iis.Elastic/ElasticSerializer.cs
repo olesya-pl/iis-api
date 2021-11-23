@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Globalization;
 using Newtonsoft.Json.Linq;
 
 using Iis.Interfaces.Elastic;
@@ -12,6 +13,12 @@ namespace Iis.Elastic
     public class ElasticSerializer : IElasticSerializer
     {
         private const string DateFormat = "yyyy-MM-ddTHH:mm:ss.fffZ";
+        private const string AccessLevelPropertyName = "__accessLevel";
+        private const string LattiturePropertyName = "lat";
+        private const string LongitudePropertyName = "long";
+        private const string ShortLongitudePropertyName = "lon";
+        private const string CoordinatesPropertyName = "__coordinates";
+        private const string LocationPropertyName = "location";
 
         public string GetJsonByExtNode(IExtNode extNode)
         {
@@ -21,24 +28,23 @@ namespace Iis.Elastic
         {
             var json = new JObject();
 
-
             if (IsHeadNode)
             {
                 json[nameof(extNode.Id)] = extNode.Id;
                 json[nameof(extNode.NodeTypeName)] = extNode.NodeTypeName;
 
                 if (extNode.AccessLevel.HasValue)
-                    json["__accessLevel"] = extNode.AccessLevel;
+                    json[AccessLevelPropertyName] = extNode.AccessLevel;
 
                 if (!string.IsNullOrEmpty(extNode.NodeTypeTitle))
                 {
                     json[nameof(extNode.NodeTypeTitle)] = extNode.NodeTypeTitle;
                     json[$"{nameof(extNode.NodeTypeTitle)}{SearchQueryExtension.AggregateSuffix}"] = extNode.NodeTypeTitle;
                 }
-                json[nameof(extNode.CreatedAt)] = extNode.CreatedAt.ToString(DateFormat);
-                json[nameof(extNode.UpdatedAt)] = extNode.UpdatedAt.ToString(DateFormat);
-
-            } else if(extNode.NodeType.IsObject)
+                json[nameof(extNode.CreatedAt)] = extNode.CreatedAt.ToString(DateFormat, CultureInfo.InvariantCulture);
+                json[nameof(extNode.UpdatedAt)] = extNode.UpdatedAt.ToString(DateFormat, CultureInfo.InvariantCulture);
+            }
+            else if (extNode.NodeType.IsObject)
             {
                 json[nameof(extNode.Id)] = extNode.Id;
             }
@@ -50,16 +56,16 @@ namespace Iis.Elastic
                 foreach (var coord in coordinates)
                 {
                     var item = new JObject();
-                    item["lat"] = coord.Latitude;
-                    item["long"] = coord.Longitude;
+                    item[LattiturePropertyName] = coord.Latitude;
+                    item[LongitudePropertyName] = coord.Longitude;
                     coords.Add(item);
                 }
-                json["__coordinates"] = coords;
+                json[CoordinatesPropertyName] = coords;
             }
 
-            TryAddGeoPointProperty(json, "location", extNode.Location);
+            TryAddGeoPointProperty(json, LocationPropertyName, extNode.Location);
 
-            foreach (var childGroup in extNode.Children.GroupBy(p => new {p.NodeTypeName, p.EntityTypeName}))
+            foreach (var childGroup in extNode.Children.GroupBy(p => new { p.NodeTypeName, p.EntityTypeName }))
             {
                 var key = childGroup.Key.NodeTypeName;
                 if (childGroup.Count() == 1)
@@ -82,7 +88,7 @@ namespace Iis.Elastic
             return json;
         }
 
-        private JToken GetFuzzyDateJToken(IExtNode extNode)
+        private static JToken GetFuzzyDateJToken(IExtNode extNode)
         {
             int? year = (int?)extNode.Children.SingleOrDefault(c => c.NodeTypeName == "year")?.AttributeValue;
             if (year == null)
@@ -95,7 +101,7 @@ namespace Iis.Elastic
             try
             {
                 var date = new DateTime(year.Value, month, day);
-                return JToken.FromObject(date.ToString(DateFormat));
+                return JToken.FromObject(date.ToString(DateFormat, CultureInfo.InvariantCulture));
             }
             catch
             {
@@ -103,15 +109,28 @@ namespace Iis.Elastic
             }
         }
 
-        private JToken GetDateTimeJToken(IExtNode extNode)
+        private static JToken GetDateTimeJToken(IExtNode extNode)
         {
             var returnValue = extNode.AttributeValue;
 
-            if(DateTime.TryParse(extNode.AttributeValue.ToString(), out DateTime dateTimeValue))
+            if (DateTimeOffset.TryParse(extNode.AttributeValue.ToString(), out DateTimeOffset offsetValue))
             {
-                returnValue = dateTimeValue.ToString(DateFormat);
+                returnValue = offsetValue.ToString(DateFormat, CultureInfo.InvariantCulture);
             }
             return JToken.FromObject(returnValue);
+        }
+
+        private static bool TryAddGeoPointProperty(JObject jobject, string propertyName, GeoCoordinates location)
+        {
+            if (jobject is null || string.IsNullOrWhiteSpace(propertyName) || location is null) return false;
+
+            var coordinate = new JObject(
+                new JProperty(LattiturePropertyName, location.Latitude),
+                new JProperty(ShortLongitudePropertyName, location.Longitude));
+
+            jobject[propertyName] = coordinate;
+
+            return true;
         }
 
         private JToken GetExtNodeValue(IExtNode extNode)
@@ -121,7 +140,7 @@ namespace Iis.Elastic
                 return GetFuzzyDateJToken(extNode);
             }
 
-            if(extNode.ScalarType.HasValue && extNode.ScalarType.Value == ScalarType.Date)
+            if (extNode.ScalarType.HasValue && extNode.ScalarType.Value == ScalarType.Date)
             {
                 return GetDateTimeJToken(extNode);
             }
@@ -132,21 +151,6 @@ namespace Iis.Elastic
             }
 
             return GetJsonObjectByExtNode(extNode, false);
-        }
-
-        private bool TryAddGeoPointProperty(JObject jobject, string propertyName, GeoCoordinates location)
-        {
-            if(jobject is null || string.IsNullOrWhiteSpace(propertyName) || location is null) return false;
-
-            var coordinate = new JObject
-            (
-                new JProperty("lat", location.Latitude),
-                new JProperty("lon", location.Longitude)
-            );
-
-            jobject[propertyName] = coordinate;
-
-            return true;
         }
     }
 }
