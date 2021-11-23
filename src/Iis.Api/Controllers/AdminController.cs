@@ -275,7 +275,8 @@ namespace Iis.Api.Controllers
             var log = new StringBuilder();
             _adminElasticService.Logger = log;
 
-            var indexSecurityParam = new List<(IReadOnlyCollection<string>, string)>{
+            var indexSecurityParam = new List<(IReadOnlyCollection<string>, string)>
+            {
                 (_elasticState.MaterialIndexes, "AccessLevel"),
                 (new[] { _elasticState.ReportIndex }, "AccessLevel"),
                 (_elasticState.OntologyIndexes, "__accessLevel"),
@@ -306,7 +307,6 @@ namespace Iis.Api.Controllers
             var json = jObj.ToString(Newtonsoft.Json.Formatting.Indented);
             return Content(json);
         }
-
 
         [HttpPost("RestartApplication")]
         public async Task RestartApplication()
@@ -353,7 +353,6 @@ namespace Iis.Api.Controllers
             try
             {
                 message = await _userService.ImportUsersFromExternalSourceAsync(cancellationToken: ct);
-
             }
             catch (Exception ex)
             {
