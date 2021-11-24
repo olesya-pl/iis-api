@@ -141,7 +141,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             var wikiSearchGranted = _elasticService.ShouldReturnAllEntities(filter) ? user.IsWikiReadGranted() : user.IsWikiSearchGranted();
 
             var derivedTypes = _data.Schema
-                .GetNodeTypes(types.Select(t => t.Id))
+                .GetNodeTypes(types.Select(t => t.Id), true)
                 .Where(type => !type.IsAbstract 
                     && _elasticService.TypeIsAvalilable(type,
                         entitySearchGranted,
