@@ -413,7 +413,7 @@ namespace IIS.Services.Materials
                             .ToArray();
 
             var featureIdList = nodes
-                                .Where(_materialDocumentMapper.IsObjectSign)
+                                .Where(_ => _.OriginalNode.NodeType.IsObjectSign)
                                 .Select(e => e.Id)
                                 .ToArray();
 

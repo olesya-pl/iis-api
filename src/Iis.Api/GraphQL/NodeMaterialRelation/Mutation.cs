@@ -54,4 +54,3 @@ namespace IIS.Core.GraphQL.NodeMaterialRelation
         }
     }
 }
-
