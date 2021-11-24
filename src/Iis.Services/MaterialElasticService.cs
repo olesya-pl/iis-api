@@ -667,7 +667,7 @@ namespace Iis.Services
 
             materialDocument.RelatedSignCollection = MaterialDocumentHelper.MapSingCollection(nodeDictionary);
 
-            materialDocument.ObjectsOfStudyCount = materialDocument.RelatedObjectCollection.Count(e => e.RelationType == NoneLinkTypeValue);
+            materialDocument.ObjectsOfStudyCount = materialDocument.RelatedObjectCollection.Count;
 
             return materialDocument;
         }

@@ -1,10 +1,8 @@
-using Iis.DataModel.Materials;
+using System;
+using System.Collections.Generic;
 using Iis.Domain.Users;
 using Iis.Interfaces.Common;
 using Newtonsoft.Json.Linq;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace Iis.Domain.Materials
 {
@@ -53,25 +51,11 @@ namespace Iis.Domain.Materials
         public DateTime? RegistrationDate { get; set; }
         public bool HasAttachedFile() => File != null;
         public bool IsParentMaterial() => ParentId == null;
-        public IdTitleDto Caller => GetIdTitle(MaterialNodeLinkType.Caller);
-        public IdTitleDto Receiver => GetIdTitle(MaterialNodeLinkType.Receiver);
+        public IdTitleDto Caller { get; set; }
+        public IdTitleDto Receiver { get; set; }
         public IReadOnlyCollection<RelatedObjectOfStudy> RelatedObjectCollection { get; set; } = Array.Empty<RelatedObjectOfStudy>();
         public IReadOnlyCollection<RelatedObject> RelatedEventCollection { get; set; } = Array.Empty<RelatedObject>();
         public IReadOnlyCollection<RelatedObject> RelatedSignCollection { get; set; } = Array.Empty<RelatedObject>();
-        private MaterialFeature GetFeature(MaterialNodeLinkType linkType) =>
-            Infos.SelectMany(i => i.Features)
-            .Where(f => f.NodeLinkType == linkType)
-            .FirstOrDefault();
-        private IdTitleDto GetIdTitle(MaterialNodeLinkType linkType)
-        {
-            var node = GetFeature(linkType)?.Node.OriginalNode;
-            return node == null ? null :
-                new IdTitleDto
-                {
-                    Id = node.Id,
-                    Title = node.GetTitleValue(),
-                    NodeTypeName = node.NodeType.Name
-                };
-        }
+        public int ObjectsOfStudyCount { get; set; }
     }
 }

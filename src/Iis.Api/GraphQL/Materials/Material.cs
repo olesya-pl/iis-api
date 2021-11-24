@@ -10,8 +10,8 @@ using Iis.Services.Contracts.Interfaces;
 using IIS.Core.GraphQL.Scalars;
 using IIS.Core.GraphQL.Users;
 using Newtonsoft.Json.Linq;
-using FileInfo = IIS.Core.GraphQL.Files.FileInfo;
 using Iis.Api.GraphQL.Common;
+using FileInfo = IIS.Core.GraphQL.Files.FileInfo;
 
 namespace IIS.Core.GraphQL.Materials
 {
@@ -70,6 +70,8 @@ namespace IIS.Core.GraphQL.Materials
         public IReadOnlyCollection<RelatedObjectOfStudy> RelatedObjectCollection { get; set; } = Array.Empty<RelatedObjectOfStudy>();
         public IReadOnlyCollection<RelatedObject> RelatedEventCollection { get; set; } = Array.Empty<RelatedObject>();
         public IReadOnlyCollection<RelatedObject> RelatedSignCollection { get; set; } = Array.Empty<RelatedObject>();
+        public int ObjectsOfStudyCount { get; set; }
+
         public async Task<FileInfo> GetFile([Service] IFileService fileService)
         {
             if (FileId == null) return null;

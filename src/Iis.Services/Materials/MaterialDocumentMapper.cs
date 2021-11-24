@@ -7,6 +7,7 @@ using Iis.DbLayer.Repositories;
 using Iis.Domain;
 using Iis.Domain.Materials;
 using Iis.Domain.Users;
+using Iis.Interfaces.Common;
 using Iis.Interfaces.Ontology.Schema;
 using Iis.Services;
 using Newtonsoft.Json.Linq;
@@ -15,12 +16,15 @@ namespace IIS.Services.Materials
 {
     public class MaterialDocumentMapper
     {
+        private static readonly string CallerTypeName = MaterialNodeLinkType.Caller.ToString();
+        private static readonly string ReceiverTypeName = MaterialNodeLinkType.Receiver.ToString();
         private readonly IMapper _mapper;
         private readonly IOntologyService _ontologyService;
         private readonly IOntologySchema _ontologySchema;
         private readonly NodeToJObjectMapper _nodeToJObjectMapper;
 
-        public MaterialDocumentMapper(IMapper mapper,
+        public MaterialDocumentMapper(
+            IMapper mapper,
             IOntologySchema ontologySchema,
             IOntologyService ontologyService,
             NodeToJObjectMapper nodeToJObjectMapper)
@@ -36,22 +40,28 @@ namespace IIS.Services.Materials
             var material = _mapper.Map<Material>(document);
 
             material.Children = document.Children
-                                            .Select(_mapper.Map<Material>)
+                                            .Select(_ => _mapper.Map<Material>(_))
                                             .ToList();
 
-            var nodes = document.NodeIds
-                                    .Select(_ontologyService.GetNode)
+            material.Caller = GetIdTitleForLinkType(material.RelatedObjectCollection, CallerTypeName);
+
+            material.Receiver = GetIdTitleForLinkType(material.RelatedObjectCollection, ReceiverTypeName);
+
+            var nodeCollection = document.NodeIds
+                                    .Select(_ => _ontologyService.GetNode(_))
                                     .ToArray();
 
-            material.Events = nodes
-                                .Where(IsEvent)
-                                .Select(_nodeToJObjectMapper.EventToJObject);
+            material.Events = nodeCollection
+                                .Where(_ => _.OriginalNode.NodeType.IsEvent)
+                                .Select(_ => _nodeToJObjectMapper.EventToJObject(_));
 
-            material.Features = nodes
-                                .Where(IsObjectSign)
+            material.Features = nodeCollection
+                                .Where(_ => _.OriginalNode.NodeType.IsObjectSign)
                                 .Select(_nodeToJObjectMapper.NodeToJObject);
 
-            material.ObjectsOfStudy = GetObjectOfStudyListForMaterial(nodes);
+            var (ObjectsOfStudy, ObjectsOfStudyCount) = GetObjectOfStudyListForMaterial(nodeCollection);
+
+            material.ObjectsOfStudy = ObjectsOfStudy;
 
             return material;
         }
@@ -79,52 +89,100 @@ namespace IIS.Services.Materials
 
             result.Editor = _mapper.Map<User>(material.Editor);
 
-            var nodes = result.Infos
-                                .SelectMany(p => p.Features.Where(e => e.NodeLinkType == MaterialNodeLinkType.None).Select(e => e.Node))
-                                .ToList();
+            var featureCollection = result.Infos
+                                    .SelectMany(_ => _.Features)
+                                    .ToArray();
 
-            result.Events = nodes
-                                .Where(IsEvent)
-                                .Select(_nodeToJObjectMapper.EventToJObject);
+            var nodeCollection = featureCollection
+                                    .Select(_ => _.Node)
+                                    .ToArray();
 
-            result.Features = nodes
-                                .Where(IsObjectSign)
-                                .Select(_nodeToJObjectMapper.NodeToJObject);
+            result.Caller = GetIdTitleForLinkType(featureCollection, MaterialNodeLinkType.Caller);
 
-            result.ObjectsOfStudy = GetObjectOfStudyListForMaterial(nodes);
+            result.Receiver = GetIdTitleForLinkType(featureCollection, MaterialNodeLinkType.Receiver);
+
+            result.Events = nodeCollection
+                                .Where(_ => _.OriginalNode.NodeType.IsEvent)
+                                .Select(_ => _nodeToJObjectMapper.EventToJObject(_));
+
+            result.Features = nodeCollection
+                                .Where(_ => _.OriginalNode.NodeType.IsObjectSign)
+                                .Select(_ => _nodeToJObjectMapper.NodeToJObject(_));
+
+            var (ObjectsOfStudy, ObjectsOfStudyCount) = GetObjectOfStudyListForMaterial(nodeCollection);
+
+            result.ObjectsOfStudy = ObjectsOfStudy;
+
+            result.ObjectsOfStudyCount = ObjectsOfStudyCount;
 
             return result;
         }
 
-        private JObject GetObjectOfStudyListForMaterial(IReadOnlyCollection<Node> nodeList)
+        public IReadOnlyCollection<MaterialInfo> MapInfos(MaterialEntity material) => material.MaterialInfos?.Select(_ => Map(_)).ToArray() ?? Array.Empty<MaterialInfo>();
+
+        private static JProperty CreateJProperty(Guid id, string value)
+        {
+            return new JProperty(id.ToString("N"), value);
+        }
+
+        private static IdTitleDto GetIdTitleForLinkType(IReadOnlyCollection<MaterialFeature> materialFeatureCollection, MaterialNodeLinkType linkType)
+        {
+            var node = materialFeatureCollection
+                        .FirstOrDefault(_ => _.NodeLinkType == linkType)
+                        ?.Node.OriginalNode;
+
+            return node is null ? null :
+                new IdTitleDto
+                {
+                    Id = node.Id,
+                    Title = node.GetTitleValue(),
+                    NodeTypeName = node.NodeType.Name
+                };
+        }
+
+        private static IdTitleDto GetIdTitleForLinkType(IReadOnlyCollection<Iis.Domain.Materials.RelatedObjectOfStudy> objectCollection, string linkType)
+        {
+            var element = objectCollection
+                        .FirstOrDefault(_ => _.RelationType == linkType);
+
+            return element is null ? null :
+                new IdTitleDto
+                {
+                    Id = element.Id,
+                    Title = element.Title,
+                    NodeTypeName = element.NodeType
+                };
+        }
+
+        private (JObject List, int Count) GetObjectOfStudyListForMaterial(IReadOnlyCollection<Node> nodeList)
         {
             var result = new JObject();
-            if (nodeList.Count == 0)
-                return result;
+            if (nodeList.Count == 0) return (result, 0);
 
             var directIdList = nodeList
-                .Where(x => IsObjectOfStudy(x))
-                .Select(x => x.Id)
+                .Where(_ => _.OriginalNode.NodeType.IsObjectOfStudy)
+                .Select(_ => _.Id)
                 .ToArray();
+
             var featureIdList = nodeList
-                .Where(x => IsObjectSign(x))
-                .Select(x => x.Id)
+                .Where(_ => _.OriginalNode.NodeType.IsObjectSign)
+                .Select(_ => _.Id)
                 .ToArray();
-            var featureList = _ontologyService.GetNodeIdListByFeatureIdList(featureIdList)
+
+            var relatedIdList = _ontologyService.GetNodeIdListByFeatureIdList(featureIdList)
                 .Except(directIdList)
+                .ToArray();
+
+            var featureList = relatedIdList
                 .Select(_ => CreateJProperty(_, EntityMaterialRelation.Feature));
+
             var directList = directIdList
                 .Select(_ => CreateJProperty(_, EntityMaterialRelation.Direct));
 
             result.Add(featureList);
             result.Add(directList);
 
-            return result;
-        }
-
-        private JProperty CreateJProperty(Guid id, string value)
-        {
-            return new JProperty(id.ToString("N"), value);
+            return (List: result, directIdList.Length + relatedIdList.Length);
         }
 
         private IReadOnlyCollection<Material> MapChildren(MaterialEntity material)
@@ -134,16 +192,6 @@ namespace IIS.Services.Materials
                 return Array.Empty<Material>();
             }
             return material.Children.Select(child => Map(child)).ToArray();
-        }
-
-        public IReadOnlyCollection<MaterialInfo> MapInfos(MaterialEntity material)
-        {
-            var mapInfoTasks = new List<MaterialInfo>();
-            foreach (var info in material.MaterialInfos ?? new List<MaterialInfoEntity>())
-            {
-                mapInfoTasks.Add(Map(info));
-            }
-            return mapInfoTasks;
         }
 
         private MaterialInfo Map(MaterialInfoEntity info)
@@ -159,33 +207,6 @@ namespace IIS.Services.Materials
             var result = _mapper.Map<MaterialFeature>(feature);
             result.Node = _ontologyService.GetNode(feature.NodeId);
             return result;
-        }
-
-        public bool IsEvent(Node node)
-        {
-            if (node is null) return false;
-
-            var nodeType = _ontologySchema.GetNodeTypeById(node.Type.Id);
-
-            return nodeType.IsEvent;
-        }
-
-        public bool IsObjectOfStudy(Node node)
-        {
-            if (node is null) return false;
-
-            var nodeType = _ontologySchema.GetNodeTypeById(node.Type.Id);
-
-            return nodeType.IsObjectOfStudy;
-        }
-
-        public bool IsObjectSign(Node node)
-        {
-            if (node is null) return false;
-
-            var nodeType = _ontologySchema.GetNodeTypeById(node.Type.Id);
-
-            return nodeType.IsObjectSign;
         }
     }
 }
