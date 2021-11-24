@@ -1,4 +1,5 @@
 ﻿using Iis.Interfaces.Ontology.Schema;
+using Iis.Services.Dictionaries;
 using Iis.Services.Contracts.Interfaces;
 using System.Collections.Generic;
 using System.Linq;
@@ -34,7 +35,7 @@ namespace Iis.Services
             EventIndexes = new[] { "Event" };
             MaterialIndexes = new[] { "Materials" };
             ReportIndex = "Reports";
-            SignIndexes = new[] { "CellphoneSign", "SatellitePhoneSign", "SatelliteIridiumPhoneSign" };
+            SignIndexes = new[] { SignTypeName.SatelliteIridiumPhone, SignTypeName.SatellitePhone, SignTypeName.CellPhone};
             ChangeHistoryIndexes = new[] { "ChangeHistory" };
             FieldsToExcludeByIndex = new Dictionary<string, IEnumerable<string>>()
             {

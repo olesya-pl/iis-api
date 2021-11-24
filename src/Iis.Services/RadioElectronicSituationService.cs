@@ -5,11 +5,11 @@ using System.Threading.Tasks;
 using Iis.Interfaces.Ontology.Data;
 using Iis.Interfaces.Ontology.Schema;
 using Iis.Interfaces.Ontology.Comparers;
+using Iis.Services.Dictionaries;
 using Iis.Services.Contracts.Dtos;
 using Iis.Services.Contracts.Interfaces;
 using Iis.Services.Mappers.RadioElectronicSituation;
 using Iis.DbLayer.Repositories;
-using Iis.Utility;
 using IIS.Repository;
 using IIS.Repository.Factories;
 using Iis.DataModel.Materials;
@@ -20,11 +20,12 @@ namespace Iis.Services
     public class RadioElectronicSituationService<TUnitOfWork> : BaseService<TUnitOfWork>, IRadioElectronicSituationService where TUnitOfWork : IIISUnitOfWork
     {
         private const int HistoryAllocationMultiplier = 10;
-        private static readonly string[] ObjectSignTypeNames = new[] { EntityTypeNames.ObjectSign.ToString() };
-        private static readonly string[] SignProperties = new[] { "sign" };
+        private static readonly string[] ObjectSignTypeNames = { SignTypeName.SatelliteIridiumPhone, SignTypeName.SatellitePhone, SignTypeName.CellPhone};
+        private static readonly string[] SignProperties = { "sign" };
         private readonly IOntologyNodesData _data;
         private readonly IOntologySchema _schema;
-        public RadioElectronicSituationService(IUnitOfWorkFactory<TUnitOfWork> unitOfWorkFactory,
+        public RadioElectronicSituationService(
+            IUnitOfWorkFactory<TUnitOfWork> unitOfWorkFactory,
             IOntologyNodesData data,
             IOntologySchema schema)
         : base(unitOfWorkFactory)
@@ -41,11 +42,11 @@ namespace Iis.Services
                                 .ToArray();
 
             var signsDictionary = _data.GetNodesByTypeIds(signTypes)
+                                .Distinct(NodeByIdComparer.Instance)
                                 .ToDictionary(e => e.Id);
 
             var signIds = signsDictionary
                                 .Select(_ => _.Key)
-                                .Distinct()
                                 .ToArray();
 
             var locationHistories = await RunWithoutCommitAsync(_ => _.LocationHistoryRepository.GetLatestLocationHistoryListAsync(signIds));
@@ -66,7 +67,7 @@ namespace Iis.Services
 
             foreach (var locationHistory in locationHistories)
             {
-                if(!signsDictionary.TryGetValue(locationHistory.EntityId.Value, out INode signNode)) continue;
+                if (!signsDictionary.TryGetValue(locationHistory.EntityId.Value, out INode signNode)) continue;
 
                 var material = GetMaterialEntity(locationHistory.MaterialId, materialDictionary);
 
@@ -83,12 +84,11 @@ namespace Iis.Services
                         _.LocationHistory,
                         _.SignNode,
                         _.ObjectNode,
-                        _.Material
-                    ))
+                        _.Material))
                     .ToArray();
         }
 
-        private MaterialEntity GetMaterialEntity(Guid? materialId, Dictionary<Guid, MaterialEntity> materialDictionary)
+        private static MaterialEntity GetMaterialEntity(Guid? materialId, Dictionary<Guid, MaterialEntity> materialDictionary)
         {
             return materialId.HasValue ? materialDictionary.GetValueOrDefault(materialId.Value) : null;
         }
