@@ -49,6 +49,7 @@ namespace IIS.Services.Materials
 
             var nodeCollection = document.NodeIds
                                     .Select(_ => _ontologyService.GetNode(_))
+                                    .Where(_ => _ != null)
                                     .ToArray();
 
             material.Events = nodeCollection
