@@ -281,6 +281,19 @@ namespace AcceptanceTests.UISteps
             driver.WaitFor(5);
         }
 
+        [When(@"I entered the (.*) value in the accessLevel field")]
+        public void WhenIEnteredTheValueInTheAccessLevelField(string accessLevel)
+
+        {
+            materialsSectionPage.AccessLevelField.SendKeys(accessLevel);
+            driver.WaitFor(2);
+            materialsSectionPage.AccessLevelField.SendKeys(Keys.Down);
+            materialsSectionPage.AccessLevelField.SendKeys(Keys.Enter);
+            materialsSectionPage.AccessLevelField.SendKeys(Keys.Escape);
+
+        }
+
+
 
         #endregion When
 
@@ -456,6 +469,16 @@ namespace AcceptanceTests.UISteps
             var actualMaterialName = materialsSectionPage.MaterialTitle.Text;
             Assert.Contains(expectedMaterialName, actualMaterialName);
         }
+
+        [Then(@"I must see (.*) value in the accessLevel field")]
+        public void ThenIMustSeeValueInTheAccessLevelField(string accessLevel)
+        {
+            Assert.True(materialsSectionPage.AccessLevelField.Displayed);
+            driver.WaitFor(2);
+        }
+    
+    
+
         #endregion
     }
 }

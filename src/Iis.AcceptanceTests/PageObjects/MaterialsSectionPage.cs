@@ -158,5 +158,8 @@ namespace AcceptanceTests.PageObjects
         {
             return new MaterialRelatedItems(driver, title);
         }
+
+       [FindsBy(How = How.CssSelector, Using = ".material-general-access-level .material-info-card__body .el-input__inner")]
+       public IWebElement AccessLevelField;
     }
 }
