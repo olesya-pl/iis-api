@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 namespace Iis.DataModel.Roles
 {
     [DbContext(typeof(OntologyContext))]
-    internal class RoleConfiguration: IEntityTypeConfiguration<RoleEntity>
+    internal class RoleConfiguration : IEntityTypeConfiguration<RoleEntity>
     {
         public void Configure(EntityTypeBuilder<RoleEntity> builder)
         {

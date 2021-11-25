@@ -1,10 +1,10 @@
-﻿using Iis.Interfaces.Roles;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using Iis.Interfaces.Roles;
 
 namespace Iis.DataModel.Roles
 {
-    public class AccessObjectEntity: BaseEntity
+    public class AccessObjectEntity : BaseEntity
     {
         [Required]
         public string Title { get; set; }

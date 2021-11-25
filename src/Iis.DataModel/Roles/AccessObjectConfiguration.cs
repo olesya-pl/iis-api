@@ -1,12 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Iis.DataModel.Roles
 {
-    public class AccessObjectConfiguration: IEntityTypeConfiguration<AccessObjectEntity>
+    public class AccessObjectConfiguration : IEntityTypeConfiguration<AccessObjectEntity>
     {
         public void Configure(EntityTypeBuilder<AccessObjectEntity> builder)
         {

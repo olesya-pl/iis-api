@@ -1,11 +1,8 @@
-﻿using Iis.Interfaces.Roles;
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System;
 
 namespace Iis.DataModel.Roles
 {
-    public class RoleAccessEntity: BaseEntity
+    public class RoleAccessEntity : BaseEntity
     {
         public Guid RoleId { get; set; }
         public Guid AccessObjectId { get; set; }

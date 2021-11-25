@@ -1,10 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace Iis.DataModel.Roles
 {
-    public class RoleEntity: BaseEntity
+    public class RoleEntity : BaseEntity
     {
         [Required]
         public string Name { get; set; }

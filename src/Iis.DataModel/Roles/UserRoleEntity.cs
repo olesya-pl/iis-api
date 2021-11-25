@@ -2,7 +2,7 @@
 
 namespace Iis.DataModel.Roles
 {
-    public class UserRoleEntity: BaseEntity
+    public class UserRoleEntity : BaseEntity
     {
         public Guid UserId { get; set; }
         public Guid RoleId { get; set; }

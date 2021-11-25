@@ -1,14 +1,13 @@
-﻿using Iis.Interfaces.Roles;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
+using Iis.Interfaces.Roles;
 
 namespace Iis.DataModel.Roles
 {
     public class FillDataForRoles
     {
-        OntologyContext _context;
+        private readonly OntologyContext _context;
         public FillDataForRoles(OntologyContext context)
         {
             _context = context;
@@ -177,34 +176,34 @@ namespace Iis.DataModel.Roles
 
             _context.RoleAccess.AddRange(new List<RoleAccessEntity>
             {
-                new RoleAccessEntity { Id = Guid.NewGuid(), RoleId = new Guid("a120c2b8d6f84338ab0e5d177951f119"), AccessObjectId = new Guid("01380557fb27480c96ed6c56b8ae45a8"), 
-                    ReadGranted = true },
-                new RoleAccessEntity { Id = Guid.NewGuid(), RoleId = new Guid("a120c2b8d6f84338ab0e5d177951f119"), AccessObjectId = new Guid("02c1895f7d444512a0a97ebbf6c6690c"),
-                    ReadGranted = true, UpdateGranted = true },
-                new RoleAccessEntity { Id = Guid.NewGuid(), RoleId = new Guid("a120c2b8d6f84338ab0e5d177951f119"), AccessObjectId = new Guid("0971390a21fa4ab4ae277bb4c7c5bd45"),
-                    ReadGranted = true, UpdateGranted = true },
-                new RoleAccessEntity { Id = Guid.NewGuid(), RoleId = new Guid("a120c2b8d6f84338ab0e5d177951f119"), AccessObjectId = new Guid("044b50afad56484489c460e167a5b52a"),
-                    ReadGranted = true },
+                new RoleAccessEntity
+                { Id = Guid.NewGuid(), RoleId = new Guid("a120c2b8d6f84338ab0e5d177951f119"), AccessObjectId = new Guid("01380557fb27480c96ed6c56b8ae45a8"), ReadGranted = true },
+                new RoleAccessEntity
+                { Id = Guid.NewGuid(), RoleId = new Guid("a120c2b8d6f84338ab0e5d177951f119"), AccessObjectId = new Guid("02c1895f7d444512a0a97ebbf6c6690c"), ReadGranted = true, UpdateGranted = true },
+                new RoleAccessEntity
+                { Id = Guid.NewGuid(), RoleId = new Guid("a120c2b8d6f84338ab0e5d177951f119"), AccessObjectId = new Guid("0971390a21fa4ab4ae277bb4c7c5bd45"), ReadGranted = true, UpdateGranted = true },
+                new RoleAccessEntity
+                { Id = Guid.NewGuid(), RoleId = new Guid("a120c2b8d6f84338ab0e5d177951f119"), AccessObjectId = new Guid("044b50afad56484489c460e167a5b52a"), ReadGranted = true },
 
-                new RoleAccessEntity { Id = Guid.NewGuid(), RoleId = new Guid("a25012ad140643c08ab5ff3d682b7179"), AccessObjectId = new Guid("01380557fb27480c96ed6c56b8ae45a8"),
-                    ReadGranted = true },
-                new RoleAccessEntity { Id = Guid.NewGuid(), RoleId = new Guid("a25012ad140643c08ab5ff3d682b7179"), AccessObjectId = new Guid("02c1895f7d444512a0a97ebbf6c6690c"),
-                    ReadGranted = true, UpdateGranted = true },
-                new RoleAccessEntity { Id = Guid.NewGuid(), RoleId = new Guid("a25012ad140643c08ab5ff3d682b7179"), AccessObjectId = new Guid("0971390a21fa4ab4ae277bb4c7c5bd45"),
-                    ReadGranted = true, UpdateGranted = true },
-                new RoleAccessEntity { Id = Guid.NewGuid(), RoleId = new Guid("a25012ad140643c08ab5ff3d682b7179"), AccessObjectId = new Guid("036137a67db34a0e9566f4ce9691a878"),
-                    ReadGranted = true, CreateGranted = true },
-                new RoleAccessEntity { Id = Guid.NewGuid(), RoleId = new Guid("a25012ad140643c08ab5ff3d682b7179"), AccessObjectId = new Guid("102617ecd2514b5f97e8be1a9bf99bc3"),
-                    ReadGranted = true, CreateGranted = true },
+                new RoleAccessEntity
+                { Id = Guid.NewGuid(), RoleId = new Guid("a25012ad140643c08ab5ff3d682b7179"), AccessObjectId = new Guid("01380557fb27480c96ed6c56b8ae45a8"), ReadGranted = true },
+                new RoleAccessEntity
+                { Id = Guid.NewGuid(), RoleId = new Guid("a25012ad140643c08ab5ff3d682b7179"), AccessObjectId = new Guid("02c1895f7d444512a0a97ebbf6c6690c"), ReadGranted = true, UpdateGranted = true },
+                new RoleAccessEntity
+                { Id = Guid.NewGuid(), RoleId = new Guid("a25012ad140643c08ab5ff3d682b7179"), AccessObjectId = new Guid("0971390a21fa4ab4ae277bb4c7c5bd45"), ReadGranted = true, UpdateGranted = true },
+                new RoleAccessEntity
+                { Id = Guid.NewGuid(), RoleId = new Guid("a25012ad140643c08ab5ff3d682b7179"), AccessObjectId = new Guid("036137a67db34a0e9566f4ce9691a878"), ReadGranted = true, CreateGranted = true },
+                new RoleAccessEntity
+                { Id = Guid.NewGuid(), RoleId = new Guid("a25012ad140643c08ab5ff3d682b7179"), AccessObjectId = new Guid("102617ecd2514b5f97e8be1a9bf99bc3"), ReadGranted = true, CreateGranted = true },
 
-                new RoleAccessEntity { Id = Guid.NewGuid(), RoleId = new Guid("a3b1917a46be437689819c8c9f97ee19"), AccessObjectId = new Guid("01380557fb27480c96ed6c56b8ae45a8"),
-                    ReadGranted = true, CreateGranted = true, UpdateGranted = true },
-                new RoleAccessEntity { Id = Guid.NewGuid(), RoleId = new Guid("a3b1917a46be437689819c8c9f97ee19"), AccessObjectId = new Guid("02c1895f7d444512a0a97ebbf6c6690c"),
-                    ReadGranted = true },
-                new RoleAccessEntity { Id = Guid.NewGuid(), RoleId = new Guid("a3b1917a46be437689819c8c9f97ee19"), AccessObjectId = new Guid("0971390a21fa4ab4ae277bb4c7c5bd45"),
-                    ReadGranted = true, UpdateGranted = true },
-                new RoleAccessEntity { Id = Guid.NewGuid(), RoleId = new Guid("a3b1917a46be437689819c8c9f97ee19"), AccessObjectId = new Guid("036137a67db34a0e9566f4ce9691a878"),
-                    ReadGranted = true },
+                new RoleAccessEntity
+                { Id = Guid.NewGuid(), RoleId = new Guid("a3b1917a46be437689819c8c9f97ee19"), AccessObjectId = new Guid("01380557fb27480c96ed6c56b8ae45a8"), ReadGranted = true, CreateGranted = true, UpdateGranted = true },
+                new RoleAccessEntity
+                { Id = Guid.NewGuid(), RoleId = new Guid("a3b1917a46be437689819c8c9f97ee19"), AccessObjectId = new Guid("02c1895f7d444512a0a97ebbf6c6690c"), ReadGranted = true },
+                new RoleAccessEntity
+                { Id = Guid.NewGuid(), RoleId = new Guid("a3b1917a46be437689819c8c9f97ee19"), AccessObjectId = new Guid("0971390a21fa4ab4ae277bb4c7c5bd45"), ReadGranted = true, UpdateGranted = true },
+                new RoleAccessEntity
+                { Id = Guid.NewGuid(), RoleId = new Guid("a3b1917a46be437689819c8c9f97ee19"), AccessObjectId = new Guid("036137a67db34a0e9566f4ce9691a878"), ReadGranted = true },
             });
 
             var tabIds = new List<string> { "06be568c17aa4c38983aae5e80dac279", "076b6fd6204b46d7afc923b3328687a4", "08e273695e9a49ee8eb4daa305cf9029" };
