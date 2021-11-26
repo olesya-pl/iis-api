@@ -4,6 +4,7 @@ Feature: Materials - regression
     - IIS-6045 - Change material reliability by clicking on the Processed button
     - IIS-6052 - Ability to lose the connection between a material and an event from a material
     - IIS-6051 - Ability to connect the material to an event from a material
+	- IIS-7445 - Change a material`s AccessLevel
 
 Background:
 	Given I sign in with the user olya and password 123 in the Contour
@@ -117,3 +118,22 @@ Scenario: I can upload material and find it by its name
 	And I searched for uploaded material in the materials
 	And I clicked on the first search result in the Materials section
 	And I clean up uploaded material via API
+
+	 @regression @UI @Material @upload
+    Scenario: IIS-7445 - Change a material`s AccessLevel 
+        Given I upload a new docx material via API
+		| Field                 | Value                                      |
+		| FileName              | тестовий матеріал                          |
+		| SourceReliabilityText | Здебільшого надійне                        |
+		| ReliabilityText       | Достовірна                                 |
+		| Content               | таємний контент                           |
+		| AccessLevel           | 0                                          |
+		| LoadedBy              | автотест                                   |
+		| MetaData              | {"type":"document","source":"contour.doc"} |
+        When I navigated to Materials page
+        And I clicked search button in the Materials section
+        And I searched таємн data in the materials
+        And I clicked on the first search result in the Materials section
+		And I entered the Т - Таємно value in the accessLevel field 
+		Then I must see Т - Таємно value in the accessLevel field
+		When I clean up uploaded material via API
