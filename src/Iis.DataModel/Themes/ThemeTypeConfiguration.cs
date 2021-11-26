@@ -16,7 +16,7 @@ namespace Iis.DataModel.Themes
             builder
                 .Property(p => p.Id)
                 .ValueGeneratedNever();
-            
+
             builder
                 .Property(p => p.ShortTitle)
                 .IsRequired()
