@@ -15,6 +15,7 @@ namespace Iis.Services
 {
     public static class InputTypesExtensions
     {
+        private const string DateWithTZFormat = "yyyy-MM-ddTHH:mm:ss.fffK";
         public static async Task<Guid> ProcessFileInput(IFileService fileService, object value)
         {
             // todo: think about file service work, where to store file info (name, etc.) - in ontology or in files db table
@@ -71,6 +72,13 @@ namespace Iis.Services
         public static bool IsAssignableFrom(this INodeTypeLinked target, INodeTypeLinked source)
         {
             return source.Name == target.Name || source.AllParents.Any(t => t.Name == target.Name);
+        }
+
+        public static string ParseWithTimeZoneDefinition(object value)
+        {
+            if (value is null) throw new ArgumentNullException();
+            if (!(value is DateTime)) throw new ArgumentException("Wrong argument type. Type is not DateTime");
+            return ((DateTime)value).ToString(DateWithTZFormat);
         }
     }
 }
