@@ -1,5 +1,5 @@
-using Iis.Interfaces.Ontology.Schema;
 using System;
+using Iis.Interfaces.Ontology.Schema;
 
 namespace Iis.DataModel
 {

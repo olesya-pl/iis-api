@@ -13,6 +13,11 @@ namespace Iis.DataModel
 {
     public class OntologyContext : DbContext
     {
+        public OntologyContext(DbContextOptions<OntologyContext> options)
+            : base(options)
+        {
+        }
+
         public DbSet<NodeTypeEntity> NodeTypes { get; set; }
         public DbSet<RelationTypeEntity> RelationTypes { get; set; }
         public DbSet<AttributeTypeEntity> AttributeTypes { get; set; }
@@ -65,22 +70,12 @@ namespace Iis.DataModel
 
         public DbSet<LocationHistoryEntity> LocationHistory { get; set; }
 
-        public DbSet<FlightRadarHistorySyncJobConfig> FlightRadarHistorySyncJobConfig { get; set;}
-        
-        public DbSet<TowerLocationEntity> TowerLocations { get; set;}
+        public DbSet<FlightRadarHistorySyncJobConfig> FlightRadarHistorySyncJobConfig { get; set; }
+
+        public DbSet<TowerLocationEntity> TowerLocations { get; set; }
 
         public DbSet<ModifyDataLogEntity> ModifyDataLogs { get; set; }
         public DbSet<MaterialChannelMappingEntity> MaterialChannelMappings { get; set; }
-
-        public OntologyContext(DbContextOptions<OntologyContext> options)
-            : base(options)
-        {
-        }
-
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
-        {
-            modelBuilder.ApplyConfigurationsFromAssembly<OntologyContext>(GetType());
-        }
 
         public static OntologyContext GetContext(string connectionString)
         {
@@ -88,6 +83,11 @@ namespace Iis.DataModel
                 .UseNpgsql(connectionString);
             var context = new OntologyContext(optionsBuilder.Options);
             return context;
+        }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.ApplyConfigurationsFromAssembly<OntologyContext>(GetType());
         }
     }
 }

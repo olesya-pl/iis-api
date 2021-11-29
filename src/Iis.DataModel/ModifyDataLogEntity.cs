@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Iis.DataModel
 {
-    public class ModifyDataLogEntity: BaseEntity
+    public class ModifyDataLogEntity : BaseEntity
     {
         public string Name { get; set; }
         public DateTime RunDate { get; set; }

@@ -1,12 +1,12 @@
+using System;
+using System.Collections.Generic;
 using Iis.DataModel.Materials;
 using Iis.DataModel.Roles;
-using System.Collections.Generic;
-using System;
 using Iis.Interfaces.Users;
 
 namespace Iis.DataModel
 {
-    public class UserEntity: BaseEntity
+    public class UserEntity : BaseEntity
     {
         public string Username { get; set; }
         public string Name { get; set; }

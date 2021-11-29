@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using Iis.DataModel.Materials;
 using Iis.DataModel.Reports;
 using Iis.Interfaces.Ontology.Data;
-using Iis.Interfaces.Ontology.Schema;
 
 namespace Iis.DataModel
 {

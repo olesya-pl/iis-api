@@ -1,7 +1,7 @@
-using Iis.Interfaces.Ontology.Schema;
 using System;
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
+using Iis.Interfaces.Ontology.Schema;
 
 namespace Iis.DataModel
 {

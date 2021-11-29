@@ -25,7 +25,7 @@ namespace Iis.DataModel
         public string Range { get; set; }
 
         public DateTime Created { get; set; }
-        
+
         public DateTime? Updated { get; set; }
     }
 }

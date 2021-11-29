@@ -1,8 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Infrastructure;
-using System;
+﻿using System;
 using System.Linq;
 using System.Reflection;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 
 namespace Iis.DataModel
 {
@@ -12,10 +12,12 @@ namespace Iis.DataModel
             where TDbContext : DbContext
         {
             foreach (var type in markerTypes)
+            {
                 modelBuilder.ApplyConfigurationsFromAssembly(type.Assembly, _ => _.GetInterfaces()
                     .Any(_ => _.IsGenericType && _.GetGenericTypeDefinition() == typeof(IEntityTypeConfiguration<>))
                         && _.TryGetAttribute<DbContextAttribute>(out var attribute)
                         && attribute.ContextType == typeof(TDbContext));
+            }
 
             return modelBuilder;
         }
