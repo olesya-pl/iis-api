@@ -12,6 +12,7 @@ using Iis.Interfaces.Elastic;
 using System.Linq.Expressions;
 using Iis.Services.Contracts.Materials.Distribution;
 using Iis.Interfaces.Common;
+using Iis.Services.Contracts.Dtos.RadioElectronicSituation;
 
 namespace IIS.Services.Contracts.Interfaces
 {
@@ -54,5 +55,6 @@ namespace IIS.Services.Contracts.Interfaces
         Task<IReadOnlyList<MaterialDistributionItem>> GetMaterialsForDistributionAsync(
             UserDistributionItem user,
             Expression<Func<MaterialEntity, bool>> filter);
+        Task<IReadOnlyList<ResCallerReceiverDto>> GetCallInfo(IReadOnlyList<Guid> nodeIds);
     }
 }

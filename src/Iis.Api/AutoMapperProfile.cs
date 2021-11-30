@@ -38,6 +38,7 @@ using Iis.Domain.Users;
 using Iis.Utility;
 using Iis.Utility.Automapper;
 using Iis.DbLayer.Repositories;
+using Iis.Services.Contracts.Dtos.RadioElectronicSituation;
 
 namespace Iis.Api
 {
@@ -437,16 +438,11 @@ namespace Iis.Api
             CreateMap<DomainGraphTypes.GraphLink, GraphQLGraphTypes.GraphLink>();
             CreateMap<DomainGraphTypes.GraphNode, GraphQLGraphTypes.GraphNode>();
 
-            CreateMap<SituationNodeDto, SituationNode>();
-            CreateMap<GeometryDto, Geometry>();
-            CreateMap<AttributesDto, Attributes>()
-                .ForMember(_ => _.RegisteredAt, opt => opt.MapFrom(src => src.RegisteredAt.ToString(Iso8601DateFormat, CultureInfo.InvariantCulture)));
-            CreateMap<ObjectDto, ObjectNode>();
-            CreateMap<SignDto, SignNode>();
-
-            CreateMap<MaterialDto, MaterialNode>()
+            CreateMap<ResMaterialDto, MaterialNode>()
                 .ForMember(_ => _.CreatedDate,  opt => opt.MapFrom(src => src.CreatedDate.ToString(Iso8601DateFormat, CultureInfo.InvariantCulture)))
                 .ForMember(_ => _.RegistrationDate, opt => opt.MapFrom(src => src.RegistrationDate.HasValue ? src.RegistrationDate.Value.ToString(Iso8601DateFormat, CultureInfo.InvariantCulture): null));
+            CreateMap<MaterialEntity, ResMaterialDto>()
+                .ForMember(dest => dest.Title, opt => opt.MapFrom(src => src.File == null ? null : src.File.Name));
         }
     }
 }

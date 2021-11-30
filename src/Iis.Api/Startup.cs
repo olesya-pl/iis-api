@@ -84,6 +84,8 @@ using Iis.CoordinatesEventHandler.DependencyInjection;
 using Iis.Utility.Csv;
 using Iis.Utility.Logging;
 using Iis.Api.Authentication.OntologyBasicAuthentication;
+using Iis.Interfaces.DirectQueries;
+using Iis.DbLayer.DirectQueries;
 
 namespace IIS.Core
 {
@@ -324,10 +326,11 @@ namespace IIS.Core
 
             services.Configure<KestrelServerOptions>(options =>
             {
-                options.Limits.MaxRequestBodySize = long.MaxValue; 
+                options.Limits.MaxRequestBodySize = long.MaxValue;
             });
 
             services.Configure<FormOptions>(options => options.MultipartBodyLengthLimit = long.MaxValue);
+            services.AddSingleton<IDirectQueryFactory>(new DirectQueryFactory(System.IO.Path.GetDirectoryName(Assembly.GetEntryAssembly().Location)));
         }
 
         private async Task AuthenticateAsync(IQueryContext context, HashSet<string> publiclyAccesible)
