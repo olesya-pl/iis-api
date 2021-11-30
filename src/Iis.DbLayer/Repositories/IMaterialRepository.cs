@@ -73,6 +73,6 @@ namespace Iis.DbLayer.Repositories
             Expression<Func<MaterialEntity, bool>> filter);
         Task SaveDistributionResult(DistributionResult distributionResult);
         void RemoveMaterialAndRelatedData(Guid materialId);
-        Task<IReadOnlyList<ResCallerReceiverDto>> GetCallInfo(IReadOnlyList<Guid> nodeIds);
+        Task<IReadOnlyList<ResCallerReceiverDto>> GetCallInfoAsync(IReadOnlyList<Guid> nodeIds, CancellationToken cancellationToken = default);
     }
 }

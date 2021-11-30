@@ -13,7 +13,7 @@ namespace Iis.DbLayer.Repositories
 {
     public class LocationHistoryRepository : RepositoryBase<OntologyContext>, ILocationHistoryRepository
     {
-        private IDirectQueryFactory _directQueryFactory;
+        private readonly IDirectQueryFactory _directQueryFactory;
         public LocationHistoryRepository(IDirectQueryFactory directQueryFactory)
         {
             _directQueryFactory = directQueryFactory;

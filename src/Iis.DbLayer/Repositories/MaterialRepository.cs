@@ -328,7 +328,7 @@ namespace Iis.DbLayer.Repositories
             }
         }
 
-        public async Task<IReadOnlyList<ResCallerReceiverDto>> GetCallInfo(IReadOnlyList<Guid> nodeIds)
+        public async Task<IReadOnlyList<ResCallerReceiverDto>> GetCallInfoAsync(IReadOnlyList<Guid> nodeIds, CancellationToken cancellationToken = default)
         {
             var rawData = await
                     (from mf in Context.MaterialFeatures
@@ -342,7 +342,7 @@ namespace Iis.DbLayer.Repositories
                         MaterialId = mi.MaterialId,
                         NodeId = mf.NodeId,
                         NodeLinkType = mf.NodeLinkType
-                    }).ToArrayAsync();
+                    }).ToArrayAsync(cancellationToken);
 
             var groupedData = rawData
                 .GroupBy(rd => rd.MaterialId)

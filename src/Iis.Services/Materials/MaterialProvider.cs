@@ -454,8 +454,8 @@ namespace IIS.Services.Materials
                    unitOfWork.MaterialRepository.GetMaterialsForDistribution(user, filter));
         }
 
-        public async Task<IReadOnlyList<ResCallerReceiverDto>> GetCallInfo(IReadOnlyList<Guid> nodeIds) =>
-            await RunWithoutCommitAsync((unitOfWork) =>
-                unitOfWork.MaterialRepository.GetCallInfo(nodeIds));
+        public Task<IReadOnlyList<ResCallerReceiverDto>> GetCallInfo(IReadOnlyList<Guid> nodeIds, CancellationToken cancellationToken = default) =>
+            RunWithoutCommitAsync((unitOfWork) =>
+                unitOfWork.MaterialRepository.GetCallInfoAsync(nodeIds));
     }
 }

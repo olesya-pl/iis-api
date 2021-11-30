@@ -9,10 +9,12 @@ namespace Iis.DbLayer.DirectQueries
     {
         private string _baseSql;
         private Dictionary<string, string> _parameters = new Dictionary<string, string>();
+
         public DirectQuery(string baseSql)
         {
             _baseSql = baseSql;
         }
+
         public IDirectQuery SetParameter(string name, string value)
         {
             _parameters[name] = value;
