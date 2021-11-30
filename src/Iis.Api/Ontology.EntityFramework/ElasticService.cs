@@ -12,17 +12,14 @@ using Iis.Interfaces.Elastic;
 using Iis.Interfaces.Ontology.Data;
 using Iis.Interfaces.Ontology.Schema;
 using Iis.Utility;
+using Iis.Elastic;
+using Iis.DataModel.ChangeHistory;
 
 namespace IIS.Core.Ontology.EntityFramework
 {
     public class ElasticService : IElasticService
     {
-        private const decimal HistoricalSearchBoost = 0.05m;
         private const string ExclamationMark = "!";
-        private const string IdField = "Id";
-        private const string IdFieldSeparator = " ";
-        private const string HistoricalIndexName = "historical";
-        private const string Highlight = "highlight";
         private const int MaxAggregationsCount = 20;
 
         private readonly IElasticManager _elasticManager;
@@ -30,6 +27,11 @@ namespace IIS.Core.Ontology.EntityFramework
         private readonly INodeSaveService _nodeRepository;
         private readonly IElasticState _elasticState;
         private readonly IGroupedAggregationNameGenerator _groupedAggregationNameGenerator;
+        private readonly IIisElasticField[] _historicalSearchFields =
+        {
+            new IisElasticField { Name = $"{ElasticSerializer.HistoricalPropertyName}.{nameof(ChangeHistoryDocument.OldValue) }" },
+            new IisElasticField { Name = $"{ElasticSerializer.HistoricalPropertyName}.{nameof(ChangeHistoryDocument.NewValue)}" }
+        };
 
         public ElasticService(
             IElasticManager elasticManager,
@@ -106,6 +108,7 @@ namespace IIS.Core.Ontology.EntityFramework
                    && !filter.FilteredItems.Any()
                    && !filter.CherryPickedItems.Any();
         }
+
         public bool ShouldReturnNoEntities(ElasticFilter filter)
         {
             return filter.Suggestion?.Trim() == ExclamationMark;
@@ -115,23 +118,21 @@ namespace IIS.Core.Ontology.EntityFramework
             IEnumerable<string> typeNames,
             ElasticFilter filter,
             Guid userId,
-            CancellationToken ct = default)
+            CancellationToken cancellationToken = default)
         {
             if (ShouldReturnAllEntities(filter))
             {
-                var result = await GetAllSearchResultAsync(typeNames, filter, userId, ct);
+                var result = await GetAllSearchResultAsync(typeNames, filter, userId, cancellationToken);
 
                 return result.ToOutputSearchResult();
             }
 
-            var (multiSearchQuery, context) = await PrepareMultiSearchQueryAsync(typeNames, filter, ct);
-            var aggregations = await GetAggregationsQueryResultAsync(typeNames, filter, userId, context.SearchContext.IsBaseQueryExact, ct);
+            var (multiSearchQuery, context) = PrepareMultiSearchQuery(typeNames, filter);
+            var aggregations = await GetAggregationsQueryResultAsync(typeNames, filter, userId, context.IsBaseQueryExact, cancellationToken);
             var multiSearchQueryString = multiSearchQuery
                 .WithHighlights()
                 .ToString();
-            var searchResult = await _elasticManager.WithUserId(userId).SearchAsync(multiSearchQueryString, typeNames, ct);
-
-            PopulateHighlights(searchResult, context);
+            var searchResult = await _elasticManager.WithUserId(userId).SearchAsync(multiSearchQueryString, typeNames, cancellationToken);
 
             return searchResult.ToOutputSearchResult(aggregations);
         }
@@ -139,33 +140,34 @@ namespace IIS.Core.Ontology.EntityFramework
         public async Task<SearchEntitiesByConfiguredFieldsResult> FilterNodeCoordinatesAsync(
             IEnumerable<string> typeNames,
             ElasticFilter filter,
-            CancellationToken ct = default)
+            CancellationToken cancellationToken = default)
         {
-            var context = await PrepareMultiElasticSearchContextAsync(typeNames, filter, ct);
+            var context = PrepareMultiElasticSearchContext(typeNames, filter);
 
-            var query = new MultiSearchParamsQueryBuilder(context.MultiSearchParams.SearchParams)
-                .WithPagination(context.MultiSearchParams.From, context.MultiSearchParams.Size)
-                .WithLeniency(context.MultiSearchParams.IsLenient)
-                .WithResultFields(context.MultiSearchParams.ResultFields)
+            var query = new MultiSearchParamsQueryBuilder(context.ElasticMultiSearchParams.SearchParams)
+                .WithPagination(context.ElasticMultiSearchParams.From, context.ElasticMultiSearchParams.Size)
+                .WithLeniency(context.ElasticMultiSearchParams.IsLenient)
+                .WithResultFields(context.ElasticMultiSearchParams.ResultFields)
                 .BuildSearchQuery()
                 .ToString();
 
-            var searchResult = await _elasticManager.SearchAsync(query, typeNames, ct);
+            var searchResult = await _elasticManager.SearchAsync(query, typeNames, cancellationToken);
 
             return searchResult.ToOutputSearchResult();
         }
 
-        public async Task<int> CountEntitiesByConfiguredFieldsAsync(
+        public Task<int> CountEntitiesByConfiguredFieldsAsync(
             IEnumerable<string> typeNames,
             ElasticFilter filter,
-            CancellationToken ct = default)
+            CancellationToken cancellationToken = default)
         {
-            var context = await PrepareMultiElasticSearchContextAsync(typeNames, filter, ct);
-            var query = new MultiSearchParamsQueryBuilder(context.MultiSearchParams.SearchParams)
-                .WithLeniency(context.MultiSearchParams.IsLenient)
+            var context = PrepareMultiElasticSearchContext(typeNames, filter);
+            var query = new MultiSearchParamsQueryBuilder(context.ElasticMultiSearchParams.SearchParams)
+                .WithLeniency(context.ElasticMultiSearchParams.IsLenient)
                 .BuildCountQuery()
                 .ToString();
-            return await _elasticManager.CountAsync(query, typeNames, ct);
+
+            return _elasticManager.CountAsync(query, typeNames, cancellationToken);
         }
 
         public Task<bool> PutNodeAsync(Guid id, CancellationToken ct = default)
@@ -176,11 +178,6 @@ namespace IIS.Core.Ontology.EntityFramework
         public Task<bool> PutNodeAsync(Guid id, IEnumerable<string> fieldsToExtract, CancellationToken ct = default)
         {
             return _nodeRepository.PutNodeAsync(id, fieldsToExtract, ct);
-        }
-
-        public Task<List<ElasticBulkResponse>> PutHistoricalNodesAsync(Guid id, Guid? requestId = null, CancellationToken ct = default)
-        {
-            return _nodeRepository.PutHistoricalNodesAsync(id, requestId, ct);
         }
 
         public bool TypesAreSupported(IEnumerable<string> typeNames)
@@ -232,6 +229,7 @@ namespace IIS.Core.Ontology.EntityFramework
                     v => new SearchResultItem { Highlight = v.Higlight, SearchResult = v.SearchResult })
             };
         }
+
         public Task<bool> DeleteNodeAsync(Guid id, string typeName, CancellationToken ct = default)
         {
             var indexName = _elasticState.OntologyIndexes.Union(_elasticState.EventIndexes).FirstOrDefault(e => e.Equals(typeName, StringComparison.OrdinalIgnoreCase));
@@ -246,16 +244,15 @@ namespace IIS.Core.Ontology.EntityFramework
                 || (!_elasticState.WikiIndexes.Contains(type.Name) && !_elasticState.OntologyIndexes.Contains(type.Name));
         }
 
-        private async Task<(JObject Query, MultiSearchQueryContext Context)> PrepareMultiSearchQueryAsync(
+        private (JObject Query, ISearchParamsContext SearchContext) PrepareMultiSearchQuery(
             IEnumerable<string> typeNames,
             ElasticFilter filter,
-            CancellationToken ct = default,
             bool applyFuzziness = false)
         {
-            var context = await PrepareMultiElasticSearchContextAsync(typeNames, filter, ct, applyFuzziness);
-            var query = PrepareMultiSearchQuery(context.MultiSearchParams);
+            var searchParamsContext = PrepareMultiElasticSearchContext(typeNames, filter, applyFuzziness);
+            var query = PrepareMultiSearchQuery(searchParamsContext.ElasticMultiSearchParams);
 
-            return (query, context);
+            return (query, searchParamsContext);
         }
 
         private JObject PrepareMultiSearchQuery(IElasticMultiSearchParams multiSearchParams)
@@ -288,13 +285,14 @@ namespace IIS.Core.Ontology.EntityFramework
             return indexNames.All(indexName => OntologyIndexIsSupported(indexName));
         }
 
-        private async Task<MultiSearchQueryContext> PrepareMultiElasticSearchContextAsync(
+        private ISearchParamsContext PrepareMultiElasticSearchContext(
             IEnumerable<string> typeNames,
             ElasticFilter filter,
-            CancellationToken ct = default,
             bool applyFuzziness = false)
         {
-            var searchFields = GetSearchFields(typeNames);
+            var searchFields = GetSearchFields(typeNames)
+                .Concat(_historicalSearchFields)
+                .ToList();
             var baseParameterQuery = filter.ToQueryString(applyFuzziness);
             var multiSearchParams = new ElasticMultiSearchParams
             {
@@ -306,113 +304,15 @@ namespace IIS.Core.Ontology.EntityFramework
                     new SearchParameter(baseParameterQuery, searchFields, filter.IsExact)
                 }
             };
-            var useHistoricalSearch = !string.IsNullOrEmpty(filter.Suggestion);
 
-            if (!useHistoricalSearch)
-            {
-                return MultiSearchQueryContext.CreateFrom(multiSearchParams, filter);
-            }
-
-            var historySearchResult = await GetHistorySearchResultAsync(typeNames, filter, searchFields, applyFuzziness, ct);
-
-            PopulateHistorySearchParams(multiSearchParams, historySearchResult);
-
-            return MultiSearchQueryContext.CreateFrom(multiSearchParams, filter, historySearchResult);
-        }
-
-        private void PopulateHistorySearchParams(IElasticMultiSearchParams multiSearchParams, IElasticSearchResult historySearchResult)
-        {
-            if (historySearchResult.Count == 0) return;
-
-            var entityIds = historySearchResult.Items
-                .Select(x => x.SearchResult[IdField].Value<string>())
-                .Distinct();
-            var historySearchQueryFields = new List<IIisElasticField>
-            {
-                new IisElasticField { Name = IdField, Boost = HistoricalSearchBoost }
-            };
-            var query = string.Join(IdFieldSeparator, entityIds);
-            var historySearchParameter = new SearchParameter(query, historySearchQueryFields);
-
-            multiSearchParams.SearchParams.Add(historySearchParameter);
-        }
-
-        private async Task<IElasticSearchResult> GetHistorySearchResultAsync(
-            IEnumerable<string> typeNames,
-            ElasticFilter filter,
-            IReadOnlyList<IIisElasticField> searchFields,
-            bool applyFuzziness,
-            CancellationToken ct = default)
-        {
-            var historicalIndexes = typeNames.Select(GetHistoricalIndex);
-            var resultFields = new List<string> { IdField };
-
-            if (filter.IsExact)
-            {
-                var exactQuery = new ExactQueryBuilder()
-                    .WithResultFields(resultFields)
-                    .WithPagination(0, filter.Limit)
-                    .WithQueryString(filter.Suggestion)
-                    .WithLeniency(true)
-                    .BuildSearchQuery();
-
-                return await _elasticManager.SearchAsync(exactQuery.ToString(), historicalIndexes, ct);
-            }
-
-            var historySearchParams = new IisElasticSearchParams
-            {
-                BaseIndexNames = historicalIndexes,
-                Query = filter.ToQueryString(applyFuzziness),
-                Size = filter.Limit,
-                SearchFields = searchFields,
-                ResultFields = resultFields,
-                IsExact = filter.IsExact
-            };
-
-            return await _elasticManager.SearchAsync(historySearchParams, ct);
-        }
-
-        private JToken CombineHighlights(JToken historicalHighlights, JToken actualHighlights, string entityId)
-        {
-            if (historicalHighlights == null)
-                return actualHighlights;
-
-            var result = DeepCloneWithNewPrefix(historicalHighlights, HistoricalIndexName);
-            if (actualHighlights == null)
-                return result;
-
-            foreach (var item in ((JObject)actualHighlights).Children<JProperty>())
-            {
-                if (item.Name == IdField && item.Value[0].Value<string>().Contains(entityId))
-                    continue;
-
-                result.TryAdd(item.Name, item.Value);
-            }
-
-            return result;
-        }
-
-        private JObject DeepCloneWithNewPrefix(JToken token, string prefix)
-        {
-            var result = new JObject();
-            foreach (var jProp in token.Children<JProperty>())
-            {
-                result.Add($"{prefix}.{jProp.Name}", jProp.Value);
-            }
-
-            return result;
-        }
-
-        private string GetHistoricalIndex(string typeName)
-        {
-            return $"{HistoricalIndexName}_{typeName}";
+            return SearchParamsContext.CreateFrom(multiSearchParams);
         }
 
         private Task<IElasticSearchResult> GetAllSearchResultAsync(
             IEnumerable<string> typeNames,
             ElasticFilter filter,
             Guid userId,
-            CancellationToken ct)
+            CancellationToken cancellationToken)
         {
             var defaultAggregations = new List<AggregationField>
             {
@@ -429,7 +329,7 @@ namespace IIS.Core.Ontology.EntityFramework
                 .WithHighlights()
                 .ToString();
 
-            return _elasticManager.WithUserId(userId).SearchAsync(query, typeNames, ct);
+            return _elasticManager.WithUserId(userId).SearchAsync(query, typeNames, cancellationToken);
         }
 
         private async Task<Dictionary<string, AggregationItem>> GetAggregationsQueryResultAsync(
@@ -437,7 +337,7 @@ namespace IIS.Core.Ontology.EntityFramework
             ElasticFilter filter,
             Guid userId,
             bool applyFuzziness,
-            CancellationToken ct)
+            CancellationToken cancellationToken)
         {
             var aggregatesElasticFilter = new ElasticFilter
             {
@@ -446,23 +346,22 @@ namespace IIS.Core.Ontology.EntityFramework
                 Offset = filter.Offset,
                 Suggestion = filter.Suggestion
             };
-            var (_, multiSearchQueryContext) = await PrepareMultiSearchQueryAsync(typeNames, aggregatesElasticFilter, ct, applyFuzziness);
-            var aggregatesContext = multiSearchQueryContext.SearchContext;
+            var (_, aggregatesContext) = PrepareMultiSearchQuery(typeNames, aggregatesElasticFilter, applyFuzziness);
             var multiSearchAggregationQuery = aggregatesContext.IsBaseQueryMatchAll
                 ? new MatchAllQueryBuilder()
                     .WithPagination(filter.Offset, filter.Limit)
                     .WithResultFields(aggregatesContext.ElasticMultiSearchParams.ResultFields)
                     .BuildSearchQuery()
                 : PrepareMultiSearchQuery(aggregatesContext.ElasticMultiSearchParams);
-            var aggregationFields = multiSearchQueryContext.MultiSearchParams.SearchParams.SelectMany(_ => _.Fields)
+            var aggregationFields = aggregatesContext.ElasticMultiSearchParams.SearchParams.SelectMany(_ => _.Fields)
                 .Where(_ => _.IsAggregated)
-                .Select(_ => new AggregationField($"{_.Name}{SearchQueryExtension.AggregateSuffix}", _.Alias, $"{_.Name}{SearchQueryExtension.AggregateSuffix}", _.Name))
+                .Select(_ => new AggregationField(AsAggregateName(_), _.Alias, AsAggregateName(_), _.Name))
                 .ToArray();
             var batchQueries = GetBatchAggregateQueries(aggregationFields, multiSearchAggregationQuery, filter, aggregatesContext).ToArray();
 
             _elasticManager.WithUserId(userId);
 
-            var aggregationQueryResults = await batchQueries.ForEachAsync(_ => _elasticManager.SearchAsync(_, typeNames, ct));
+            var aggregationQueryResults = await batchQueries.ForEachAsync(_ => _elasticManager.SearchAsync(_, typeNames, cancellationToken));
             var aggregations = aggregationQueryResults
                 .SelectMany(_ => _.Aggregations)
                 .ToDictionary(_ => _.Key, _ => _.Value);
@@ -490,48 +389,10 @@ namespace IIS.Core.Ontology.EntityFramework
             }
         }
 
-        private void PopulateHighlights(IElasticSearchResult searchResult, MultiSearchQueryContext context)
-        {
-            if (!context.HasHistoricalResult) return;
-
-            foreach (var item in searchResult.Items)
-            {
-                item.SearchResult[Highlight] = CombineHighlights(
-                    context.HighlightsById.GetValueOrDefault(item.Identifier),
-                    item.Higlight,
-                    item.Identifier);
-            }
-        }
-
         private IReadOnlyList<IIisElasticField> GetSearchFields(IEnumerable<string> typeNames) => _elasticConfiguration
                 .GetOntologyIncludedFields(typeNames.Where(_ => _elasticState.ObjectIndexes.Contains(_)))
                 .ToList();
 
-        private class MultiSearchQueryContext
-        {
-            public IElasticSearchResult HistoricalResult { get; private set; }
-            public Dictionary<string, JToken> HighlightsById { get; private set; }
-            public ISearchParamsContext SearchContext { get; private set; }
-            public IElasticMultiSearchParams MultiSearchParams => SearchContext.ElasticMultiSearchParams;
-            public bool HasHistoricalResult => HistoricalResult != null && HistoricalResult.Count > 0;
-
-            public static MultiSearchQueryContext CreateFrom(
-                IElasticMultiSearchParams elasticMultiSearchParams,
-                ElasticFilter filter,
-                IElasticSearchResult historicalResult = default)
-            {
-                var highlightsById = historicalResult?.Items
-                        .GroupBy(_ => _.SearchResult[IdField].Value<string>())
-                        .ToDictionary(_ => _.Key, _ => _.First().Higlight)
-                        ?? new Dictionary<string, JToken>();
-
-                return new MultiSearchQueryContext
-                {
-                    HistoricalResult = historicalResult,
-                    HighlightsById = highlightsById,
-                    SearchContext = SearchParamsContext.CreateFrom(elasticMultiSearchParams)
-                };
-            }
-        }
+        private string AsAggregateName(IIisElasticField field) => $"{field.Name}{SearchQueryExtension.AggregateSuffix}";
     }
 }

@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using Iis.DataModel;
 using Iis.DataModel.ChangeHistory;
+using Iis.Interfaces.Enums;
 using Iis.Services.Contracts.Dtos;
 
 namespace Iis.MaterialLoader.Services

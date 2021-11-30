@@ -92,7 +92,7 @@ namespace Iis.Elastic.SearchQueryExtensions
                 .GroupBy(_ => _.Query)
                 .ToDictionary(_ => _.Key, _ => _.ToArray());
             foreach (var (query, contexts) in queryGroups)
-                aggregations.ProcessQueryGroup(query, contexts, groupedAggregationNameGenerator, searchParamsContext);
+                aggregations.ProcessQueryGroup(query, contexts, groupedAggregationNameGenerator);
 
             return jsonQuery;
         }
@@ -199,12 +199,11 @@ namespace Iis.Elastic.SearchQueryExtensions
             this JObject aggregations,
             string query,
             IReadOnlyCollection<AggregationFieldContext> contexts,
-            IGroupedAggregationNameGenerator groupedAggregationNameGenerator,
-            ISearchParamsContext context)
+            IGroupedAggregationNameGenerator groupedAggregationNameGenerator)
         {
             if (contexts.Count == 1)
             {
-                aggregations.ProcessQueryContext(contexts.First(), context);
+                aggregations.ProcessQueryContext(contexts.First());
                 return;
             }
 
@@ -215,11 +214,11 @@ namespace Iis.Elastic.SearchQueryExtensions
             {
                 if (isFilteredByField)
                 {
-                    groupedContexts.ForEach(_ => aggregations.ProcessQueryContext(_, context));
+                    groupedContexts.ForEach(_ => aggregations.ProcessQueryContext(_));
                     continue;
                 }
 
-                aggregations.ProcessQueryContexts(query, groupedAggregationNameGenerator.GetUniqueAggregationName(), groupedContexts, context);
+                aggregations.ProcessQueryContexts(query, groupedAggregationNameGenerator.GetUniqueAggregationName(), groupedContexts);
             }
         }
 
@@ -227,8 +226,7 @@ namespace Iis.Elastic.SearchQueryExtensions
             this JObject aggregations,
             string query,
             string fieldName,
-            IReadOnlyCollection<AggregationFieldContext> contexts,
-            ISearchParamsContext searchParamsContext)
+            IReadOnlyCollection<AggregationFieldContext> contexts)
         {
             var filterSection = CreateAggregationFilter(query);
             var subAggsSection = new JObject();
@@ -244,11 +242,9 @@ namespace Iis.Elastic.SearchQueryExtensions
 
         private static void ProcessQueryContext(
             this JObject aggregations,
-            AggregationFieldContext context,
-            ISearchParamsContext searchParamsContext)
+            AggregationFieldContext context)
         {
-            var filterSection = CreateAggregationFilter(context.Query)
-                .ApplyAdditionalAggregationQueries(searchParamsContext, context);
+            var filterSection = CreateAggregationFilter(context.Query);
             var subAggsSection = CreateSubAggs("sub_aggs", context.Field);
 
             aggregations[context.FieldName] = new JObject
@@ -308,25 +304,6 @@ namespace Iis.Elastic.SearchQueryExtensions
             {
                 {"bool", boolSection}
             };
-        }
-
-        private static JObject ApplyAdditionalAggregationQueries(
-            this JObject aggregationFilter,
-            ISearchParamsContext searchParamsContext,
-            AggregationFieldContext fieldContext)
-        {
-            if (!searchParamsContext.HasAdditionalParameters
-                || !fieldContext.IsFilteredByField) return aggregationFilter;
-
-            var aggregateQueries = SearchParamsQueryHelper.CreateMultiFieldShouldSection(
-                searchParamsContext.HistorySearchParameter.Query,
-                searchParamsContext.HistorySearchParameter.Fields,
-                searchParamsContext.ElasticMultiSearchParams.IsLenient);
-            var queriesSection = aggregationFilter["bool"]["should"] as JArray;
-
-            queriesSection.Merge(aggregateQueries);
-
-            return aggregationFilter;
         }
 
         private static string PopulateFilteredItems(IReadOnlyCollection<Property> filter, string result)

@@ -2,16 +2,18 @@
 using System.Linq;
 using System.Globalization;
 using Newtonsoft.Json.Linq;
-
 using Iis.Interfaces.Elastic;
 using Iis.Interfaces.Ontology;
 using Iis.Interfaces.Ontology.Schema;
 using Iis.Elastic.SearchQueryExtensions;
+using AutoMapper;
+using Iis.DataModel.ChangeHistory;
 
 namespace Iis.Elastic
 {
     public class ElasticSerializer : IElasticSerializer
     {
+        public const string HistoricalPropertyName = "historical";
         private const string DateFormat = "yyyy-MM-ddTHH:mm:ss.fffZ";
         private const string AccessLevelPropertyName = "__accessLevel";
         private const string LattiturePropertyName = "lat";
@@ -20,10 +22,18 @@ namespace Iis.Elastic
         private const string CoordinatesPropertyName = "__coordinates";
         private const string LocationPropertyName = "location";
 
+        private readonly IMapper _mapper;
+
+        public ElasticSerializer(IMapper mapper)
+        {
+            _mapper = mapper;
+        }
+
         public string GetJsonByExtNode(IExtNode extNode)
         {
             return GetJsonObjectByExtNode(extNode).ToString();
         }
+
         public JObject GetJsonObjectByExtNode(IExtNode extNode, bool IsHeadNode = true)
         {
             var json = new JObject();
@@ -84,6 +94,8 @@ namespace Iis.Elastic
                     }
                 }
             }
+
+            PopulateChangeHistory(json, extNode);
 
             return json;
         }
@@ -151,6 +163,17 @@ namespace Iis.Elastic
             }
 
             return GetJsonObjectByExtNode(extNode, false);
+        }
+
+        private void PopulateChangeHistory(JObject jobject, IExtNode extNode)
+        {
+            if (extNode.ChangeHistory is null || extNode.ChangeHistory.Count == 0) return;
+
+            var documents = extNode.ChangeHistory
+                .Select(_ => _mapper.Map<ChangeHistoryDocument>(_))
+                .ToArray();
+
+            jobject[HistoricalPropertyName] = JArray.FromObject(documents);
         }
     }
 }

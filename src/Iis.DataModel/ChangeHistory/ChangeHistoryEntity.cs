@@ -1,14 +1,10 @@
-﻿using System;
+﻿using Iis.Interfaces.Enums;
+using Iis.Interfaces.Ontology;
+using System;
 
 namespace Iis.DataModel.ChangeHistory
 {
-    public enum ChangeHistoryEntityType
-    {
-        Node = 0,
-        Material = 1
-    }
-
-    public class ChangeHistoryEntity : BaseEntity
+    public class ChangeHistoryEntity : BaseEntity, INodeChangeHistory
     {
         public Guid TargetId { get; set; }
         public string UserName { get; set; }

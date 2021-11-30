@@ -1,13 +1,13 @@
 ﻿using Xunit;
 using System;
 using System.Collections.Generic;
-
 using Iis.Elastic;
 using Iis.Domain.ExtendedData;
 using Newtonsoft.Json.Linq;
 using AutoFixture.Xunit2;
 using Moq;
 using Iis.Interfaces.Ontology.Schema;
+using AutoMapper;
 
 namespace Iis.UnitTests.Iis.Elastic.Tests
 {
@@ -20,7 +20,8 @@ namespace Iis.UnitTests.Iis.Elastic.Tests
 
             nodeTypeMock.Setup(e => e.IsObjectOfStudy).Returns(true);
 
-            var serializer = new ElasticSerializer();
+            var mapperMock = new Mock<IMapper>();
+            var serializer = new ElasticSerializer(mapperMock.Object);
             var extNode = new ExtNode
             {
                 Id = "a01",
@@ -48,7 +49,8 @@ namespace Iis.UnitTests.Iis.Elastic.Tests
             var entityNodeTypeMock = new Mock<INodeTypeLinked>();
             entityNodeTypeMock.Setup(e => e.IsObjectOfStudy).Returns(true);
 
-            var serializer = new ElasticSerializer();
+            var mapperMock = new Mock<IMapper>();
+            var serializer = new ElasticSerializer(mapperMock.Object);
             var extNode = new ExtNode
             {
                 Id = "b01",
@@ -109,7 +111,8 @@ namespace Iis.UnitTests.Iis.Elastic.Tests
             var entityNodeTypeMock = new Mock<INodeTypeLinked>();
             entityNodeTypeMock.Setup(e => e.IsEvent).Returns(true);
 
-            var serializer = new ElasticSerializer();
+            var mapperMock = new Mock<IMapper>();
+            var serializer = new ElasticSerializer(mapperMock.Object);
             var extNode = new ExtNode
             {
                 Id = "b01",
@@ -134,7 +137,8 @@ namespace Iis.UnitTests.Iis.Elastic.Tests
             var nodeTypeMock = new Mock<INodeTypeLinked>();
             nodeTypeMock.Setup(p => p.IsObjectOfStudy).Returns(false);
 
-            var serializer = new ElasticSerializer();
+            var mapperMock = new Mock<IMapper>();
+            var serializer = new ElasticSerializer(mapperMock.Object);
             var extNode = new ExtNode
             {
                 CreatedAt = new DateTime(2020, 1, 2),

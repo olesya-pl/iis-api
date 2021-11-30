@@ -1,16 +1,14 @@
-﻿using Iis.Interfaces.Elastic;
-using Iis.Interfaces.Ontology;
+﻿using Iis.Interfaces.Ontology;
 using Iis.Interfaces.Ontology.Schema;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using ScalarTypeEnum = Iis.Interfaces.Ontology.Schema.ScalarType;
 
 namespace Iis.Domain.ExtendedData
 {
-    public class ExtNode: IExtNode
+    public class ExtNode : IExtNode
     {
         public string Id { get; set; }
         public string NodeTypeId { get; set; }
@@ -27,6 +25,7 @@ namespace Iis.Domain.ExtendedData
 
         public INodeTypeLinked NodeType { get; set; }
         public GeoCoordinates Location { get; set; }
+        public IReadOnlyCollection<INodeChangeHistory> ChangeHistory { get; set; } = Array.Empty<INodeChangeHistory>();
 
         public List<GeoCoordinates> GetCoordinatesWithoutNestedObjects()
         {

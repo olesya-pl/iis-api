@@ -36,5 +36,22 @@ namespace Iis.Utility
 
             return bag.ToArray();
         }
+
+        public static async Task ForEachAsync<TItem>(
+            this IReadOnlyCollection<TItem> items,
+            Func<TItem, Task> action)
+        {
+            if (items.Count == 0) return;
+
+            var block = new ActionBlock<TItem>(action, Options);
+
+            foreach (var item in items)
+            {
+                block.Post(item);
+            }
+
+            block.Complete();
+            await block.Completion;
+        }
     }
 }

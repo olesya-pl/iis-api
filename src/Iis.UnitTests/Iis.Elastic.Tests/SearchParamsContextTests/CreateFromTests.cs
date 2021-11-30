@@ -39,13 +39,11 @@ namespace Iis.UnitTests.Iis.Elastic.Tests.SearchParamsContextTests
             var fixture = ElasticMultiSearchParamsFixture.CreateFixture();
             var searchParams = fixture.Create<IElasticMultiSearchParams>();
             var expectedBaseSearchParameter = searchParams.SearchParams.First();
-            var expectedHistorySearchParameter = searchParams.SearchParams.Skip(1).FirstOrDefault();
 
             var context = SearchParamsContext.CreateFrom(searchParams);
 
             context.ElasticMultiSearchParams.Should().BeEquivalentTo(searchParams);
             context.BaseSearchParameter.Should().BeEquivalentTo(expectedBaseSearchParameter);
-            context.HistorySearchParameter.Should().BeEquivalentTo(expectedHistorySearchParameter);
         }
     }
 }

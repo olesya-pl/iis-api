@@ -1,5 +1,5 @@
-﻿using Iis.DataModel.Reports;
-using Iis.DbLayer.Repositories;
+﻿using Iis.DataModel.ChangeHistory;
+using Iis.DataModel.Reports;
 using Iis.Elastic;
 using Iis.Elastic.ElasticMappingProperties;
 using Iis.Interfaces.Elastic;
@@ -8,6 +8,7 @@ using Iis.Interfaces.Ontology.Data;
 using Iis.Interfaces.Ontology.Schema;
 using Iis.OntologySchema.DataTypes;
 using Iis.Services.Contracts.Interfaces;
+using Iis.Utility;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -30,6 +31,17 @@ namespace Iis.Services
         private readonly IAliasService _aliasService;
 
         private readonly Dictionary<AliasType, string> _elasticIndexByAliasType;
+        private readonly IReadOnlyCollection<IAttributeInfoItem> _historicalAttributes = new IAttributeInfoItem[]
+        {
+            new AttributeInfoItem($"{ElasticSerializer.HistoricalPropertyName}.{nameof(ChangeHistoryDocument.Date)}", ScalarType.Date, "Дата зміни".AsArray(), false),
+            new AttributeInfoItem($"{ElasticSerializer.HistoricalPropertyName}.{nameof(ChangeHistoryDocument.OldValue)}", ScalarType.String, "Було".AsArray(), true),
+            new AttributeInfoItem($"{ElasticSerializer.HistoricalPropertyName}.{nameof(ChangeHistoryDocument.NewValue)}", ScalarType.String, "Стало".AsArray(), true),
+            new AttributeInfoItem($"{ElasticSerializer.HistoricalPropertyName}.{nameof(ChangeHistoryDocument.OldTitle)}", ScalarType.String, Array.Empty<string>(), true),
+            new AttributeInfoItem($"{ElasticSerializer.HistoricalPropertyName}.{nameof(ChangeHistoryDocument.NewTitle)}", ScalarType.String, Array.Empty<string>(), true),
+            new AttributeInfoItem($"{ElasticSerializer.HistoricalPropertyName}.{nameof(ChangeHistoryDocument.ParentTypeName)}", ScalarType.String, Array.Empty<string>(), true),
+            new AttributeInfoItem($"{ElasticSerializer.HistoricalPropertyName}.{nameof(ChangeHistoryDocument.PropertyName)}", ScalarType.String, "Назва поля".AsArray(), true),
+            new AttributeInfoItem($"{ElasticSerializer.HistoricalPropertyName}.{nameof(ChangeHistoryDocument.UserName)}", ScalarType.String, "Користувач".AsArray(), true)
+        };
 
         public StringBuilder Logger { get; set; }
 
@@ -58,65 +70,55 @@ namespace Iis.Services
             };
         }
 
-        public async Task DeleteIndexesAsync(IEnumerable<string> indexes, bool isHistorical, CancellationToken ct = default)
+        public Task CreateIndexWithMappingsAsync(IReadOnlyCollection<string> indexes, CancellationToken cancellationToken = default)
         {
-            var indexesToDelete = isHistorical ? GetHistoricalIndexes(indexes) : indexes;
-            await DeleteIndexesAsync(indexesToDelete);
-        }
-
-        public async Task CreateIndexWithMappingsAsync(IEnumerable<string> indexes, bool isHistorical, CancellationToken ct = default)
-        {
-            foreach (var index in indexes)
+            return indexes.ForEachAsync(async index =>
             {
-                ct.ThrowIfCancellationRequested();
+                cancellationToken.ThrowIfCancellationRequested();
 
-                var attributesInfo = isHistorical
-                    ? _ontologySchema.GetHistoricalAttributesInfo(index, GetHistoricalIndex(index))
-                    : _ontologySchema.GetAttributesInfo(index);
+                var attributesInfo = _ontologySchema.GetAttributesInfo(index);
 
-                if(_ontologySchema.GetEntityTypeByName(index).IsObjectSign)
-                {
-                    var singLocationAttribute = new AttributeInfoItem(LocationPropertyName, ScalarType.GeoPoint, null, false);
-                    attributesInfo.TryAddItem(singLocationAttribute);
-                }
+                attributesInfo.AddItems(_historicalAttributes);
 
-                var result = await _elasticManager.CreateMapping(attributesInfo, ct);
-
-                if (!result)
-                    TryLog($"mapping was not created for {index}");
-            }
+                await CreateIndexWithMappingsAsync(attributesInfo, index, cancellationToken);
+            });
         }
 
-        public async Task FillIndexesFromMemoryAsync(IEnumerable<string> indexes, bool isHistorical, CancellationToken ct = default)
+        public async Task FillIndexesFromMemoryAsync(IEnumerable<string> indexes, CancellationToken cancellationToken = default)
         {
             var nodes = GetNodesFromMemory(indexes);
-            var response = isHistorical
-                ? await _nodeRepository.PutHistoricalNodesAsync(nodes, ct)
-                : await _nodeRepository.PutNodesAsync(nodes, ct);
+            var response = await _nodeRepository.PutNodesAsync(nodes, cancellationToken);
 
             LogBulkResponse(response);
         }
 
-        public async Task FillIndexesFromMemoryAsync(IEnumerable<string> indexes, IEnumerable<string> fieldsToExclude, CancellationToken ct = default)
+        public async Task FillIndexesFromMemoryAsync(IEnumerable<string> indexes, IEnumerable<string> fieldsToExclude, CancellationToken cancellationToken = default)
         {
             var nodes = GetNodesFromMemory(indexes);
-            var response = await _nodeRepository.PutNodesAsync(nodes, fieldsToExclude, ct);
+            var response = await _nodeRepository.PutNodesAsync(nodes, fieldsToExclude, cancellationToken);
 
             LogBulkResponse(response);
         }
 
-        public async Task DeleteIndexesAsync(IEnumerable<string> indexes, CancellationToken ct = default)
+        public async Task DeleteIndexesAsync(IEnumerable<string> indexes, CancellationToken cancellationToken = default)
         {
             foreach (var index in indexes)
             {
-                ct.ThrowIfCancellationRequested();
-                var result = await _elasticManager.DeleteIndexAsync(index, ct);
+                cancellationToken.ThrowIfCancellationRequested();
+                var result = await _elasticManager.DeleteIndexAsync(index, cancellationToken);
                 if (!result)
                     TryLog($"{index} was not deleted");
             }
         }
 
-        public async Task CreateReportIndexWithMappingsAsync(CancellationToken ct = default)
+        public Task DeleteHistoricalIndexesAsync(IEnumerable<string> indexes, CancellationToken cancellationToken = default)
+        {
+            var indexesToDelete = GetHistoricalIndexes(indexes);
+
+            return DeleteIndexesAsync(indexesToDelete, cancellationToken);
+        }
+
+        public Task CreateReportIndexWithMappingsAsync(CancellationToken cancellationToken = default)
         {
             var mappingConfiguration = new ElasticMappingConfiguration(new List<ElasticMappingProperty> {
                 KeywordProperty.Create(nameof(ReportEntity.Id), false),
@@ -126,10 +128,10 @@ namespace Iis.Services
                 KeywordProperty.Create("ReportEventIds", true)
             });
 
-            await _elasticManager.CreateIndexesAsync(new[] { _elasticState.ReportIndex }, mappingConfiguration.ToJObject(), ct);
+            return _elasticManager.CreateIndexesAsync(_elasticState.ReportIndex.AsArray(), mappingConfiguration.ToJObject(), cancellationToken);
         }
 
-        public async Task FillReportIndexAsync(CancellationToken ct = default)
+        public async Task FillReportIndexAsync(CancellationToken cancellationToken = default)
         {
             var reports = await _reportService.GetAllAsync();
 
@@ -139,7 +141,7 @@ namespace Iis.Services
             LogBulkResponse(response);
         }
 
-        public async Task AddAliasesToIndexAsync(AliasType type, CancellationToken ct = default)
+        public async Task AddAliasesToIndexAsync(AliasType type, CancellationToken cancellationToken = default)
         {
             if (!_elasticIndexByAliasType.ContainsKey(type))
                 throw new NotImplementedException($"{type} is not supported");
@@ -151,13 +153,27 @@ namespace Iis.Services
 
             foreach (var property in aliasProperties)
             {
-                ct.ThrowIfCancellationRequested();
+                cancellationToken.ThrowIfCancellationRequested();
 
                 var aliasMappingConfiguration = new ElasticMappingConfiguration(new List<ElasticMappingProperty> { property });
-                var elasticResponse = await _elasticManager.AddMappingPropertyToIndexAsync(index, aliasMappingConfiguration.GetPropertiesJObject(), ct);
+                var elasticResponse = await _elasticManager.AddMappingPropertyToIndexAsync(index, aliasMappingConfiguration.GetPropertiesJObject(), cancellationToken);
                 if (!elasticResponse.IsSuccess)
                     TryLog($"{property.Name} was not created due to {elasticResponse.ErrorType}: {elasticResponse.ErrorReason}");
             }
+        }
+
+        public async Task CreateIndexWithMappingsAsync(IAttributeInfoList attributesInfo, string index, CancellationToken cancellationToken)
+        {
+            if (_ontologySchema.GetEntityTypeByName(index).IsObjectSign)
+            {
+                var singLocationAttribute = new AttributeInfoItem(LocationPropertyName, ScalarType.GeoPoint, null, false);
+                attributesInfo.TryAddItem(singLocationAttribute);
+            }
+
+            var result = await _elasticManager.CreateMapping(attributesInfo, cancellationToken);
+
+            if (!result)
+                TryLog($"mapping was not created for {index}");
         }
 
         private List<INode> GetNodesFromMemory(IEnumerable<string> indexes)
@@ -199,6 +215,7 @@ namespace Iis.Services
         }
 
         private string GetHistoricalIndex(string typeName) => $"historical_{typeName}";
+
         private List<string> GetHistoricalIndexes(IEnumerable<string> indexes) => indexes.Select(x => GetHistoricalIndex(x)).ToList();
     }
 }

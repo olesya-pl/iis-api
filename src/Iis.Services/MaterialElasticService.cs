@@ -32,6 +32,7 @@ using Iis.Elastic.SearchQueryExtensions.CompositeBuilders.BoolQuery;
 using Iis.Domain;
 using Iis.Services.Contracts.Elastic;
 using Iis.Interfaces.Materials;
+using Iis.Interfaces.Enums;
 
 namespace Iis.Services
 {

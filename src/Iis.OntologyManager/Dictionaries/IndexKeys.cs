@@ -3,13 +3,11 @@
     public enum IndexKeys
     {
         Ontology = 0,
-        OntologyHistorical,
         Signs,
         Events,
         Reports,
         Materials,
         Wiki,
-        WikiHistorical,
         Users
     }
 }

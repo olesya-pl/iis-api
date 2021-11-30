@@ -18,10 +18,12 @@ namespace Iis.Interfaces.Ontology
         DateTime UpdatedAt { get; }
         IReadOnlyList<IExtNode> Children { get; }
         bool IsAttribute { get; }
+        INodeTypeLinked NodeType { get; }
+        GeoCoordinates Location { get; set; }
+        IReadOnlyCollection<INodeChangeHistory> ChangeHistory { get; set; }
+
         List<GeoCoordinates> GetCoordinatesWithoutNestedObjects();
         List<IExtNode> GetAttributesRecursive(ScalarType scalarType);
         List<IExtNode> GetAttributesRecursiveWithoutNestedObjects(ScalarType scalarType);
-        INodeTypeLinked NodeType { get; }
-        GeoCoordinates Location { get; set; }
     }
 }
