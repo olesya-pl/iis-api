@@ -8,12 +8,13 @@ using Iis.Interfaces.Ontology.Comparers;
 using Iis.Services.Dictionaries;
 using Iis.Services.Contracts.Dtos;
 using Iis.Services.Contracts.Interfaces;
-using Iis.Services.Mappers.RadioElectronicSituation;
 using Iis.DbLayer.Repositories;
 using IIS.Repository;
 using IIS.Repository.Factories;
 using Iis.DataModel.Materials;
 using Iis.DataModel.FlightRadar;
+using Iis.Services.Contracts.Dtos.RadioElectronicSituation;
+using AutoMapper;
 
 namespace Iis.Services
 {
@@ -24,34 +25,29 @@ namespace Iis.Services
         private static readonly string[] SignProperties = { "sign" };
         private readonly IOntologyNodesData _data;
         private readonly IOntologySchema _schema;
+        private readonly IMapper _mapper;
         public RadioElectronicSituationService(
             IUnitOfWorkFactory<TUnitOfWork> unitOfWorkFactory,
             IOntologyNodesData data,
-            IOntologySchema schema)
+            IOntologySchema schema,
+            IMapper mapper)
         : base(unitOfWorkFactory)
         {
             _data = data;
             _schema = schema;
+            _mapper = mapper;
         }
 
-        public async Task<IReadOnlyCollection<SituationNodeDto>> GetSituationNodesAsync()
+        public async Task<IReadOnlyCollection<ResSourceItemDto>> GetSituationNodesAsync()
         {
             var signTypes = _schema
                                 .GetEntityTypesByName(ObjectSignTypeNames, true)
                                 .Select(_ => _.Id)
                                 .ToArray();
 
-            var signsDictionary = _data.GetNodesByTypeIds(signTypes)
-                                .Distinct(NodeByIdComparer.Instance)
-                                .ToDictionary(e => e.Id);
+            var locationHistories = await RunWithoutCommitAsync(_ => _.LocationHistoryRepository.GetLatestLocationHistoryListAsync(signTypes));
 
-            var signIds = signsDictionary
-                                .Select(_ => _.Key)
-                                .ToArray();
-
-            var locationHistories = await RunWithoutCommitAsync(_ => _.LocationHistoryRepository.GetLatestLocationHistoryListAsync(signIds));
-
-            if (locationHistories.Length == 0) return Array.Empty<SituationNodeDto>();
+            if (locationHistories.Length == 0) return Array.Empty<ResSourceItemDto>();
 
             var materialIdCollection = locationHistories
                                         .Where(_ => _.MaterialId.HasValue)
@@ -63,29 +59,28 @@ namespace Iis.Services
             var materialDictionary = materialCollection
                                         .ToDictionary(_ => _.Id);
 
-            var mappingData = new List<(LocationHistoryEntity LocationHistory, INode SignNode, INode ObjectNode, MaterialEntity Material)>(locationHistories.Length * HistoryAllocationMultiplier);
+            var mappingData = new List<ResSourceItemDto>(locationHistories.Length * HistoryAllocationMultiplier);
 
             foreach (var locationHistory in locationHistories)
             {
-                if (!signsDictionary.TryGetValue(locationHistory.EntityId.Value, out INode signNode)) continue;
+                var signNode = _data.GetNode(locationHistory.EntityId.Value);
+                if (signNode == null) continue;
 
                 var material = GetMaterialEntity(locationHistory.MaterialId, materialDictionary);
 
                 var data = signNode
                     .GetIncomingRelations(SignProperties)
-                    .Select(p => (LocationHistory: locationHistory, SignNode: signNode, ObjectNode: p.SourceNode, Material: material))
+                    .Select(p => new ResSourceItemDto(
+                        _mapper.Map<LocationHistoryDto>(locationHistory),
+                        signNode,
+                        p.SourceNode,
+                        _mapper.Map<ResMaterialDto>(material)))
                     .ToArray();
 
                 mappingData.AddRange(data);
             }
 
-            return mappingData
-                    .Select(_ => RadioElectronicSituationMapper.Map(
-                        _.LocationHistory,
-                        _.SignNode,
-                        _.ObjectNode,
-                        _.Material))
-                    .ToArray();
+            return mappingData;
         }
 
         private static MaterialEntity GetMaterialEntity(Guid? materialId, Dictionary<Guid, MaterialEntity> materialDictionary)

@@ -13,6 +13,7 @@ using Iis.Interfaces.Materials;
 using Iis.Interfaces.Ontology;
 using Iis.Interfaces.Ontology.Data;
 using Iis.Services.Contracts.Dtos;
+using Iis.Services.Contracts.Dtos.RadioElectronicSituation;
 using Iis.Services.Contracts.Interfaces;
 using Iis.Services.Contracts.Materials.Distribution;
 using IIS.Repository;
@@ -400,7 +401,7 @@ namespace IIS.Services.Materials
             }
 
             return RunWithoutCommitAsync(uow => uow.MaterialRepository.GetMaterialCollectionByNodeIdAsync(nodeIdList, MaterialIncludeEnum.WithChildren, MaterialIncludeEnum.WithFeatures, MaterialIncludeEnum.WithFiles));
-        }  
+        }
 
         public async Task<IReadOnlyCollection<LocationHistoryDto>> GetLocationHistoriesAsync(Guid materialId)
         {
@@ -452,5 +453,9 @@ namespace IIS.Services.Materials
             return RunWithoutCommitAsync((unitOfWork) =>
                    unitOfWork.MaterialRepository.GetMaterialsForDistribution(user, filter));
         }
+
+        public Task<IReadOnlyList<ResCallerReceiverDto>> GetCallInfoAsync(IReadOnlyList<Guid> nodeIds, CancellationToken cancellationToken = default) =>
+            RunWithoutCommitAsync((unitOfWork) =>
+                unitOfWork.MaterialRepository.GetCallInfoAsync(nodeIds));
     }
 }

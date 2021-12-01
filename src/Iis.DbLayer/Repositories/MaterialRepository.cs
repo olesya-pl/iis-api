@@ -13,6 +13,7 @@ using Iis.Domain.Materials;
 using IIS.Repository;
 using Iis.Services.Contracts.Materials.Distribution;
 using Microsoft.EntityFrameworkCore;
+using Iis.Services.Contracts.Dtos.RadioElectronicSituation;
 
 namespace Iis.DbLayer.Repositories
 {
@@ -325,6 +326,41 @@ namespace Iis.DbLayer.Repositories
             if (changeHistory.Any()) {
                 Context.ChangeHistory.RemoveRange(changeHistory);
             }
+        }
+
+        public async Task<IReadOnlyList<ResCallerReceiverDto>> GetCallInfoAsync(IReadOnlyList<Guid> nodeIds, CancellationToken cancellationToken = default)
+        {
+            var rawData = await
+                    (from mf in Context.MaterialFeatures
+                    join mi in Context.MaterialInfos on mf.MaterialInfoId equals mi.Id
+                    where (mf.NodeLinkType == MaterialNodeLinkType.Caller ||
+                            mf.NodeLinkType == MaterialNodeLinkType.Receiver)
+                        && nodeIds.Contains(mf.NodeId)
+                    orderby mi.MaterialId, mf.NodeLinkType
+                    select new ResRawLinkDto
+                    {
+                        MaterialId = mi.MaterialId,
+                        NodeId = mf.NodeId,
+                        NodeLinkType = mf.NodeLinkType
+                    }).ToArrayAsync(cancellationToken);
+
+            var groupedData = rawData
+                .GroupBy(rd => rd.MaterialId)
+                .Where(g => g.Count() == 2)
+                .Select(g => (CallerId: g.First().NodeId, ReceiverId: g.Last().NodeId))
+                .ToArray();
+
+            var result = groupedData
+                .GroupBy(_ => _)
+                .Select(g => new ResCallerReceiverDto
+                {
+                    CallerId = g.Key.CallerId,
+                    ReceiverId = g.Key.ReceiverId,
+                    Count = g.Count()
+                })
+                .ToList();
+
+            return result;
         }
 
         private Task<PaginatedCollection<MaterialEntity>> GetAllWithPredicateAsync(

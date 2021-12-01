@@ -7,6 +7,7 @@ using Iis.DataModel.Materials;
 using Iis.DbLayer.Common;
 using Iis.DbLayer.MaterialEnum;
 using Iis.Domain.Materials;
+using Iis.Services.Contracts.Dtos.RadioElectronicSituation;
 using Iis.Services.Contracts.Materials.Distribution;
 
 namespace Iis.DbLayer.Repositories
@@ -72,5 +73,6 @@ namespace Iis.DbLayer.Repositories
             Expression<Func<MaterialEntity, bool>> filter);
         Task SaveDistributionResult(DistributionResult distributionResult);
         void RemoveMaterialAndRelatedData(Guid materialId);
+        Task<IReadOnlyList<ResCallerReceiverDto>> GetCallInfoAsync(IReadOnlyList<Guid> nodeIds, CancellationToken cancellationToken = default);
     }
 }
