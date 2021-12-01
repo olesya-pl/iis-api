@@ -31,7 +31,7 @@ namespace Iis.Api.GraphQL.RadioElectronicSituation
                 .Select(_ => _.ObjectNode.Id)
                 .ToList();
 
-            var callItems = await materialProvider.GetCallInfo(nodeIds);
+            var callItems = await materialProvider.GetCallInfoAsync(nodeIds);
             var result = MapToResResult(locationItems, callItems);
             return result;
         }

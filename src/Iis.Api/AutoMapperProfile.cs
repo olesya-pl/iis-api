@@ -438,9 +438,6 @@ namespace Iis.Api
             CreateMap<DomainGraphTypes.GraphLink, GraphQLGraphTypes.GraphLink>();
             CreateMap<DomainGraphTypes.GraphNode, GraphQLGraphTypes.GraphNode>();
 
-            CreateMap<ResMaterialDto, MaterialNode>()
-                .ForMember(_ => _.CreatedDate,  opt => opt.MapFrom(src => src.CreatedDate.ToString(Iso8601DateFormat, CultureInfo.InvariantCulture)))
-                .ForMember(_ => _.RegistrationDate, opt => opt.MapFrom(src => src.RegistrationDate.HasValue ? src.RegistrationDate.Value.ToString(Iso8601DateFormat, CultureInfo.InvariantCulture): null));
             CreateMap<MaterialEntity, ResMaterialDto>()
                 .ForMember(dest => dest.Title, opt => opt.MapFrom(src => src.File == null ? null : src.File.Name));
         }
