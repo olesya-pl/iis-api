@@ -85,7 +85,7 @@ namespace IIS.Core.GraphQL
                 d.Include<RelationsCountQuery>();
                 d.Include<CreateMenuItemsQuery>();
                 d.Include<GraphQuery>();
-                d.Include<SituationQuery>();
+                d.Include<ResQuery>();
                 d.Include<NodeMaterialRelationQuery>();
 
 
