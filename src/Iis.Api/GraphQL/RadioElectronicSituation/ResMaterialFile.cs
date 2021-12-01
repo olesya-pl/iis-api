@@ -1,6 +1,6 @@
-﻿using HotChocolate;
+﻿using System;
+using HotChocolate;
 using HotChocolate.Types;
-using System;
 
 namespace Iis.Api.GraphQL.RadioElectronicSituation
 {

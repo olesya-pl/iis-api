@@ -1,9 +1,6 @@
-﻿using HotChocolate;
+﻿using System;
+using HotChocolate;
 using HotChocolate.Types;
-using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Iis.Api.GraphQL.RadioElectronicSituation
 {
