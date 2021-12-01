@@ -69,7 +69,7 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
             var id = ctx.Argument<Guid>("id");
             var data = ctx.Argument<Dictionary<string, object>>("data");
             if (!data.ContainsKey(LastConfirmedFieldName))
-                data.Add(LastConfirmedFieldName, DateTime.UtcNow);
+                data.Add(LastConfirmedFieldName, DateTime.Now);
 
             var tokenPayload = ctx.GetToken();
             VerifyAccess(id, data, tokenPayload.User);
