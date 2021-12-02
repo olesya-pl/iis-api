@@ -70,7 +70,11 @@ namespace IIS.Core.GraphQL.Entities
             {
                 Limit = pagination.PageSize,
                 Offset = pagination.Offset(),
-                Suggestion = filter?.Suggestion ?? filter?.SearchQuery
+                Suggestion = filter?.Suggestion ?? filter?.SearchQuery,
+                CherryPickedItems = filter
+                    .CherryPickedItems
+                    .Select(p => new Iis.Interfaces.Elastic.CherryPickedItem(p.Id, p.IncludeDescendants))
+                    .ToList()
             });
             var mapped = mapper.Map<OntologyFilterableQueryResponse>(response);
             return mapped;
