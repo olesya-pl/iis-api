@@ -51,8 +51,8 @@ namespace Iis.Domain.Materials
         public DateTime? RegistrationDate { get; set; }
         public bool HasAttachedFile() => File != null;
         public bool IsParentMaterial() => ParentId == null;
-        public IdTitleDto Caller { get; set; }
-        public IdTitleDto Receiver { get; set; }
+        public SubscriberDto Caller { get; set; }
+        public SubscriberDto Receiver { get; set; }
         public IReadOnlyCollection<RelatedObjectOfStudy> RelatedObjectCollection { get; set; } = Array.Empty<RelatedObjectOfStudy>();
         public IReadOnlyCollection<RelatedObject> RelatedEventCollection { get; set; } = Array.Empty<RelatedObject>();
         public IReadOnlyCollection<RelatedObject> RelatedSignCollection { get; set; } = Array.Empty<RelatedObject>();

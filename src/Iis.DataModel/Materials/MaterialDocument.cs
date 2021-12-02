@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Iis.DataModel;
-using Newtonsoft.Json;
+using Iis.Interfaces.Common;
 
 namespace Iis.DbLayer.Repositories
 {
@@ -45,6 +46,8 @@ namespace Iis.DbLayer.Repositories
         public IReadOnlyCollection<RelatedObjectOfStudy> RelatedObjectCollection { get; set; } = Array.Empty<RelatedObjectOfStudy>();
         public IReadOnlyCollection<RelatedObject> RelatedEventCollection { get; set; } = Array.Empty<RelatedObject>();
         public IReadOnlyCollection<RelatedObject> RelatedSignCollection { get; set; } = Array.Empty<RelatedObject>();
+        public SubscriberDto Caller { get; set; }
+        public SubscriberDto Receiver { get; set; }
         public string RegistrationDate { get; set; }
         public string ProcessedAt { get; set; }
         public SecurityAttributes SecurityAttributes { get; set; } = new SecurityAttributes();

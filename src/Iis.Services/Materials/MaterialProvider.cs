@@ -33,8 +33,7 @@ namespace IIS.Services.Materials
     public class MaterialProvider<TUnitOfWork> : BaseService<TUnitOfWork>, IMaterialProvider where TUnitOfWork : IIISUnitOfWork
     {
         private const string WildCart = "*";
-        
-        private static readonly IEnumerable<Material> EmptyMaterialCollection = Array.Empty<Material>();
+        private static readonly IReadOnlyCollection<Material> EmptyMaterialCollection = Array.Empty<Material>();
         private static readonly IReadOnlyCollection<string> RelationTypeNameList = new List<string>
         {
             "parent", "bePartOf"
@@ -118,23 +117,19 @@ namespace IIS.Services.Materials
             if (entity is null)
             {
                 throw new ArgumentException($"{FrontEndErrorCodes.NotFound}:Матеріал не знайдено");
-            }            
+            }
             return _materialDocumentMapper.Map(entity, user.Id);
         }
 
         public async Task<Material[]> GetMaterialsByIdsAsync(ISet<Guid> ids, User user)
         {
-            var entities = await RunWithoutCommitAsync(uow =>
-                uow.MaterialRepository.GetByIdsAsync(ids, MaterialIncludeEnum.WithChildren, MaterialIncludeEnum.WithFeatures));
+            var documentCollection = await _materialElasticService.GetMaterialCollectionByIdCollectionAsync(ids.ToArray(), user.Id, CancellationToken.None);
 
-            return entities.Where(p => user == null || p.CanBeAccessedBy(user.AccessLevel))
-                .Select(entity =>
-                {
-                    var mapped = _materialDocumentMapper.Map(entity);
-                    mapped.CanBeEdited = entity.CanBeEdited(user.Id);
-                    return mapped;
-                })
-                .ToArray();
+            if (!documentCollection.Any()) return EmptyMaterialCollection.ToArray();
+
+            return documentCollection
+                    .Select(_ => _materialDocumentMapper.Map(_))
+                    .ToArray();
         }
 
         public Task<IEnumerable<MaterialEntity>> GetMaterialEntitiesAsync()
