@@ -32,6 +32,7 @@ using Iis.Elastic.SearchQueryExtensions.CompositeBuilders.BoolQuery;
 using Iis.Domain;
 using Iis.Services.Contracts.Elastic;
 using Iis.Interfaces.Materials;
+using Iis.Interfaces.Common;
 using Iis.Interfaces.Enums;
 
 namespace Iis.Services
@@ -45,7 +46,6 @@ namespace Iis.Services
         private const string ExclamationMark = "!";
         private const string Iso8601DateFormat = "yyyy-MM-dd'T'HH:mm:ssZ";
         private static readonly string[] IgnoreDocumentPropertyNames = new[] { "Content" };
-        private static readonly string NoneLinkTypeValue = MaterialNodeLinkType.None.ToString();
         private static readonly MaterialIncludeEnum[] IncludeAll = new[]
         {
             MaterialIncludeEnum.WithChildren,
@@ -66,6 +66,7 @@ namespace Iis.Services
             new AggregationField(nameof(MaterialDocument.Channel), null, nameof(MaterialDocument.Channel))
         };
         private static readonly List<ElasticBulkResponse> EmptyElasticBulkResponseList = new List<ElasticBulkResponse>();
+        private static readonly IReadOnlyCollection<MaterialDocument> EmptyMaterialDocumentCollection = Array.Empty<MaterialDocument>();
         private readonly IElasticManager _elasticManager;
         private readonly IElasticState _elasticState;
         private readonly IElasticResponseManagerFactory _elasticResponseManagerFactory;
@@ -198,6 +199,25 @@ namespace Iis.Services
             if (!result.Items.Any()) return null;
 
             return MaterialDocument.FromJObject(result.Items.First().SearchResult);
+        }
+
+        public async Task<IReadOnlyCollection<MaterialDocument>> GetMaterialCollectionByIdCollectionAsync(IReadOnlyCollection<Guid> idCollection, Guid userId, CancellationToken cancellationToken)
+        {
+            if (!idCollection.Any()) return EmptyMaterialDocumentCollection;
+
+            var query = new GetByIdCollectionQueryBuilder(idCollection)
+                            .BuildSearchQuery()
+                            .ToString(Formatting.None);
+
+            var elasticResult = await _elasticManager
+                .WithUserId(userId)
+                .SearchAsync(query, _elasticState.MaterialIndexes, cancellationToken);
+
+            if (!elasticResult.Items.Any()) return EmptyMaterialDocumentCollection;
+
+            return elasticResult.Items
+                    .Select(_ => MaterialDocument.FromJObject(_.SearchResult))
+                    .ToArray();
         }
 
         public async Task<SearchResult> SearchMaterialsAsync(Guid userId,
@@ -638,6 +658,24 @@ namespace Iis.Services
             return propertyName;
         }
 
+        private SubscriberDto GetIdTitleForLinkType(IReadOnlyCollection<MaterialFeatureEntity> materialFeatureCollection, MaterialNodeLinkType linkType)
+        {
+            var featureEntity = materialFeatureCollection
+                                .FirstOrDefault(_ => _.NodeLinkType == linkType);
+
+            if (featureEntity is null) return null;
+
+            var node = _ontologyData.GetNode(featureEntity.NodeId);
+
+            return node is null ? null :
+                new SubscriberDto
+                {
+                    Id = node.Id,
+                    Title = node.GetTitleValue(),
+                    NodeTypeName = node.NodeType.Name
+                };
+        }
+
         private MaterialDocument MapEntityToDocument(MaterialEntity material)
         {
             var materialDocument = _mapper.Map<MaterialDocument>(material);
@@ -661,6 +699,10 @@ namespace Iis.Services
             var nodeFromSingsDictionary = MaterialDocumentHelper.GetObjectsLinkedBySign(nodeDictionary, _ontologyData);
 
             nodeDictionary.TryAddRange(nodeFromSingsDictionary);
+
+            materialDocument.Caller = GetIdTitleForLinkType(featureCollection, MaterialNodeLinkType.Caller);
+
+            materialDocument.Receiver = GetIdTitleForLinkType(featureCollection, MaterialNodeLinkType.Receiver);
 
             materialDocument.RelatedObjectCollection = MaterialDocumentHelper.MapObjectOfStudyCollection(nodeDictionary);
 

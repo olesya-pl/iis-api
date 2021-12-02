@@ -91,7 +91,7 @@ namespace Iis.Api
                 .ForMember(dest => dest.Data, opts => opts.MapFrom(src => src.Data.ToString()))
                 .ForMember(dest => dest.MaterialFeatures, opts => opts.MapFrom(src => src.Features));
 
-            CreateMap<Iis.Interfaces.Common.IdTitleDto, IdTitle>().ReverseMap();
+            CreateMap<Iis.Interfaces.Common.SubscriberDto, IdTitle>().ReverseMap();
 
             CreateMap<RoleAccessEntity, AccessGranted>()
                 .ForMember(dest => dest.Kind, opts => opts.MapFrom(src => src.AccessObject.Kind))
