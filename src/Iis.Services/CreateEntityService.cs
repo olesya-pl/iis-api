@@ -220,9 +220,6 @@ namespace Iis.Services
                 else if (scalarType == ScalarType.Geo)
                     value = InputTypesExtensions.ProcessGeoInput(value);
                 else
-                    //All date time typw should be converted to string with time zone declaration
-                    if (scalarType == ScalarType.Date)
-                        value = InputTypesExtensions.ParseWithTimeZoneDefinition(value);
                     // All non-string types are converted to string before ParseValue. Numbers and booleans can be processed without it.
                     value = AttributeType.ParseValue(value.ToString(), scalarType);
 
@@ -256,7 +253,5 @@ namespace Iis.Services
             var signIds = _ontologyService.GetSignIds(nodeId);
             await _materialElasticService.PutMaterialsToElasticByNodeIdsAsync(signIds);
         }
-
-
     }
 }
