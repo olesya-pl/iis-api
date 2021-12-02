@@ -440,7 +440,7 @@ namespace Iis.Api
             CreateMap<DomainGraphTypes.GraphLink, GraphQLGraphTypes.GraphLink>();
             CreateMap<DomainGraphTypes.GraphNode, GraphQLGraphTypes.GraphNode>();
 
-            CreateMap<Iis.Domain.Materials.Material, ResMaterial>()
+            CreateMap<Iis.Domain.Materials.Material, GraphQL.RadioElectronicSituation.ResMaterial>()
                 .ForMember(dest => dest.File, opts => opts.Ignore())
                 .ForMember(dest => dest.Metadata, opts => opts.Ignore());
         }
