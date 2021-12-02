@@ -417,7 +417,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
 
             if (isElasticSearch)
             {
-                return await _elasticService.FilterNodeCoordinatesAsync(derivedTypeNames, filter);
+                return await _elasticService.FilterNodeCoordinatesAsync(derivedTypeNames, filter, cancellationToken);
             }
             else
             {
