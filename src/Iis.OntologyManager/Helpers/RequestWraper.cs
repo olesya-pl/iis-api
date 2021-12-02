@@ -22,13 +22,11 @@ namespace Iis.OntologyManager.Helpers
         private readonly static IReadOnlyDictionary<IndexKeys, string> IndexPaths = new Dictionary<IndexKeys, string>
         {
             {IndexKeys.Ontology, ApiRouteList.OntologyReIndex},
-            {IndexKeys.OntologyHistorical, ApiRouteList.OntologyHistoricalReIndex},
             {IndexKeys.Signs, ApiRouteList.SignsReIndex},
             {IndexKeys.Events, ApiRouteList.EventsReIndex},
             {IndexKeys.Reports, ApiRouteList.ReportsReIndex},
             {IndexKeys.Materials, ApiRouteList.MaterialsReIndex},
             {IndexKeys.Wiki, ApiRouteList.WikiReIndex},
-            {IndexKeys.WikiHistorical, ApiRouteList.WikiHistoricalReIndex},
             {IndexKeys.Users, ApiRouteList.UsersReIndex},
         };
 

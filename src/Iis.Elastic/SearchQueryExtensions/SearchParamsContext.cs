@@ -8,8 +8,6 @@ namespace Iis.Elastic.SearchQueryExtensions
     {
         IElasticMultiSearchParams ElasticMultiSearchParams { get; }
         SearchParameter BaseSearchParameter { get; }
-        SearchParameter HistorySearchParameter { get; }
-        public bool HasAdditionalParameters => HistorySearchParameter != null;
         public bool IsBaseQueryExact => SearchQueryExtension.IsExactQuery(BaseSearchParameter.Query);
         public bool IsBaseQueryMatchAll => SearchQueryExtension.IsMatchAll(BaseSearchParameter.Query);
     }
@@ -31,14 +29,10 @@ namespace Iis.Elastic.SearchQueryExtensions
 
             ElasticMultiSearchParams = elasticMultiSearchParams;
             BaseSearchParameter = elasticMultiSearchParams.SearchParams.First();
-            HistorySearchParameter = elasticMultiSearchParams.SearchParams
-                .Skip(BaseParametersCount)
-                .FirstOrDefault();
         }
 
         public IElasticMultiSearchParams ElasticMultiSearchParams { get; private set; }
         public SearchParameter BaseSearchParameter { get; private set; }
-        public SearchParameter HistorySearchParameter { get; private set; }
 
         public static ISearchParamsContext CreateFrom(IElasticMultiSearchParams multiElasticSearchParams)
         {

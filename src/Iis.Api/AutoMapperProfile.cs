@@ -17,7 +17,6 @@ using Iis.Api.GraphQL.Common;
 using Iis.Api.GraphQL.Roles;
 using Iis.Api.GraphQL.Aliases;
 using GraphQLGraphTypes = Iis.Api.GraphQL.Graph;
-using Iis.Api.GraphQL.RadioElectronicSituation;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
@@ -38,6 +37,7 @@ using Iis.Domain.Users;
 using Iis.Utility;
 using Iis.Utility.Automapper;
 using Iis.DbLayer.Repositories;
+using Iis.Interfaces.Ontology;
 using Iis.Services.Contracts.Dtos.RadioElectronicSituation;
 
 namespace Iis.Api
@@ -412,6 +412,8 @@ namespace Iis.Api
             #endregion
 
             CreateMap<ChangeHistoryEntity, ChangeHistoryDto>().ReverseMap();
+            CreateMap<INodeChangeHistory, ChangeHistoryDocument>()
+                .ForMember(dest => dest.Date, opts => opts.MapFrom(src => src.Date.ToString(Iso8601DateFormat, CultureInfo.InvariantCulture)));
             CreateMap<ChangeHistoryDto, IIS.Core.GraphQL.ChangeHistory.ChangeHistoryItem>()
                 .ForMember(dest => dest.EntityId, opts => opts.MapFrom(src => src.TargetId))
                 .ForMember(dest => dest.OldValue, opts => opts.MapFrom(src => src.OldTitle ?? src.OldValue))

@@ -21,6 +21,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Hosting;
 using MoreLinq;
 using Iis.Services.Contracts.Elastic;
+using Iis.Utility;
 
 namespace Iis.Api.Controllers
 {
@@ -88,54 +89,57 @@ namespace Iis.Api.Controllers
         }
 
         [HttpGet("ReInitializeOntologyIndexes/{indexNames}")]
-        public Task<IActionResult> ReInitializeOntologyIndexes(string indexNames, CancellationToken ct)
+        public Task<IActionResult> ReInitializeOntologyIndexes(string indexNames, CancellationToken cancellationToken)
         {
-            return CreateOntologyIndexes(indexNames, _elasticState.OntologyIndexes, false, ct);
+            return CreateOntologyIndexes(indexNames, _elasticState.OntologyIndexes, cancellationToken);
         }
 
-        [HttpGet("ReInitializeHistoricalOntologyIndexes/{indexNames}")]
-        public Task<IActionResult> ReInitializeHistoricalOntologyIndexes(string indexNames, CancellationToken ct)
+        [HttpGet("RemoveHistoricalIndexes")]
+        public async Task<IActionResult> RemoveHistoricalIndexesAsync(CancellationToken cancellationToken)
         {
-            return CreateOntologyIndexes(indexNames, _elasticState.OntologyIndexes, true, ct);
+            var stopwatch = Stopwatch.StartNew();
+            var allIndexes = _elasticState.WikiIndexes.Union(_elasticState.OntologyIndexes);
+
+            _adminElasticService.Logger = new StringBuilder();
+
+            await _adminElasticService.DeleteHistoricalIndexesAsync(allIndexes, cancellationToken);
+
+            _adminElasticService.Logger.AppendLine($"spend: {stopwatch.ElapsedMilliseconds} ms");
+
+            return Content(_adminElasticService.Logger.ToString());
         }
 
         [HttpGet("ReInitializeWikiIndexes/{indexNames}")]
-        public Task<IActionResult> ReInitializeWikiIndexes(string indexNames, CancellationToken ct)
+        public Task<IActionResult> ReInitializeWikiIndexes(string indexNames, CancellationToken cancellationToken)
         {
-            return CreateOntologyIndexes(indexNames, _elasticState.WikiIndexes, false, ct);
-        }
-
-        [HttpGet("ReInitializeHistoricalWikiIndexes/{indexNames}")]
-        public Task<IActionResult> ReInitializeHistoricalWikiIndexes(string indexNames, CancellationToken ct)
-        {
-            return CreateOntologyIndexes(indexNames, _elasticState.WikiIndexes, true, ct);
+            return CreateOntologyIndexes(indexNames, _elasticState.WikiIndexes, cancellationToken);
         }
 
         [HttpGet("ReInitializeSignIndexes/{indexNames}")]
-        public Task<IActionResult> ReInitializeSignIndexes(string indexNames, CancellationToken ct)
+        public Task<IActionResult> ReInitializeSignIndexes(string indexNames, CancellationToken cancellationToken)
         {
-            return CreateOntologyIndexes(indexNames, _elasticState.SignIndexes, false, ct);
+            return CreateOntologyIndexes(indexNames, _elasticState.SignIndexes, cancellationToken);
         }
 
         [HttpGet("ReInitializeEventIndexes")]
-        public async Task<IActionResult> ReInitializeEventIndexes(CancellationToken ct)
+        public async Task<IActionResult> ReInitializeEventIndexes(CancellationToken cancellationToken)
         {
             var stopwatch = Stopwatch.StartNew();
 
             _adminElasticService.Logger = new StringBuilder();
 
             var indexes = _elasticState.EventIndexes;
-            await _adminElasticService.DeleteIndexesAsync(indexes, false, ct);
+            await _adminElasticService.DeleteIndexesAsync(indexes, cancellationToken);
 
-            await _adminElasticService.CreateIndexWithMappingsAsync(indexes, false, ct);
+            await _adminElasticService.CreateIndexWithMappingsAsync(indexes, cancellationToken);
 
             if (_elasticState.FieldsToExcludeByIndex.TryGetValue(indexes.First(), out var fieldsToExclude))
             {
-                await _adminElasticService.FillIndexesFromMemoryAsync(indexes, fieldsToExclude, ct);
+                await _adminElasticService.FillIndexesFromMemoryAsync(indexes, fieldsToExclude, cancellationToken);
             }
             else
             {
-                await _adminElasticService.FillIndexesFromMemoryAsync(indexes, false, ct);
+                await _adminElasticService.FillIndexesFromMemoryAsync(indexes, cancellationToken);
             }
 
             _adminElasticService.Logger.AppendLine($"spend: {stopwatch.ElapsedMilliseconds} ms");
@@ -144,14 +148,14 @@ namespace Iis.Api.Controllers
         }
 
         [HttpGet("RecreateElasticReportIndex")]
-        public async Task<IActionResult> RecreateReportIndex(CancellationToken ct)
+        public async Task<IActionResult> RecreateReportIndex(CancellationToken cancellationToken)
         {
             _adminElasticService.Logger = new StringBuilder();
             var index = _elasticState.ReportIndex;
 
-            await _adminElasticService.DeleteIndexesAsync(new string[] { index }, ct);
-            await _adminElasticService.CreateReportIndexWithMappingsAsync(ct);
-            await _adminElasticService.FillReportIndexAsync(ct);
+            await _adminElasticService.DeleteIndexesAsync(index.AsArray(), cancellationToken);
+            await _adminElasticService.CreateReportIndexWithMappingsAsync(cancellationToken);
+            await _adminElasticService.FillReportIndexAsync(cancellationToken);
 
             return Content(_adminElasticService.Logger.ToString());
         }
@@ -256,7 +260,7 @@ namespace Iis.Api.Controllers
                 AliasProperty.Create("Стало", "NewValue")
             });
             await _elasticManager.CreateIndexesAsync(
-                new[] { index },
+                index.AsArray(),
                 mappingConfiguration.ToJObject(),
                 cancellationToken);
 
@@ -278,7 +282,7 @@ namespace Iis.Api.Controllers
             var indexSecurityParam = new List<(IReadOnlyCollection<string>, string)>
             {
                 (_elasticState.MaterialIndexes, "AccessLevel"),
-                (new[] { _elasticState.ReportIndex }, "AccessLevel"),
+                (_elasticState.ReportIndex.AsArray(), "AccessLevel"),
                 (_elasticState.OntologyIndexes, "__accessLevel"),
                 (_elasticState.WikiIndexes, "__accessLevel"),
                 (_elasticState.EventIndexes, "__accessLevel"),
@@ -324,20 +328,20 @@ namespace Iis.Api.Controllers
         }
 
         [HttpPost("ChangeAccessLevels")]
-        public async Task ChangeAccessLevels(ChangeAccessLevelsParams param, CancellationToken ct)
+        public async Task ChangeAccessLevels(ChangeAccessLevelsParams param, CancellationToken cancellationToken)
         {
             var newAccessLevels = new AccessLevels(param.AccessLevelList);
-            await _accessLevelService.ChangeAccessLevels(newAccessLevels, param.DeletedMappings, ct);
-            await ReInitializeOntologyIndexes("all", ct);
+            await _accessLevelService.ChangeAccessLevels(newAccessLevels, param.DeletedMappings, cancellationToken);
+            await ReInitializeOntologyIndexes("all", cancellationToken);
         }
 
         [HttpGet("ImportExternalUsers/{userNames}")]
-        public async Task<IActionResult> ImportExternalUsers(string userNames, CancellationToken ct)
+        public async Task<IActionResult> ImportExternalUsers(string userNames, CancellationToken cancellationToken)
         {
             string message;
             try
             {
-                message = await _userService.ImportUsersFromExternalSourceAsync(userNames.Split(','), ct);
+                message = await _userService.ImportUsersFromExternalSourceAsync(userNames.Split(','), cancellationToken);
             }
             catch (Exception ex)
             {
@@ -347,12 +351,12 @@ namespace Iis.Api.Controllers
         }
 
         [HttpGet("ImportExternalUsers")]
-        public async Task<IActionResult> ImportExternalUsers(CancellationToken ct)
+        public async Task<IActionResult> ImportExternalUsers(CancellationToken cancellationToken)
         {
             string message;
             try
             {
-                message = await _userService.ImportUsersFromExternalSourceAsync(cancellationToken: ct);
+                message = await _userService.ImportUsersFromExternalSourceAsync(cancellationToken: cancellationToken);
             }
             catch (Exception ex)
             {
@@ -376,7 +380,7 @@ namespace Iis.Api.Controllers
         }
 
         [HttpGet("GetCsv/{typeName}")]
-        public Task<IActionResult> GetCsv(string typeName, CancellationToken ct)
+        public Task<IActionResult> GetCsv(string typeName, CancellationToken cancellationToken)
         {
             var result = _csvService.GetDorCsvByTypeName(typeName);
             var bytes = Encoding.Unicode.GetBytes(result);
@@ -402,13 +406,18 @@ namespace Iis.Api.Controllers
             }
         }
 
-        private async Task<IActionResult> CreateOntologyIndexes(string indexNames, IReadOnlyCollection<string> baseIndexList, bool isHistorical, CancellationToken ct)
+        private async Task<IActionResult> CreateOntologyIndexes(
+            string indexNames,
+            IReadOnlyCollection<string> baseIndexList,
+            CancellationToken cancellationToken)
         {
             var stopwatch = Stopwatch.StartNew();
 
             var indexes = indexNames == AllIndexes ? baseIndexList : indexNames.Split(",");
 
-            var notValidIndexes = indexes.Where(name => !baseIndexList.Contains(name, StringComparer.OrdinalIgnoreCase)).ToArray();
+            var notValidIndexes = indexes
+                .Where(name => !baseIndexList.Contains(name, StringComparer.OrdinalIgnoreCase))
+                .ToArray();
 
             if (notValidIndexes.Any())
             {
@@ -417,11 +426,11 @@ namespace Iis.Api.Controllers
 
             _adminElasticService.Logger = new StringBuilder();
 
-            await _adminElasticService.DeleteIndexesAsync(indexes, isHistorical, ct);
+            await _adminElasticService.DeleteIndexesAsync(indexes, cancellationToken);
 
-            await _adminElasticService.CreateIndexWithMappingsAsync(indexes, isHistorical, ct);
+            await _adminElasticService.CreateIndexWithMappingsAsync(indexes, cancellationToken);
 
-            await _adminElasticService.FillIndexesFromMemoryAsync(indexes, isHistorical, ct);
+            await _adminElasticService.FillIndexesFromMemoryAsync(indexes, cancellationToken);
 
             _adminElasticService.Logger.AppendLine($"spend: {stopwatch.ElapsedMilliseconds} ms");
 

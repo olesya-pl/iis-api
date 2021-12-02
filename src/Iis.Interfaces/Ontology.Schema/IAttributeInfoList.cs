@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 
 namespace Iis.Interfaces.Ontology.Schema
 {
@@ -9,5 +7,6 @@ namespace Iis.Interfaces.Ontology.Schema
         string EntityTypeName { get; }
         IReadOnlyList<IAttributeInfoItem> Items { get; }
         bool TryAddItem(IAttributeInfoItem item);
+        void AddItems(IEnumerable<IAttributeInfoItem> items);
     }
 }

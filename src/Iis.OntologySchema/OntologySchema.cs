@@ -6,13 +6,12 @@ using Iis.OntologySchema.DataTypes;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.Design;
 using System.Linq;
 using System.Text.RegularExpressions;
 
 namespace Iis.OntologySchema
 {
-    public class OntologySchema: IOntologySchema
+    public class OntologySchema : IOntologySchema
     {
         private readonly string FuzzyDateEntityTypeName = EntityTypeNames.FuzzyDate.ToString();
         IMapper _mapper;
@@ -73,7 +72,8 @@ namespace Iis.OntologySchema
 
         public INodeTypeLinked GetNodeTypeById(Guid id)
         {
-            if (_storage.NodeTypes.TryGetValue(id, out var nodeType)) {
+            if (_storage.NodeTypes.TryGetValue(id, out var nodeType))
+            {
                 return nodeType;
             };
 
@@ -114,14 +114,14 @@ namespace Iis.OntologySchema
 
         public Dictionary<string, INodeTypeLinked> GetFullHierarchyNodes()
         {
-            return _storage.DotNameTypes.ToDictionary(x => x.Key, x => (INodeTypeLinked) x.Value);
+            return _storage.DotNameTypes.ToDictionary(x => x.Key, x => (INodeTypeLinked)x.Value);
         }
 
         public INodeTypeLinked GetEntityTypeByName(string entityTypeName)
         {
             return _storage.NodeTypes.Values
-                .Where(nt => !nt.IsArchived 
-                    && nt.Kind == Kind.Entity 
+                .Where(nt => !nt.IsArchived
+                    && nt.Kind == Kind.Entity
                     && string.Equals(nt.Name, entityTypeName, StringComparison.OrdinalIgnoreCase))
                 .SingleOrDefault();
         }
@@ -171,7 +171,7 @@ namespace Iis.OntologySchema
             result.ItemsToAdd = thisCodes.Keys.Where(key => !otherCodes.ContainsKey(key)).Select(key => thisCodes[key]).ToList();
             result.ItemsToDelete = otherCodes.Keys.Where(key => !thisCodes.ContainsKey(key)).Select(key => otherCodes[key]).ToList();
             var commonKeys = thisCodes.Keys.Where(key => otherCodes.ContainsKey(key)).ToList();
-            
+
             result.ItemsToUpdate = commonKeys
                 .Where(key => !thisCodes[key].IsIdentical(otherCodes[key]))
                 .Select(key => new SchemaCompareDiffItem { NodeTypeFrom = thisCodes[key], NodeTypeTo = otherCodes[key] })
@@ -187,7 +187,7 @@ namespace Iis.OntologySchema
 
             return result;
         }
-        
+
         private INodeTypeLinked UpdateNodeType(SchemaNodeType nodeType, INodeTypeUpdateParameter updateParameter)
         {
             if (!string.IsNullOrEmpty(updateParameter.Title))
@@ -266,10 +266,10 @@ namespace Iis.OntologySchema
                 Kind = Kind.Attribute,
             };
             _storage.AddNodeType(attributeNodeType);
-            var attribute = new SchemaAttributeType 
-            { 
-                Id = attributeNodeType.Id, 
-                ScalarType = (ScalarType)updateParameter.ScalarType 
+            var attribute = new SchemaAttributeType
+            {
+                Id = attributeNodeType.Id,
+                ScalarType = (ScalarType)updateParameter.ScalarType
             };
             _storage.AddAttributeType(attribute);
             var relationNodeType = new SchemaNodeType()
@@ -503,14 +503,6 @@ namespace Iis.OntologySchema
             return new AttributeInfo(entityName, BuildAttributesBasedOnEntityFileds(entityName));
         }
 
-        public IAttributeInfoList GetHistoricalAttributesInfo(string entityName, string historicalEntityName)
-        {
-            var items = BuildAttributesBasedOnEntityFileds(entityName);
-            items.Add(new AttributeInfoItem("actualDatePeriod", ScalarType.DateRange, null, false));
-
-            return new AttributeInfo(historicalEntityName, items);
-        }
-
         public void RemoveRelation(Guid relationId)
         {
             var relationType = _storage.RelationTypes[relationId];
@@ -535,17 +527,17 @@ namespace Iis.OntologySchema
 
             RemoveRelation(relationType.Id);
         }
-        
+
         public IEnumerable<INodeTypeLinked> GetAllNodeTypes()
         {
             return _storage.NodeTypes.Values;
         }
-        
+
         public void PutInOrder()
         {
             _storage.SetDotNameTypes();
         }
-        
+
         public string ValidateRemoveEntity(Guid id)
         {
             var nodeType = GetNodeTypeById(id);
@@ -561,7 +553,7 @@ namespace Iis.OntologySchema
             }
             return null;
         }
-        
+
         public void RemoveEntity(Guid id)
         {
             _storage.RemoveEntity(id);
@@ -580,7 +572,7 @@ namespace Iis.OntologySchema
                 if (nodeType.Kind != Kind.Attribute && !isFuzzyDateEntity) continue;
 
                 if (IsFuzzyDateEntityAttribute(nodeType)) continue;
-                
+
                 var aliases = GetAlias(key)?.Split(',') ?? null;
                 var shortDotName = key.Substring(key.IndexOf('.') + 1);
                 var scalarType = isFuzzyDateEntity ? ScalarType.Date : nodeType.AttributeType.ScalarType;

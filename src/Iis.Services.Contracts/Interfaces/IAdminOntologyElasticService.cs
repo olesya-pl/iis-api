@@ -10,13 +10,13 @@ namespace Iis.Services.Contracts.Interfaces
     {
         StringBuilder Logger { get; set; }
 
-        Task CreateIndexWithMappingsAsync(IEnumerable<string> indexes, bool isHistorical, CancellationToken ct = default);
-        Task DeleteIndexesAsync(IEnumerable<string> indexes, bool isHistorical, CancellationToken ct = default);
-        Task FillIndexesFromMemoryAsync(IEnumerable<string> indexes, bool isHistorical, CancellationToken ct = default);
-        Task FillIndexesFromMemoryAsync(IEnumerable<string> indexes, IEnumerable<string> fieldsToExclude, CancellationToken ct = default);
-        Task DeleteIndexesAsync(IEnumerable<string> indexes, CancellationToken ct = default);
-        Task CreateReportIndexWithMappingsAsync(CancellationToken ct = default);
-        Task FillReportIndexAsync(CancellationToken ct = default);
-        Task AddAliasesToIndexAsync(AliasType type, CancellationToken ct = default);
+        Task CreateIndexWithMappingsAsync(IReadOnlyCollection<string> indexes, CancellationToken cancellationToken = default);
+        Task FillIndexesFromMemoryAsync(IEnumerable<string> indexes, CancellationToken cancellationToken = default);
+        Task FillIndexesFromMemoryAsync(IEnumerable<string> indexes, IEnumerable<string> fieldsToExclude, CancellationToken cancellationToken = default);
+        Task DeleteIndexesAsync(IEnumerable<string> indexes, CancellationToken cancellationToken = default);
+        Task DeleteHistoricalIndexesAsync(IEnumerable<string> indexes, CancellationToken cancellationToken = default);
+        Task CreateReportIndexWithMappingsAsync(CancellationToken cancellationToken = default);
+        Task FillReportIndexAsync(CancellationToken cancellationToken = default);
+        Task AddAliasesToIndexAsync(AliasType type, CancellationToken cancellationToken = default);
     }
 }

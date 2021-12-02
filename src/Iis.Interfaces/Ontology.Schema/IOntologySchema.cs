@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace Iis.Interfaces.Ontology.Schema
 {
-    public interface IOntologySchema: ISchemaEntityTypeFinder, IFieldToAliasMapper
+    public interface IOntologySchema : ISchemaEntityTypeFinder, IFieldToAliasMapper
     {
         IOntologySchemaSource SchemaSource { get; }
         void Initialize(IOntologyRawData ontologyRawData);
@@ -52,7 +52,6 @@ namespace Iis.Interfaces.Ontology.Schema
         void SetInheritance(Guid sourceTypeId, Guid targetTypeId);
         void RemoveInheritance(Guid sourceTypeId, Guid targetTypeId);
         IAttributeInfoList GetAttributesInfo(string entityName);
-        IAttributeInfoList GetHistoricalAttributesInfo(string entityName, string historicalEntityName);
         IAliases Aliases { get; }
         void RemoveRelation(Guid relationId);
         void RemoveRelation(string entityTypeName, string relationTypeName);

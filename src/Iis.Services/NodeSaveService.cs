@@ -7,9 +7,7 @@ using Iis.Interfaces.Elastic;
 using Iis.Interfaces.Ontology.Data;
 using Iis.Interfaces.Ontology.Schema;
 using Iis.Services.Helpers;
-using Iis.Services.Contracts.Dtos;
 using Iis.Services.Contracts.Interfaces;
-using Iis.Services.Contracts.Params;
 using Iis.DbLayer.Repositories;
 using Iis.Utility;
 using MoreLinq;
@@ -21,17 +19,14 @@ namespace Iis.Services
     {
         private readonly IElasticManager _elasticManager;
         private readonly NodeFlattener<IIISUnitOfWork> _nodeFlattener;
-        private readonly IChangeHistoryService _changeHistoryService;
         private const int BulkSize = 50000;
-        private static List<string> PropertiesToIgnore = new List<string>() { "photo", "lastConfirmedAt", "attachment" };
 
         public NodeSaveService(IElasticManager elasticManager,
             NodeFlattener<IIISUnitOfWork> nodeFlattener,
-            IOntologySchema ontologySchema, IChangeHistoryService changeHistoryService)
+            IOntologySchema ontologySchema)
         {
             _elasticManager = elasticManager;
             _nodeFlattener = nodeFlattener;
-            _changeHistoryService = changeHistoryService;
 
             var objectOfStudyType = ontologySchema.GetEntityTypeByName(EntityTypeNames.ObjectOfStudy.ToString());
             if (objectOfStudyType != null)
@@ -75,7 +70,7 @@ namespace Iis.Services
         {
             var flattenNodes = await _nodeFlattener.FlattenNodesAsync(nodes);
 
-            return await PutNodesToElasticAsync(flattenNodes, false, ct);
+            return await PutNodesToElasticAsync(flattenNodes, ct);
         }
 
         public async Task<List<ElasticBulkResponse>> PutNodesAsync(IReadOnlyCollection<INode> nodes, IEnumerable<string> fieldsToExclude, CancellationToken ct)
@@ -86,49 +81,20 @@ namespace Iis.Services
                 node.SerializedNode = ExcludeFields(node.SerializedNode, fieldsToExclude);
             });
 
-            return await PutNodesToElasticAsync(flattenNodes, false, ct);
+            return await PutNodesToElasticAsync(flattenNodes, ct);
         }
 
-        public async Task<List<ElasticBulkResponse>> PutHistoricalNodesAsync(IReadOnlyCollection<INode> items, CancellationToken ct = default)
-        {
-            var nodes = await _nodeFlattener.FlattenNodesAsync(items);
-            var changes = await _changeHistoryService.GetChangeHistory(items.Select(x => x.Id).Distinct().ToList());
-
-            var historicalNodes = nodes.SelectMany(x => GetHistoricalNodes(x, changes.Where(ch => ch.TargetId.ToString("N") == x.Id)));
-
-            return await PutNodesToElasticAsync(historicalNodes, true, ct);
-        }
-
-        public async Task<List<ElasticBulkResponse>> PutHistoricalNodesAsync(Guid id, Guid? requestId = null, CancellationToken ct = default)
-        {
-            var actualNode = await _nodeFlattener.FlattenNodeAsync(id);
-            var entityIdList = new HashSet<Guid>{ id };
-            var getNodeChanges = requestId.HasValue ?
-                _changeHistoryService.GetChangeHistoryByRequest(requestId.Value) :
-                _changeHistoryService.GetChangeHistoryAsync(new ChangeHistoryParams
-                {
-                    EntityIdentityList = entityIdList
-                });
-
-            var nodeChanges = await getNodeChanges;
-
-            var nodes = GetHistoricalNodes(actualNode, nodeChanges);
-
-            return await PutNodesToElasticAsync(nodes, true, ct);
-        }
-
-        private async Task<List<ElasticBulkResponse>> PutNodesToElasticAsync(IEnumerable<FlattenNodeResult> nodes, bool isHistoricalIndex, CancellationToken ct = default)
+        private async Task<List<ElasticBulkResponse>> PutNodesToElasticAsync(IEnumerable<FlattenNodeResult> nodes, CancellationToken ct = default)
         {
             var responses = new List<ElasticBulkResponse>(nodes.Count());
             foreach (var group in nodes.GroupBy(x => x.NodeTypeName))
             {
-                var index = isHistoricalIndex ? $"historical_{group.Key}" : group.Key;
                 foreach (var nodeBatch in group.Batch(BulkSize))
                 {
                     ct.ThrowIfCancellationRequested();
 
-                    var bulkData = GenerateBulkData(nodeBatch, isHistoricalIndex);
-                    var response = await _elasticManager.PutDocumentsAsync(index, bulkData, ct: ct);
+                    var bulkData = GenerateBulkData(nodeBatch);
+                    var response = await _elasticManager.PutDocumentsAsync(group.Key, bulkData, ct: ct);
 
                     responses.AddRange(response);
                 }
@@ -137,36 +103,9 @@ namespace Iis.Services
             return responses;
         }
 
-        private List<FlattenNodeResult> GetHistoricalNodes(FlattenNodeResult node, IEnumerable<ChangeHistoryDto> changes)
+        private string GenerateBulkData(IEnumerable<FlattenNodeResult> nodes)
         {
-            var changesByRequestId = changes
-                    .Where(x => x.TargetId.ToString("N") == node.Id && !string.IsNullOrWhiteSpace(x.OldValue) && !PropertiesToIgnore.Contains(x.PropertyName))
-                    .GroupBy(x => x.RequestId)
-                    .Where(x => x.Count() > 0)
-                    .OrderByDescending(x => x.First().Date)
-                    .ToList();
-
-            var chistoricalNodes = new List<FlattenNodeResult>(changes.Count());
-            var actualNode = node;
-            foreach (var changePack in changesByRequestId)
-            {
-                var olderNode = new FlattenNodeResult
-                {
-                    Id = actualNode.Id,
-                    NodeTypeName = actualNode.NodeTypeName,
-                    SerializedNode = actualNode.SerializedNode.ReplaceOrAddValues(changePack.Select(x => (x.PropertyName, x.OldValue)).ToArray())
-                };
-                chistoricalNodes.Add(olderNode);
-                actualNode = olderNode;
-            }
-
-            return chistoricalNodes;
-        }
-
-        private string GenerateBulkData(IEnumerable<FlattenNodeResult> nodes, bool isHistoricalIndex)
-        {
-            Func<string, string> getIdFunc = id => isHistoricalIndex ? Guid.NewGuid().ToString("N") : id;
-            return nodes.Aggregate("", (acc, p) => acc += $"{{ \"index\":{{ \"_id\": \"{getIdFunc(p.Id):N}\" }} }}\n{p.SerializedNode.RemoveNewLineCharacters()}\n");
+            return nodes.Aggregate("", (acc, p) => acc += $"{{ \"index\":{{ \"_id\": \"{p.Id:N}\" }} }}\n{p.SerializedNode.RemoveNewLineCharacters()}\n");
         }
 
         private string ExcludeFields(string json, IEnumerable<string> fieldsToExclude)
