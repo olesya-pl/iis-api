@@ -133,7 +133,7 @@ namespace Iis.Services
             await _changeHistoryService.SaveMaterialChanges(new[] { changeHistoryDto }, material.Title);
         }
 
-        public async Task<IReadOnlyList<IdTitleDto>> GetRelatedNodesForLinkTabAsync(Guid materialId)
+        public async Task<IReadOnlyList<SubscriberDto>> GetRelatedNodesForLinkTabAsync(Guid materialId)
         {
             var material = await RunWithoutCommitAsync(uow =>
                 uow.MaterialRepository.GetByIdAsync(
@@ -151,7 +151,7 @@ namespace Iis.Services
                 .Where(n => !n.NodeType.IsEvent);
 
             return nodes.Select(n =>
-                new IdTitleDto { 
+                new SubscriberDto { 
                     Id = n.Id, 
                     Title = n.GetTitleValue() 
                 })

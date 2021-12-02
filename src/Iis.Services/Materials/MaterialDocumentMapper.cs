@@ -16,8 +16,6 @@ namespace IIS.Services.Materials
 {
     public class MaterialDocumentMapper
     {
-        private static readonly string CallerTypeName = MaterialNodeLinkType.Caller.ToString();
-        private static readonly string ReceiverTypeName = MaterialNodeLinkType.Receiver.ToString();
         private readonly IMapper _mapper;
         private readonly IOntologyService _ontologyService;
         private readonly IOntologySchema _ontologySchema;
@@ -42,10 +40,6 @@ namespace IIS.Services.Materials
             material.Children = document.Children
                                             .Select(_ => _mapper.Map<Material>(_))
                                             .ToList();
-
-            material.Caller = GetIdTitleForLinkType(material.RelatedObjectCollection, CallerTypeName);
-
-            material.Receiver = GetIdTitleForLinkType(material.RelatedObjectCollection, ReceiverTypeName);
 
             var nodeCollection = document.NodeIds
                                     .Select(_ => _ontologyService.GetNode(_))
@@ -126,32 +120,18 @@ namespace IIS.Services.Materials
             return new JProperty(id.ToString("N"), value);
         }
 
-        private static IdTitleDto GetIdTitleForLinkType(IReadOnlyCollection<MaterialFeature> materialFeatureCollection, MaterialNodeLinkType linkType)
+        private static SubscriberDto GetIdTitleForLinkType(IReadOnlyCollection<MaterialFeature> materialFeatureCollection, MaterialNodeLinkType linkType)
         {
             var node = materialFeatureCollection
                         .FirstOrDefault(_ => _.NodeLinkType == linkType)
                         ?.Node.OriginalNode;
 
             return node is null ? null :
-                new IdTitleDto
+                new SubscriberDto
                 {
                     Id = node.Id,
                     Title = node.GetTitleValue(),
                     NodeTypeName = node.NodeType.Name
-                };
-        }
-
-        private static IdTitleDto GetIdTitleForLinkType(IReadOnlyCollection<Iis.Domain.Materials.RelatedObjectOfStudy> objectCollection, string linkType)
-        {
-            var element = objectCollection
-                        .FirstOrDefault(_ => _.RelationType == linkType);
-
-            return element is null ? null :
-                new IdTitleDto
-                {
-                    Id = element.Id,
-                    Title = element.Title,
-                    NodeTypeName = element.NodeType
                 };
         }
 

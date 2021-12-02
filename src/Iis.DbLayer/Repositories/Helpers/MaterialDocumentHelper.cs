@@ -14,19 +14,28 @@ namespace Iis.DbLayer.Repositories.Helpers
         private const string ImportanceSortOrderPropertyName = "importance.sortOrder";
         private const string NoValueFound = "значення відсутне";
         private const int DefaultSortOrder = 99;
-        private static readonly Func<INode, string> getTitleFunc = (node) => node.GetComputedValue(TitlePropertyName) ?? NoValueFound;
-        private static readonly Func<INode, string> getValueFunc = (node) => node.GetSingleProperty(ValuePropertyName)?.Value ?? NoValueFound;
+        private static readonly Func<INode, string> GetTitleFunc = node => node.GetComputedValue(TitlePropertyName) ?? NoValueFound;
+        private static readonly Func<INode, string> GetValueFunc = node => node.GetSingleProperty(ValuePropertyName)?.Value ?? NoValueFound;
+        private static readonly MaterialNodeLinkType[] CallerOrReveiver = { MaterialNodeLinkType.Caller, MaterialNodeLinkType.Receiver };
         public static IDictionary<Guid, NodeDataObject> MapFeatureCollectionToNodeDictionary(
             IReadOnlyCollection<MaterialFeatureEntity> collection,
             IOntologyNodesData ontologyData)
         {
             var result = new Dictionary<Guid, NodeDataObject>(collection.Count);
 
-            foreach (var feature in collection)
+            var groupedCollection = collection.GroupBy(_ => _.NodeId);
+
+            foreach (var group in groupedCollection)
             {
-                var node = ontologyData.GetNode(feature.NodeId);
+                var key = group.Key;
+
+                var node = ontologyData.GetNode(key);
 
                 if (node is null) continue;
+
+                var feature = group.Count() == 1
+                            ? GetAnyFeature(group)
+                            : GetCallerOrReceiverFeature(group);
 
                 var element = new NodeDataObject
                 {
@@ -89,14 +98,13 @@ namespace Iis.DbLayer.Repositories.Helpers
 
                 var @object = new RelatedObjectOfStudy(
                     element.Key,
-                    getTitleFunc(element.Value.Node),
+                    GetTitleFunc(element.Value.Node),
                     element.Value.Node.NodeType.Name,
                     element.Value.NodeLinkType.ToString(),
                     element.Value.RelationCreatingType,
                     element.Value.Node.GetSingleProperty(ImportanceNamePropertyName)?.Value ?? NoValueFound,
                     sortOrder,
-                    element.Value.RelatedSignId
-                );
+                    element.Value.RelatedSignId);
 
                 result.Add(@object);
             }
@@ -105,14 +113,16 @@ namespace Iis.DbLayer.Repositories.Helpers
 
         public static IReadOnlyCollection<RelatedObject> MapSingCollection(IDictionary<Guid, NodeDataObject> collection)
         {
-            return MapNodeCollection(collection, (node) => node.NodeType.IsObjectSign, getValueFunc);
+            return MapNodeCollection(collection, (node) => node.NodeType.IsObjectSign, GetValueFunc);
         }
 
         public static IReadOnlyCollection<RelatedObject> MapEventCollection(IDictionary<Guid, NodeDataObject> collection)
         {
-            return MapNodeCollection(collection, (node) => node.NodeType.IsEvent, getTitleFunc);
+            return MapNodeCollection(collection, (node) => node.NodeType.IsEvent, GetTitleFunc);
         }
 
+        private static  MaterialFeatureEntity GetAnyFeature(IEnumerable<MaterialFeatureEntity> collection) => collection.FirstOrDefault();
+        private static MaterialFeatureEntity GetCallerOrReceiverFeature(IEnumerable<MaterialFeatureEntity> collection) => collection.FirstOrDefault(_ => CallerOrReveiver.Contains(_.NodeLinkType));
         private static IReadOnlyCollection<RelatedObject> MapNodeCollection(IDictionary<Guid, NodeDataObject> collection, Func<INode, bool> nodePredicate, Func<INode, string> getTitleProperyFunc)
         {
             var result = new List<RelatedObject>(collection.Count);
@@ -143,13 +153,13 @@ namespace Iis.DbLayer.Repositories.Helpers
                 .Select(_ => _.First())
                 .ToArray();
         }
+    }
 
-        public class NodeDataObject
-        {
-            public INode Node { get; set; }
-            public MaterialNodeLinkType NodeLinkType { get; set; }
-            public Guid? RelatedSignId { get; set; }
-            public string RelationCreatingType { get; set; }
-        }
+    public class NodeDataObject
+    {
+        public INode Node { get; set; }
+        public MaterialNodeLinkType NodeLinkType { get; set; }
+        public Guid? RelatedSignId { get; set; }
+        public string RelationCreatingType { get; set; }
     }
 }

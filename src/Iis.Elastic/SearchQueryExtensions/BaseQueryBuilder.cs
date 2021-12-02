@@ -5,6 +5,9 @@ namespace Iis.Elastic.SearchQueryExtensions
 {
     public abstract class BaseQueryBuilder<T> where T : BaseQueryBuilder<T>
     {
+        protected const string QueryPropertyName = "query";
+        protected const string FromPropertyName = "from";
+        protected const string SizePropertyName = "size";
         protected IReadOnlyCollection<string> _resultFields = new[] { "*" };
         protected int _from;
         protected int _size;
