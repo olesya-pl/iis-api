@@ -38,7 +38,7 @@ using Iis.Utility;
 using Iis.Utility.Automapper;
 using Iis.DbLayer.Repositories;
 using Iis.Interfaces.Ontology;
-using Iis.Services.Contracts.Dtos.RadioElectronicSituation;
+using Iis.Api.GraphQL.RadioElectronicSituation;
 
 namespace Iis.Api
 {
