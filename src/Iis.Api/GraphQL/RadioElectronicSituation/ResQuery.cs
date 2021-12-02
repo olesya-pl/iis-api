@@ -9,22 +9,27 @@ using System;
 using System.Linq;
 using Iis.Interfaces.Ontology.Data;
 using IIS.Services.Contracts.Interfaces;
+using Iis.Domain.Materials;
+using Iis.Utility;
+using Newtonsoft.Json.Linq;
 
 namespace Iis.Api.GraphQL.RadioElectronicSituation
 {
-    public class SituationQuery
+    public class ResQuery
     {
         private const string ValuePropertyName = "value";
         private const string SidcPropertyName = "affiliation.sidc";
         private const string BePartOfName = "bePartOf";
         private const string AmountName = "amount.code";
         private const string NoValueFound = "значення відсутне";
+        private IMapper _mapper;
         public async Task<ResResult> GetRadioElectronicSituation(
             [Service] IRadioElectronicSituationService service,
             [Service] IMaterialProvider materialProvider,
             [Service] IMapper mapper
         )
         {
+            _mapper = mapper;
             var locationItems = await service.GetSituationNodesAsync();
             var nodeIds = locationItems
                 .Where(_ => _.ObjectNode != null)
@@ -66,7 +71,8 @@ namespace Iis.Api.GraphQL.RadioElectronicSituation
                     {
                         Value = firstItem.Sign.GetSingleDirectProperty(ValuePropertyName)?.Value ?? NoValueFound 
                     },
-                    Objects = GetNodesExtraObjects(items)
+                    Objects = GetNodesExtraObjects(items),
+                    Materials = GetNodesExtraMaterials(items)
                 }
             };
             return result;
@@ -114,6 +120,27 @@ namespace Iis.Api.GraphQL.RadioElectronicSituation
                     Count = callerReceiverDto.Count
                 }
             };
+        }
+        private IReadOnlyList<ResMaterial> GetNodesExtraMaterials(IEnumerable<ResSourceItemDto> sourceItems)
+        {
+            return sourceItems
+                .Where(_ => _.Material != null)
+                .Select(_ => GetNodesExtraMaterial(_.Material)).ToList();
+        }
+        private ResMaterial GetNodesExtraMaterial(Material sourceItem)
+        {
+            var result = _mapper.Map<ResMaterial>(sourceItem);
+            result.File = new ResMaterialFile
+            {
+                Id = sourceItem.Id,
+                Url = FileUrlGetter.GetFileUrl(sourceItem.Id)
+            };
+            result.Metadata = new ResMaterialMetadata
+            {
+                Type = sourceItem.Metadata.GetValue("type", StringComparison.InvariantCultureIgnoreCase)?.Value<string>(),
+                Source = sourceItem.Metadata.GetValue("source", StringComparison.InvariantCultureIgnoreCase)?.Value<string>(),
+            };
+            return result;
         }
     }
 }

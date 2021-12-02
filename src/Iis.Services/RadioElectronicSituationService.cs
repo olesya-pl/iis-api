@@ -15,6 +15,8 @@ using Iis.DataModel.Materials;
 using Iis.DataModel.FlightRadar;
 using Iis.Services.Contracts.Dtos.RadioElectronicSituation;
 using AutoMapper;
+using Iis.DbLayer.MaterialEnum;
+using IIS.Services.Materials;
 
 namespace Iis.Services
 {
@@ -26,16 +28,19 @@ namespace Iis.Services
         private readonly IOntologyNodesData _data;
         private readonly IOntologySchema _schema;
         private readonly IMapper _mapper;
+        private readonly MaterialDocumentMapper _materialDocumentMapper;
         public RadioElectronicSituationService(
             IUnitOfWorkFactory<TUnitOfWork> unitOfWorkFactory,
             IOntologyNodesData data,
             IOntologySchema schema,
-            IMapper mapper)
+            IMapper mapper,
+            MaterialDocumentMapper materialDocumentMapper)
         : base(unitOfWorkFactory)
         {
             _data = data;
             _schema = schema;
             _mapper = mapper;
+            _materialDocumentMapper = materialDocumentMapper;
         }
 
         public async Task<IReadOnlyCollection<ResSourceItemDto>> GetSituationNodesAsync()
@@ -54,7 +59,7 @@ namespace Iis.Services
                                         .Select(_ => _.MaterialId.Value)
                                         .ToHashSet();
 
-            var materialCollection = await RunWithoutCommitAsync(_ => _.MaterialRepository.GetByIdsAsync(materialIdCollection));
+            var materialCollection = await RunWithoutCommitAsync(_ => _.MaterialRepository.GetByIdsAsync(materialIdCollection, MaterialIncludeEnum.WithFeatures));
 
             var materialDictionary = materialCollection
                                         .ToDictionary(_ => _.Id);
@@ -74,7 +79,7 @@ namespace Iis.Services
                         _mapper.Map<LocationHistoryDto>(locationHistory),
                         signNode,
                         p.SourceNode,
-                        _mapper.Map<ResMaterialDto>(material)))
+                        _materialDocumentMapper.Map(material)))
                     .ToArray();
 
                 mappingData.AddRange(data);
