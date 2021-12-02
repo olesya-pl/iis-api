@@ -44,7 +44,6 @@ namespace Iis.Services
         private const int MaterialsBatchSize = 5000;
         private const int MaterialChangesBatchSize = 5000;
         private const string ExclamationMark = "!";
-        private const string Iso8601DateFormat = "yyyy-MM-dd'T'HH:mm:ssZ";
         private static readonly string[] IgnoreDocumentPropertyNames = new[] { "Content" };
         private static readonly MaterialIncludeEnum[] IncludeAll = new[]
         {
@@ -541,7 +540,7 @@ namespace Iis.Services
 
             materialDocument.ImageVectors = GetImageVectorList(materialIdList, responseDictionary);
 
-            materialDocument.ProcessedAt = changeHistoryEntity?.Date.ToString(Iso8601DateFormat, CultureInfo.InvariantCulture);
+            materialDocument.ProcessedAt = changeHistoryEntity?.Date.ToString(DateTimeExtensions.Iso8601DateFormat, CultureInfo.InvariantCulture);
 
             return await _elasticManager.PutDocumentAsync(_elasticState.MaterialIndexes.FirstOrDefault(),
                 material.Id.ToString("N"),
@@ -606,7 +605,7 @@ namespace Iis.Services
         private string GetProcessedAtFromChangeHistoryDictionary(Guid materialId, Dictionary<Guid, ChangeHistoryEntity> changeHistoryDictionary)
         {
             return changeHistoryDictionary.TryGetValue(materialId, out var changeHistory)
-                ? changeHistory.Date.ToString(Iso8601DateFormat, CultureInfo.InvariantCulture)
+                ? changeHistory.Date.ToString(DateTimeExtensions.Iso8601DateFormat, CultureInfo.InvariantCulture)
                 : null;
         }
 

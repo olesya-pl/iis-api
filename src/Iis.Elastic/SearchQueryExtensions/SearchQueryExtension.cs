@@ -356,8 +356,8 @@ namespace Iis.Elastic.SearchQueryExtensions
         private static string PopulateDateRangeCondition(string field, DateRange dateRange, string result)
         {
             if (dateRange == null || dateRange.IsEmpty) return result;
-            var fromStr = (dateRange.From ?? DateTime.MinValue).ToString("yyyy-MM-dd");
-            var toStr = (dateRange.To ?? DateTime.MaxValue).ToString("yyyy-MM-dd");
+            var fromStr = (dateRange.From ?? DateTime.MinValue).ToString(DateTimeExtensions.Iso8601DateFormat);
+            var toStr = (dateRange.To ?? DateTime.MaxValue).ToString(DateTimeExtensions.Iso8601DateFormat);
             return $"({result}) AND {field}:[{fromStr} TO {toStr}]";
         }
 
