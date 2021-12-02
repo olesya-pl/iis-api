@@ -121,8 +121,8 @@ namespace Iis.DbLayer.Repositories.Helpers
             return MapNodeCollection(collection, (node) => node.NodeType.IsEvent, GetTitleFunc);
         }
 
-        private static  MaterialFeatureEntity GetAnyFeature(IEnumerable<MaterialFeatureEntity> collection) => collection.FirstOrDefault();
-        private static MaterialFeatureEntity GetCallerOrReceiverFeature(IEnumerable<MaterialFeatureEntity> collection) => collection.FirstOrDefault(_ => CallerOrReveiver.Contains(_.NodeLinkType));
+        private static MaterialFeatureEntity GetAnyFeature(IEnumerable<MaterialFeatureEntity> collection) => collection.FirstOrDefault();
+        private static MaterialFeatureEntity GetCallerOrReceiverFeature(IEnumerable<MaterialFeatureEntity> collection) => collection.FirstOrDefault(_ => CallerOrReveiver.Contains(_.NodeLinkType)) ?? collection.FirstOrDefault();
         private static IReadOnlyCollection<RelatedObject> MapNodeCollection(IDictionary<Guid, NodeDataObject> collection, Func<INode, bool> nodePredicate, Func<INode, string> getTitleProperyFunc)
         {
             var result = new List<RelatedObject>(collection.Count);
