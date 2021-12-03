@@ -50,7 +50,7 @@ namespace IIS.Core.GraphQL.Materials
             }
 
             var relationsState = ParseRelationsState(filter.RelationsState);
-            MaterialsDto materialsResult = searchByRelation != null && searchByRelation.HasConditions ?
+            MaterialsDto materialsResult = searchByRelation != null && searchByRelation.HasConditions && cherryPickedItems.Count == 0?
                 await materialProvider.GetMaterialsCommonForEntitiesAsync(
                     tokenPayload.UserId,
                     searchByRelation.NodeIdentityList,
