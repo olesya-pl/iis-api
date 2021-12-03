@@ -170,7 +170,7 @@ namespace Iis.Elastic.SearchQueryExtensions
             var queryString = noSuggestion ? "(ParentId:NULL)" : $"(({searchParams.Suggestion}) AND ParentId:NULL)";
 
             queryString = PopulateFilteredItems(searchParams.FilteredItems, queryString);
-            PopulateCherryPickedIds(searchParams.CherryPickedItems, queryString);
+            queryString = PopulateCherryPickedIds(searchParams.CherryPickedItems, queryString);
             queryString = PopulateDateRangeCondition("CreatedDate", searchParams.CreatedDateRange, queryString);
             return queryString;
         }
@@ -374,10 +374,10 @@ namespace Iis.Elastic.SearchQueryExtensions
             {
                 var item = cherryPickedItems.ElementAt(i).Item;
                 pickedQuery.Append($"\"{ConvertToHypensFormat(item)}\"");
-                if (i + 1 < cherryPickedItems.Count) pickedQuery.Append(" OR ");
+                if (i + 1 < cherryPickedItems.Count) pickedQuery.Append(" AND ");
             }
 
-            return string.IsNullOrEmpty(result) ? $"({pickedQuery})" : $"({result} OR ({pickedQuery}))";
+            return string.IsNullOrEmpty(result) ? $"({pickedQuery})" : $"({result} AND ({pickedQuery}))";
         }
 
         private static string GetFieldQuery(string field, string value)
