@@ -1,15 +1,16 @@
 ﻿using Newtonsoft.Json.Linq;
+using Iis.Elastic.Dictionaries;
 
 namespace Iis.Elastic.SearchQueryExtensions
 {
-    public class ExactQueryBuilder : BaseQueryBuilder<ExactQueryBuilder>
+    public class ExactQueryBuilder : PaginatedQueryBuilder<ExactQueryBuilder>
     {
-        private string Query = string.Empty;
+        private string _query = string.Empty;
         private bool? IsLenient;
 
         public ExactQueryBuilder WithQueryString(string query)
         {
-            Query = query;
+            _query = query;
             return this;
         }
 
@@ -21,12 +22,12 @@ namespace Iis.Elastic.SearchQueryExtensions
 
         protected override JObject CreateQuery(JObject jsonQuery)
         {
-            var queryStringProperty = new JObject(new JProperty("query", Query));
-            if (IsLenient.HasValue) queryStringProperty.Add("lenient", IsLenient.Value);
+            var queryStringProperty = new JObject(new JProperty(SearchQueryPropertyName.Query, _query));
+            if (IsLenient.HasValue) queryStringProperty.Add(SearchQueryPropertyName.Lenient, IsLenient.Value);
             var queryString = new JObject(
-                new JProperty("query_string", queryStringProperty)
+                new JProperty(SearchQueryPropertyName.QueryString, queryStringProperty)
             );
-            jsonQuery["query"] = queryString;
+            jsonQuery[SearchQueryPropertyName.Query] = queryString;
             return jsonQuery;
         }
     }

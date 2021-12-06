@@ -4,7 +4,7 @@ using Newtonsoft.Json.Linq;
 
 namespace Iis.Elastic.SearchQueryExtensions
 {
-    public class SearchByImageQueryBuilder : BaseQueryBuilder<SearchByImageQueryBuilder>
+    public class SearchByImageQueryBuilder : PaginatedQueryBuilder<SearchByImageQueryBuilder>
     {
         private decimal[][] _imageVectorList;
 
@@ -58,10 +58,6 @@ namespace Iis.Elastic.SearchQueryExtensions
 
             jsonQuery["min_score"] = 1.0;
             jsonQuery["query"] = query;
-
-            //можно будет попробовать эти формулы модифицировать
-            //source = "double total = 0.0; for(vector in params.vectorList) { total += (1.0+cosineSimilarity(vector, doc['ImageVectors.Vector'])); } return total/params.vectorListLength;",
-            //source = "double total = 0.0; for(vector in params.vectorList) { total += 1/(l2norm(vector, doc['ImageVectors.Vector']) + 1); } return total/params.vectorListLength;",
 
             return jsonQuery;
         }

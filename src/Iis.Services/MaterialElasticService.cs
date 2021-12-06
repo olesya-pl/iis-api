@@ -1,39 +1,40 @@
 using System;
+using System.Linq;
 using System.Threading;
+using System.Diagnostics;
 using System.Globalization;
 using System.Threading.Tasks;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using Microsoft.Extensions.Logging;
+using AutoMapper;
+using Iis.Interfaces.Common;
+using Iis.Interfaces.Enums;
 using Iis.Interfaces.Elastic;
+using Iis.Interfaces.Materials;
+using Iis.Interfaces.Ontology.Data;
+using Iis.Interfaces.Ontology.Schema;
 using Iis.Services.Contracts.Enums;
+using Iis.Services.Contracts.Elastic;
 using Iis.Services.Contracts.Interfaces;
 using Iis.Services.Contracts.Interfaces.Elastic;
 using Iis.Elastic;
 using Iis.Elastic.SearchQueryExtensions;
-using System.Linq;
-using Iis.DbLayer.Repositories;
-using Iis.DataModel.Materials;
-using Iis.DbLayer.MaterialDictionaries;
-using Newtonsoft.Json.Linq;
-using Iis.DbLayer.Repositories.Helpers;
-using Iis.Utility;
-using AutoMapper;
-using Iis.Interfaces.Ontology.Data;
-using Iis.DataModel.ChangeHistory;
-using Iis.Utility.Elasticsearch.Documents;
-using System.Text.RegularExpressions;
+using Iis.Elastic.SearchQueryExtensions.CompositeBuilders.BoolQuery;
 using Iis.DbLayer.MaterialEnum;
+using Iis.DbLayer.Repositories;
+using Iis.DbLayer.Repositories.Helpers;
+using Iis.DbLayer.MaterialDictionaries;
+using Iis.DataModel.Materials;
+using Iis.Utility;
+using Iis.Utility.Elasticsearch.Documents;
+using Iis.DataModel.ChangeHistory;
 using IIS.Repository;
 using IIS.Repository.Factories;
-using System.Diagnostics;
-using Microsoft.Extensions.Logging;
 using Iis.Domain.Materials;
-using Iis.Elastic.SearchQueryExtensions.CompositeBuilders.BoolQuery;
 using Iis.Domain;
-using Iis.Services.Contracts.Elastic;
-using Iis.Interfaces.Materials;
-using Iis.Interfaces.Common;
-using Iis.Interfaces.Enums;
 
 namespace Iis.Services
 {
@@ -65,7 +66,7 @@ namespace Iis.Services
             new AggregationField(MaterialAliases.Assignees.Path, MaterialAliases.Assignees.Alias, MaterialAliases.Assignees.Path),
             new AggregationField(nameof(MaterialDocument.Channel), null, nameof(MaterialDocument.Channel))
         };
-        private static readonly List<ElasticBulkResponse> EmptyElasticBulkResponseList = new List<ElasticBulkResponse>();
+        private static readonly List<ElasticBulkResponse> EmptyElasticBulkResponseList = new List<ElasticBulkResponse>(0);
         private static readonly IReadOnlyCollection<MaterialDocument> EmptyMaterialDocumentCollection = Array.Empty<MaterialDocument>();
         private readonly IElasticManager _elasticManager;
         private readonly IElasticState _elasticState;
@@ -206,6 +207,29 @@ namespace Iis.Services
             if (!idCollection.Any()) return EmptyMaterialDocumentCollection;
 
             var query = new GetByIdCollectionQueryBuilder(idCollection)
+                            .BuildSearchQuery()
+                            .ToString(Formatting.None);
+
+            var elasticResult = await _elasticManager
+                .WithUserId(userId)
+                .SearchAsync(query, _elasticState.MaterialIndexes, cancellationToken);
+
+            if (!elasticResult.Items.Any()) return EmptyMaterialDocumentCollection;
+
+            return elasticResult.Items
+                    .Select(_ => MaterialDocument.FromJObject(_.SearchResult))
+                    .ToArray();
+        }
+
+        public async Task<IReadOnlyCollection<MaterialDocument>> GetMaterialCollectionRelatedToNodeAsync(Guid nodeId, Guid userId, CancellationToken cancellationToken)
+        {
+            var node = _ontologyData.GetNode(nodeId);
+
+            if (node is null) return EmptyMaterialDocumentCollection;
+
+            var queryString = GetQueryStringForNode(node.NodeType, node.Id);
+
+            var query = new SimpleQueryStringQueryBuilder(queryString)
                             .BuildSearchQuery()
                             .ToString(Formatting.None);
 
@@ -573,16 +597,13 @@ namespace Iis.Services
             return result.ToArray();
         }
 
-        private async Task<(JObject mlResponses, int mlResponsesCount, ImageVector[] imageVector)> GetMLResponseData(Guid materialId)
+        private static string GetQueryStringForNode(INodeTypeLinked nodeType, Guid nodeId) => nodeType switch
         {
-            var mlResponses = await _mLResponseRepository.GetAllForMaterialAsync(materialId);
-
-            var imageVectorList = GetLatestImageVectorList(mlResponses, MlHandlerCodeList.ImageVector)
-                                    .Select(e => new ImageVector(e))
-                                    .ToArray();
-
-            return (ConvertMLResponsesToJson(mlResponses), mlResponses.Count, imageVectorList);
-        }
+            { IsEvent: true } => $"RelatedEventCollection.Id.keyword:{nodeId}",
+            { IsObjectOfStudy: true } => $"RelatedObjectCollection.Id.keyword:{nodeId}",
+            { IsObjectSign: true } => $"RelatedSignCollection.Id.keyword:{nodeId}",
+            _ => throw new InvalidOperationException("Not supported NodeType.")
+        };
 
         private static IReadOnlyCollection<decimal[]> GetLatestImageVectorList(IReadOnlyCollection<MLResponseEntity> mlResponsesByEntity, string handlerCode)
         {
@@ -601,13 +622,6 @@ namespace Iis.Services
             }
 
             return (new JObject(), 0);
-        }
-
-        private string GetProcessedAtFromChangeHistoryDictionary(Guid materialId, Dictionary<Guid, ChangeHistoryEntity> changeHistoryDictionary)
-        {
-            return changeHistoryDictionary.TryGetValue(materialId, out var changeHistory)
-                ? changeHistory.Date.ToString(Iso8601DateFormat, CultureInfo.InvariantCulture)
-                : null;
         }
 
         private static JObject ConvertMLResponsesToJson(IReadOnlyCollection<MLResponseEntity> mlResponses)
@@ -656,6 +670,26 @@ namespace Iis.Services
                 ? mlHandler.Key.ToLowerCamelCase().RemoveWhiteSpace()
                 : code;
             return propertyName;
+        }
+
+        private static string GetRelationTypeFieldName() => $"{nameof(MaterialDocument.RelatedObjectCollection)}.{nameof(DbLayer.Repositories.RelatedObject.RelationCreatingType)}";
+
+        private async Task<(JObject mlResponses, int mlResponsesCount, ImageVector[] imageVector)> GetMLResponseData(Guid materialId)
+        {
+            var mlResponses = await _mLResponseRepository.GetAllForMaterialAsync(materialId);
+
+            var imageVectorList = GetLatestImageVectorList(mlResponses, MlHandlerCodeList.ImageVector)
+                                    .Select(e => new ImageVector(e))
+                                    .ToArray();
+
+            return (ConvertMLResponsesToJson(mlResponses), mlResponses.Count, imageVectorList);
+        }
+
+        private string GetProcessedAtFromChangeHistoryDictionary(Guid materialId, Dictionary<Guid, ChangeHistoryEntity> changeHistoryDictionary)
+        {
+            return changeHistoryDictionary.TryGetValue(materialId, out var changeHistory)
+                ? changeHistory.Date.ToString(Iso8601DateFormat, CultureInfo.InvariantCulture)
+                : null;
         }
 
         private SubscriberDto GetIdTitleForLinkType(IReadOnlyCollection<MaterialFeatureEntity> materialFeatureCollection, MaterialNodeLinkType linkType)
@@ -788,7 +822,5 @@ namespace Iis.Services
             RelationsState.HasDirect => builder.WithCondition<MatchQueryConditionBuilder>(_ => _.Must().Match(GetRelationTypeFieldName(), EntityMaterialRelation.Direct)),
             _ => builder
         };
-
-        private string GetRelationTypeFieldName() => $"{nameof(MaterialDocument.RelatedObjectCollection)}.{nameof(DbLayer.Repositories.RelatedObject.RelationCreatingType)}";
     }
 }

@@ -2,7 +2,7 @@ using System;
 using System.Linq;
 using System.Collections.Generic;
 using Newtonsoft.Json.Linq;
-
+using Iis.Elastic.Dictionaries;
 namespace Iis.Elastic.SearchQueryExtensions
 {
     public class GetByIdCollectionQueryBuilder : BaseQueryBuilder<GetByIdCollectionQueryBuilder>
@@ -21,9 +21,6 @@ namespace Iis.Elastic.SearchQueryExtensions
         }
         protected override JObject CreateQuery(JObject json)
         {
-            json.Property(FromPropertyName, StringComparison.Ordinal).Remove();
-            json.Property(SizePropertyName, StringComparison.Ordinal).Remove();
-
             var idCollection = _idCollection
                                 .Select(_ => _.ToString("N"))
                                 .ToArray();
@@ -34,7 +31,7 @@ namespace Iis.Elastic.SearchQueryExtensions
             var idsObject = new JObject(
                                 new JProperty(IdsProperyName, valuesObject));
 
-            json[QueryPropertyName] = idsObject;
+            json[SearchQueryPropertyName.Query] = idsObject;
 
             return json;
         }

@@ -2,7 +2,7 @@ using Newtonsoft.Json.Linq;
 
 namespace Iis.Elastic.SearchQueryExtensions
 {
-    public class MoreLikeThisQueryBuilder : BaseQueryBuilder<MoreLikeThisQueryBuilder>
+    public class MoreLikeThisQueryBuilder : PaginatedQueryBuilder<MoreLikeThisQueryBuilder>
     {
         private string guid;
         public MoreLikeThisQueryBuilder WithMaterialId(string materialId)

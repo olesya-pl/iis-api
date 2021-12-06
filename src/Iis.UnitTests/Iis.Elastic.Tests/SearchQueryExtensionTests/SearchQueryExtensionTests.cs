@@ -12,26 +12,49 @@ namespace Iis.UnitTests.Iis.Elastic.Tests.SearchQueryExtensionTests
     public class SearchQueryExtensionTests
     {
         [Theory]
-        [InlineData(new[] {"*"}, 1, 5)]
-        [InlineData(new[] {"Id", "Type", "Source"}, 0, 3)]
-        public void WithSearchJson_Success(IEnumerable<string> resultFieldList, int from, int size)
+        [InlineData(new object[] {new[] {"*"}})]
+        [InlineData(new object[] {new[] {"Id", "Type", "Source"}})]
+        public void GetBaseQueryJson_SourceCollectionSuccess(string[] sourceCollection)
         {
-            var expected = JObject.Parse("{\"_source\":[" + string.Join(",", resultFieldList.Select(x => $"\"{x}\"")) +
+            var expected = JObject.Parse("{\"_source\":[" + string.Join(",", sourceCollection.Select(x => $"\"{x}\"")) +
+                                         "], \"query\": {}}");
+
+            var actual = SearchQueryExtension.GetBaseQueryJson(sourceCollection);
+
+            actual.Should().BeEquivalentTo(expected);
+        }
+
+        [Fact]
+        public void GetBaseQueryJson_DefaulCollectionSuccess()
+        {
+            var expected = JObject.Parse("{\"_source\":[\"*\"], \"query\": {}}");
+
+            var actual = SearchQueryExtension.GetBaseQueryJson(null);
+
+            actual.Should().BeEquivalentTo(expected);
+        }
+
+        [Theory]
+        [InlineData(new[] { "*" }, 1, 5)]
+        [InlineData(new[] { "Id", "Type", "Source" }, 0, 3)]
+        public void GetPaginatedBaseQueryJson_Success(IReadOnlyCollection<string> sourceCollection, int from, int size)
+        {
+            var expected = JObject.Parse("{\"_source\":[" + string.Join(",", sourceCollection.Select(x => $"\"{x}\"")) +
                                          "], \"from\":" + from + ",\"size\":" + size + ",\"query\": {}}");
 
-            var actual = SearchQueryExtension.WithSearchJson(resultFieldList, from, size);
+            var actual = SearchQueryExtension.GetPaginatedBaseQueryJson(sourceCollection, from, size);
 
             actual.Should().BeEquivalentTo(expected);
         }
 
         [Theory]
         [InlineData(1, 5)]
-        public void WithSearchJson_DefaultResultFieldList(int from, int size)
+        public void GetPaginatedBaseQueryJson_DefaultResultFieldList(int from, int size)
         {
             var expected =
                 JObject.Parse("{\"_source\":[\"*\"], \"from\":" + from + ",\"size\":" + size + ",\"query\": {}}");
 
-            var actual = SearchQueryExtension.WithSearchJson(null, from, size);
+            var actual = SearchQueryExtension.GetPaginatedBaseQueryJson(null, from, size);
 
             actual.Should().BeEquivalentTo(expected);
         }
@@ -131,7 +154,7 @@ namespace Iis.UnitTests.Iis.Elastic.Tests.SearchQueryExtensionTests
             var actual = new ExactQueryBuilder()
                 .WithQueryString(query)
                 .WithPagination(offset, size)
-                .WithResultFields(new[] {resultField})
+                .WithResultFields(new[] { resultField })
                 .BuildSearchQuery();
 
             actual.Should().BeEquivalentTo(expected);
@@ -142,7 +165,7 @@ namespace Iis.UnitTests.Iis.Elastic.Tests.SearchQueryExtensionTests
         [InlineData("fieldName", "desc", "_first")]
         public void SetupSorting_Success(string sortColumn, string sortOrder, string missing)
         {
-            var expected = JObject.Parse("{\"sort\":[{\"" + sortColumn + "\":{\"order\":\"" + sortOrder + "\", \"missing\":\""+missing+"\"}}]}");
+            var expected = JObject.Parse("{\"sort\":[{\"" + sortColumn + "\":{\"order\":\"" + sortOrder + "\", \"missing\":\"" + missing + "\"}}]}");
 
             var actual = new JObject().SetupSorting(sortColumn, sortOrder);
 

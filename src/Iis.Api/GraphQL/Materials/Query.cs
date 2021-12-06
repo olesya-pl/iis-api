@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using AutoMapper;
 using HotChocolate;
@@ -149,26 +150,34 @@ namespace IIS.Core.GraphQL.Materials
 
         [GraphQLType(typeof(MaterialCollection))]
         public async Task<(IEnumerable<Material> materials, int totalCount)> GetRelatedMaterialsByNodeId(
-           [Service] IMaterialProvider materialProvider,
-           [Service] IMapper mapper,
-           Guid nodeId)
+            IResolverContext ctx,
+            [Service] IMaterialProvider materialProvider,
+            [Service] IMapper mapper,
+            Guid nodeId)
         {
-            var materialsResult = await materialProvider.GetMaterialsByNodeIdAndRelatedEntities(nodeId);
+            var tokenPayload = ctx.GetToken();
 
-            var materials = materialsResult.Materials.Select(m => mapper.Map<Material>(m)).ToList();
-            return (materials, materialsResult.Count);
+            var materialCollectionResult = await materialProvider.GetMaterialsByNodeIdAsync(nodeId, tokenPayload.UserId, ctx.RequestAborted);
+
+            var mappedMaterialCollection = mapper.Map<Material[]>(materialCollectionResult.Items);
+
+            return (mappedMaterialCollection, materialCollectionResult.Count);
         }
 
         [GraphQLType(typeof(MaterialCollection))]
         public async Task<(IEnumerable<Material> materials, int totalCount)> GetRelatedMaterialsByEventId(
-           [Service] IMaterialProvider materialProvider,
-           [Service] IMapper mapper,
-           Guid nodeId)
+            IResolverContext ctx,
+            [Service] IMaterialProvider materialProvider,
+            [Service] IMapper mapper,
+            Guid nodeId)
         {
-            var materialsResult = await materialProvider.GetMaterialsByNodeId(nodeId);
+            var tokenPayload = ctx.GetToken();
 
-            var materials = materialsResult.Materials.Select(m => mapper.Map<Material>(m)).ToList();
-            return (materials, materialsResult.Count);
+            var materialCollectionResult = await materialProvider.GetMaterialsByNodeIdAsync(nodeId, tokenPayload.UserId, ctx.RequestAborted);
+
+            var mappedMaterialCollection = mapper.Map<Material[]>(materialCollectionResult.Items);
+
+            return (mappedMaterialCollection, materialCollectionResult.Count);
         }
 
         public async Task<List<MaterialsCountByType>> CountMaterialsByTypeAndNodeAsync(

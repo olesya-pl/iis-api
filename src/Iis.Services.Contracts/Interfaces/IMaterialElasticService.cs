@@ -32,5 +32,6 @@ namespace Iis.Services.Contracts.Interfaces
         Task PutMaterialsToElasticByNodeIdsAsync(IReadOnlyCollection<Guid> nodeIds, CancellationToken ct = default, bool waitForIndexing = false);
         Task RemoveMaterialAsync(Guid materialId, CancellationToken cancellationToken);
         Task<IReadOnlyCollection<MaterialDocument>> GetMaterialCollectionByIdCollectionAsync(IReadOnlyCollection<Guid> idCollection, Guid userId, CancellationToken cancellationToken);
+        Task<IReadOnlyCollection<MaterialDocument>> GetMaterialCollectionRelatedToNodeAsync(Guid nodeId, Guid userId, CancellationToken cancellationToken);
     }
 }

@@ -6,7 +6,7 @@ using Iis.Elastic.Dictionaries;
 
 namespace Iis.Elastic.SearchQueryExtensions
 {
-    public class BoolQueryBuilder : BaseQueryBuilder<BoolQueryBuilder>
+    public class BoolQueryBuilder : PaginatedQueryBuilder<BoolQueryBuilder>
     {
         private string _occur = QueryBooleanOccurs.Should;
         private string _query = string.Empty;
@@ -44,7 +44,7 @@ namespace Iis.Elastic.SearchQueryExtensions
             var occurQueries = new JArray();
             boolClause[_occur] = occurQueries;
             var documentListQuery = GetDocumentListQuery(_documentList);
-            
+
             if(documentListQuery != null) { 
                 occurQueries.Add(documentListQuery);
             }
