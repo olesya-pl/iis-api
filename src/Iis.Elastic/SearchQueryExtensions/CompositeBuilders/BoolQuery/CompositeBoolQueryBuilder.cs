@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace Iis.Elastic.SearchQueryExtensions.CompositeBuilders.BoolQuery
 {
-    public class CompositeBoolQueryBuilder : BaseQueryBuilder<CompositeBoolQueryBuilder>
+    public class CompositeBoolQueryBuilder : PaginatedQueryBuilder<CompositeBoolQueryBuilder>
     {
         private readonly List<IQueryConditionBuilder> _conditionBuilders = new List<IQueryConditionBuilder>();
 

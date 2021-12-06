@@ -5,6 +5,7 @@ using System.Text;
 using Iis.Interfaces.Common;
 using Iis.Interfaces.Elastic;
 using Iis.Interfaces.Materials;
+using Iis.Elastic.Dictionaries;
 using Iis.Utility;
 using Newtonsoft.Json.Linq;
 
@@ -12,11 +13,12 @@ namespace Iis.Elastic.SearchQueryExtensions
 {
     public static class SearchQueryExtension
     {
+        private const int MaxBucketsCount = 100;
         public const string AggregateSuffix = "Aggregate";
         public const string MissingValueKey = "__hasNoValue";
         public const string NoExistsValue = "-_exists_";
         public const string Wildcard = "*";
-        private const int MaxBucketsCount = 100;
+        public static readonly string[] DefaultSourceCollectionValue = { "*" };
 
         public static bool IsExactQuery(string query)
         {
@@ -27,19 +29,25 @@ namespace Iis.Elastic.SearchQueryExtensions
                    || query.Contains(" OR ", StringComparison.Ordinal);
         }
 
-        public static bool IsMatchAll(string query) =>
-            string.IsNullOrWhiteSpace(query) || query.Trim().Equals(Wildcard);
+        public static bool IsMatchAll(string query) => string.IsNullOrWhiteSpace(query) || query.Trim().Equals(Wildcard);
 
-        public static JObject WithSearchJson(IEnumerable<string> resultFieldList, int from, int size)
+        public static JObject GetPaginatedBaseQueryJson(IReadOnlyCollection<string> sourceCollection, int from, int size)
         {
-            if (resultFieldList is null || !resultFieldList.Any()) resultFieldList = new[] { "*" };
+            var jsonQuery = GetBaseQueryJson(sourceCollection);
+
+            jsonQuery.Add(SearchQueryPropertyName.From, from);
+            jsonQuery.Add(SearchQueryPropertyName.Size, size);
+
+            return jsonQuery;
+        }
+
+        public static JObject GetBaseQueryJson(IReadOnlyCollection<string> sourceCollection)
+        {
+            if (sourceCollection is null || !sourceCollection.Any()) sourceCollection = DefaultSourceCollectionValue;
 
             return new JObject(
-                new JProperty("_source", new JArray(resultFieldList)),
-                new JProperty("from", from),
-                new JProperty("size", size),
-                new JProperty("query", new JObject())
-            );
+                new JProperty(SearchQueryPropertyName.Source, new JArray(sourceCollection)),
+                new JProperty(SearchQueryPropertyName.Query, new JObject()));
         }
 
         public static JObject WithHighlights(this JObject jsonQuery)
@@ -369,7 +377,7 @@ namespace Iis.Elastic.SearchQueryExtensions
             if (cherryPickedItems.Count == 0) return result;
 
             var pickedQuery = new StringBuilder();
-            
+
             for (var i = 0; i < cherryPickedItems.Count; i++)
             {
                 var item = cherryPickedItems.ElementAt(i).Item;

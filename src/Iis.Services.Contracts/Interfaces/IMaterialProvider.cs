@@ -35,6 +35,7 @@ namespace IIS.Services.Contracts.Interfaces
         Task<MaterialsDto> GetMaterialsByImageAsync(Guid userId, PaginationParams page, string fileName, byte[] content);
         Task<(IEnumerable<Material> Materials, int Count)> GetMaterialsByNodeId(Guid nodeId);
         Task<(IEnumerable<Material> Materials, int Count)> GetMaterialsByNodeIdAndRelatedEntities(Guid nodeId);
+        Task<MaterialCollection> GetMaterialsByNodeIdAsync(Guid nodeId, Guid userId, CancellationToken cancellationToken);
         Task<MaterialsDto> GetMaterialsCommonForEntitiesAsync(Guid userId,
             IEnumerable<Guid> nodeIdList, 
             bool includeDescendants,

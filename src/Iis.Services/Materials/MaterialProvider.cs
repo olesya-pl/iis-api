@@ -34,6 +34,7 @@ namespace IIS.Services.Materials
     {
         private const string WildCart = "*";
         private static readonly IReadOnlyCollection<Material> EmptyMaterialCollection = Array.Empty<Material>();
+        private static readonly MaterialCollection EmptyMaterialCollectionInstance = new MaterialCollection(Array.Empty<Material>(), 0);
         private static readonly IReadOnlyCollection<string> RelationTypeNameList = new List<string>
         {
             "parent", "bePartOf"
@@ -202,6 +203,19 @@ namespace IIS.Services.Materials
             var materialsByNode = await GetMaterialCollectionByNodeIdAsync(nodeId, false);
             var materials = materialsByNode.Select(p => _materialDocumentMapper.Map(p));
             return (materials, materials.Count());
+        }
+
+        public async Task<MaterialCollection> GetMaterialsByNodeIdAsync(Guid nodeId, Guid userId, CancellationToken cancellationToken)
+        {
+            var documentCollection = await _materialElasticService.GetMaterialCollectionRelatedToNodeAsync(nodeId, userId, cancellationToken);
+
+            if (!documentCollection.Any()) return EmptyMaterialCollectionInstance;
+
+            var materialCollction = documentCollection
+                                    .Select(_ => _materialDocumentMapper.Map(_))
+                                    .ToArray();
+
+            return new MaterialCollection(materialCollction, materialCollction.Count());
         }
 
         public async Task<(IEnumerable<Material> Materials, int Count)> GetMaterialsByNodeIdAndRelatedEntities(Guid nodeId)

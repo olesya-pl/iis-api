@@ -1,43 +1,37 @@
 using System.Collections.Generic;
 using Newtonsoft.Json.Linq;
+using Iis.Elastic.Dictionaries;
 
 namespace Iis.Elastic.SearchQueryExtensions
 {
-    public abstract class BaseQueryBuilder<T> where T : BaseQueryBuilder<T>
+    public abstract class BaseQueryBuilder<T>
+    where T : BaseQueryBuilder<T>
     {
-        protected const string QueryPropertyName = "query";
-        protected const string FromPropertyName = "from";
-        protected const string SizePropertyName = "size";
-        protected IReadOnlyCollection<string> _resultFields = new[] { "*" };
-        protected int _from;
-        protected int _size;
+        protected IReadOnlyCollection<string> _sourceCollection = SearchQueryExtension.DefaultSourceCollectionValue;
 
-        public T WithPagination(int from, int size)
+        public T WithResultFields(IReadOnlyCollection<string> sourceCollection)
         {
-            _from = from;
-            _size = size;
+            _sourceCollection = sourceCollection;
+
             return this as T;
         }
 
-        public T WithResultFields(IReadOnlyCollection<string> resultFields)
+        public JObject BuildSearchQuery()
         {
-            _resultFields = resultFields;
-            return this as T;
-        }
-        
-        public JObject BuildSearchQuery() {
-            var jsonQuery = SearchQueryExtension.WithSearchJson(_resultFields, _from, _size);
-            jsonQuery["query"] = new JObject();
+            var jsonQuery = GetBaseQuery();
 
             return CreateQuery(jsonQuery);
         }
 
-        public JObject BuildCountQuery() 
+        public JObject BuildCountQuery()
         {
-            var json = new JObject(new JProperty("query", new JObject()));
+            var json = new JObject(new JProperty(SearchQueryPropertyName.Query, new JObject()));
+
             return CreateQuery(json);
         }
-        
+
+        protected virtual JObject GetBaseQuery() => SearchQueryExtension.GetBaseQueryJson(_sourceCollection);
+
         protected abstract JObject CreateQuery(JObject json);
     }
 }

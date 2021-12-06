@@ -4,7 +4,7 @@ using Newtonsoft.Json.Linq;
 
 namespace Iis.Elastic.SearchQueryExtensions
 {
-    public class MultiSearchParamsQueryBuilder : BaseQueryBuilder<MultiSearchParamsQueryBuilder>
+    public class MultiSearchParamsQueryBuilder : PaginatedQueryBuilder<MultiSearchParamsQueryBuilder>
     {
         private IReadOnlyCollection<SearchParameter> _searchParams;
         private bool? _isLenient;

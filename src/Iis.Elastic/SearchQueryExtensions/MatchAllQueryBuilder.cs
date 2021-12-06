@@ -2,7 +2,7 @@ using Newtonsoft.Json.Linq;
 
 namespace Iis.Elastic.SearchQueryExtensions
 {
-    public class MatchAllQueryBuilder : BaseQueryBuilder<MatchAllQueryBuilder>
+    public class MatchAllQueryBuilder : PaginatedQueryBuilder<MatchAllQueryBuilder>
     {
         protected override JObject CreateQuery(JObject jsonQuery)
         {
