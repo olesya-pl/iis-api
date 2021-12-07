@@ -17,7 +17,7 @@ namespace Iis.UnitTests.Iis.Elastic.Tests.SearchQueryExtensionTests
         public void GetBaseQueryJson_SourceCollectionSuccess(string[] sourceCollection)
         {
             var expected = JObject.Parse("{\"_source\":[" + string.Join(",", sourceCollection.Select(x => $"\"{x}\"")) +
-                                         "], \"query\": {}}");
+                                         "], \"size\":10000, \"query\": {}}");
 
             var actual = SearchQueryExtension.GetBaseQueryJson(sourceCollection);
 
@@ -27,7 +27,7 @@ namespace Iis.UnitTests.Iis.Elastic.Tests.SearchQueryExtensionTests
         [Fact]
         public void GetBaseQueryJson_DefaulCollectionSuccess()
         {
-            var expected = JObject.Parse("{\"_source\":[\"*\"], \"query\": {}}");
+            var expected = JObject.Parse("{\"_source\":[\"*\"],  \"size\":10000, \"query\": {}}");
 
             var actual = SearchQueryExtension.GetBaseQueryJson(null);
 

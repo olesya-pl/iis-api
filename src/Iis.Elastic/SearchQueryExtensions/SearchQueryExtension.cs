@@ -14,6 +14,7 @@ namespace Iis.Elastic.SearchQueryExtensions
     public static class SearchQueryExtension
     {
         private const int MaxBucketsCount = 100;
+        private const int DefaultIndexMaxResultWindow = 10000;
         public const string AggregateSuffix = "Aggregate";
         public const string MissingValueKey = "__hasNoValue";
         public const string NoExistsValue = "-_exists_";
@@ -35,8 +36,8 @@ namespace Iis.Elastic.SearchQueryExtensions
         {
             var jsonQuery = GetBaseQueryJson(sourceCollection);
 
-            jsonQuery.Add(SearchQueryPropertyName.From, from);
-            jsonQuery.Add(SearchQueryPropertyName.Size, size);
+            jsonQuery[SearchQueryPropertyName.From] = from;
+            jsonQuery[SearchQueryPropertyName.Size] = size;
 
             return jsonQuery;
         }
@@ -47,6 +48,7 @@ namespace Iis.Elastic.SearchQueryExtensions
 
             return new JObject(
                 new JProperty(SearchQueryPropertyName.Source, new JArray(sourceCollection)),
+                new JProperty(SearchQueryPropertyName.Size, DefaultIndexMaxResultWindow),
                 new JProperty(SearchQueryPropertyName.Query, new JObject()));
         }
 

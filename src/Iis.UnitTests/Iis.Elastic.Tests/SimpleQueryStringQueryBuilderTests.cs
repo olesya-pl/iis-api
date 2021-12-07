@@ -25,7 +25,7 @@ namespace Iis.UnitTests.Iis.Elastic.Tests
         [Fact]
         public void SimpleQueryStringQuery_Success()
         {
-            var expected = JObject.Parse("{\"_source\": [\"*\"], \"query\":{\"query_string\":{\"query\":\"fieldName:fieldValue\"}}}");
+            var expected = JObject.Parse("{\"_source\": [\"*\"], \"size\":10000, \"query\":{\"query_string\":{\"query\":\"fieldName:fieldValue\"}}}");
 
             var actual = new SimpleQueryStringQueryBuilder("fieldName:fieldValue")
                         .BuildSearchQuery();

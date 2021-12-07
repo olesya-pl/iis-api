@@ -21,7 +21,7 @@ namespace Iis.UnitTests.Iis.Elastic.Tests
             actual.Should()
                     .NotHaveElement("from")
                     .And
-                    .NotHaveElement("size")
+                    .HaveElement("size")
                     .And
                     .HaveElement("query");
         }
@@ -31,7 +31,7 @@ namespace Iis.UnitTests.Iis.Elastic.Tests
         {
             var strIdCollection = idCollection.Select(_ => $"\"{_.ToString("N")}\"").ToArray();
 
-            var expected = JObject.Parse("{\"_source\":[\"*\"], \"query\":{\"ids\":{\"values\":[" + string.Join(',', strIdCollection) + "]}}}");
+            var expected = JObject.Parse("{\"_source\":[\"*\"], \"size\":10000, \"query\":{\"ids\":{\"values\":[" + string.Join(',', strIdCollection) + "]}}}");
 
             var actual = new GetByIdCollectionQueryBuilder(idCollection)
                             .BuildSearchQuery();
