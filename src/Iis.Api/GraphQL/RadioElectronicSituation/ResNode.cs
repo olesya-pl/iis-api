@@ -8,6 +8,8 @@ namespace Iis.Api.GraphQL.RadioElectronicSituation
     {
         [GraphQLType(typeof(NonNullType<IdType>))]
         public Guid Id { get; set; }
+        public decimal Latitude { get; set; }
+        public decimal Longitude { get; set; }
         public ResNodeExtra Extra { get; set; }
     }
 }
