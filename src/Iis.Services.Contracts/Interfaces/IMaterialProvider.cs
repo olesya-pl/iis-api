@@ -35,16 +35,16 @@ namespace IIS.Services.Contracts.Interfaces
         Task<MaterialsDto> GetMaterialsByImageAsync(Guid userId, PaginationParams page, string fileName, byte[] content);
         Task<(IEnumerable<Material> Materials, int Count)> GetMaterialsByNodeId(Guid nodeId);
         Task<(IEnumerable<Material> Materials, int Count)> GetMaterialsByNodeIdAndRelatedEntities(Guid nodeId);
-        Task<MaterialCollection> GetMaterialsByNodeIdAsync(Guid nodeId, Guid userId, CancellationToken cancellationToken);
+        Task<OutputCollection<Material>> GetMaterialsByNodeIdAsync(Guid nodeId, Guid userId, CancellationToken cancellationToken);
         Task<MaterialsDto> GetMaterialsCommonForEntitiesAsync(Guid userId,
-            IEnumerable<Guid> nodeIdList, 
+            IEnumerable<Guid> nodeIdList,
             bool includeDescendants,
             string suggestion,
             DateRange createdDateRange,
             PaginationParams page,
             SortingParams sorting,
             CancellationToken ct = default);
-        Task<Dictionary<Guid, int>> CountMaterialsByNodeIds(HashSet<Guid> nodeIds);
+        Task<Dictionary<Guid, int>> CountMaterialsByNodeIdSetAsync(ISet<Guid> nodeIdSet, Guid userId, CancellationToken cancellationToken);
         Task<List<MaterialsCountByType>> CountMaterialsByTypeAndNodeAsync(Guid nodeId);
         Task<(List<Material> Materials, int Count)> GetMaterialsByAssigneeIdAsync(Guid assigneeId);
         Task<(IEnumerable<Material> Materials,  int Count)> GetMaterialsLikeThisAsync(Guid userId, Guid materialId, PaginationParams page, SortingParams sorting);

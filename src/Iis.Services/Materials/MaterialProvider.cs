@@ -34,7 +34,7 @@ namespace IIS.Services.Materials
     {
         private const string WildCart = "*";
         private static readonly IReadOnlyCollection<Material> EmptyMaterialCollection = Array.Empty<Material>();
-        private static readonly MaterialCollection EmptyMaterialCollectionInstance = new MaterialCollection(Array.Empty<Material>(), 0);
+        private static readonly OutputCollection<Material> EmptyMaterialCollectionInstance = new OutputCollection<Material>(Array.Empty<Material>());
         private static readonly IReadOnlyCollection<string> RelationTypeNameList = new List<string>
         {
             "parent", "bePartOf"
@@ -205,17 +205,17 @@ namespace IIS.Services.Materials
             return (materials, materials.Count());
         }
 
-        public async Task<MaterialCollection> GetMaterialsByNodeIdAsync(Guid nodeId, Guid userId, CancellationToken cancellationToken)
+        public async Task<OutputCollection<Material>> GetMaterialsByNodeIdAsync(Guid nodeId, Guid userId, CancellationToken cancellationToken)
         {
             var documentCollection = await _materialElasticService.GetMaterialCollectionRelatedToNodeAsync(nodeId, userId, cancellationToken);
 
             if (!documentCollection.Any()) return EmptyMaterialCollectionInstance;
 
-            var materialCollction = documentCollection
+            var materialCollection = documentCollection
                                     .Select(_ => _materialDocumentMapper.Map(_))
                                     .ToArray();
 
-            return new MaterialCollection(materialCollction, materialCollction.Count());
+            return new OutputCollection<Material>(materialCollection);
         }
 
         public async Task<(IEnumerable<Material> Materials, int Count)> GetMaterialsByNodeIdAndRelatedEntities(Guid nodeId)
@@ -225,61 +225,14 @@ namespace IIS.Services.Materials
             return (materials, materials.Count());
         }
 
-        public async Task<Dictionary<Guid, int>> CountMaterialsByNodeIds(HashSet<Guid> nodeIds)
+        public async Task<Dictionary<Guid, int>> CountMaterialsByNodeIdSetAsync(ISet<Guid> nodeIdSet, Guid userId, CancellationToken cancellationToken)
         {
-            var nodeFeatureRelationsList = _ontologyService.GetObjectFeatureRelationCollection(nodeIds);
+            var materialCountTaskList = nodeIdSet
+                .Select(_ => _materialElasticService.CountMaterialCollectionRelatedToNodeAsync(_, userId, cancellationToken));
 
-            var nodeIdsForCountQuery = new List<Guid>(nodeIds);
-            nodeIdsForCountQuery.AddRange(nodeFeatureRelationsList.Select(p => p.FeatureId));
+            var materialCountResultList = await Task.WhenAll(materialCountTaskList);
 
-            var nodesWithMaterials = await RunWithoutCommitAsync(
-                    uow => uow.MaterialRepository.GetNodeIsWithMaterialsAsync(nodeIdsForCountQuery));
-
-            var parentNodesMap = PrepareNodesMap(nodeIds, nodeFeatureRelationsList);
-
-            return PrepareResult(nodesWithMaterials, parentNodesMap);
-        }
-
-        private static Dictionary<Guid, int> PrepareResult(List<Guid> nodesWithMaterials, Dictionary<Guid, List<Guid>> parentNodesMap)
-        {
-            var res = new Dictionary<Guid, int>();
-
-            foreach (var nodeWithMaterial in nodesWithMaterials)
-            {
-                var nodesToIncrement = parentNodesMap[nodeWithMaterial];
-                foreach (var nodeToIncrement in nodesToIncrement)
-                {
-                    if (res.ContainsKey(nodeToIncrement))
-                    {
-                        res[nodeToIncrement]++;
-                    }
-                    else
-                    {
-                        res.Add(nodeToIncrement, 1);
-                    }
-                }
-            }
-
-            return res;
-        }
-
-        private static Dictionary<Guid, List<Guid>> PrepareNodesMap(HashSet<Guid> nodeIds, IReadOnlyCollection<ObjectFeatureRelation> nodeFeatureRelationsList)
-        {
-            var parentNodesMap = nodeIds.ToDictionary(k => k, v => new List<Guid> { v });
-
-            foreach (var relation in nodeFeatureRelationsList)
-            {
-                if (parentNodesMap.ContainsKey(relation.FeatureId))
-                {
-                    parentNodesMap[relation.FeatureId].Add(relation.ObjectId);
-                }
-                else
-                {
-                    parentNodesMap.Add(relation.FeatureId, new List<Guid> { relation.ObjectId });
-                }
-            }
-
-            return parentNodesMap;
+            return materialCountResultList.ToDictionary(_ => _.Key, _ => _.Count);
         }
 
         public async Task<(IEnumerable<Material> Materials, int Count)> GetMaterialsLikeThisAsync(

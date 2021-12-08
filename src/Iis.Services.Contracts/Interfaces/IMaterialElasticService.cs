@@ -7,6 +7,7 @@ using Iis.DataModel.ChangeHistory;
 using Iis.DataModel.Materials;
 using Iis.DbLayer.Repositories;
 using Iis.Domain.Materials;
+using Iis.Interfaces.Common;
 using Iis.Interfaces.Materials;
 
 namespace Iis.Services.Contracts.Interfaces
@@ -33,5 +34,6 @@ namespace Iis.Services.Contracts.Interfaces
         Task RemoveMaterialAsync(Guid materialId, CancellationToken cancellationToken);
         Task<IReadOnlyCollection<MaterialDocument>> GetMaterialCollectionByIdCollectionAsync(IReadOnlyCollection<Guid> idCollection, Guid userId, CancellationToken cancellationToken);
         Task<IReadOnlyCollection<MaterialDocument>> GetMaterialCollectionRelatedToNodeAsync(Guid nodeId, Guid userId, CancellationToken cancellationToken);
+        Task<OutputCount<Guid>> CountMaterialCollectionRelatedToNodeAsync(Guid nodeId, Guid userId, CancellationToken cancellationToken);
     }
 }

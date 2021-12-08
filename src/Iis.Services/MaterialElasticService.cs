@@ -244,6 +244,27 @@ namespace Iis.Services
                     .ToArray();
         }
 
+        public async Task<OutputCount<Guid>> CountMaterialCollectionRelatedToNodeAsync(Guid nodeId, Guid userId, CancellationToken cancellationToken)
+        {
+            var result = new OutputCount<Guid> { Key = nodeId, Count = 0 };
+
+            var node = _ontologyData.GetNode(nodeId);
+
+            if (node is null) return result;
+
+            var queryString = GetQueryStringForNode(node.NodeType, node.Id);
+
+            var query = new SimpleQueryStringQueryBuilder(queryString)
+                            .BuildCountQuery()
+                            .ToString(Formatting.None);
+
+            result.Count = await _elasticManager
+                            .WithUserId(userId)
+                            .CountAsync(query, _elasticState.MaterialIndexes, cancellationToken);
+
+            return result;
+        }
+
         public async Task<SearchResult> SearchMaterialsAsync(Guid userId,
             SearchParams searchParams,
             IEnumerable<Guid> materialList,
