@@ -128,7 +128,7 @@ namespace IIS.Core.Ontology.EntityFramework
             }
 
             var (multiSearchQuery, context) = PrepareMultiSearchQuery(typeNames, filter);
-            var aggregations = await GetAggregationsQueryResultAsync(typeNames, filter, userId, context.IsBaseQueryExact, cancellationToken);
+            var aggregations = await GetAggregationsQueryResultAsync(typeNames, filter, userId, !filter.IsExact && context.IsBaseQueryExact, cancellationToken);
             var multiSearchQueryString = multiSearchQuery
                 .WithHighlights()
                 .ToString();
