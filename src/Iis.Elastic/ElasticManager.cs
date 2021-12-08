@@ -1,46 +1,42 @@
-﻿using Elasticsearch.Net;
-
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
+using Elasticsearch.Net;
 using Iis.Interfaces.Elastic;
 using Iis.Interfaces.Ontology.Schema;
 using Iis.Utility;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using Iis.Elastic.SearchResult;
 using Iis.Elastic.ElasticMappingProperties;
 using Iis.Elastic.SearchQueryExtensions;
 using Newtonsoft.Json;
-using System.Text;
-using System.Text.RegularExpressions;
 
 namespace Iis.Elastic
 {
     internal class ElasticManager : IElasticManager
     {
-        private ElasticLowLevelClient _lowLevelClient;
+        public const string NullValue = "NULL";
+        public static readonly HashSet<char> RemoveSymbolsPattern = new HashSet<char> { '№' };
+        public static readonly HashSet<char> EscapeSymbolsPattern = new HashSet<char> { '^', ':', '{', '}', '(', ')', '[', ']', '/', '!' };
         private readonly ElasticConfiguration _configuration;
         private readonly SearchResultExtractor _resultExtractor;
         private readonly ILogger<ElasticManager> _logger;
-        private readonly ElasticLogUtils _responseLogUtils;
-        public const string NullValue = "NULL";
-        public static readonly HashSet<char> RemoveSymbolsPattern = new HashSet<char> { '№' };
-        public static readonly HashSet<char> EscapeSymbolsPattern = new HashSet<char> { '^',   ':', '{', '}', '[', ']', '/', '!' };
+        private ElasticLowLevelClient _lowLevelClient;
 
-        public ElasticManager(ElasticConfiguration configuration,
+        public ElasticManager(
+            ElasticConfiguration configuration,
             SearchResultExtractor resultExtractor,
-            ILogger<ElasticManager> logger,
-            ElasticLogUtils responseLogUtils)
+            ILogger<ElasticManager> logger)
         {
             _configuration = configuration;
             CreateLowlevelClient(_configuration.DefaultLogin, _configuration.DefaultPassword);
 
             _resultExtractor = resultExtractor;
             _logger = logger;
-            _responseLogUtils = responseLogUtils;
         }
 
         private void CreateLowlevelClient(string login, string password)
