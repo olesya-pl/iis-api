@@ -19,5 +19,7 @@ namespace Iis.OntologySchema.DataTypes
         public ScalarType? ScalarType { get; set; }
         public EmbeddingOptions EmbeddingOptions { get; set; }
         public INodeTypeLinked TargetType { get; set; }
+
+        public override string ToString() => $"{RelationName} ({RelationTitle})";
     }
 }
