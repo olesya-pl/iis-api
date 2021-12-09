@@ -3,29 +3,34 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using HotChocolate;
+using HotChocolate.Resolvers;
 using Iis.Domain;
 using IIS.Services.Contracts.Interfaces;
+using IIS.Core.GraphQL;
 
 namespace Iis.Api.Ontology
 {
     public class RelationsCountQuery
     {
         public async Task<List<NodeRelationCount>> GetRelationsCounts(
+            IResolverContext context,
             [Service] IOntologyService ontologyService,
             [Service] IMaterialProvider materialProvider,
             Guid[] entityIds)
         {
+            var tokenPayload = context.GetToken();
+
             var uniqueEntityIds = entityIds.ToHashSet();
             var relationsCount = ontologyService.GetRelationsCount(uniqueEntityIds);
             var eventsCount = ontologyService.CountEventsAssociatedWithEntities(uniqueEntityIds);
-            var materialsCount = await materialProvider.CountMaterialsByNodeIds(uniqueEntityIds);
+            var materialsCount = await materialProvider.CountMaterialsByNodeIdSetAsync(uniqueEntityIds, tokenPayload.UserId, context.RequestAborted);
             return MergeResults(uniqueEntityIds, relationsCount, eventsCount, materialsCount);
         }
 
         private static List<NodeRelationCount> MergeResults(HashSet<Guid> uniqueEntityIds, Dictionary<Guid, int> relationsCount, Dictionary<Guid, int> eventsCount, Dictionary<Guid, int> materialsCount)
         {
-            var res = new List<NodeRelationCount>();
-            return uniqueEntityIds.Select(entityId => {
+            return uniqueEntityIds.Select(entityId =>
+            {
                 var item = new NodeRelationCount()
                 {
                     NodeId = entityId
