@@ -49,9 +49,9 @@ namespace Iis.UnitTests.Iis.Elastic.Tests.SearchQueryExtensionTests
         [AutoData]
         public void ApplyFuzzinessOperator_ShouldEscapeSymbols(string input)
         {
-            var additional = string.Join(string.Empty, ElasticManager.EscapeSymbolsPattern);
+            var additional = "^{}()[]/!";
             var inputWithSymbolsToEscape = string.Join(string.Empty, input, additional);
-            var escapedAdditionalSymbols = string.Join(string.Empty, ElasticManager.EscapeSymbolsPattern.Select(_ => $"\\{_}"));
+            var escapedAdditionalSymbols = "\\^\\{\\}\\(\\)\\[\\]\\/\\!";
             var escapedInput = string.Join(string.Empty, input, escapedAdditionalSymbols);
             var expected = $"\"{escapedInput}\" OR {escapedInput}~";
 

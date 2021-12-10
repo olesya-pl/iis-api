@@ -179,6 +179,8 @@ namespace Iis.Elastic.SearchQueryExtensions
         {
             if (string.IsNullOrWhiteSpace(input)) return string.Empty;
 
+            if (IsExactQuery(input) || IsMatchAll(input)) return input;
+
             input = input.RemoveSymbols(ElasticManager.RemoveSymbolsPattern)
                         .EscapeSymbols(ElasticManager.EscapeSymbolsPattern);
 
