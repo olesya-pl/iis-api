@@ -114,7 +114,10 @@ namespace Iis.Api.Materials
                 var oneUserResult = await DistributeForUser(user, new List<Guid> { });
                 await _materialService.SaveDistributionResult(oneUserResult);
 
-                var materialIds = oneUserResult.Items.Select(_ => _.MaterialId).ToList();
+                var materialIds = oneUserResult.Items
+                                    .Select(_ => _.MaterialId)
+                                    .ToHashSet();
+
                 await _materialElasticService.PutMaterialsToElasticSearchAsync(materialIds);
 
                 _logger.LogInformation(GetLogMessage(oneUserResult, user, sw.Elapsed));

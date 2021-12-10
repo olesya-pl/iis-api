@@ -400,10 +400,10 @@ namespace IIS.Services.Materials
             return result.Where(x => x != null).ToList();
         }
 
-        public async Task<bool> MaterialExists(Guid id)
+        public async Task<bool> MaterialExists(Guid materialId)
         {
             var entity = await RunWithoutCommitAsync((unitOfWork) =>
-                unitOfWork.MaterialRepository.GetByIdAsync(id));
+                unitOfWork.MaterialRepository.GetByIdAsync(materialId));
 
             return entity != null;
         }

@@ -1,17 +1,17 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Linq.Expressions;
 using System.Collections.Generic;
+using Iis.Domain.Users;
 using Iis.Domain.Materials;
 using Iis.Domain.MachineLearning;
+using Iis.Interfaces.Common;
+using Iis.Interfaces.Elastic;
 using Iis.DataModel.Materials;
 using Iis.Services.Contracts.Dtos;
-using Iis.Domain.Users;
 using IIS.Services.Contracts.Materials;
-using Iis.Interfaces.Elastic;
-using System.Linq.Expressions;
 using Iis.Services.Contracts.Materials.Distribution;
-using Iis.Interfaces.Common;
 using Iis.Services.Contracts.Dtos.RadioElectronicSituation;
 
 namespace IIS.Services.Contracts.Interfaces
@@ -19,7 +19,8 @@ namespace IIS.Services.Contracts.Interfaces
     public interface IMaterialProvider
     {
         Task<Material[]> GetMaterialsByIdsAsync(ISet<Guid> ids, User user);
-        Task<MaterialsDto> GetMaterialsAsync(Guid userId,
+        Task<MaterialsDto> GetMaterialsAsync(
+            Guid userId,
             string filterQuery,
             RelationsState? materialRelationsState,
             IReadOnlyCollection<Property> filteredItems,
@@ -36,7 +37,8 @@ namespace IIS.Services.Contracts.Interfaces
         Task<(IEnumerable<Material> Materials, int Count)> GetMaterialsByNodeId(Guid nodeId);
         Task<(IEnumerable<Material> Materials, int Count)> GetMaterialsByNodeIdAndRelatedEntities(Guid nodeId);
         Task<OutputCollection<Material>> GetMaterialsByNodeIdAsync(Guid nodeId, Guid userId, CancellationToken cancellationToken);
-        Task<MaterialsDto> GetMaterialsCommonForEntitiesAsync(Guid userId,
+        Task<MaterialsDto> GetMaterialsCommonForEntitiesAsync(
+            Guid userId,
             IEnumerable<Guid> nodeIdList,
             bool includeDescendants,
             string suggestion,
@@ -48,7 +50,7 @@ namespace IIS.Services.Contracts.Interfaces
         Task<List<MaterialsCountByType>> CountMaterialsByTypeAndNodeAsync(Guid nodeId);
         Task<(List<Material> Materials, int Count)> GetMaterialsByAssigneeIdAsync(Guid assigneeId);
         Task<(IEnumerable<Material> Materials,  int Count)> GetMaterialsLikeThisAsync(Guid userId, Guid materialId, PaginationParams page, SortingParams sorting);
-        Task<bool> MaterialExists(Guid value);
+        Task<bool> MaterialExists(Guid materialId);
         Task<IReadOnlyCollection<Guid>> GetMaterialsIdsAsync(int limit);
         Task<Material> GetMaterialAsync(Guid id);
         Task<Material> GetMaterialAsync(Guid id, User user);

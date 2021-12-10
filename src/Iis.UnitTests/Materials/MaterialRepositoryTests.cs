@@ -74,7 +74,7 @@ namespace Iis.UnitTests.Materials
             await context.SaveChangesAsync();
 
             var materialElasticService = _serviceProvider.GetRequiredService<IMaterialElasticService>();
-            var res = await materialElasticService.PutMaterialToElasticSearchAsync(materialId, CancellationToken.None);
+            var res = await materialElasticService.PutMaterialToElasticSearchAsync(materialId, false, CancellationToken.None);
 
             elasticManagerMock
                 .Verify(

@@ -97,7 +97,7 @@ namespace Iis.Services
                 }
             }
 
-            await _materialElasticService.PutMaterialsToElasticSearchAsync(materialIds, CancellationToken.None, true);
+            await _materialElasticService.PutMaterialsToElasticSearchAsync(materialIds, true, CancellationToken.None);
             await _changeHistoryService.SaveMaterialChanges(changeHistoryList);
         }
 
@@ -118,7 +118,7 @@ namespace Iis.Services
             _context.MaterialInfos.Remove(featureToRemove.MaterialInfo);
             _context.MaterialFeatures.Remove(featureToRemove);
             await _context.SaveChangesAsync();
-            await _materialElasticService.PutMaterialToElasticSearchAsync(relation.MaterialId, CancellationToken.None, true);
+            await _materialElasticService.PutMaterialToElasticSearchAsync(relation.MaterialId, true, CancellationToken.None);
 
             var changeHistoryDto = new ChangeHistoryDto
             {
