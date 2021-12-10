@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading;
 using System.Diagnostics;
 using System.Globalization;
@@ -52,7 +53,7 @@ namespace Iis.Services
             MaterialIncludeEnum.WithChildren,
             MaterialIncludeEnum.WithFeatures
         };
-        private static IReadOnlyCollection<AggregationField> AggregationsFieldList = new List<AggregationField>
+        private static readonly IReadOnlyCollection<AggregationField> AggregationsFieldList = new List<AggregationField>
         {
             new AggregationField(MaterialAliases.ProcessedStatus.Path, MaterialAliases.ProcessedStatus.Alias, MaterialAliases.ProcessedStatus.Path),
             new AggregationField(MaterialAliases.Completeness.Path, MaterialAliases.Completeness.Alias, MaterialAliases.Completeness.Path),
@@ -77,7 +78,8 @@ namespace Iis.Services
         private readonly IOntologyNodesData _ontologyData;
         private readonly ILogger<MaterialElasticService<TUnitOfWork>> _logger;
 
-        public MaterialElasticService(IElasticManager elasticManager,
+        public MaterialElasticService(
+            IElasticManager elasticManager,
             IElasticState elasticState,
             IElasticResponseManagerFactory elasticResponseManagerFactory,
             ElasticConfiguration elasticConfiguration,
@@ -97,6 +99,8 @@ namespace Iis.Services
             _ontologyData = ontologyData;
             _logger = logger;
         }
+
+        private static Expression<Func<ChangeHistoryEntity, bool>> ChangeHistoryTotalCountPredicate => _ => (_.Type == ChangeHistoryEntityType.Material || _.Type == ChangeHistoryEntityType.Node) && _.PropertyName == ChangeHistoryDocument.MaterialLinkPropertyName;
 
         public bool ShouldReturnNoEntities(string queryExpression)
         {
@@ -150,11 +154,6 @@ namespace Iis.Services
         public Task RemoveMaterialAsync(Guid materialId, CancellationToken cancellationToken)
         {
             return _elasticManager.DeleteDocumentAsync(_elasticState.MaterialIndexes.First(), materialId.ToString("N"), cancellationToken);
-        }
-
-        private static bool ItemsCountPossiblyExceedsMaxThreshold(SearchResult searchResult)
-        {
-            return searchResult.Count == ElasticConstants.MaxItemsCount;
         }
 
         public async Task<SearchResult> BeginSearchByScrollAsync(Guid userId, SearchParams searchParams, CancellationToken ct = default)
@@ -265,7 +264,8 @@ namespace Iis.Services
             return result;
         }
 
-        public async Task<SearchResult> SearchMaterialsAsync(Guid userId,
+        public async Task<SearchResult> SearchMaterialsAsync(
+            Guid userId,
             SearchParams searchParams,
             IEnumerable<Guid> materialList,
             CancellationToken ct = default)
@@ -461,8 +461,7 @@ namespace Iis.Services
 
         public async Task<List<ElasticBulkResponse>> PutAllMaterialChangesToElasticSearchAsync(CancellationToken cancellationToken = default)
         {
-            int count = await RunWithoutCommitAsync(_ => _.ChangeHistoryRepository.GetTotalCountAsync(_ => _.Type == ChangeHistoryEntityType.Material
-                    || _.Type == ChangeHistoryEntityType.Node && _.PropertyName == ChangeHistoryDocument.MaterialLinkPropertyName, cancellationToken));
+            int count = await RunWithoutCommitAsync(_ => _.ChangeHistoryRepository.GetTotalCountAsync(ChangeHistoryTotalCountPredicate, cancellationToken));
             if (count == 0)
                 return new List<ElasticBulkResponse>();
 
@@ -472,10 +471,10 @@ namespace Iis.Services
             {
                 cancellationToken.ThrowIfCancellationRequested();
 
-                var entities = await RunWithoutCommitAsync(_ => _.ChangeHistoryRepository.GetAllAsync(MaterialChangesBatchSize,
+                var entities = await RunWithoutCommitAsync(_ => _.ChangeHistoryRepository.GetAllAsync(
+                    MaterialChangesBatchSize,
                     batchIndex * MaterialChangesBatchSize,
-                    _ => _.Type == ChangeHistoryEntityType.Material
-                        || _.Type == ChangeHistoryEntityType.Node && _.PropertyName == ChangeHistoryDocument.MaterialLinkPropertyName,
+                    ChangeHistoryTotalCountPredicate,
                     cancellationToken));
                 var response = await PutMaterialChangesToElasticSearchAsync(entities, false, cancellationToken);
 
@@ -524,7 +523,8 @@ namespace Iis.Services
             return response;
         }
 
-        public async Task<List<ElasticBulkResponse>> PutCreatedMaterialsToElasticSearchAsync(IReadOnlyCollection<Guid> materialIds,
+        public async Task<List<ElasticBulkResponse>> PutCreatedMaterialsToElasticSearchAsync(
+            IReadOnlyCollection<Guid> materialIds,
             bool waitForIndexing = false,
             CancellationToken cancellationToken = default)
         {
@@ -537,24 +537,24 @@ namespace Iis.Services
             return await _elasticManager.PutDocumentsAsync(_elasticState.MaterialIndexes.FirstOrDefault(), json, waitForIndexing, cancellationToken);
         }
 
-        public async Task<bool> PutMaterialToElasticSearchAsync(Guid materialId, CancellationToken ct = default, bool waitForIndexing = false)
+        public async Task<bool> PutMaterialToElasticSearchAsync(Guid materialId, bool waitForIndexing = false, CancellationToken cancellationToken = default)
         {
             var material = await RunWithoutCommitAsync(_ => _.MaterialRepository.GetByIdAsync(materialId, IncludeAll));
 
-            return await PutMaterialToElasticSearchAsync(material, ct, waitForIndexing);
+            return await PutMaterialToElasticSearchAsync(material, waitForIndexing, cancellationToken);
         }
 
-        public async Task PutMaterialsToElasticSearchAsync(IEnumerable<Guid> materialIds, CancellationToken ct = default, bool waitForIndexing = false)
+        public async Task PutMaterialsToElasticSearchAsync(ISet<Guid> materialIdSet, bool waitForIndexing = false, CancellationToken cancellationToken = default)
         {
-            var materials = await RunWithoutCommitAsync(_ => _.MaterialRepository.GetByIdsAsync(materialIds.ToHashSet(), IncludeAll));
+            var materials = await RunWithoutCommitAsync(_ => _.MaterialRepository.GetByIdsAsync(materialIdSet, IncludeAll));
 
             foreach (var material in materials)
             {
-                await PutMaterialToElasticSearchAsync(material, ct, waitForIndexing);
+                await PutMaterialToElasticSearchAsync(material, waitForIndexing, cancellationToken);
             }
         }
 
-        public async Task<bool> PutMaterialToElasticSearchAsync(MaterialEntity material, CancellationToken ct = default, bool waitForIndexing = false)
+        public async Task<bool> PutMaterialToElasticSearchAsync(MaterialEntity material, bool waitForIndexing = false, CancellationToken cancellationToken = default)
         {
             var materialDocument = MapEntityToDocument(material);
 
@@ -565,7 +565,7 @@ namespace Iis.Services
 
             var processedSign = RunWithoutCommit(_ => _.MaterialSignRepository.GetById(MaterialEntity.ProcessingStatusProcessedSignId));
 
-            var getChangeHistoryEntity = RunWithoutCommitAsync(_ => _.ChangeHistoryRepository.GetLatestByIdAndPropertyWithNewValueAsync(material.Id, processedSign.MaterialSignType.Name, processedSign.Title));
+            var getChangeHistoryEntity = RunWithoutCommitAsync(_ => _.ChangeHistoryRepository.GetLatestByIdAndPropertyWithNewValueAsync(material.Id, processedSign.MaterialSignType.Name, processedSign.Title, cancellationToken));
 
             var getResponseList = _mLResponseRepository.GetAllForMaterialListAsync(materialIdList);
 
@@ -588,17 +588,19 @@ namespace Iis.Services
 
             materialDocument.ProcessedAt = changeHistoryEntity?.Date.ToString(Iso8601DateFormat, CultureInfo.InvariantCulture);
 
-            return await _elasticManager.PutDocumentAsync(_elasticState.MaterialIndexes.FirstOrDefault(),
+            return await _elasticManager.PutDocumentAsync(
+                _elasticState.MaterialIndexes.FirstOrDefault(),
                 material.Id.ToString("N"),
                 JsonConvert.SerializeObject(materialDocument),
                 waitForIndexing,
-                ct);
+                cancellationToken);
         }
 
-        public async Task PutMaterialsToElasticByNodeIdsAsync(IReadOnlyCollection<Guid> nodeIds, CancellationToken ct = default, bool waitForIndexing = false)
+        public async Task PutMaterialsToElasticByNodeIdsAsync(IReadOnlyCollection<Guid> nodeIds, bool waitForIndexing = false, CancellationToken cancellationToken = default)
         {
             var materials = await RunWithoutCommitAsync(_ => _.MaterialRepository.GetMaterialCollectionByNodeIdAsync(nodeIds, MaterialIncludeEnum.WithChildren, MaterialIncludeEnum.WithFeatures, MaterialIncludeEnum.WithFiles));
-            await Task.WhenAll(materials.Select(_ => PutMaterialToElasticSearchAsync(_, ct, waitForIndexing)));
+
+            await Task.WhenAll(materials.Select(_ => PutMaterialToElasticSearchAsync(_, waitForIndexing, cancellationToken)));
         }
 
         private static ImageVector[] GetImageVectorList(IReadOnlyCollection<Guid> materialIdList, Dictionary<Guid, MLResponseEntity[]> responseDictionary)
@@ -654,8 +656,9 @@ namespace Iis.Services
                 foreach (var mlHandler in mlHandlers)
                 {
                     string propertyName = GetMlHandlerName(mlHandler);
-                    mlResponsesContainer.Add(new JProperty(propertyName,
-                            mlHandler.Select(p => p.OriginalResponse).ToArray()));
+                    mlResponsesContainer.Add(new JProperty(
+                                                propertyName,
+                                                mlHandler.Select(p => p.OriginalResponse).ToArray()));
                 }
             }
             return mlResponsesContainer;
@@ -695,6 +698,92 @@ namespace Iis.Services
 
         private static string GetRelationTypeFieldName() => $"{nameof(MaterialDocument.RelatedObjectCollection)}.{nameof(DbLayer.Repositories.RelatedObject.RelationCreatingType)}";
 
+        private static bool ItemsCountPossiblyExceedsMaxThreshold(SearchResult searchResult)
+        {
+            return searchResult.Count == ElasticConstants.MaxItemsCount;
+        }
+
+        private static CompositeBoolQueryBuilder WithRelationsStateCondition(CompositeBoolQueryBuilder builder, RelationsState? relationsState) => relationsState switch
+        {
+            RelationsState.Empty => builder.WithCondition<ExistsQueryConditionBuilder>(_ => _.MustNot().Exist(nameof(MaterialDocument.RelatedObjectCollection))),
+            RelationsState.Exists => builder.WithCondition<ExistsQueryConditionBuilder>(_ => _.Must().Exist(nameof(MaterialDocument.RelatedObjectCollection))),
+            RelationsState.HasFeature => builder.WithCondition<MatchQueryConditionBuilder>(_ => _.Must().Match(GetRelationTypeFieldName(), EntityMaterialRelation.Feature)),
+            RelationsState.HasDirect => builder.WithCondition<MatchQueryConditionBuilder>(_ => _.Must().Match(GetRelationTypeFieldName(), EntityMaterialRelation.Direct)),
+            _ => builder
+        };
+
+        private static string GetProcessedAtFromChangeHistoryDictionary(Guid materialId, Dictionary<Guid, ChangeHistoryEntity> changeHistoryDictionary)
+        {
+            return changeHistoryDictionary.TryGetValue(materialId, out var changeHistory)
+                ? changeHistory.Date.ToString(Iso8601DateFormat, CultureInfo.InvariantCulture)
+                : null;
+        }
+
+        private static void ChangeAssigneeAggregations(Dictionary<string, AggregationItem> aggregations, Guid userId)
+        {
+            var item = aggregations.GetValueOrDefault(MaterialAliases.Assignees.Alias);
+            if (item == null) return;
+
+            item.Buckets = item.Buckets.Where(_ => _.Key == userId.ToString()).ToArray();
+            if (item.Buckets.Length == 0) return;
+
+            item.Buckets[0].Key = MaterialAliases.Assignees.AliasForSingleItem;
+        }
+
+        private static IReadOnlyCollection<Property> ChangeAssigneeFiltered(IReadOnlyCollection<Property> items, Guid userId)
+        {
+            var result = new List<Property>(items.Select(_ => new Property(_.Name, _.Value)));
+            var assigneeProperty = result.FirstOrDefault(_ => _.Name == MaterialAliases.Assignees.Alias);
+            if (assigneeProperty?.Value == MaterialAliases.Assignees.AliasForSingleItem)
+            {
+                assigneeProperty.Value = userId.ToString();
+            }
+
+            return result;
+        }
+
+        private static JObject ChangeAssigneeHighlight(JObject highlight, Guid userId)
+        {
+            if (highlight.ContainsKey(MaterialAliases.Assignees.Path))
+            {
+                highlight.Remove(MaterialAliases.Assignees.Path);
+            }
+            if (highlight.ContainsKey(MaterialAliases.Assignees.Alias))
+            {
+                var value = highlight.GetValue(MaterialAliases.Assignees.Alias, StringComparison.OrdinalIgnoreCase).ToString()
+                    .Replace(userId.ToString(), MaterialAliases.Assignees.AliasForSingleItem, StringComparison.OrdinalIgnoreCase);
+                highlight[MaterialAliases.Assignees.Alias] = JToken.Parse(value);
+            }
+            return highlight;
+        }
+
+        private static JObject BuildMaterialsQuery(
+            string queryString,
+            int from,
+            int size,
+            RelationsState? materialRelationsState)
+        {
+            if (!materialRelationsState.HasValue)
+            {
+                return new ExactQueryBuilder()
+                    .WithPagination(from, size)
+                    .WithQueryString(queryString)
+                    .BuildSearchQuery()
+                    .WithAggregation(AggregationsFieldList)
+                    .WithHighlights();
+            }
+
+            var builder = new CompositeBoolQueryBuilder()
+                .WithPagination(from, size)
+                .WithCondition<ExactQueryConditionBuilder>(_ => _.WithQuery(queryString));
+
+            builder = WithRelationsStateCondition(builder, materialRelationsState);
+
+            return builder.BuildSearchQuery()
+                    .WithAggregation(AggregationsFieldList)
+                    .WithHighlights();
+        }
+
         private async Task<(JObject mlResponses, int mlResponsesCount, ImageVector[] imageVector)> GetMLResponseData(Guid materialId)
         {
             var mlResponses = await _mLResponseRepository.GetAllForMaterialAsync(materialId);
@@ -704,13 +793,6 @@ namespace Iis.Services
                                     .ToArray();
 
             return (ConvertMLResponsesToJson(mlResponses), mlResponses.Count, imageVectorList);
-        }
-
-        private string GetProcessedAtFromChangeHistoryDictionary(Guid materialId, Dictionary<Guid, ChangeHistoryEntity> changeHistoryDictionary)
-        {
-            return changeHistoryDictionary.TryGetValue(materialId, out var changeHistory)
-                ? changeHistory.Date.ToString(Iso8601DateFormat, CultureInfo.InvariantCulture)
-                : null;
         }
 
         private SubscriberDto GetIdTitleForLinkType(IReadOnlyCollection<MaterialFeatureEntity> materialFeatureCollection, MaterialNodeLinkType linkType)
@@ -747,7 +829,7 @@ namespace Iis.Services
                 .Select(p => p.NodeId)
                 .ToArray();
 
-            materialDocument.NodesCount = materialDocument.NodeIds.Count();
+            materialDocument.NodesCount = materialDocument.NodeIds.Length;
 
             var nodeDictionary = MaterialDocumentHelper.MapFeatureCollectionToNodeDictionary(featureCollection, _ontologyData);
 
@@ -769,79 +851,5 @@ namespace Iis.Services
 
             return materialDocument;
         }
-
-        private void ChangeAssigneeAggregations(Dictionary<string, AggregationItem> aggregations, Guid userId)
-        {
-            var item = aggregations.GetValueOrDefault(MaterialAliases.Assignees.Alias);
-            if (item == null) return;
-
-            item.Buckets = item.Buckets.Where(_ => _.Key == userId.ToString()).ToArray();
-            if (item.Buckets.Length == 0) return;
-
-            item.Buckets[0].Key = MaterialAliases.Assignees.AliasForSingleItem;
-        }
-
-        private IReadOnlyCollection<Property> ChangeAssigneeFiltered(IReadOnlyCollection<Property> items, Guid userId)
-        {
-            var result = new List<Property>(items.Select(_ => new Property(_.Name, _.Value)));
-            var assigneeProperty = result.FirstOrDefault(_ => _.Name == MaterialAliases.Assignees.Alias);
-            if (assigneeProperty?.Value == MaterialAliases.Assignees.AliasForSingleItem)
-            {
-                assigneeProperty.Value = userId.ToString();
-            }
-
-            return result;
-        }
-
-        private JObject ChangeAssigneeHighlight(JObject highlight, Guid userId)
-        {
-            if (highlight.ContainsKey(MaterialAliases.Assignees.Path))
-            {
-                highlight.Remove(MaterialAliases.Assignees.Path);
-            }
-            if (highlight.ContainsKey(MaterialAliases.Assignees.Alias))
-            {
-                var value = highlight.GetValue(MaterialAliases.Assignees.Alias).ToString()
-                    .Replace(userId.ToString(), MaterialAliases.Assignees.AliasForSingleItem);
-                highlight[MaterialAliases.Assignees.Alias] = JToken.Parse(value);
-            }
-            return highlight;
-        }
-
-        private JObject BuildMaterialsQuery(
-            string queryString,
-            int from,
-            int size,
-            RelationsState? materialRelationsState)
-        {
-            if (!materialRelationsState.HasValue)
-            {
-                return new ExactQueryBuilder()
-                    .WithPagination(from, size)
-                    .WithQueryString(queryString)
-                    .BuildSearchQuery()
-                    .WithAggregation(AggregationsFieldList)
-                    .WithHighlights();
-            }
-
-            var builder = new CompositeBoolQueryBuilder()
-                .WithPagination(from, size)
-                .WithCondition<ExactQueryConditionBuilder>(_ => _.WithQuery(queryString));
-
-            builder = WithRelationsStateCondition(builder, materialRelationsState);
-
-            return builder.BuildSearchQuery()
-                    .WithAggregation(AggregationsFieldList)
-                    .WithHighlights();
-        }
-
-        private CompositeBoolQueryBuilder WithRelationsStateCondition(CompositeBoolQueryBuilder builder, RelationsState? relationsState) => relationsState switch
-        {
-            RelationsState.Empty => builder.WithCondition<ExistsQueryConditionBuilder>(_ => _.MustNot().Exist(nameof(MaterialDocument.RelatedObjectCollection))),
-            RelationsState.Exists => builder.WithCondition<ExistsQueryConditionBuilder>(_ => _.Must().Exist(nameof(MaterialDocument.RelatedObjectCollection))),
-            RelationsState.HasFeature => builder.WithCondition<MatchQueryConditionBuilder>(_ => _.Must().Match(GetRelationTypeFieldName(), EntityMaterialRelation.Feature)),
-            RelationsState.HasDirect => builder.WithCondition<MatchQueryConditionBuilder>(_ => _.Must().Match(GetRelationTypeFieldName(), EntityMaterialRelation.Direct)),
-            _ => builder
-        };
     }
 }
