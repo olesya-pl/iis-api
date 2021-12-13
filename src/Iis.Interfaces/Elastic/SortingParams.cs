@@ -3,8 +3,8 @@ namespace Iis.Interfaces.Elastic
 {
     public class SortingParams
     {
-        private const string ASC = "asc";
-        private const string DESC = "desc";
+        public const string ASC = "asc";
+        public const string DESC = "desc";
         public string ColumnName { get; }
         public string Order { get; }
         public SortingParams(string columnName, string order)
