@@ -418,6 +418,6 @@ namespace IIS.Services.Materials
 
         public Task<IReadOnlyList<ResCallerReceiverDto>> GetCallInfoAsync(IReadOnlyList<Guid> nodeIds, CancellationToken cancellationToken = default) =>
             RunWithoutCommitAsync((unitOfWork) =>
-                unitOfWork.MaterialRepository.GetCallInfoAsync(nodeIds));
+                unitOfWork.MaterialRepository.GetCallInfoAsync(nodeIds, cancellationToken));
     }
 }

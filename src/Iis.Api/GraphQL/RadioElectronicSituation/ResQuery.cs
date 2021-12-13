@@ -34,12 +34,13 @@ namespace Iis.Api.GraphQL.RadioElectronicSituation
         {
             var locationItems = await service.GetSituationNodesAsync();
 
-            var nodeIds = locationItems
-                .Where(_ => _.ObjectNode != null)
-                .Select(_ => _.ObjectNode.Id)
+            var signIds = locationItems
+                .Where(_ => _.Sign != null)
+                .Select(_ => _.Sign.Id)
+                .Distinct()
                 .ToArray();
 
-            var callItems = await materialProvider.GetCallInfoAsync(nodeIds);
+            var callItems = await materialProvider.GetCallInfoAsync(signIds);
 
             var result = MapToResResult(locationItems, callItems);
 
