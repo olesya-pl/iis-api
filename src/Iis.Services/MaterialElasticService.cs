@@ -625,20 +625,13 @@ namespace Iis.Services
             return mlResponsesContainer;
         }
 
-        private static string RemoveImagesFromContent(string content)
-        {
-            if (string.IsNullOrWhiteSpace(content)) return null;
-
-            return Regex.Replace(content, @"\(data:image.+\)", string.Empty, RegexOptions.Compiled);
-        }
-
         private static (string SortColumn, string SortOrder) MapSortingToElastic(SortingParams sorting)
         {
             return sorting.ColumnName switch
             {
                 "createdDate" => ("CreatedDate", sorting.Order),
-                "type" => ("Type.keyword", sorting.Order),
-                "source" => ("Source.keyword", sorting.Order),
+                "type" => (MaterialAliases.Type.Path, sorting.Order),
+                "source" => (MaterialAliases.Source.Path, sorting.Order),
                 "processedStatus" => ("ProcessedStatus.OrderNumber", sorting.Order),
                 "sessionPriority" => ("SessionPriority.OrderNumber", sorting.Order),
                 "importance" => ("Importance.OrderNumber", sorting.Order),
@@ -678,8 +671,6 @@ namespace Iis.Services
         private MaterialDocument MapEntityToDocument(MaterialEntity material)
         {
             var materialDocument = _mapper.Map<MaterialDocument>(material);
-
-            materialDocument.Content = RemoveImagesFromContent(materialDocument.Content);
 
             materialDocument.Children = material.Children.Select(p => _mapper.Map<MaterialDocument>(p)).ToArray();
 
