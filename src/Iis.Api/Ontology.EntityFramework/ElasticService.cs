@@ -342,6 +342,7 @@ namespace IIS.Core.Ontology.EntityFramework
             var aggregatesElasticFilter = new ElasticFilter
             {
                 CherryPickedItems = filter.CherryPickedItems,
+                FilteredItems = filter.FilteredItems,
                 Limit = filter.Limit,
                 Offset = filter.Offset,
                 Suggestion = filter.Suggestion
