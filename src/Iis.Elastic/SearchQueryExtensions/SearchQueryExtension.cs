@@ -353,7 +353,7 @@ namespace Iis.Elastic.SearchQueryExtensions
                 }
                 if (lastOne)
                 {
-                    result = string.IsNullOrEmpty(result) ? $"(* OR {pickedQuery})" : $"({result} OR ({pickedQuery}))";
+                    result = string.IsNullOrEmpty(result) ? $"({pickedQuery})" : $"({result} OR ({pickedQuery}))";
                 }
             }
 
