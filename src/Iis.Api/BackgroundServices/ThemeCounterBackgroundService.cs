@@ -1,30 +1,40 @@
-﻿using Iis.DataModel.Themes;
+﻿using System;
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
+using Iis.DataModel.Themes;
 using Iis.Services.Contracts.Interfaces;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace Iis.Api.BackgroundServices
 {
     public class ThemeCounterBackgroundService : BackgroundService
     {
         private const string RefreshIntervalInSecondsParamName = "themesRefreshIntervalInSeconds";
-        private readonly IServiceProvider _serviceProvider;
-        private readonly ILogger<ThemeCounterBackgroundService> _logger;
-        private readonly int _refreshIntervalInSeconds;
 
         private static bool _objectUpdateNeeded = false;
         private static bool _eventUpdateNeeded = false;
         private static bool _materialUpdateNeeded = false;
         private static bool _reportUpdateNeeded = false;
 
-        private static bool UpdateNeeded => _objectUpdateNeeded 
-            || _eventUpdateNeeded 
+        private readonly IServiceProvider _serviceProvider;
+        private readonly ILogger<ThemeCounterBackgroundService> _logger;
+        private readonly int _refreshIntervalInSeconds;
+
+        public ThemeCounterBackgroundService(IServiceProvider serviceProvider, ILogger<ThemeCounterBackgroundService> logger)
+        {
+            _serviceProvider = serviceProvider;
+            _logger = logger;
+
+            var configuration = _serviceProvider.GetRequiredService<IConfiguration>();
+            _refreshIntervalInSeconds = configuration.GetValue(RefreshIntervalInSecondsParamName, 100);
+        }
+
+        private static bool UpdateNeeded => _objectUpdateNeeded
+            || _eventUpdateNeeded
             || _materialUpdateNeeded
             || _reportUpdateNeeded;
 
@@ -48,15 +58,6 @@ namespace Iis.Api.BackgroundServices
             _reportUpdateNeeded = true;
         }
 
-        public ThemeCounterBackgroundService(IServiceProvider serviceProvider, ILogger<ThemeCounterBackgroundService> logger)
-        {
-            _serviceProvider = serviceProvider;
-            _logger = logger;
-
-            var configuration = _serviceProvider.GetRequiredService<IConfiguration>();
-            _refreshIntervalInSeconds = configuration.GetValue(RefreshIntervalInSecondsParamName, 100);
-        }
-
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
             while (!stoppingToken.IsCancellationRequested)
@@ -74,10 +75,10 @@ namespace Iis.Api.BackgroundServices
                             await Task.Delay(TimeSpan.FromSeconds(_refreshIntervalInSeconds), stoppingToken);
                         }
                     }
-                    catch (Exception e) 
+                    catch (Exception e)
                     {
-                        _logger.LogError(e, $"Error occur while {nameof(ThemeCounterBackgroundService)} excution");
-                        await Task.Delay(TimeSpan.FromMinutes(2));
+                        _logger.LogError(e, $"Error occured while {nameof(ThemeCounterBackgroundService)} excution");
+                        await Task.Delay(TimeSpan.FromMinutes(2), stoppingToken);
                     }
                 }
                 else
@@ -85,6 +86,14 @@ namespace Iis.Api.BackgroundServices
                     await Task.Delay(TimeSpan.FromSeconds(1), stoppingToken);
                 }
             }
+        }
+
+        private static void ResetFlags()
+        {
+            _objectUpdateNeeded = false;
+            _eventUpdateNeeded = false;
+            _materialUpdateNeeded = false;
+            _reportUpdateNeeded = false;
         }
 
         private Guid[] GetTypesToUpdate()
@@ -108,21 +117,14 @@ namespace Iis.Api.BackgroundServices
             {
                 res.Add(ThemeTypeEntity.EntityReportId);
             }
-            _logger.LogInformation("ThemeCounterBackgroundService. Getting types to update Objects: {objects}, Events {events}, Materials {materials}, Reports {reports}", 
-                _objectUpdateNeeded, 
+            _logger.LogInformation(
+                "ThemeCounterBackgroundService. Getting types to update Objects: {objects}, Events {events}, Materials {materials}, Reports {reports}",
+                _objectUpdateNeeded,
                 _eventUpdateNeeded,
                 _materialUpdateNeeded,
                 _reportUpdateNeeded);
 
             return res.ToArray();
-        }
-
-        private static void ResetFlags()
-        {
-            _objectUpdateNeeded = false;
-            _eventUpdateNeeded = false;
-            _materialUpdateNeeded = false;
-            _reportUpdateNeeded = false;
         }
     }
 }
