@@ -22,9 +22,9 @@ namespace Iis.Api.Ontology
             [Service] NodeMapper nodeToJObjectMapper,
             [GraphQLNonNullType] Guid entityId,
             [GraphQLNonNullType] PaginationInput pagination,
-            [GraphQLNonNullType] SortingInput sorting)
+            SortingInput sorting)
         {
-            var sortingParam = new SortingParams(sorting.ColumnName, sorting.Order);
+            var sortingParam = new SortingParams(sorting?.ColumnName ?? UpdatedAtColumn, sorting?.Order ?? SortingParams.DESC);
 
             var paginationParam = new PaginationParams(pagination.Page, pagination.PageSize);
 
