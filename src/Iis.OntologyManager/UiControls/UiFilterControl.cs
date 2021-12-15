@@ -23,7 +23,7 @@ namespace Iis.OntologyManager.UiControls
 
         protected override void CreateControls()
         {
-            _container.SetColWidth(_style.ButtonWidthDefault / 2);
+            _container.SetColWidth(_style.Common.ButtonWidthDefault / 2);
 
             var radioAll = new RadioButton
             {

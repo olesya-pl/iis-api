@@ -106,7 +106,7 @@ namespace Iis.OntologyManager
 
             _configuration = configuration;
             _style = OntologyManagerStyle.GetDefaultStyle(this);
-            _uiControlsCreator = new UiControlsCreator(_style);
+            _uiControlsCreator = new UiControlsCreator(_style.Common);
             _logger = logger;
             _schemaService = schemaService;
 
@@ -141,17 +141,17 @@ namespace Iis.OntologyManager
         #region UI Control Creators
         private void SetBackColor()
         {
-            panelTop.BackColor = _style.BackgroundColor;
-            panelMain.BackColor = _style.BackgroundColor;
-            panelLeft.BackColor = _style.BackgroundColor;
-            panelRight.BackColor = _style.BackgroundColor;
+            panelTop.BackColor = _style.Common.BackgroundColor;
+            panelMain.BackColor = _style.Common.BackgroundColor;
+            panelLeft.BackColor = _style.Common.BackgroundColor;
+            panelRight.BackColor = _style.Common.BackgroundColor;
         }
 
         private void SetControlsTabMain(Panel rootPanel)
         {
             pnlTop = new Panel();
             pnlTop.Location = new Point(0, 0);
-            pnlTop.Size = new Size(rootPanel.Width, _style.ButtonHeightDefault * 2);
+            pnlTop.Size = new Size(rootPanel.Width, _style.Common.ButtonHeightDefault * 2);
             pnlTop.BorderStyle = BorderStyle.FixedSingle;
             pnlTop.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
 
@@ -230,7 +230,7 @@ namespace Iis.OntologyManager
 
         private void SetTypeViewHeader(Panel rootPanel)
         {
-            var rootContainer = new UiContainerManager("RootPanel", rootPanel);
+            var rootContainer = new UiContainerManager("RootPanel", rootPanel, _style.Common);
 
             btnTypeBack = new Button { Text = "Назад" };
             btnTypeBack.Click += (sender, e) => { GoBack(); };
@@ -256,7 +256,7 @@ namespace Iis.OntologyManager
         private void SetControlsTopPanel()
         {
             panelTop.SuspendLayout();
-            var container = new UiContainerManager("PanelTop", panelTop);
+            var container = new UiContainerManager("PanelTop", panelTop, _style.Common);
             _filterControl = new UiFilterControl();
             _filterControl.Initialize("FilterControl", null);
             _filterControl.OnChange += ReloadTypes;
@@ -273,21 +273,21 @@ namespace Iis.OntologyManager
             cmbSchemaSources.SelectedIndexChanged += SourceSelectionChanged;
             container.Add(cmbSchemaSources);
 
-            btnSaveSchema = new Button { Text = "Зберегти", MinimumSize = new Size { Height = _style.ButtonHeightDefault } };
+            btnSaveSchema = new Button { Text = "Зберегти", MinimumSize = new Size { Height = _style.Common.ButtonHeightDefault } };
             btnSaveSchema.Click += btnSave_Click;
-            btnCompare = new Button { Text = "Порівняти", MinimumSize = new Size { Height = _style.ButtonHeightDefault } };
+            btnCompare = new Button { Text = "Порівняти", MinimumSize = new Size { Height = _style.Common.ButtonHeightDefault } };
             btnCompare.Click += btnCompare_Click;
             container.AddInRow(new List<Control> { btnSaveSchema, btnCompare });
 
-            btnMigrate = new Button { Text = "Міграція", MinimumSize = new Size { Height = _style.ButtonHeightDefault } };
+            btnMigrate = new Button { Text = "Міграція", MinimumSize = new Size { Height = _style.Common.ButtonHeightDefault } };
             btnMigrate.Click += btnMigrate_Click;
             container.Add(btnMigrate);
 
-            btnDuplicates = new Button { Text = "Дублікати", MinimumSize = new Size { Height = _style.ButtonHeightDefault } };
+            btnDuplicates = new Button { Text = "Дублікати", MinimumSize = new Size { Height = _style.Common.ButtonHeightDefault } };
             btnDuplicates.Click += btnDuplicates_Click;
             container.Add(btnDuplicates);
 
-            var btnRemoveEntity = new Button { Text = "Видалення", MinimumSize = new Size { Height = _style.ButtonHeightDefault } };
+            var btnRemoveEntity = new Button { Text = "Видалення", MinimumSize = new Size { Height = _style.Common.ButtonHeightDefault } };
             btnRemoveEntity.Click += RemoveEntityClick;
 
             container.Add(btnRemoveEntity);
@@ -309,7 +309,7 @@ namespace Iis.OntologyManager
             menuElastic.Items[5].Click += async (sender, e) => { await ReIndexElasticAsync(IndexKeys.Wiki); };
             menuElastic.Items.Add("Індекси Користувачів");
             menuElastic.Items[6].Click += async (sender, e) => { await ReIndexElasticAsync(IndexKeys.Users); };
-            var btnElastic = new Button { Text = "Перестворити Elastic " + char.ConvertFromUtf32(9660), MinimumSize = new Size { Height = _style.ButtonHeightDefault }, ContextMenuStrip = menuElastic};
+            var btnElastic = new Button { Text = "Перестворити Elastic " + char.ConvertFromUtf32(9660), MinimumSize = new Size { Height = _style.Common.ButtonHeightDefault }, ContextMenuStrip = menuElastic};
             btnElastic.Click += (sender, e) => { menuElastic.Show(btnElastic, new Point(0, btnElastic.Height)); };
             container.Add(btnElastic);
 
@@ -318,7 +318,7 @@ namespace Iis.OntologyManager
             menuReload.Items[0].Click += async (sender, e) => { await ReloadOntologyData(); };
             menuReload.Items.Add("Весь веб-додаток");
             menuReload.Items[1].Click += async (sender, e) => { await RestartIisApp(); };
-            var btnReload = new Button { Text = "Перезавантажити " + char.ConvertFromUtf32(9660), MinimumSize = new Size { Height = _style.ButtonHeightDefault }, ContextMenuStrip = menuReload };
+            var btnReload = new Button { Text = "Перезавантажити " + char.ConvertFromUtf32(9660), MinimumSize = new Size { Height = _style.Common.ButtonHeightDefault }, ContextMenuStrip = menuReload };
             btnReload.Click += (sender, e) => { menuReload.Show(btnReload, new Point(0, btnReload.Height)); };
             container.Add(btnReload);
 

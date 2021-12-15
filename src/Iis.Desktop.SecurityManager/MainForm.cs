@@ -12,8 +12,6 @@ using Iis.Desktop.SecurityManager.Style;
 using Microsoft.Extensions.Configuration;
 using Serilog;
 
-using Iis.Services.Contracts.Interfaces;
-
 namespace Iis.Desktop.SecurityManager
 {
     public partial class MainForm : Form

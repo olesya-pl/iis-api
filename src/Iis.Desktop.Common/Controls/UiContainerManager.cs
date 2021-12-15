@@ -11,7 +11,7 @@ namespace Iis.OntologyManager.UiControls
     public class UiContainerManager
     {
         private Control _rootControl;
-        private IOntologyManagerStyle _style;
+        private IDesktopStyle _style;
         private Rectangle _rect;
         private int _bottom;
         private int _right;
@@ -26,11 +26,11 @@ namespace Iis.OntologyManager.UiControls
         public string Name { get; private set; }
         public Control RootControl => _rootControl;
 
-        public UiContainerManager(string name, Control rootControl, Rectangle? rect = null)
+        public UiContainerManager(string name, Control rootControl, IDesktopStyle style, Rectangle? rect = null)
         {
             Name = name;
             _rootControl = rootControl;
-            _style = OntologyManagerStyle.GetDefaultStyle(rootControl);
+            _style = style;
             _rect = rect ?? rootControl.ClientRectangle;
             Top = TopOfFirst;
             _left = _rect.Left + _style.MarginHor;

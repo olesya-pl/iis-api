@@ -83,9 +83,9 @@ namespace Iis.OntologyManager.UiControls
         protected override void CreateControls()
         {
             var panels = _uiControlsCreator.GetTopBottomPanels(MainPanel, 350);
-            var containerTop = new UiContainerManager("MainOptions", panels.panelTop);
-            containerTop.SetColWidth((int)(_style.ControlWidthDefault * 1.5));
-            var containerBottom = new UiContainerManager("SecondaryOptions", panels.panelBottom);
+            var containerTop = new UiContainerManager("MainOptions", panels.panelTop, _style.Common);
+            containerTop.SetColWidth((int)(_style.Common.ControlWidthDefault * 1.5));
+            var containerBottom = new UiContainerManager("SecondaryOptions", panels.panelBottom, _style.Common);
 
             containerTop.Add(txtId = new TextBox { ReadOnly = true }, "ІД");
             containerTop.Add(txtName = new TextBox(), "Ім'я *");
@@ -113,7 +113,7 @@ namespace Iis.OntologyManager.UiControls
                     DropDownStyle = ComboBoxStyle.DropDownList,
                     DisplayMember = "Name",
                     ValueMember = "Id",
-                    BackColor = _style.BackgroundColor
+                    BackColor = _style.Common.BackgroundColor
                 };
                 containerTop.Add(cmbTargetType, "Зв'язок до типу *");
                 cmbTargetType.SelectedIndexChanged += (sender, e) => TargetTypeChanged();

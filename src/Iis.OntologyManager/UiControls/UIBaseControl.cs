@@ -30,17 +30,17 @@ namespace Iis.OntologyManager.UiControls
                 BorderStyle = BorderStyle.FixedSingle,
             };
             _style = OntologyManagerStyle.GetDefaultStyle(MainPanel);
-            _uiControlsCreator = new UiControlsCreator(_style);
+            _uiControlsCreator = new UiControlsCreator(_style.Common);
 
-            _container = new UiContainerManager(name, MainPanel);
-            MainPanel.BackColor = _style.BackgroundColor;
+            _container = new UiContainerManager(name, MainPanel, _style.Common);
+            MainPanel.BackColor = _style.Common.BackgroundColor;
 
             MainPanel.SuspendLayout();
             CreateControls();
             if (mainPanel == null)
             {
                 MainPanel.Width = _container.Right;
-                MainPanel.Height = _container.Bottom + _style.MarginVer;
+                MainPanel.Height = _container.Bottom + _style.Common.MarginVer;
             }
             MainPanel.ResumeLayout();
 

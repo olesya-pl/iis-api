@@ -169,7 +169,7 @@ namespace Iis.OntologyManager.UiControls
                 DropDownStyle = ComboBoxStyle.DropDownList,
                 DisplayMember = "",
                 ValueMember = "",
-                BackColor = _style.BackgroundColor
+                BackColor = _style.Common.BackgroundColor
             };
             _container.Add(cmbUniqueValueFieldName, "Unique Value Field Name");
 

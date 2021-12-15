@@ -38,7 +38,7 @@ namespace Iis.OntologyManager.UiControls
         protected override void CreateControls()
         {
             var panels = _uiControlsCreator.GetTopBottomPanels(MainPanel, 200);
-            var container = new UiContainerManager("DuplicateSearchOptions", panels.panelTop);
+            var container = new UiContainerManager("DuplicateSearchOptions", panels.panelTop, _style.Common);
             container.SetColWidth(500);
             container.Add(txtSearch = new TextBox(), "Параметри пошуку");
             txtSearch.Text = "MilitaryOrganization: title, commonInfo.OpenName, commonInfo.RealNameShort (parent.title, parent.parent.title, parent.parent.parent.title)";
@@ -46,7 +46,7 @@ namespace Iis.OntologyManager.UiControls
             txtUrl.Text = "http://qa.contour.net";
 
             container.Add(btnSearch = new Button { Text = "Шукати" });
-            btnSearch.Width = _style.ButtonWidthDefault;
+            btnSearch.Width = _style.Common.ButtonWidthDefault;
             btnSearch.Click += (sender, e) => { Search(true); };
             container.Add(lblRecordsCount = new Label { Text = RECORDS_COUNT_TEXT });
             container.Add(lblValuesCount = new Label { Text = VALUES_COUNT_TEXT });
@@ -62,7 +62,7 @@ namespace Iis.OntologyManager.UiControls
             menuGrid.Items[0].Click += (sender, e) => { Delete(); };
             grid.ContextMenuStrip = menuGrid;
 
-            var bottomContainer = new UiContainerManager("DuplicateSearchResult", panels.panelBottom);
+            var bottomContainer = new UiContainerManager("DuplicateSearchResult", panels.panelBottom, _style.Common);
             bottomContainer.SetFullWidthColumn();
             bottomContainer.Add(grid, null, true);
             grid.DoubleClick += (sender, e) => { OpenUrl(); };

@@ -41,8 +41,8 @@ namespace Iis.OntologyManager.UiControls
         protected override void CreateControls()
         {
             var panels = _uiControlsCreator.GetTopBottomPanels(MainPanel, 200);
-            var container = new UiContainerManager("RemoveEntityOptions", panels.panelTop);
-            var bottomContainer = new UiContainerManager("RemoveEntityResult", panels.panelBottom);
+            var container = new UiContainerManager("RemoveEntityOptions", panels.panelTop, _style.Common);
+            var bottomContainer = new UiContainerManager("RemoveEntityResult", panels.panelBottom, _style.Common);
 
             container.SetFullWidthColumn();
 
@@ -196,7 +196,7 @@ namespace Iis.OntologyManager.UiControls
             actionButton.Click += RemoveClick;
             actionButton.Text = RemoveEntityBtnCaption;
             actionButton.Enabled = false;
-            actionButton.Width = _style.ButtonWidthDefault;
+            actionButton.Width = _style.Common.ButtonWidthDefault;
 
             return actionButton;
         }
@@ -208,7 +208,7 @@ namespace Iis.OntologyManager.UiControls
             actionButton.Click += SearchClick;
             actionButton.Text = FindEntityBtnCaption;
             actionButton.Enabled = false;
-            actionButton.Width = _style.ButtonWidthDefault;
+            actionButton.Width = _style.Common.ButtonWidthDefault;
 
             return actionButton;
         }
@@ -216,7 +216,7 @@ namespace Iis.OntologyManager.UiControls
         private TextBox SetupTextBox(TextBox textBox)
         {
             textBox.TextChanged += TextChanged;
-            textBox.Width = _style.ButtonWidthDefault;
+            textBox.Width = _style.Common.ButtonWidthDefault;
 
             return textBox;
         }

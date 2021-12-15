@@ -48,7 +48,7 @@ namespace Iis.OntologyManager.UiControls
         {
             MainPanel.SuspendLayout();
             var panels = _uiControlsCreator.GetTopBottomPanels(MainPanel, 120, 20);
-            var container = new UiContainerManager("Comparison", panels.panelTop);
+            var container = new UiContainerManager("Comparison", panels.panelTop, _style.Common);
 
             cmbSchemaSourcesCompare = new ComboBox
             {
@@ -63,7 +63,7 @@ namespace Iis.OntologyManager.UiControls
             cmbSchemaSourcesCompare.SelectedIndexChanged += (sender, e) => { CompareSchemas(); };
             container.Add(cmbSchemaSourcesCompare);
 
-            var btnComparisonUpdate = new Button { Text = "Update database", MinimumSize = new Size { Height = _style.ButtonHeightDefault } };
+            var btnComparisonUpdate = new Button { Text = "Update database", MinimumSize = new Size { Height = _style.Common.ButtonHeightDefault } };
             btnComparisonUpdate.Click += (sender, e) => { UpdateComparedDatabase(); };
             container.Add(btnComparisonUpdate);
 
@@ -86,13 +86,13 @@ namespace Iis.OntologyManager.UiControls
         }
         private void CreateCheckBoxes(UiContainerManager container)
         {
-            container.Add(cbNodeTypeCreate = new CheckBox { Text = "NodeType Create", Checked = true, MinimumSize = new Size { Height = _style.CheckboxHeightDefault } });
-            container.Add(cbNodeTypeUpdate = new CheckBox { Text = "NodeType Update", Checked = true, MinimumSize = new Size { Height = _style.CheckboxHeightDefault } });
-            container.Add(cbNodeTypeDelete = new CheckBox { Text = "NodeType Delete", MinimumSize = new Size { Height = _style.CheckboxHeightDefault } });
+            container.Add(cbNodeTypeCreate = _uiControlsCreator.GetCheckBox("NodeType Create", true));
+            container.Add(cbNodeTypeUpdate = _uiControlsCreator.GetCheckBox("NodeType Update", true));
+            container.Add(cbNodeTypeDelete = _uiControlsCreator.GetCheckBox("NodeType Delete", false));
             container.GoToNewColumn();
-            container.Add(cbAliasCreate = new CheckBox { Text = "Aliases Create", MinimumSize = new Size { Height = _style.CheckboxHeightDefault } });
-            container.Add(cbAliasUpdate = new CheckBox { Text = "Aliases Update", MinimumSize = new Size { Height = _style.CheckboxHeightDefault } });
-            container.Add(cbAliasDelete = new CheckBox { Text = "Aliases Delete", MinimumSize = new Size { Height = _style.CheckboxHeightDefault } });
+            container.Add(cbAliasCreate = _uiControlsCreator.GetCheckBox("Aliases Create", false));
+            container.Add(cbAliasUpdate = _uiControlsCreator.GetCheckBox("Aliases Update", false));
+            container.Add(cbAliasDelete = _uiControlsCreator.GetCheckBox("Aliases Delete", false));
 
             cbNodeTypeCreate.BackColor = _createColor;
             cbNodeTypeUpdate.BackColor = _updateColor;

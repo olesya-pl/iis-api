@@ -1,16 +1,16 @@
-﻿using Iis.OntologyManager.Style;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Text;
 using System.Windows.Forms;
+using Iis.OntologyManager.Style;
 
 namespace Iis.OntologyManager.UiControls
 {
     public class UiControlsCreator
     {
-        IOntologyManagerStyle _style;
-        public UiControlsCreator(IOntologyManagerStyle style)
+        IDesktopStyle _style;
+        public UiControlsCreator(IDesktopStyle style)
         {
             _style = style;
         }
@@ -142,7 +142,7 @@ namespace Iis.OntologyManager.UiControls
                 BackColor = _style.BackgroundColor
             };
             form.Controls.Add(rootPanel);
-            var container = new UiContainerManager("ModalComboBox", rootPanel);
+            var container = new UiContainerManager("ModalComboBox", rootPanel, _style);
             var comboBox = new ComboBox
             {
                 DropDownStyle = ComboBoxStyle.DropDownList,
@@ -215,5 +215,8 @@ namespace Iis.OntologyManager.UiControls
                 StartPosition = FormStartPosition.CenterParent
             };
         }
-    };
+
+        public CheckBox GetCheckBox(string text, bool isChecked) =>
+            new CheckBox { Text = text, Checked = isChecked, MinimumSize = new Size { Height = _style.CheckboxHeightDefault } };
+    }
 }

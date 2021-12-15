@@ -53,6 +53,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Iis.CoordinatesHandler", "I
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Iis.Desktop.SecurityManager", "Iis.Desktop.SecurityManager\Iis.Desktop.SecurityManager.csproj", "{FD9A183B-B13E-45E2-9E4E-C956CFF85983}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Iis.Desktop.Common", "Iis.Desktop.Common\Iis.Desktop.Common.csproj", "{D73789B5-E2CB-4661-A045-241B08E5C470}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -159,6 +161,10 @@ Global
 		{FD9A183B-B13E-45E2-9E4E-C956CFF85983}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FD9A183B-B13E-45E2-9E4E-C956CFF85983}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FD9A183B-B13E-45E2-9E4E-C956CFF85983}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D73789B5-E2CB-4661-A045-241B08E5C470}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D73789B5-E2CB-4661-A045-241B08E5C470}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D73789B5-E2CB-4661-A045-241B08E5C470}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D73789B5-E2CB-4661-A045-241B08E5C470}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
