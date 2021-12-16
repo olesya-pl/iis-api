@@ -5,6 +5,8 @@ namespace Iis.Utility
 {
     public static class DateTimeExtensions
     {
+        public const string Iso8601DateFormat = "yyyy-MM-dd'T'HH:mm:ssZ";
+
         public static string ToString(this DateTime? dateTime, string format)
         {
             return dateTime.HasValue

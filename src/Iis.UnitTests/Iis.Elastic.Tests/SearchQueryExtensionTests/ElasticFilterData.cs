@@ -124,37 +124,37 @@ namespace Iis.UnitTests.Iis.Elastic.Tests.SearchQueryExtensionTests
             {
                 new ElasticFilter()
                 {
-                    Suggestion = "омсбр№^:{}[]/!"
+                    Suggestion = "омсбр№^{}[]/!"
                 },
                 false,
-                "омсбр\\^\\:\\{\\}\\[\\]\\/\\!"
+                "омсбр\\^\\{\\}\\[\\]\\/\\!"
             };
             yield return new object[]
             {
                 new ElasticFilter()
                 {
-                    Suggestion = "ом№^:{}[]/!сбр"
+                    Suggestion = "ом№^{}[]/!сбр"
                 },
                 false,
-                "ом\\^\\:\\{\\}\\[\\]\\/\\!сбр"
+                "ом\\^\\{\\}\\[\\]\\/\\!сбр"
             };
             yield return new object[]
             {
                 new ElasticFilter()
                 {
-                    Suggestion = "омсбр№^:{}[]/!"
+                    Suggestion = "омсбр№^{}[]/!"
                 },
                 true,
-                "\"омсбр\\^\\:\\{\\}\\[\\]\\/\\!\" OR омсбр\\^\\:\\{\\}\\[\\]\\/\\!~"
+                "\"омсбр\\^\\{\\}\\[\\]\\/\\!\" OR омсбр\\^\\{\\}\\[\\]\\/\\!~"
             };
             yield return new object[]
             {
                 new ElasticFilter()
                 {
-                    Suggestion = "ом№^:{}[]/!сбр"
+                    Suggestion = "ом№^{}[]/!сбр"
                 },
                 true,
-                "\"ом\\^\\:\\{\\}\\[\\]\\/\\!сбр\" OR ом\\^\\:\\{\\}\\[\\]\\/\\!сбр~"
+                "\"ом\\^\\{\\}\\[\\]\\/\\!сбр\" OR ом\\^\\{\\}\\[\\]\\/\\!сбр~"
             };
         }
     }

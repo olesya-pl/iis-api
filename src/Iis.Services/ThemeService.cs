@@ -1,27 +1,25 @@
-using AutoMapper;
-using Iis.DataModel;
-using Iis.DataModel.Themes;
-using Iis.Interfaces.Elastic;
-using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
-using Iis.Services.Contracts.Interfaces;
 using System.Threading;
+using System.Threading.Tasks;
+using AutoMapper;
+using Iis.DataModel;
+using Iis.DataModel.Themes;
 using Iis.DbLayer.MaterialDictionaries;
-using IIS.Repository;
 using Iis.DbLayer.Repositories;
-using IIS.Repository.Factories;
-using Iis.Services.Contracts.Params;
-using Iis.Services.Contracts.Dtos;
-using Newtonsoft.Json.Linq;
-using Iis.Interfaces.Ontology.Schema;
 using Iis.Domain.Users;
-using Newtonsoft.Json;
-using IIS.Services.Contracts.Interfaces;
-using Microsoft.Extensions.Logging;
+using Iis.Interfaces.Elastic;
 using Iis.Interfaces.Materials;
+using Iis.Interfaces.Ontology.Schema;
+using IIS.Repository;
+using IIS.Repository.Factories;
+using Iis.Services.Contracts.Dtos;
+using Iis.Services.Contracts.Interfaces;
+using IIS.Services.Contracts.Interfaces;
+using Iis.Services.Contracts.Params;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace Iis.Services
 {
@@ -39,7 +37,8 @@ namespace Iis.Services
         private readonly IMaterialProvider _materialProvider;
         private readonly ILogger<ThemeService<IIISUnitOfWork>> _logger;
 
-        public ThemeService(IUnitOfWorkFactory<TUnitOfWork> unitOfWorkFactory,
+        public ThemeService(
+            IUnitOfWorkFactory<TUnitOfWork> unitOfWorkFactory,
             OntologyContext context,
             IMapper mapper,
             IOntologySchema ontologySchema,
@@ -66,12 +65,12 @@ namespace Iis.Services
         public async Task<Guid> CreateThemeAsync(ThemeDto theme)
         {
             var entity = _mapper.Map<ThemeEntity>(theme);
-            
-            entity.QueryResults 
-                = entity.ReadQueryResults 
+
+            entity.QueryResults
+                = entity.ReadQueryResults
                 = (await GetQueryResultsAsync(entity.Id, entity.UserId, entity.TypeId, ThemeQueryParser.Parse(entity.QueryRequest))).Count;
             entity.UnreadCount = default;
-                
+
             _context.Themes.Add(entity);
 
             await _context.SaveChangesAsync();
@@ -99,11 +98,11 @@ namespace Iis.Services
             }
             else
             {
-                entity.QueryResults 
-                    = entity.ReadQueryResults 
+                entity.QueryResults
+                    = entity.ReadQueryResults
                     = (await GetQueryResultsAsync(entity.Id, entity.UserId, entity.TypeId, ThemeQueryParser.Parse(entity.QueryRequest))).Count;
             }
-            
+
             entity.UnreadCount = GetUnreadQueryResult(originalEntity.QueryResults, originalEntity.ReadQueryResults);
         }
 
@@ -213,14 +212,14 @@ namespace Iis.Services
         {
             var entityTypes = await RunWithoutCommitAsync(
                 async uow => await uow.ThemeRepository.GetThemeTypesByEntityTypeNamesAsync(entityTypeNames));
-            
+
             var entitiesTypeId = entityTypes.Select(e => e.Id);
-            
-            var entities  = await GetThemes()
+
+            var entities = await GetThemes()
                 .Where(e => e.UserId == userId && entitiesTypeId.Contains(e.TypeId))
                 .OrderByDescending(_ => _.UpdatedAt)
                 .ToListAsync();
-            
+
             var themes = _mapper.Map<IReadOnlyCollection<ThemeDto>>(entities);
 
             return themes;
@@ -245,6 +244,8 @@ namespace Iis.Services
         }
         public async Task UpdateQueryResultsAsync(CancellationToken ct, params Guid[] themeTypes)
         {
+            _logger.LogInformation("ThemeService. UpdateQueryResultsAsync. ThemeTypes {types}", string.Join(',', themeTypes));
+
             var themes = await _context.Themes
                 .Where(p => themeTypes.Contains(p.TypeId))
                 .AsNoTracking()
@@ -271,6 +272,7 @@ namespace Iis.Services
 
             foreach (var result in results)
             {
+                _logger.LogInformation("ThemeService. UpdateQueryResultsAsync. Trying update theme with id {types} and count {count}", result.ThemeId, result.Count);
                 if (!themesByQuery.ContainsKey(result.ThemeId))
                 {
                     continue;
@@ -342,7 +344,7 @@ namespace Iis.Services
                     TypeId = typeId
                 };
             }
-            
+
             var filter = new ElasticFilter
             {
                 Limit = 50,
@@ -363,12 +365,15 @@ namespace Iis.Services
                 _ => (IEnumerable<string>)null
             };
 
-            if (indexes is null) return new QueryResult
+            if (indexes is null)
+            {
+                return new QueryResult
             {
                 Count = 0,
                 ThemeId = themeId,
                 TypeId = typeId
             };
+            }
 
             try
             {
@@ -482,7 +487,7 @@ namespace Iis.Services
                     ThemeId = themeId,
                     TypeId = typeId
                 };
-            }            
+            }
         }
 
         private string[] GetOntologyIndexes(string typeName)
@@ -503,6 +508,6 @@ namespace Iis.Services
             public int Count { get; set; }
             public Guid ThemeId { get; set; }
             public Guid TypeId { get; set; }
-        } 
+        }
     }
 }

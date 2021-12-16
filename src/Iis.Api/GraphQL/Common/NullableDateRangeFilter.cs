@@ -6,9 +6,9 @@ namespace Iis.Api.GraphQL.Common
 {
     public class NullableDateRangeFilter
     {
-        [GraphQLType(typeof(DateType))]
+        [GraphQLType(typeof(DateTimeType))]
         public DateTime? From { get; set; }
-        [GraphQLType(typeof(DateType))]
+        [GraphQLType(typeof(DateTimeType))]
         public DateTime? To { get; set; }
     }
 }

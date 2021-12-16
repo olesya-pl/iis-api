@@ -44,7 +44,6 @@ namespace Iis.Api
 {
     public class AutoMapperProfile : Profile
     {
-        private const string Iso8601DateFormat = "yyyy-MM-dd'T'HH:mm:ssZ";
         private const string Iso8601DateFormatWithFraction = "yyyy-MM-ddTHH:mm:ss.fffZ";
 
         public AutoMapperProfile()
@@ -245,9 +244,9 @@ namespace Iis.Api
             CreateMap<UserEntity, DbLayer.Repositories.Editor>();
             CreateMap<MaterialSignEntity, DbLayer.Repositories.MaterialSign>();
             CreateMap<MaterialEntity, DbLayer.Repositories.MaterialDocument>()
-                .ForMember(dest => dest.CreatedDate, opts => opts.MapFrom(src => src.CreatedDate.ToString(Iso8601DateFormat, CultureInfo.InvariantCulture)))
-                .ForMember(dest => dest.UpdatedAt, opts => opts.MapFrom(src => src.UpdatedAt.ToString(Iso8601DateFormat, CultureInfo.InvariantCulture)))
-                .ForMember(dest => dest.RegistrationDate, opts => opts.MapFrom(src => src.RegistrationDate.ToString(Iso8601DateFormat, CultureInfo.InvariantCulture)))
+                .ForMember(dest => dest.CreatedDate, opts => opts.MapFrom(src => src.CreatedDate.ToString(DateTimeExtensions.Iso8601DateFormat, CultureInfo.InvariantCulture)))
+                .ForMember(dest => dest.UpdatedAt, opts => opts.MapFrom(src => src.UpdatedAt.ToString(DateTimeExtensions.Iso8601DateFormat, CultureInfo.InvariantCulture)))
+                .ForMember(dest => dest.RegistrationDate, opts => opts.MapFrom(src => src.RegistrationDate.ToString(DateTimeExtensions.Iso8601DateFormat, CultureInfo.InvariantCulture)))
                 .ForMember(dest => dest.Metadata, opts => opts.MapFrom<MaterialMetadataResolver<MaterialEntity, MaterialDocument>, string>(_ => _.Metadata))
                 .ForMember(dest => dest.FileName, opts => opts.MapFrom(src => src.File == null ? null : src.File.Name))
                 .ForPath(dest => dest.SecurityAttributes.AccessLevel, opts => opts.MapFrom(src => src.AccessLevel))
@@ -281,9 +280,9 @@ namespace Iis.Api
             CreateMap<DbLayer.Repositories.RelatedObjectOfStudy, Iis.Domain.Materials.RelatedObjectOfStudy>();
             CreateMap<DbLayer.Repositories.MaterialDocument, Iis.Domain.Materials.Material>()
                 .ForMember(dest => dest.File, opts => opts.MapFrom(src => src.FileId.HasValue ? new File(src.FileId.Value) : null))
-                .ForMember(dest => dest.CreatedDate, opts => opts.MapFrom(src => DateTime.ParseExact(src.CreatedDate, Iso8601DateFormat, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind)))
-                .ForMember(dest => dest.UpdatedAt, opts => opts.MapFrom(src => DateTime.ParseExact(src.UpdatedAt, Iso8601DateFormat, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind)))
-                .ForMember(dest => dest.RegistrationDate, opts => opts.MapFrom(src => src.RegistrationDate.AsDateTime(Iso8601DateFormat, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind)))
+                .ForMember(dest => dest.CreatedDate, opts => opts.MapFrom(src => DateTime.ParseExact(src.CreatedDate, DateTimeExtensions.Iso8601DateFormat, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind)))
+                .ForMember(dest => dest.UpdatedAt, opts => opts.MapFrom(src => DateTime.ParseExact(src.UpdatedAt, DateTimeExtensions.Iso8601DateFormat, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind)))
+                .ForMember(dest => dest.RegistrationDate, opts => opts.MapFrom(src => src.RegistrationDate.AsDateTime(DateTimeExtensions.Iso8601DateFormat, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind)))
                 .ForMember(dest => dest.Children, opts => opts.Ignore())
                 .ForMember(dest => dest.Assignees, opts => opts.MapFrom(src => src.Assignees))
                 .ForMember(dest => dest.Editor, opts => opts.MapFrom(src => src.Editor));
@@ -413,15 +412,15 @@ namespace Iis.Api
 
             CreateMap<ChangeHistoryEntity, ChangeHistoryDto>().ReverseMap();
             CreateMap<INodeChangeHistory, ChangeHistoryDocument>()
-                .ForMember(dest => dest.Date, opts => opts.MapFrom(src => src.Date.ToString(Iso8601DateFormat, CultureInfo.InvariantCulture)));
+                .ForMember(dest => dest.Date, opts => opts.MapFrom(src => src.Date.ToString(DateTimeExtensions.Iso8601DateFormat, CultureInfo.InvariantCulture)));
             CreateMap<ChangeHistoryDto, IIS.Core.GraphQL.ChangeHistory.ChangeHistoryItem>()
                 .ForMember(dest => dest.EntityId, opts => opts.MapFrom(src => src.TargetId))
                 .ForMember(dest => dest.OldValue, opts => opts.MapFrom(src => src.OldTitle ?? src.OldValue))
                 .ForMember(dest => dest.NewValue, opts => opts.MapFrom(src => src.NewTitle ?? src.NewValue));
             CreateMap<ChangeHistoryDocument, ChangeHistoryDto>()
-                .ForMember(dest => dest.Date, opts => opts.MapFrom(src => DateTime.ParseExact(src.Date, Iso8601DateFormat, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind)));
+                .ForMember(dest => dest.Date, opts => opts.MapFrom(src => DateTime.ParseExact(src.Date, DateTimeExtensions.Iso8601DateFormat, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind)));
             CreateMap<ChangeHistoryEntity, ChangeHistoryDocument>()
-                .ForMember(dest => dest.Date, opts => opts.MapFrom(src => src.Date.ToString(Iso8601DateFormat, CultureInfo.InvariantCulture)));
+                .ForMember(dest => dest.Date, opts => opts.MapFrom(src => src.Date.ToString(DateTimeExtensions.Iso8601DateFormat, CultureInfo.InvariantCulture)));
 
             CreateMap<Iis.Interfaces.Elastic.AggregationBucket, IIS.Core.GraphQL.Entities.AggregationBucket>();
             CreateMap<Iis.Interfaces.Elastic.AggregationItem, IIS.Core.GraphQL.Entities.AggregationItem>();
@@ -440,7 +439,7 @@ namespace Iis.Api
             CreateMap<DomainGraphTypes.GraphLink, GraphQLGraphTypes.GraphLink>();
             CreateMap<DomainGraphTypes.GraphNode, GraphQLGraphTypes.GraphNode>();
 
-            CreateMap<Iis.Domain.Materials.Material, ResMaterial>()
+            CreateMap<Iis.Domain.Materials.Material, GraphQL.RadioElectronicSituation.ResMaterial>()
                 .ForMember(dest => dest.File, opts => opts.Ignore())
                 .ForMember(dest => dest.Metadata, opts => opts.Ignore());
         }

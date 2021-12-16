@@ -46,7 +46,6 @@ namespace Iis.Services
         private const int MaterialsBatchSize = 5000;
         private const int MaterialChangesBatchSize = 5000;
         private const string ExclamationMark = "!";
-        private const string Iso8601DateFormat = "yyyy-MM-dd'T'HH:mm:ssZ";
         private static readonly string[] IgnoreDocumentPropertyNames = new[] { "Content" };
         private static readonly MaterialIncludeEnum[] IncludeAll = new[]
         {
@@ -586,7 +585,7 @@ namespace Iis.Services
 
             materialDocument.ImageVectors = GetImageVectorList(materialIdList, responseDictionary);
 
-            materialDocument.ProcessedAt = changeHistoryEntity?.Date.ToString(Iso8601DateFormat, CultureInfo.InvariantCulture);
+            materialDocument.ProcessedAt = changeHistoryEntity?.Date.ToString(DateTimeExtensions.Iso8601DateFormat, CultureInfo.InvariantCulture);
 
             return await _elasticManager.PutDocumentAsync(
                 _elasticState.MaterialIndexes.FirstOrDefault(),
@@ -647,6 +646,13 @@ namespace Iis.Services
             return (new JObject(), 0);
         }
 
+        private string GetProcessedAtFromChangeHistoryDictionary(Guid materialId, Dictionary<Guid, ChangeHistoryEntity> changeHistoryDictionary)
+        {
+            return changeHistoryDictionary.TryGetValue(materialId, out var changeHistory)
+                ? changeHistory.Date.ToString(DateTimeExtensions.Iso8601DateFormat, CultureInfo.InvariantCulture)
+                : null;
+        }
+
         private static JObject ConvertMLResponsesToJson(IReadOnlyCollection<MLResponseEntity> mlResponses)
         {
             var mlResponsesContainer = new JObject();
@@ -664,20 +670,13 @@ namespace Iis.Services
             return mlResponsesContainer;
         }
 
-        private static string RemoveImagesFromContent(string content)
-        {
-            if (string.IsNullOrWhiteSpace(content)) return null;
-
-            return Regex.Replace(content, @"\(data:image.+\)", string.Empty, RegexOptions.Compiled);
-        }
-
         private static (string SortColumn, string SortOrder) MapSortingToElastic(SortingParams sorting)
         {
             return sorting.ColumnName switch
             {
                 "createdDate" => ("CreatedDate", sorting.Order),
-                "type" => ("Type.keyword", sorting.Order),
-                "source" => ("Source.keyword", sorting.Order),
+                "type" => (MaterialAliases.Type.Path, sorting.Order),
+                "source" => (MaterialAliases.Source.Path, sorting.Order),
                 "processedStatus" => ("ProcessedStatus.OrderNumber", sorting.Order),
                 "sessionPriority" => ("SessionPriority.OrderNumber", sorting.Order),
                 "importance" => ("Importance.OrderNumber", sorting.Order),
@@ -711,51 +710,6 @@ namespace Iis.Services
             RelationsState.HasDirect => builder.WithCondition<MatchQueryConditionBuilder>(_ => _.Must().Match(GetRelationTypeFieldName(), EntityMaterialRelation.Direct)),
             _ => builder
         };
-
-        private static string GetProcessedAtFromChangeHistoryDictionary(Guid materialId, Dictionary<Guid, ChangeHistoryEntity> changeHistoryDictionary)
-        {
-            return changeHistoryDictionary.TryGetValue(materialId, out var changeHistory)
-                ? changeHistory.Date.ToString(Iso8601DateFormat, CultureInfo.InvariantCulture)
-                : null;
-        }
-
-        private static void ChangeAssigneeAggregations(Dictionary<string, AggregationItem> aggregations, Guid userId)
-        {
-            var item = aggregations.GetValueOrDefault(MaterialAliases.Assignees.Alias);
-            if (item == null) return;
-
-            item.Buckets = item.Buckets.Where(_ => _.Key == userId.ToString()).ToArray();
-            if (item.Buckets.Length == 0) return;
-
-            item.Buckets[0].Key = MaterialAliases.Assignees.AliasForSingleItem;
-        }
-
-        private static IReadOnlyCollection<Property> ChangeAssigneeFiltered(IReadOnlyCollection<Property> items, Guid userId)
-        {
-            var result = new List<Property>(items.Select(_ => new Property(_.Name, _.Value)));
-            var assigneeProperty = result.FirstOrDefault(_ => _.Name == MaterialAliases.Assignees.Alias);
-            if (assigneeProperty?.Value == MaterialAliases.Assignees.AliasForSingleItem)
-            {
-                assigneeProperty.Value = userId.ToString();
-            }
-
-            return result;
-        }
-
-        private static JObject ChangeAssigneeHighlight(JObject highlight, Guid userId)
-        {
-            if (highlight.ContainsKey(MaterialAliases.Assignees.Path))
-            {
-                highlight.Remove(MaterialAliases.Assignees.Path);
-            }
-            if (highlight.ContainsKey(MaterialAliases.Assignees.Alias))
-            {
-                var value = highlight.GetValue(MaterialAliases.Assignees.Alias, StringComparison.OrdinalIgnoreCase).ToString()
-                    .Replace(userId.ToString(), MaterialAliases.Assignees.AliasForSingleItem, StringComparison.OrdinalIgnoreCase);
-                highlight[MaterialAliases.Assignees.Alias] = JToken.Parse(value);
-            }
-            return highlight;
-        }
 
         private static JObject BuildMaterialsQuery(
             string queryString,
@@ -817,8 +771,6 @@ namespace Iis.Services
         {
             var materialDocument = _mapper.Map<MaterialDocument>(material);
 
-            materialDocument.Content = RemoveImagesFromContent(materialDocument.Content);
-
             materialDocument.Children = material.Children.Select(p => _mapper.Map<MaterialDocument>(p)).ToArray();
 
             var featureCollection = material.MaterialInfos
@@ -829,7 +781,7 @@ namespace Iis.Services
                 .Select(p => p.NodeId)
                 .ToArray();
 
-            materialDocument.NodesCount = materialDocument.NodeIds.Length;
+            materialDocument.NodesCount = materialDocument.NodeIds.Count();
 
             var nodeDictionary = MaterialDocumentHelper.MapFeatureCollectionToNodeDictionary(featureCollection, _ontologyData);
 
