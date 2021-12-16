@@ -3,6 +3,8 @@ using System.Linq;
 using System.Collections.Generic;
 using Iis.DataModel;
 using Iis.DataModel.Roles;
+using Iis.DataModel.Materials;
+using Iis.DataModel.FlightRadar;
 using Iis.Interfaces.Roles;
 using Iis.Interfaces.Ontology.Data;
 using Iis.Interfaces.Ontology.Schema;
@@ -869,14 +871,267 @@ namespace Iis.DbLayer.ModifyDataScripts
                 {
                     var code = node.GetSingleProperty(ImportanceCodePropertyName)?.Value;
 
-                    if(code is null) continue;
+                    if (code is null) continue;
 
-                    if(sortOrderDictionary.TryGetValue(code, out string sortOrder))
+                    if (sortOrderDictionary.TryGetValue(code, out string sortOrder))
                     {
                         data.AddValueByDotName(node.Id, sortOrder, SortOrderPropertyName);
                     }
                 }
             });
+        }
+
+        public void SeedTestReoData(OntologyContext context, IOntologyNodesData data)
+        {
+            var phone_23621610312_material = new MaterialEntry
+            {
+                Id = new Guid("9f8574295fad4fb689487d9a86460390"),
+                FileId = new Guid("508e67132a3a4c978754368463dca150"),
+                FileName = "Voice_11-11-2023 11-11-21 (1).mp3",
+                TimeStamp = DateTime.UtcNow,
+                Point = new GeoPoint { Lat = 4.3728127m, Lon = 18.5441459m }
+            };
+
+            var phone_23621610534_material = new MaterialEntry
+            {
+                Id = new Guid("3656e14cdd8c4228970fe9140c28e037"),
+                FileId = new Guid("6c66ce3184894f069c67a42bed0bfb52"),
+                FileName = "Voice_11-11-2023 11-11-22 (2).mp3",
+                TimeStamp = DateTime.UtcNow,
+                Point = new GeoPoint { Lat = 4.3664549796904515m, Lon = 18.581554362535677m }
+            };
+
+            var phone_23621610711_material = new MaterialEntry
+            {
+                Id = new Guid("16089ed0828043458e21c1510b0307c3"),
+                FileId = new Guid("28096ed1b550467dbb54a0a34e6a2e61"),
+                FileName = "Voice_11-11-2023 11-11-23 (3).mp3",
+                TimeStamp = DateTime.UtcNow,
+                Point = new GeoPoint { Lat = 4.486280909861276m, Lon = 18.50683874821686m }
+            };
+
+            var phone_23621622511_material = new MaterialEntry
+            {
+                Id = new Guid("eabcda857fb14637a083baee1286b20a"),
+                FileId = new Guid("4a614057979849678f6d05fae69c2d66"),
+                FileName = "Voice_11-11-2023 11-11-24 (4).mp3",
+                TimeStamp = DateTime.UtcNow,
+                Point = new GeoPoint { Lat = 4.3417462m, Lon = 18.5238899m }
+            };
+
+            var phone_23621622512_material = new MaterialEntry
+            {
+                Id = new Guid("6473244a93554e3daf567f5a1a8befdc"),
+                FileId = new Guid("2c2a8b446a8c4215b9a2bc7f011f87ec"),
+                FileName = "Voice_11-11-2023 11-11-25 (5).mp3",
+                TimeStamp = DateTime.UtcNow,
+                Point = new GeoPoint { Lat = 4.3680810276585005m, Lon = 18.589472243547664m }
+            };
+
+            CreateMaterial(context, phone_23621610312_material);
+            CreateMaterial(context, phone_23621610534_material);
+            CreateMaterial(context, phone_23621610711_material);
+            CreateMaterial(context, phone_23621622511_material);
+            CreateMaterial(context, phone_23621622512_material);
+
+            var phone_23621610312 = GetOrAddSingNode(data, new Guid("0da57278ed074a52bf76673321e5296e"), "+23621610312", "380672444445", "1122334455");
+            var phone_23621610534 = GetOrAddSingNode(data, new Guid("5d7719b7db5041f2b048c5cc29fd78f6"), "+23621610534", "380672444448", "1122334459");
+            var phone_23621610711 = GetOrAddSingNode(data, new Guid("9b0c60baf594401d95319a10c315f01d"), "+23621610711", "380672444449", "1122334459");
+            var phone_23621622511 = GetOrAddSingNode(data, new Guid("ba3ca82f780345729061d66320e15534"), "+23621622511", "380672444446", "1122334456");
+            var phone_23621622512 = GetOrAddSingNode(data, new Guid("6959d5ad96234900b8d43d7deacbfa65"), "+23621622512", "380672444447", "1122334457");
+
+            AddSignLocation(context, phone_23621610312.Id, phone_23621610312_material);
+            AddSignLocation(context, phone_23621610534.Id, phone_23621610534_material);
+            AddSignLocation(context, phone_23621610711.Id, phone_23621610711_material);
+            AddSignLocation(context, phone_23621622511.Id, phone_23621622511_material);
+            AddSignLocation(context, phone_23621622512.Id, phone_23621622512_material);
+
+            AddSignRelation(context, phone_23621610312_material.Id, new[] { phone_23621610312.Id, phone_23621610534.Id }, phone_23621610312.Id, phone_23621610534.Id);
+            AddSignRelation(context, phone_23621622511_material.Id, new[] { phone_23621622511.Id, phone_23621610711.Id }, phone_23621622511.Id, phone_23621610711.Id);
+            AddSignRelation(context, phone_23621622512_material.Id, new[] { phone_23621622512.Id }, phone_23621622511.Id, null);
+            AddSignRelation(context, phone_23621610711_material.Id, new[] { phone_23621610711.Id }, phone_23621610711.Id, null);
+            AddSignRelation(context, phone_23621610534_material.Id, new[] { phone_23621610534.Id }, phone_23621610534.Id, null);
+
+            var firstCompany = GetOrAddObjectNode(data, new Guid("5b30b7dd53244e04aaa16f2977fc810d"), "1 рота 5 батальону ЧВК Вагнера", "hostile", "CF", "normal", "1", phone_23621610312.Id);
+            var secondCompany = GetOrAddObjectNode(data, new Guid("46a0ace90e41453b9480ece345365945"), "2 рота 5 батальону ЧВК Вагнера", "hostile", "CF", "normal", "1", phone_23621610312.Id);
+            var engineeringPlatoon = GetOrAddObjectNode(data, new Guid("669166d8f2da40c1953ca2e57302b6c2"), "Саперний взвод 5 батальону ЧВК Вагнер", "hostile", "CF", "normal", "1", phone_23621610711.Id);
+            var supplyCompany = GetOrAddObjectNode(data, new Guid("bb87f9d1d9444ccf97818b2ebab3dc7d"), "Рота забезпечення 5 батальону ЧВК Вагнера", "hostile", "CF", "normal", "1", phone_23621610534.Id);
+            var firstRepGuardPlatoon = GetOrAddObjectNode(data, new Guid("65108afab50947a89813a84def475c3d"), "1 plat. of Republic Guard", "neutral", "CF", "normal", "1", phone_23621622511.Id);
+            var presPalaceGuard = GetOrAddObjectNode(data, new Guid("74b73118573b4bef8ff4b768fbe19f22"), "President Palace Guards", "neutral", "CF", "normal", "1", phone_23621622512.Id);
+        }
+
+        private static INode GetOrAddSingNode(IOntologyNodesData data, Guid signId, string phoneNumber, string imei, string tmsi)
+        {
+            const string singTypeName = "CellphoneSign";
+
+            var node = data.GetNode(signId);
+
+            if (node != null) return node;
+
+            var nodeType = data.Schema.GetEntityTypeByName(singTypeName);
+
+            node = data.CreateNode(nodeType.Id, signId);
+
+            data.WriteLock(() =>
+            {
+                data.AddValueByDotName(node.Id, phoneNumber, "value");
+                data.AddValueByDotName(node.Id, imei, "imei");
+                data.AddValueByDotName(node.Id, tmsi, "tmsi");
+            });
+
+            return node;
+        }
+
+        private static INode GetOrAddObjectNode(IOntologyNodesData data, Guid nodeId, string name, string affilationCode, string countryCode, string importanceCode, string accessLevelIndex, Guid signId)
+        {
+            const string militaryOrganizationTypeName = "MilitaryOrganization";
+            const string objectAffiliationTypeName = "ObjectAffiliation";
+            const string objectImportanceTypeName = "ObjectImportance";
+            const string countryTypeName = "Country";
+            const string CodeProperyName = "code";
+            const string NumericIndexPropertyName = "numericIndex";
+
+            var node = data.GetNode(nodeId);
+
+            if (node != null) return node;
+
+            var nodeType = data.Schema.GetEntityTypeByName(militaryOrganizationTypeName);
+            var countryType = data.Schema.GetEntityTypeByName(countryTypeName);
+            var objectAffiliationType = data.Schema.GetEntityTypeByName(objectAffiliationTypeName);
+            var objectImportanceType = data.Schema.GetEntityTypeByName(objectImportanceTypeName);
+            var accessLevelType = data.Schema.GetEntityTypeByName(EntityTypeNames.AccessLevel.ToString());
+
+            var affilationRelationType = nodeType.GetProperty("affiliation");
+            var countryRelationType = nodeType.GetProperty("country");
+            var importanceRelationType = nodeType.GetProperty("importance");
+            var accessLevelRelationType = nodeType.GetProperty("accessLevel");
+            var signRelationType = nodeType.GetProperty("sign");
+
+            var affilation = data.GetNodesByUniqueValue(objectAffiliationType.Id, affilationCode, CodeProperyName)
+                                    .FirstOrDefault();
+
+            var country = data.GetNodesByUniqueValue(countryType.Id, countryCode, CodeProperyName)
+                                .FirstOrDefault();
+
+            var importance = data.GetNodesByUniqueValue(objectImportanceType.Id, importanceCode, CodeProperyName)
+                                .FirstOrDefault();
+
+            var accessLevel = data.GetNodesByUniqueValue(accessLevelType.Id, accessLevelIndex, NumericIndexPropertyName)
+                                .FirstOrDefault();
+
+            node = data.CreateNode(nodeType.Id, nodeId);
+
+            data.WriteLock(() =>
+            {
+                data.AddValueByDotName(node.Id, name, "commonInfo.OpenName");
+                data.AddValueByDotName(node.Id, name, "commonInfo.RealNameExtended");
+
+                data.CreateRelation(node.Id, affilation.Id, affilationRelationType.Id);
+                data.CreateRelation(node.Id, country.Id, countryRelationType.Id);
+                data.CreateRelation(node.Id, importance.Id, importanceRelationType.Id);
+                data.CreateRelation(node.Id, accessLevel.Id, accessLevelRelationType.Id);
+                data.CreateRelation(node.Id, signId, signRelationType.Id);
+            });
+
+            return node;
+        }
+
+        private static void CreateMaterial(OntologyContext context, MaterialEntry entry)
+        {
+            var file = CreateFileEntity(entry);
+
+            context.Files.Add(file);
+
+            var material = CreateMaterialEntity(entry);
+
+            context.Materials.Add(material);
+
+            context.SaveChanges();
+        }
+
+        private static FileEntity CreateFileEntity(MaterialEntry entry)
+        {
+            return new FileEntity
+            {
+                Id = entry.FileId,
+                Name = entry.FileName,
+                ContentType = "multipart/form-data",
+                ContentHash = Guid.NewGuid(),
+                UploadTime = entry.TimeStamp,
+                IsTemporary = false
+            };
+        }
+
+        private static MaterialEntity CreateMaterialEntity(MaterialEntry entry)
+        {
+            return new MaterialEntity
+            {
+                Id = entry.Id,
+                FileId = entry.FileId,
+                Source = "cell.voice",
+                Type = "audio",
+                Metadata = "{\"type\":\"audio\",\"source\":\"cell.voice\"}",
+                CreatedDate = entry.TimeStamp,
+                ProcessedStatusSignId = MaterialEntity.ProcessingStatusNotProcessedSignId,
+                Content = entry.FileName,
+                MlHandlersCount = 0,
+                AccessLevel = 0,
+                UpdatedAt = entry.TimeStamp
+            };
+        }
+
+        private static void AddSignLocation(OntologyContext context, Guid signId, MaterialEntry materialEntry)
+        {
+            var location = new LocationHistoryEntity
+            {
+                Id = Guid.NewGuid(),
+                Lat = materialEntry.Point.Lat,
+                Long = materialEntry.Point.Lon,
+                RegisteredAt = materialEntry.TimeStamp,
+                EntityId = signId,
+                NodeId = signId,
+                MaterialId = materialEntry.Id,
+                Type = Interfaces.Enums.LocationType.Node
+            };
+
+            context.LocationHistory.Add(location);
+
+            context.SaveChanges();
+        }
+
+        private static void AddSignRelation(OntologyContext context, Guid materialId, Guid[] featureIdArray, Guid? callerSignId, Guid? receiverSignId)
+        {
+            foreach (var featureId in featureIdArray)
+            {
+                context.MaterialFeatures.Add(MaterialFeatureEntity.CreateFrom(materialId, featureId));
+            }
+
+            if (callerSignId.HasValue)
+            {
+                context.MaterialFeatures.Add(MaterialFeatureEntity.CreateFrom(materialId, callerSignId.Value, MaterialNodeLinkType.Caller));
+            }
+
+            if (receiverSignId.HasValue)
+            {
+                context.MaterialFeatures.Add(MaterialFeatureEntity.CreateFrom(materialId, receiverSignId.Value, MaterialNodeLinkType.Receiver));
+            }
+
+            context.SaveChanges();
+        }
+
+        private class MaterialEntry
+        {
+            public Guid Id { get; set; }
+            public Guid FileId { get; set; }
+            public string FileName { get; set; }
+            public DateTime TimeStamp { get; set; }
+            public GeoPoint Point { get; set; }
+        }
+
+        private class GeoPoint
+        {
+            public decimal Lat { get; set; }
+            public decimal Lon { get; set; }
         }
     }
 }

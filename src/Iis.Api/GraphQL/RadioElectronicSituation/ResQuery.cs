@@ -71,7 +71,7 @@ namespace Iis.Api.GraphQL.RadioElectronicSituation
                 },
                 BePartOf = new ResNodeExtraObjectBePartOf
                 {
-                    Title = sourceItem.GetSingleProperty(BePartOfName)?.GetTitleValue() ?? NoValueFound
+                    Title = sourceItem.GetSingleProperty(BePartOfName)?.GetTitleValue() //?? NoValueFound
                 }
             };
         }
