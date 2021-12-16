@@ -6,7 +6,7 @@ namespace IIS.Core.Migrations
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.Sql("delete from public.\"MLResponses\" where \"MaterialId\" not in (select \"Id\" from public.\"Materials\")");
+            migrationBuilder.Sql("DELETE FROM public.\"MLResponses\" WHERE \"Id\" IN(select f.\"Id\" from public.\"MLResponses\" f LEFT JOIN public.\"Materials\" d on f.\"MaterialId\" = d.\"Id\" WHERE d.\"Id\" IS NULL);");
 
             migrationBuilder.CreateIndex(
                 name: "IX_MLResponses_MaterialId",

@@ -13,12 +13,14 @@ namespace Iis.Elastic.SearchQueryExtensions
 {
     public static class SearchQueryExtension
     {
-        private const int MaxBucketsCount = 100;
-        private const int DefaultIndexMaxResultWindow = 10000;
         public const string AggregateSuffix = "Aggregate";
         public const string MissingValueKey = "__hasNoValue";
         public const string NoExistsValue = "-_exists_";
         public const string Wildcard = "*";
+        private const int MaxBucketsCount = 100;
+        private const int DefaultIndexMaxResultWindow = 10000;
+        private const char SkipEscapedSymbol = ':';
+        private static readonly ISet<char> AggregateEscapedSymbols = ElasticManager.EscapeSymbolsPattern.Where(_ => _ != SkipEscapedSymbol).ToHashSet();
         public static readonly string[] DefaultSourceCollectionValue = { "*" };
 
         public static bool IsExactQuery(string query)
@@ -153,7 +155,10 @@ namespace Iis.Elastic.SearchQueryExtensions
             return ToQueryStringWithFilterItems(filter);
         }
 
-        public static string ToQueryStringWithForcedEscape(this ElasticFilter filter, bool applyFuzzinessByDefault)
+        public static string ToQueryStringWithForcedEscape(
+            this ElasticFilter filter,
+            bool applyFuzzinessByDefault,
+            ISet<char> escapeSymbols = null)
         {
             if (IsMatchAll(filter.Suggestion)
                       && filter.FilteredItems.Count == 0
@@ -163,14 +168,14 @@ namespace Iis.Elastic.SearchQueryExtensions
             {
                 if (applyFuzzinessByDefault)
                 {
-                    return ApplyFuzzinessOperator(filter.Suggestion);
+                    return ApplyFuzzinessOperator(filter.Suggestion, escapeSymbols);
                 }
 
                 return filter.Suggestion
                     .RemoveSymbols(ElasticManager.RemoveSymbolsPattern)
-                    .EscapeSymbols(ElasticManager.EscapeSymbolsPattern);
+                    .EscapeSymbols(escapeSymbols ?? ElasticManager.EscapeSymbolsPattern);
             }
-            return ToQueryStringWithFilterItems(filter);
+            return ToQueryStringWithFilterItems(filter, escapeSymbols);
         }
 
         public static string CreateMaterialsQueryString(SearchParams searchParams)
@@ -180,17 +185,19 @@ namespace Iis.Elastic.SearchQueryExtensions
             var queryString = noSuggestion ? "(ParentId:NULL)" : $"(({searchParams.Suggestion}) AND ParentId:NULL)";
 
             queryString = PopulateFilteredItems(searchParams.FilteredItems, queryString);
-            PopulateCherryPickedIds(searchParams.CherryPickedItems, queryString);
+            queryString = PopulateCherryPickedIds(searchParams.CherryPickedItems, queryString);
             queryString = PopulateDateRangeCondition("CreatedDate", searchParams.CreatedDateRange, queryString);
             return queryString;
         }
 
-        public static string ApplyFuzzinessOperator(string input)
+        public static string ApplyFuzzinessOperator(string input, ISet<char> escapeSymbols = null)
         {
             if (string.IsNullOrWhiteSpace(input)) return string.Empty;
 
+            if (IsExactQuery(input) || IsMatchAll(input)) return input;
+
             input = input.RemoveSymbols(ElasticManager.RemoveSymbolsPattern)
-                        .EscapeSymbols(ElasticManager.EscapeSymbolsPattern);
+                        .EscapeSymbols(escapeSymbols ?? ElasticManager.EscapeSymbolsPattern);
 
             if (IsWildCard(input) || IsInBrackets(input))
             {
@@ -384,10 +391,10 @@ namespace Iis.Elastic.SearchQueryExtensions
             {
                 var item = cherryPickedItems.ElementAt(i).Item;
                 pickedQuery.Append($"\"{ConvertToHypensFormat(item)}\"");
-                if (i + 1 < cherryPickedItems.Count) pickedQuery.Append(" OR ");
+                if (i + 1 < cherryPickedItems.Count) pickedQuery.Append(" AND ");
             }
 
-            return string.IsNullOrEmpty(result) ? $"({pickedQuery})" : $"({result} OR ({pickedQuery}))";
+            return string.IsNullOrEmpty(result) ? $"({pickedQuery})" : $"({result} AND ({pickedQuery}))";
         }
 
         private static string GetFieldQuery(string field, string value)
@@ -412,14 +419,17 @@ namespace Iis.Elastic.SearchQueryExtensions
             return sortOrder == "asc" ? "_last" : "_first";
         }
 
-        private static (string Query, bool IsFilteredByField) ToQueryString(this ElasticFilter filter, AggregationField field, bool applyFuzzinessByDefault)
+        private static (string Query, bool IsFilteredByField) ToQueryString(
+            this ElasticFilter filter,
+            AggregationField field,
+            bool applyFuzzinessByDefault)
         {
             var fieldSpecificFilter = new ElasticFilter
             {
                 Suggestion = filter.Suggestion,
                 FilteredItems = filter.FilteredItems.Where(x => !(x.Name == field.Name || x.Name == field.Alias)).ToList()
             };
-            var possibleQuery = fieldSpecificFilter.ToQueryStringWithForcedEscape(applyFuzzinessByDefault);
+            var possibleQuery = fieldSpecificFilter.ToQueryStringWithForcedEscape(applyFuzzinessByDefault, AggregateEscapedSymbols);
             var isFilteredByField = filter.FilteredItems.Count != fieldSpecificFilter.FilteredItems.Count;
 
             return string.IsNullOrEmpty(possibleQuery)
@@ -439,9 +449,11 @@ namespace Iis.Elastic.SearchQueryExtensions
         private static bool IsInBrackets(string input) => input.StartsWith('(') && input.EndsWith(')');
 
 
-        private static string ToQueryStringWithFilterItems(this ElasticFilter filter)
+        private static string ToQueryStringWithFilterItems(this ElasticFilter filter, ISet<char> escapeSymbols = null)
         {
-            var result = string.IsNullOrEmpty(filter.Suggestion) ? "" : $"({ApplyFuzzinessOperator(filter.Suggestion)})";
+            var result = string.IsNullOrEmpty(filter.Suggestion)
+                ? string.Empty
+                : $"({ApplyFuzzinessOperator(filter.Suggestion, escapeSymbols)})";
             result = PopulateFilteredItems(filter.FilteredItems, result);
             return PopulateCherryPickedObjectsOfStudy(filter.CherryPickedItems, result);
         }
@@ -456,7 +468,7 @@ namespace Iis.Elastic.SearchQueryExtensions
                 FieldName = aggregationField.GetFieldName();
                 Field = aggregationField;
 
-                var (query, isfilteredByField) = filter.ToQueryString(aggregationField, context.IsBaseQueryExact);
+                var (query, isfilteredByField) = filter.ToQueryString(aggregationField, !filter.IsExact && context.IsBaseQueryExact);
 
                 Query = query;
                 IsFilteredByField = isfilteredByField;

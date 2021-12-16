@@ -112,14 +112,14 @@ namespace Iis.OntologySchema.DataTypes
         {
             var result = new List<IChildNodeType>();
             var directChildren = GetDirectChildren(false);
-            var directChildrenNames = directChildren.Select(p => p.Name).ToList();
+            var directRelationNames = directChildren.Select(p => p.RelationName).ToList();
             result.AddRange(directChildren);
             var ancestors = GetAllAncestors();
             foreach (var ancestor in ancestors)
             {
                 result.AddRange(ancestor
                     .GetDirectChildren(true)
-                    .Where(p => !directChildrenNames.Contains(p.Name)));
+                    .Where(p => !directRelationNames.Contains(p.RelationName)));
 
             }
 

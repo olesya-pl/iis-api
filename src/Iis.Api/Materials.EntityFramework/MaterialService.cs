@@ -107,7 +107,7 @@ namespace IIS.Core.Materials.EntityFramework
         public async Task<Material> UpdateMaterialAsync(IMaterialUpdateInput input, User user)
         {
             var includes = MaterialIncludeEnum.WithChildren.AsArray();
-            var material = await RunWithoutCommitAsync(_ => _.MaterialRepository.GetByIdAsync(input.Id));
+            var material = await RunWithoutCommitAsync(_ => _.MaterialRepository.GetByIdAsync(input.Id, includes));
             if (!material.CanBeEdited(user.Id))
                 return await _materialProvider.GetMaterialAsync(input.Id, user);
 
