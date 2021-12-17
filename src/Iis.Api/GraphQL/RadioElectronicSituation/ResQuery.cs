@@ -144,13 +144,13 @@ namespace Iis.Api.GraphQL.RadioElectronicSituation
             result.File = new ResMaterialFile
             {
                 Id = sourceItem.Id,
-                Url = FileUrlGetter.GetFileUrl(sourceItem.Id)
+                Url = FileUrlGetter.GetFileUrl(sourceItem.FileId.Value)
             };
 
             result.Metadata = new ResMaterialMetadata
             {
-                Type = sourceItem.Metadata.GetValue("type", StringComparison.InvariantCultureIgnoreCase)?.Value<string>(),
-                Source = sourceItem.Metadata.GetValue("source", StringComparison.InvariantCultureIgnoreCase)?.Value<string>(),
+                Type = sourceItem.Type,
+                Source = sourceItem.Source,
             };
 
             return result;
