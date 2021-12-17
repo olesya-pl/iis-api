@@ -162,8 +162,8 @@ namespace Iis.OntologyManager
             pnlBottom.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             SetTypeViewHeader(pnlTop);
             var pnlEntityType = _uiControlsCreator.GetFillPanel(pnlBottom, false);
-            _uiEntityTypeControl = new UiEntityTypeControl(_uiControlsCreator);
-            _uiEntityTypeControl.Initialize("EntityTypeControl", pnlEntityType);
+            _uiEntityTypeControl = new UiEntityTypeControl(_uiControlsCreator, _style);
+            _uiEntityTypeControl.Initialize("EntityTypeControl", pnlEntityType, _style.Common);
             _uiEntityTypeControl.OnShowRelationType += ChildrenShowRelation;
             _uiEntityTypeControl.OnShowTargetType += (childNodeType) => SetNodeTypeView(childNodeType.TargetType, true);
             _uiEntityTypeControl.OnShowEntityType += (nodeType) => SetNodeTypeView(nodeType, true);
@@ -176,21 +176,21 @@ namespace Iis.OntologyManager
 
             var pnlRelationToAttribute = _uiControlsCreator.GetFillPanel(pnlBottom, true);
             _uiRelationToAttributeControl = new UiRelationControl(_uiControlsCreator, GetAllEntities, RelationControlMode.ToAttribute);
-            _uiRelationToAttributeControl.Initialize("RelationControl", pnlRelationToAttribute);
+            _uiRelationToAttributeControl.Initialize("RelationControl", pnlRelationToAttribute, _style.Common);
             _uiRelationToAttributeControl.OnSave += OnNodeTypeSaveClick;
 
             var pnlRelationToEntity = _uiControlsCreator.GetFillPanel(pnlBottom, true);
             _uiRelationToEntityControl = new UiRelationControl(_uiControlsCreator, GetAllEntities, RelationControlMode.ToEntity);
-            _uiRelationToEntityControl.Initialize("RelationControl", pnlRelationToEntity);
+            _uiRelationToEntityControl.Initialize("RelationControl", pnlRelationToEntity, _style.Common);
             _uiRelationToEntityControl.OnSave += OnNodeTypeSaveClick;
 
             var pnlOntologyData = _uiControlsCreator.GetFillPanel(pnlBottom, true);
             _uiOntologyDataControl = new UiOntologyDataControl(_uiControlsCreator);
-            _uiOntologyDataControl.Initialize("OntologyDataControl", pnlOntologyData);
+            _uiOntologyDataControl.Initialize("OntologyDataControl", pnlOntologyData, _style.Common);
 
             var pnlAccessLevels = _uiControlsCreator.GetFillPanel(pnlBottom, true);
-            _uiAccessLevelControl = new UiAccessLevelControl(_uiControlsCreator);
-            _uiAccessLevelControl.Initialize("AccessLevelControl", pnlAccessLevels);
+            _uiAccessLevelControl = new UiAccessLevelControl(_uiControlsCreator, _style);
+            _uiAccessLevelControl.Initialize("AccessLevelControl", pnlAccessLevels, _style.Common);
             _uiAccessLevelControl.OnSave += SaveAccessLevels;
 
             _dataViewControls[EntityTypeNames.AccessLevel.ToString()] = _uiAccessLevelControl;
@@ -257,8 +257,8 @@ namespace Iis.OntologyManager
         {
             panelTop.SuspendLayout();
             var container = new UiContainerManager("PanelTop", panelTop, _style.Common);
-            _filterControl = new UiFilterControl();
-            _filterControl.Initialize("FilterControl", null);
+            _filterControl = new UiFilterControl(_style);
+            _filterControl.Initialize("FilterControl", null, _style.Common);
             _filterControl.OnChange += ReloadTypes;
             container.AddPanel(_filterControl.MainPanel);
 
@@ -273,21 +273,22 @@ namespace Iis.OntologyManager
             cmbSchemaSources.SelectedIndexChanged += SourceSelectionChanged;
             container.Add(cmbSchemaSources);
 
-            btnSaveSchema = new Button { Text = "Зберегти", MinimumSize = new Size { Height = _style.Common.ButtonHeightDefault } };
+            btnSaveSchema = _uiControlsCreator.GetButton("Зберегти");
             btnSaveSchema.Click += btnSave_Click;
-            btnCompare = new Button { Text = "Порівняти", MinimumSize = new Size { Height = _style.Common.ButtonHeightDefault } };
+            
+            btnCompare = btnSaveSchema = _uiControlsCreator.GetButton("Порівняти");
             btnCompare.Click += btnCompare_Click;
             container.AddInRow(new List<Control> { btnSaveSchema, btnCompare });
 
-            btnMigrate = new Button { Text = "Міграція", MinimumSize = new Size { Height = _style.Common.ButtonHeightDefault } };
+            btnMigrate = btnSaveSchema = _uiControlsCreator.GetButton("Міграція");
             btnMigrate.Click += btnMigrate_Click;
             container.Add(btnMigrate);
 
-            btnDuplicates = new Button { Text = "Дублікати", MinimumSize = new Size { Height = _style.Common.ButtonHeightDefault } };
+            btnDuplicates = btnSaveSchema = _uiControlsCreator.GetButton("Дублікати");
             btnDuplicates.Click += btnDuplicates_Click;
             container.Add(btnDuplicates);
 
-            var btnRemoveEntity = new Button { Text = "Видалення", MinimumSize = new Size { Height = _style.Common.ButtonHeightDefault } };
+            var btnRemoveEntity = btnSaveSchema = _uiControlsCreator.GetButton("Видалення");
             btnRemoveEntity.Click += RemoveEntityClick;
 
             container.Add(btnRemoveEntity);
@@ -419,7 +420,7 @@ namespace Iis.OntologyManager
             var form = _uiControlsCreator.GetModalForm(this);
             var rootPanel = _uiControlsCreator.GetFillPanel(form);
             var control = new UiComparisonControl(_schemaSources, _schemaService, _schema);
-            control.Initialize("ComparisonControl", rootPanel);
+            control.Initialize("ComparisonControl", rootPanel, _style.Common);
 
             form.ShowDialog();
             form.Close();
@@ -431,8 +432,8 @@ namespace Iis.OntologyManager
             var form = _uiControlsCreator.GetModalForm(this);
             var rootPanel = _uiControlsCreator.GetFillPanel(form);
 
-            _duplicatesControl = new UiDuplicatesControl();
-            _duplicatesControl.Initialize("DuplicatesControl", rootPanel);
+            _duplicatesControl = new UiDuplicatesControl(_style);
+            _duplicatesControl.Initialize("DuplicatesControl", rootPanel, _style.Common);
             _duplicatesControl.OnGetData += () => _ontologyData;
 
             var context = OntologyContext.GetContext(SelectedConnectionString);
@@ -446,7 +447,7 @@ namespace Iis.OntologyManager
             var form = _uiControlsCreator.GetModalForm(this);
             var rootPanel = _uiControlsCreator.GetFillPanel(form);
             _migrationControl = new UiMigrationControl();
-            _migrationControl.Initialize("MigrationControl", rootPanel);
+            _migrationControl.Initialize("MigrationControl", rootPanel, _style.Common);
             _migrationControl.OnRun += Migrate;
 
             form.ShowDialog();
@@ -471,7 +472,7 @@ namespace Iis.OntologyManager
             var form = _uiControlsCreator.GetModalForm(this);
             var rootPanel = _uiControlsCreator.GetFillPanel(form);
             var control = new UiNodeTypeSearch(_schema);
-            control.Initialize("NodeTypeSearch", rootPanel);
+            control.Initialize("NodeTypeSearch", rootPanel, _style.Common);
 
             form.ShowDialog();
             form.Close();
@@ -509,8 +510,8 @@ namespace Iis.OntologyManager
 
             form.Text = "Видалення";
 
-            _removeEntityUiControl = new RemoveEntityUiControl(SelectedSchemaSource);
-            _removeEntityUiControl.Initialize("RemoveEntityControl", rootPanel);
+            _removeEntityUiControl = new RemoveEntityUiControl(SelectedSchemaSource, _style);
+            _removeEntityUiControl.Initialize("RemoveEntityControl", rootPanel, _style.Common);
             _removeEntityUiControl.OnGetOntologyData += () => _ontologyData;
             _removeEntityUiControl.OnRemove += OnRemove;
 

@@ -20,7 +20,7 @@ namespace Iis.OntologyManager.UiControls
         protected override void CreateControls()
         {
             var panels = _uiControlsCreator.GetTopBottomPanels(MainPanel, 200);
-            var container = new UiContainerManager("Filters", panels.panelTop, _style.Common);
+            var container = new UiContainerManager("Filters", panels.panelTop, _style);
 
             AddSearchButton(container, "IsAggregated", GetWithAggregation);
             AddSearchButton(container, "Format", GetWithFormat);
@@ -40,7 +40,7 @@ namespace Iis.OntologyManager.UiControls
 
         private void AddSearchButton(UiContainerManager container, string text, Func<string> func)
         {
-            var btn = new Button { Text = text, MinimumSize = new Size { Height = _style.Common.ButtonHeightDefault } };
+            var btn = new Button { Text = text, MinimumSize = new Size { Height = _style.ButtonHeightDefault } };
             btn.Click += (sender, e) => Run(func);
             container.Add(btn);
         }

@@ -48,7 +48,7 @@ namespace Iis.OntologyManager.UiControls
         {
             MainPanel.SuspendLayout();
             var panels = _uiControlsCreator.GetTopBottomPanels(MainPanel, 120, 20);
-            var container = new UiContainerManager("Comparison", panels.panelTop, _style.Common);
+            var container = new UiContainerManager("Comparison", panels.panelTop, _style);
 
             cmbSchemaSourcesCompare = new ComboBox
             {
@@ -63,7 +63,7 @@ namespace Iis.OntologyManager.UiControls
             cmbSchemaSourcesCompare.SelectedIndexChanged += (sender, e) => { CompareSchemas(); };
             container.Add(cmbSchemaSourcesCompare);
 
-            var btnComparisonUpdate = new Button { Text = "Update database", MinimumSize = new Size { Height = _style.Common.ButtonHeightDefault } };
+            var btnComparisonUpdate = _uiControlsCreator.GetButton("Update database");
             btnComparisonUpdate.Click += (sender, e) => { UpdateComparedDatabase(); };
             container.Add(btnComparisonUpdate);
 

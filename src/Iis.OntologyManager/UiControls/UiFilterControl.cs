@@ -12,36 +12,43 @@ namespace Iis.OntologyManager.UiControls
 {
     public class UiFilterControl: UIBaseControl
     {
-        TextBox txtFilterName;
-        List<RadioButton> radioButtons = new List<RadioButton>();
+        private TextBox txtFilterName;
+        private IOntologyManagerStyle _appStyle;
+
+        private List<RadioButton> radioButtons = new List<RadioButton>();
 
         public delegate bool NodeTypeFilterFunc(INodeTypeLinked nodeType);
-        NodeTypeFilterFunc _filterFunc;
+        private NodeTypeFilterFunc _filterFunc;
 
         public delegate void OnChangeHandler(NodeTypeFilterFunc filter);
         public event OnChangeHandler OnChange;
 
+        public UiFilterControl(IOntologyManagerStyle appStyle)
+        {
+            _appStyle = appStyle;
+        }
+
         protected override void CreateControls()
         {
-            _container.SetColWidth(_style.Common.ButtonWidthDefault / 2);
+            _container.SetColWidth(_style.ButtonWidthDefault / 2);
 
             var radioAll = new RadioButton
             {
                 Text = "All",
                 Checked = true,
-                BackColor = _style.EntityOtherColor
+                BackColor = _appStyle.EntityOtherColor
             };
             _container.Add(radioAll);
             radioAll.CheckedChanged += OnFilterChanged;
             radioButtons.Add(radioAll);
 
-            foreach (var typeName in _style.EntityColors.Keys)
+            foreach (var typeName in _appStyle.EntityColors.Keys)
             {
                 var radio = new RadioButton
                 {
                     Text = typeName,
                     Checked = false,
-                    BackColor = _style.EntityColors[typeName]
+                    BackColor = _appStyle.EntityColors[typeName]
                 };
                 _container.Add(radio);
                 radio.CheckedChanged += OnFilterChanged;

@@ -4,6 +4,7 @@ using Iis.Interfaces.Ontology.Schema;
 using Iis.OntologyData.IisAccessLevels;
 using Iis.OntologyManager.DTO;
 using Iis.OntologyManager.Helpers;
+using Iis.OntologyManager.Style;
 using Iis.Services.Contracts.Params;
 using System;
 using System.Collections.Generic;
@@ -26,14 +27,16 @@ namespace Iis.OntologyManager.UiControls
         AccessLevels _accessLevels;
         bool _editMode = false;
         Dictionary<Guid, Guid> _deletedMappings = new Dictionary<Guid, Guid>();
+        IOntologyManagerStyle _appStyle;
         public event Func<ChangeAccessLevelsParams, Task<RequestResult>> OnSave;
 
         DataGridViewRow SelectedRow => grid.SelectedRows.Count > 0 ? grid.SelectedRows[0] : null;
         AccessLevel SelectedItem => SelectedRow == null ? null : (AccessLevel)SelectedRow.DataBoundItem;
 
-        public UiAccessLevelControl(UiControlsCreator uiControlsCreator)
+        public UiAccessLevelControl(UiControlsCreator uiControlsCreator, IOntologyManagerStyle appStyle)
         {
             _uiControlsCreator = uiControlsCreator;
+            _appStyle = appStyle;
         }
         protected override void CreateControls()
         {
@@ -90,7 +93,7 @@ namespace Iis.OntologyManager.UiControls
             var grid = (DataGridView)sender;
             var row = grid.Rows[e.RowIndex];
 
-            var color = _style.AttributeTypeBackColor;
+            var color = _appStyle.AttributeTypeBackColor;
             var style = row.DefaultCellStyle;
 
             style.BackColor = color;
@@ -158,7 +161,7 @@ namespace Iis.OntologyManager.UiControls
             };
             var rootPanel = _uiControlsCreator.GetFillPanel(form);
             var editControl = new UiAccessLevelEditControl(accessLevel, _accessLevels.Items.Count);
-            editControl.Initialize("AccessLevelEditControl", rootPanel);
+            editControl.Initialize("AccessLevelEditControl", rootPanel, _style);
             editControl.SetUiValues();
             editControl.OnSave += () =>
             {

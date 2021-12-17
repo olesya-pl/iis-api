@@ -28,6 +28,7 @@ namespace Iis.OntologyManager.UiControls
         private CheckBox cbAbstract;
         private PictureBox iconBox;
         private string IconBase64Body;
+        private IOntologyManagerStyle _appStyle;
 
         public event Action<IChildNodeType> OnShowRelationType;
         public event Action<IChildNodeType> OnShowTargetType;
@@ -38,6 +39,11 @@ namespace Iis.OntologyManager.UiControls
         public event Action<IChildNodeType> OnDeleteRelationEntity;
         public event Action OnSetInheritance;
         public event Action<Guid> OnRemoveInheritance;
+
+        public UiEntityTypeControl(IOntologyManagerStyle appStyle)
+        {
+            _appStyle = appStyle;
+        }
 
         public IChildNodeType SelectedChild
         {
@@ -56,9 +62,10 @@ namespace Iis.OntologyManager.UiControls
             }
         }
 
-        public UiEntityTypeControl(UiControlsCreator uiControlsCreator)
+        public UiEntityTypeControl(UiControlsCreator uiControlsCreator, IOntologyManagerStyle appStyle)
         {
             _uiControlsCreator = uiControlsCreator;
+            _appStyle = appStyle;
         }
         public void SetUiValues(INodeTypeLinked nodeType, List<string> aliases)
         {
@@ -167,9 +174,9 @@ namespace Iis.OntologyManager.UiControls
             cmbUniqueValueFieldName = new ComboBox
             {
                 DropDownStyle = ComboBoxStyle.DropDownList,
-                DisplayMember = "",
-                ValueMember = "",
-                BackColor = _style.Common.BackgroundColor
+                DisplayMember = string.Empty,
+                ValueMember = string.Empty,
+                BackColor = _style.BackgroundColor
             };
             _container.Add(cmbUniqueValueFieldName, "Unique Value Field Name");
 
@@ -258,7 +265,7 @@ namespace Iis.OntologyManager.UiControls
             var grid = _uiControlsCreator.GetDataGridView(name, null,
                 new List<string> { "Name" });
             grid.Columns[0].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
-            grid.CellFormatting += _style.GridTypes_CellFormatting;
+            grid.CellFormatting += _appStyle.GridTypes_CellFormatting;
             grid.DoubleClick += gridInheritance_DoubleClick;
             return grid;
         }
@@ -302,8 +309,8 @@ namespace Iis.OntologyManager.UiControls
 
             style.BackColor =
                 nodeType.Kind == Kind.Entity ?
-                    _style.GetColorByAncestor(nodeType.TargetType) :
-                    _style.GetColorByNodeTypeKind(nodeType.Kind);
+                    _appStyle.GetColorByAncestor(nodeType.TargetType) :
+                    _appStyle.GetColorByNodeTypeKind(nodeType.Kind);
 
             style.SelectionBackColor = style.BackColor;
             style.SelectionForeColor = grid.DefaultCellStyle.ForeColor;

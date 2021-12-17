@@ -1,5 +1,6 @@
 ﻿using Iis.Interfaces.Ontology.Data;
 using Iis.Interfaces.Ontology.Schema;
+using Iis.OntologyManager.Style;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,6 +16,7 @@ namespace Iis.OntologyManager.UiControls
         INodeTypeLinked _nodeType;
         IOntologyNodesData _ontologyData;
         List<INodeTypeLinked> _attributes;
+        IOntologyManagerStyle _appStyle;
         
         DataGridViewRow SelectedRow => grid.SelectedRows.Count > 0 ? grid.SelectedRows[0] : null;
 
@@ -102,7 +104,7 @@ namespace Iis.OntologyManager.UiControls
             var grid = (DataGridView)sender;
             var row = grid.Rows[e.RowIndex];
 
-            var color = _style.AttributeTypeBackColor;
+            var color = _appStyle.AttributeTypeBackColor;
             var style = row.DefaultCellStyle;
 
             style.BackColor = color;
@@ -129,7 +131,7 @@ namespace Iis.OntologyManager.UiControls
             };
             var rootPanel = _uiControlsCreator.GetFillPanel(form);
             var editControl = new UiDataEditControl(node, _nodeType, _attributes, _ontologyData);
-            editControl.Initialize("DataEditControl", rootPanel);
+            editControl.Initialize("DataEditControl", rootPanel, _style);
             editControl.SetUiValues();
             editControl.OnSave += () =>
             {

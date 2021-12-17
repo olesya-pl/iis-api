@@ -218,5 +218,13 @@ namespace Iis.OntologyManager.UiControls
 
         public CheckBox GetCheckBox(string text, bool isChecked) =>
             new CheckBox { Text = text, Checked = isChecked, MinimumSize = new Size { Height = _style.CheckboxHeightDefault } };
+
+        public Button GetButton(string text) =>
+            new Button
+            {
+                Text = "Порівняти", 
+                Width = _style.ButtonWidthDefault,
+                MinimumSize = new Size { Height = _style.ButtonHeightDefault } 
+            };
     }
 }

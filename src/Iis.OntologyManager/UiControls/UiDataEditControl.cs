@@ -1,5 +1,6 @@
 ﻿using Iis.Interfaces.Ontology.Data;
 using Iis.Interfaces.Ontology.Schema;
+using Iis.OntologyManager.Style;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,7 +20,11 @@ namespace Iis.OntologyManager.UiControls
 
         public event Action OnSave;
 
-        public UiDataEditControl(INode node, INodeTypeLinked nodeType, List<INodeTypeLinked> attributes, IOntologyNodesData ontologyData)
+        public UiDataEditControl(
+            INode node,
+            INodeTypeLinked nodeType,
+            List<INodeTypeLinked> attributes,
+            IOntologyNodesData ontologyData)
         {
             _node = node;
             _attributes = attributes;

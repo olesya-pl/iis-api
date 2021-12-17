@@ -34,7 +34,7 @@ namespace Iis.Desktop.SecurityManager
         {
             InitializeComponent();
             this.WindowState = FormWindowState.Maximized;
-            Text = $"Володар Онтології {VERSION}";
+            Text = $"Володар Таємниць {VERSION}";
 
             _configuration = configuration;
             _style = SecurityManagerStyle.GetDefaultStyle(this);

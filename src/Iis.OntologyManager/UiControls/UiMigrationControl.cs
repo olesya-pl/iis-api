@@ -25,9 +25,9 @@ namespace Iis.OntologyManager.UiControls
         protected override void CreateControls()
         {
             var panels = _uiControlsCreator.GetTopBottomPanels(MainPanel, 200);
-            var container = new UiContainerManager("MigrateOptions", panels.panelTop, _style.Common);
+            var container = new UiContainerManager("MigrateOptions", panels.panelTop, _style);
             container.Add(_lblTitle = new Label { Text = "Відкрийте Файл Міграции (*.omg"});
-            _btnOpen = new Button { Text = "Відкрити Міграцію", MinimumSize = new Size { Height = _style.Common.ButtonHeightDefault } };
+            _btnOpen = new Button { Text = "Відкрити Міграцію", MinimumSize = new Size { Height = _style.ButtonHeightDefault } };
             container.Add(_btnOpen);
             container.Add(_cbMigrate = new CheckBox { Text = "Створити нові об'єкти", Checked = true });
             container.Add(_cbDelete = new CheckBox { Text = "Видалити старі об'єкти", Checked = true });
@@ -35,7 +35,7 @@ namespace Iis.OntologyManager.UiControls
             _btnRun = new Button { 
                 Text = "Поїхали", 
                 Enabled = false, 
-                MinimumSize = new Size { Height = _style.Common.ButtonHeightDefault } 
+                MinimumSize = new Size { Height = _style.ButtonHeightDefault } 
             };
             _btnRun.Click += btnRun_Click;
             container.Add(_btnRun);
