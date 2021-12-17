@@ -60,6 +60,7 @@ namespace AcceptanceTests.UISteps
             eventPage.EventComponentDropDown.SendKeys("Кризові регіони");
             eventPage.EventComponentDropDown.SendKeys(Keys.Down);
             eventPage.EventComponentDropDown.SendKeys(Keys.Enter);
+            driver.WaitFor(2);
             eventPage.SaveEventChangesButton.Click();
             driver.WaitFor(2);
             eventPage.ConfirmSaveEventChangesButton.Click();
