@@ -5,13 +5,11 @@ using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using Serilog;
-using Iis.OntologyManager.DTO;
-using Iis.OntologyManager.Dictionaries;
-using Iis.OntologyManager.Configurations;
 using Iis.Services.Contracts.Params;
 using Newtonsoft.Json;
+using Iis.Desktop.Common.Dtos;
 
-namespace Iis.OntologyManager.Helpers
+namespace Iis.Desktop.Common.Requests
 {
     public class RequestWraper
     {

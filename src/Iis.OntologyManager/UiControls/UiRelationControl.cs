@@ -1,4 +1,5 @@
-﻿using Iis.Domain.Meta;
+﻿using Iis.Desktop.Common.Controls;
+using Iis.Domain.Meta;
 using Iis.Interfaces.Meta;
 using Iis.Interfaces.Ontology.Schema;
 using Iis.OntologyManager.Style;

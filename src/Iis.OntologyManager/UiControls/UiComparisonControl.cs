@@ -1,5 +1,6 @@
 ﻿using Iis.DataModel;
 using Iis.DbLayer.OntologySchema;
+using Iis.Desktop.Common.Controls;
 using Iis.Interfaces.Ontology.Schema;
 using Iis.OntologyManager.Comparison;
 using Iis.OntologySchema.Saver;

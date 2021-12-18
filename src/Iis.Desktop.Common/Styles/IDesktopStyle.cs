@@ -2,7 +2,7 @@
 using System.Drawing;
 using System.Windows.Forms;
 
-namespace Iis.OntologyManager.Style
+namespace Iis.Desktop.Common.Styles
 {
     public interface IDesktopStyle
     {

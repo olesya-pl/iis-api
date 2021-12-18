@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Text;
 using System.Windows.Forms;
-using Iis.OntologyManager.Style;
+using Iis.Desktop.Common.Styles;
 
-namespace Iis.OntologyManager.UiControls
+namespace Iis.Desktop.Common.Controls
 {
     public class UiControlsCreator
     {
@@ -222,9 +222,9 @@ namespace Iis.OntologyManager.UiControls
         public Button GetButton(string text) =>
             new Button
             {
-                Text = "Порівняти", 
+                Text = "Порівняти",
                 Width = _style.ButtonWidthDefault,
-                MinimumSize = new Size { Height = _style.ButtonHeightDefault } 
+                MinimumSize = new Size { Height = _style.ButtonHeightDefault }
             };
     }
 }

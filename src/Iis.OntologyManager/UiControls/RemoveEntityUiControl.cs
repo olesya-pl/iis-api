@@ -8,6 +8,7 @@ using Iis.OntologyManager.DTO;
 using Iis.OntologyManager.Configurations;
 using System.Diagnostics;
 using Iis.OntologyManager.Style;
+using Iis.Desktop.Common.Controls;
 
 namespace Iis.OntologyManager.UiControls
 {

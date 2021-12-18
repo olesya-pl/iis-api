@@ -1,4 +1,5 @@
-﻿using Iis.Interfaces.Ontology.Schema;
+﻿using Iis.Desktop.Common.Controls;
+using Iis.Interfaces.Ontology.Schema;
 using Iis.OntologyManager.Style;
 using Serilog;
 using System;

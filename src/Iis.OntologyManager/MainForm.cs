@@ -8,9 +8,7 @@ using Iis.OntologyData;
 using Iis.OntologyData.Migration;
 using Iis.OntologyManager.Configurations;
 using Iis.OntologyManager.Style;
-using Iis.OntologyManager.Helpers;
 using Iis.OntologyManager.UiControls;
-using Iis.OntologyManager.Dictionaries;
 using Microsoft.Extensions.Configuration;
 using Serilog;
 using System;
@@ -27,7 +25,9 @@ using Iis.Services.Contracts.Interfaces;
 using Iis.Interfaces.AccessLevels;
 using System.Threading.Tasks;
 using Iis.Services.Contracts.Params;
-using Iis.OntologyManager.DTO;
+using Iis.Desktop.Common.Controls;
+using Iis.Desktop.Common.Dtos;
+using Iis.Desktop.Common.Requests;
 
 namespace Iis.OntologyManager
 {

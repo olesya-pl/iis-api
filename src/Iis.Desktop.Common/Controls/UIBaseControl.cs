@@ -1,11 +1,11 @@
-﻿using Iis.OntologyManager.Style;
+﻿using Iis.Desktop.Common.Styles;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Text;
 using System.Windows.Forms;
 
-namespace Iis.OntologyManager.UiControls
+namespace Iis.Desktop.Common.Controls
 {
     public abstract class UIBaseControl
     {

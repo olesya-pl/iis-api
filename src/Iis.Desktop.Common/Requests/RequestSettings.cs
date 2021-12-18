@@ -1,4 +1,4 @@
-﻿namespace Iis.OntologyManager.Configurations
+﻿namespace Iis.Desktop.Common.Requests
 {
     public class RequestSettings
     {

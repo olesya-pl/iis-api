@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Iis.OntologyManager.UiControls
+﻿namespace Iis.Desktop.Common.Controls
 {
     public class AddPanelOptions
     {

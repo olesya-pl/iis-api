@@ -4,7 +4,7 @@ using System.Drawing;
 using System.Text;
 using System.Windows.Forms;
 
-namespace Iis.OntologyManager.Style
+namespace Iis.Desktop.Common.Styles
 {
     public class DesktopStyle : IDesktopStyle
     {

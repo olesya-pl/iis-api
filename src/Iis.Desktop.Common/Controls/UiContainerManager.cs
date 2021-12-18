@@ -1,12 +1,12 @@
-﻿using Iis.OntologyManager.Style;
-using Serilog;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Text;
 using System.Windows.Forms;
+using Iis.Desktop.Common.Styles;
+using Serilog;
 
-namespace Iis.OntologyManager.UiControls
+namespace Iis.Desktop.Common.Controls
 {
     public class UiContainerManager
     {
@@ -85,7 +85,7 @@ namespace Iis.OntologyManager.UiControls
             if (control.Left < _left) _left = control.Left;
             if (control.Bottom > _bottom) _bottom = control.Bottom;
             if (control.Right > _right) _right = control.Right;
-            
+
             Top = control.Bottom + _style.MarginVer;
             AddToRoot(control);
             Log.Logger.Verbose($"<= Top = {Top}");

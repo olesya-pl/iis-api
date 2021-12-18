@@ -1,8 +1,9 @@
-﻿using Iis.Interfaces.AccessLevels;
+﻿using Iis.Desktop.Common.Controls;
+using Iis.Desktop.Common.Requests;
+using Iis.Interfaces.AccessLevels;
 using Iis.Interfaces.Ontology.Data;
 using Iis.Interfaces.Ontology.Schema;
 using Iis.OntologyData.IisAccessLevels;
-using Iis.OntologyManager.DTO;
 using Iis.OntologyManager.Helpers;
 using Iis.OntologyManager.Style;
 using Iis.Services.Contracts.Params;

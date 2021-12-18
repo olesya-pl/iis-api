@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Iis.OntologyManager.Configurations
+namespace Iis.Desktop.Common.Dtos
 {
     public class UserCredentials
     {

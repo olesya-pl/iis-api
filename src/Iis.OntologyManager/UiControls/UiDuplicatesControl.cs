@@ -1,4 +1,5 @@
 ﻿using Iis.DbLayer.OntologyData;
+using Iis.Desktop.Common.Controls;
 using Iis.Interfaces.Ontology.Data;
 using Iis.OntologyData;
 using Iis.OntologyManager.DuplicateSearch;

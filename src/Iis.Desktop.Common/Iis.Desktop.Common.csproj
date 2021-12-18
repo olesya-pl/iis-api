@@ -39,4 +39,8 @@
     </PackageReference>
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Iis.Interfaces\Iis.Interfaces.csproj" />
+  </ItemGroup>
+
 </Project>
