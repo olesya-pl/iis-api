@@ -1,9 +1,10 @@
 Feature: Materials - regression
     - IIS-6109 - Indicate a phone number pattern of a cell voice material
-    - IIS-6048 - Change a material priority by clicking on the Processed button
-    - IIS-6045 - Change material reliability by clicking on the Processed button
-    - IIS-6052 - Ability to lose the connection between a material and an event from a material
-    - IIS-6051 - Ability to connect the material to an event from a material
+	- IIS-6048 - Change a material priority by clicking on the Processed button
+	- IIS-6045 - Change material reliability by clicking on the Processed button
+	- IIS-6052 - Ability to lose the connection between a material and an event from a material
+	- IIS-6051 - Ability to connect the material to an event from a material
+	- IIS-6470 - Sorting materials by source
 	- IIS-7445 - Change a material`s AccessLevel
 	- IIS-7488 - Bind military organization to materials by button "general editing"
 
@@ -104,6 +105,37 @@ Scenario: IIS-6051 - Ability to connect the material to an event from a material
 	Then I must not see Тестова подія as the related event to the material
 
 @regression @UI @Material @upload
+Scenario: IIS-6470 - Sorting materials by source
+	 Given I upload a new docx material via API
+		| Field                 | Value                                        |
+		| FileName              | тестовий матеріал                            |
+		| SourceReliabilityText | Здебільшого надійне                          |
+		| ReliabilityText       | Достовірна                                   |
+		| Content               | таємний контент                              |
+		| AccessLevel           | 0                                            |
+		| LoadedBy              | автотест                                     |
+		| MetaData              | {"type":"document","source":"a.contour.doc"} |
+		| From                  | a.contour.doc                                |
+	When I navigated to Materials page
+	When I clicked arrow up for sorting by source
+	Then I must see materials sorted by source order by asc 
+	When I clean up uploaded material via API
+	 Given I upload a new docx material via API
+		| Field                 | Value                                        |
+		| FileName              | тестовий матеріал                            |
+		| SourceReliabilityText | Здебільшого надійне                          |
+		| ReliabilityText       | Достовірна                                   |
+		| Content               | таємний контент                              |
+		| AccessLevel           | 0                                            |
+		| LoadedBy              | автотест                                     |
+		| MetaData              | {"type":"document","source":"z.contour.doc"} |
+		| From                  | z.contour.doc                                |
+	When I clicked arrow down for sorting by source
+	Then I must see materials sorted by source order by desc
+	When I clicked the arrow to sort by source in the third
+	When I clean up uploaded material via API
+
+@regression @UI @Material @upload
 Scenario: I can upload material and find it by its name
 	Given I upload a new docx material via API
 		| Field                 | Value                                      |
@@ -120,9 +152,9 @@ Scenario: I can upload material and find it by its name
 	And I clicked on the first search result in the Materials section
 	And I clean up uploaded material via API
 
-	 @regression @UI @Material @upload
-    Scenario: IIS-7445 - Change a material`s AccessLevel 
-        Given I upload a new docx material via API
+@regression @UI @Material @upload
+Scenario: IIS-7445 - Change a material`s AccessLevel
+	Given I upload a new docx material via API
 		| Field                 | Value                                      |
 		| FileName              | тестовий матеріал                          |
 		| SourceReliabilityText | Здебільшого надійне                        |
@@ -131,16 +163,16 @@ Scenario: I can upload material and find it by its name
 		| AccessLevel           | 0                                          |
 		| LoadedBy              | автотест                                   |
 		| MetaData              | {"type":"document","source":"contour.doc"} |
-		When I navigated to Materials page
-		And I clicked search button in the Materials section
-		And I searched таємн data in the materials
-		And I clicked on the first search result in the Materials section
-		And I entered the Т - Таємно value in the accessLevel field 
-		Then I must see Т - Таємно value in the accessLevel field
-		When I clean up uploaded material via API
+	When I navigated to Materials page
+	And I clicked search button in the Materials section
+	And I searched таємн data in the materials
+	And I clicked on the first search result in the Materials section
+	And I entered the Т - Таємно value in the accessLevel field 
+	Then I must see Т - Таємно value in the accessLevel field
+	When I clean up uploaded material via API
 
-		 @regression @UI @Material @upload
-    Scenario: IIS-7488 - Bind military organization to materials by button "general editing"
+@regression @UI @Material @upload
+Scenario: IIS-7488 - Bind military organization to materials by button "general editing"
 	 Given I upload a new docx material via API
 		| Field                 | Value                                      |
 		| FileName              | тестовий матеріал                          |

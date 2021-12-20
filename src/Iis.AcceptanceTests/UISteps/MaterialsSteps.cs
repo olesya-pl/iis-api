@@ -312,6 +312,27 @@ namespace AcceptanceTests.UISteps
             Assert.True(materialsSectionPage.ObjectOfStudyContainer.Displayed);
         }
 
+        [When(@"I clicked arrow up for sorting by source")]
+        public void WhenIClickedArrowForSortingBySource()
+        {
+            materialsSectionPage.SourceSortable.Click();
+            driver.WaitFor(2);
+        }
+
+        [When(@"I clicked arrow down for sorting by source")]
+        public void ThenIClickedArrowDownForSortingBySource()
+        {
+            materialsSectionPage.SourceSortable.Click();
+            driver.WaitFor(2);
+        }
+
+        [When(@"I clicked the arrow to sort by source in the third")]
+        public void ThenIClickedTheArrowToSortBySourceInTheThird()
+        {
+            materialsSectionPage.SourceSortable.Click();
+            driver.WaitFor(2);
+        }
+
 
 
         #endregion When
@@ -533,7 +554,25 @@ namespace AcceptanceTests.UISteps
             materialsSectionPage.ValueFromTheList.Click();
             driver.WaitFor(1);
         }
-        
+
+        [Then(@"I must see materials sorted by source order by asc")]
+        public void ThenIMustSeeMaterialsSortedBySource()
+        {
+            Assert.True(materialsSectionPage.SortedBySourceOrderByASC.Displayed);
+        }
+
+        [Then(@"I must see materials sorted by source order by desc")]
+        public void ThenIMustSeeMaterialsSortedBySourceOrderByDesc()
+        {
+            Assert.True(materialsSectionPage.SortedBySourceOrderByDesc.Displayed);
+        }
+
+        [Then(@"I must see materials sorted by source sorting: null")]
+        public void ThenIMustSeeMaterialsSortedBySourceSortingNull()
+        {
+            Assert.True(materialsSectionPage.SortedBySourceSortingNul.Displayed);
+        }
+
 
 
 

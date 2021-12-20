@@ -163,7 +163,7 @@ namespace AcceptanceTests.PageObjects
         [FindsBy(How = How.CssSelector, Using = ".material-general-access-level .material-info-card__body .el-input__inner")]
         public IWebElement AccessLevelField;
 
-         [FindsBy(How = How.CssSelector, Using = ".material-biding__trigger")]
+        [FindsBy(How = How.CssSelector, Using = ".material-biding__trigger")]
         public IWebElement GeneralEditingButton;
 
         public IWebElement Checkbox1ByMaterials => driver.FindElement(By.XPath("//div[1]/div/div[2]/table/tbody/tr[1]/td[2]/label/input"));
@@ -182,6 +182,18 @@ namespace AcceptanceTests.PageObjects
 
         [FindsBy(How = How.XPath, Using = "//tr[1]//div[@class='input-stream-related-objects']//div/a")]
         public IWebElement ObjectOfStudyContainer;
+
+        [FindsBy(How = How.XPath, Using = "//tr[1]/*[contains(@class,'materials-table__source')]//*[text()=' a.contour.doc ']")]
+        public IWebElement SortedBySourceOrderByASC;
+
+        [FindsBy(How = How.XPath, Using = "//tr[1]/*[contains(@class,'materials-table__source')]//*[text()=' z.contour.doc ']")]
+        public IWebElement SortedBySourceOrderByDesc;
+
+        [FindsBy(How = How.XPath, Using = "//div/table/thead/tr/th[@class='materials-table__source p-sortable-column'][@aria-sort='none']")]
+        public IWebElement SortedBySourceSortingNul;
+
+        [FindsBy(How = How.CssSelector, Using = ".p-datatable-scrollable-header-table .materials-table__source .p-sortable-column-icon")]
+        public IWebElement SourceSortable;
 
     }
 }
