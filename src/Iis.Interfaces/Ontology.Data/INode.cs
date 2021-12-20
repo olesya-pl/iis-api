@@ -32,6 +32,7 @@ namespace Iis.Interfaces.Ontology.Data
         IReadOnlyList<INode> GetDirectChildNodes(Func<INode, bool> filter);
         IReadOnlyList<INode> GetAllChildNodes(Func<INode, bool> filter);
         IReadOnlyList<INode> GetAllAttributeNodes(ScalarType? scalarType = null);
+        IReadOnlyList<INode> GetMultipleDirectProperties(string relationTypeName);
         IReadOnlyList<IRelation> GetIncomingRelations(IEnumerable<string> relationTypeNameList);
         string GetComputedValue(string name);
         string GetDotName();
