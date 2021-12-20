@@ -42,23 +42,23 @@ Scenario: IIS-5830 - Search object by mobile phone sign
 	Then I must see object of study Бонд as first search result
 	Then I must see sign value 0997908973 in first search result
 
-	@functional @UI @ObjectsOfStudySearchUI				
+	@functional @UI @ObjectsOfStudySearchUI
 Scenario: IIS-0001 - Search on object page1
 	When I clicked on the Objects section
 	And I clicked on search button in the Object of study section
 	And I searched Бонд data in the Objects of study section
 	Then I must see object of study Бонд Д. as first search result
 
-	
-	#Search 
+
+	#Search
 
 @functional @UI @ObjectsOfStudySearchUI
 Scenario: IIS-0003 - Search on object page3
 	When I clicked on the Objects section
 	And I clicked on search button in the Object of study section
-	And I searched __title: "ГУСЄВ С." AND militaryRank:полковник data in the Objects of study section 
+	And I searched __title: "ГУСЄВ С." AND militaryRank:полковник data in the Objects of study section
 	Then I must see object of study Звання: полковник, __title: ГУСЄВ С., as first search result
-	
+
 @functional @UI @ObjectsOfStudySearchUI
 Scenario: IIS-0007 - Search militaryRank on object page
 	When I clicked on the Objects section
