@@ -11,6 +11,8 @@ using AutoMapper;
 using Iis.Desktop.SecurityManager.Style;
 using Microsoft.Extensions.Configuration;
 using Serilog;
+using Iis.Desktop.Common.Controls;
+using Iis.Desktop.Common.Styles;
 
 namespace Iis.Desktop.SecurityManager
 {
@@ -18,11 +20,19 @@ namespace Iis.Desktop.SecurityManager
     {
         #region Fields
 
-        IConfiguration _configuration;
-        ISecurityManagerStyle _style;
-        Panel pnlTop;
-        const string VERSION = "0.01";
-        ILogger _logger;
+        private IConfiguration _configuration;
+        //private ISecurityManagerStyle _appStyle;
+        private IDesktopStyle _style;
+        private Panel pnlTop;
+        private const string VERSION = "0.01";
+        private ILogger _logger;
+        private UiControlsCreator _uiControlsCreator;
+        
+        private Panel panelMain;
+        private Panel panelLeft;
+        private Panel panelRight;
+        private Panel panelTop;
+        private Panel panelBottom;
 
         #endregion
 
@@ -30,55 +40,31 @@ namespace Iis.Desktop.SecurityManager
 
         public MainForm(
             IConfiguration configuration,
-            ILogger logger)
+            ILogger logger,
+            IDesktopStyleFactory desktopStyleFactory)
         {
             InitializeComponent();
             this.WindowState = FormWindowState.Maximized;
             Text = $"Володар Таємниць {VERSION}";
 
             _configuration = configuration;
-            _style = SecurityManagerStyle.GetDefaultStyle(this);
+            _style = desktopStyleFactory.GetDefaultStyle(this);
             _logger = logger;
+            _uiControlsCreator = new UiControlsCreator(_style);
 
-            SuspendLayout();
-            SetBackColor();
-            SetControlsTabMain(panelRight);
-            ResumeLayout();
+            panelMain = _uiControlsCreator.GetFillPanel(this);
+
+            int panelLeftWidth = panelMain.Width / 3;
+            (panelLeft, panelRight) = _uiControlsCreator.GetLeftRightPanels(panelMain, panelLeftWidth);
+
+            int panelTopHeight = panelRight.Height / 5;
+            (panelTop, panelBottom) = _uiControlsCreator.GetTopBottomPanels(panelRight, panelTopHeight);
         }
 
         #endregion
 
         #region UI Control Creators
-        private void SetBackColor()
-        {
-            panelTop.BackColor = _style.BackgroundColor;
-            panelMain.BackColor = _style.BackgroundColor;
-            panelLeft.BackColor = _style.BackgroundColor;
-            panelRight.BackColor = _style.BackgroundColor;
-        }
 
-        private void SetControlsTabMain(Panel rootPanel)
-        {
-            pnlTop = new Panel();
-            pnlTop.Location = new Point(0, 0);
-            pnlTop.Size = new Size(rootPanel.Width, _style.ButtonHeightDefault * 2);
-            pnlTop.BorderStyle = BorderStyle.FixedSingle;
-            pnlTop.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-
-            var pnlBottom = new Panel();
-            pnlBottom.Location = new Point(0, 51);
-            pnlBottom.Size = new Size(rootPanel.Width, rootPanel.Height - 51);
-            pnlBottom.BorderStyle = BorderStyle.FixedSingle;
-            pnlBottom.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
-            rootPanel.SuspendLayout();
-            rootPanel.Controls.Add(pnlTop);
-            rootPanel.Controls.Add(pnlBottom);
-            rootPanel.ResumeLayout();
-        }
-
-        private void SetEnabled(bool enabled)
-        {
-        }
 
         #endregion
     }

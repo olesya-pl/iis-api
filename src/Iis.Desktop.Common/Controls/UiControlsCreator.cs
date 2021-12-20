@@ -171,7 +171,7 @@ namespace Iis.Desktop.Common.Controls
                 Width = parent.Width,
                 Height = parent.Height - marginVer,
                 Dock = DockStyle.None,
-                BackColor = Color.OrangeRed,
+                BackColor = _style.BackgroundColor,
                 Anchor = AnchorStyles.Left | AnchorStyles.Right | AnchorStyles.Top | AnchorStyles.Bottom,
                 Visible = visible
             };

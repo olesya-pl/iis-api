@@ -16,9 +16,6 @@ namespace Iis.Desktop.Common.Styles
         public int ButtonWidthDefault { get; set; }
         public int CheckboxHeightDefault { get; set; }
         public Color BackgroundColor { get; set; }
-        public Color GreenColor { get; set; }
-        public Color YellowColor { get; set; }
-        public Color RedColor { get; set; }
         public Font DefaultFont { get; set; }
         public Font SelectedFont { get; set; }
     }
