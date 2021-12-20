@@ -1,24 +1,33 @@
-﻿using AutoMapper;
+﻿using System.Linq;
+using System.Threading.Tasks;
+using AutoMapper;
 using Iis.DataModel;
 using Iis.Interfaces.Ontology.Data;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Iis.DbLayer.OntologyData
 {
     public class OntologyPatchSaver : IOntologyPatchSaver
     {
-        IMapper _mapper;
-        OntologyContext _context;
+        private readonly IMapper _mapper;
+        private readonly OntologyContext _context;
         public OntologyPatchSaver(OntologyContext context)
         {
             _context = context;
             _mapper = GetMapper();
         }
-        private IMapper GetMapper()
+        public async Task SavePatchAsync(IOntologyPatch patch)
+        {
+            ApplyPatch(patch);
+            await _context.SaveChangesAsync();
+            patch.Clear();
+        }
+        public void SavePatch(IOntologyPatch patch)
+        {
+            ApplyPatch(patch);
+            _context.SaveChanges();
+            patch.Clear();
+        }
+        private static IMapper GetMapper()
         {
             var configuration = new MapperConfiguration(cfg =>
             {
@@ -44,18 +53,6 @@ namespace Iis.DbLayer.OntologyData
                 _mapper.Map(node, nodeEntity);
             }
             _context.Nodes.UpdateRange(nodeEntities.Values);
-        }
-        public async Task SavePatchAsync(IOntologyPatch patch)
-        {
-            ApplyPatch(patch);
-            await _context.SaveChangesAsync();
-            patch.Clear();
-        }
-        public void SavePatch(IOntologyPatch patch)
-        {
-            ApplyPatch(patch);
-            _context.SaveChanges();
-            patch.Clear();
         }
     }
 }
