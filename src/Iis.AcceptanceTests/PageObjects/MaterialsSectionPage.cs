@@ -9,6 +9,7 @@ namespace AcceptanceTests.PageObjects
     public class MaterialsSectionPage
     {
         private readonly IWebDriver driver;
+        private IWebElement materialsSectionPageElement;
 
         public MaterialsSectionPage(IWebDriver driver)
         {
@@ -108,7 +109,7 @@ namespace AcceptanceTests.PageObjects
         public IWebElement EmptyAreInTheMaterialList;
 
         [FindsBy(How = How.CssSelector, Using = ".material-objects .material-objects-table a")]
-        public IWebElement ConnectedObjectLink;
+        public IWebElement BindedObjectLink;
 
         [FindsBy(How = How.CssSelector, Using = ".confirm-message-box__action-confirm")]
         public IWebElement ConfirmDeleteRelationButton;
@@ -159,7 +160,28 @@ namespace AcceptanceTests.PageObjects
             return new MaterialRelatedItems(driver, title);
         }
 
-       [FindsBy(How = How.CssSelector, Using = ".material-general-access-level .material-info-card__body .el-input__inner")]
-       public IWebElement AccessLevelField;
+        [FindsBy(How = How.CssSelector, Using = ".material-general-access-level .material-info-card__body .el-input__inner")]
+        public IWebElement AccessLevelField;
+
+         [FindsBy(How = How.CssSelector, Using = ".material-biding__trigger")]
+        public IWebElement GeneralEditingButton;
+
+        public IWebElement Checkbox1ByMaterials => driver.FindElement(By.XPath("//div[1]/div/div[2]/table/tbody/tr[1]/td[2]/label/input"));
+
+        [FindsBy(How = How.CssSelector, Using = ".material-biding .el-dropdown__caret-button .el-icon-arrow-down")]
+        public IWebElement EditDropdownButton;
+
+        [FindsBy(How = How.CssSelector, Using = "li.el-dropdown-menu__item:nth-of-type(1)")]
+        public IWebElement ValueFromTheList;
+
+        [FindsBy(How = How.CssSelector, Using = ".material-relations-input .el-input__inner")]
+        public IWebElement ObjectsSearchTextBox;
+
+        [FindsBy(How = How.CssSelector, Using = "button[class='el-button el-button--primary'] > span")]
+        public IWebElement SaveChangesButton;
+
+        [FindsBy(How = How.XPath, Using = "//tr[1]//div[@class='input-stream-related-objects']//div/a")]
+        public IWebElement ObjectOfStudyContainer;
+
     }
 }

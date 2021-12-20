@@ -17,6 +17,7 @@ namespace AcceptanceTests.UISteps
         private readonly ScenarioContext context;
         private readonly MaterialsSectionPage materialsSectionPage;
         private readonly NavigationSection navigationSection;
+       
 
         public MaterialsSteps(ScenarioContext injectedContext, IWebDriver driver)
         {
@@ -104,6 +105,7 @@ namespace AcceptanceTests.UISteps
             context.Set(materialModel.FileName, "uploadedMaterial");
             var response = await MaterialsHelper.UploadDocxMaterial(materialModel);
             context.Set(response, "uploadedMaterial.Id");
+            driver.WaitFor(5);
         }
 
         [When(@"I clean up uploaded material via API")]
@@ -157,13 +159,6 @@ namespace AcceptanceTests.UISteps
             driver.WaitFor(15);
         }
 
-        [Then(@"I pressed Processed button")]
-        public void ThenIPressProcessedButton()
-        {
-            materialsSectionPage.ProcessedButton.Click();
-            driver.WaitFor(15);
-        }
-
         [When(@"I pressed Back button")]
         public void WhenIPressBackButton()
         {
@@ -201,10 +196,10 @@ namespace AcceptanceTests.UISteps
             materialsSectionPage.ObjectsSearch.SendKeys(Keys.Escape);
         }
 
-        [When(@"I clicked on the connected object")]
-        public void WhenIClickedOnTheConnectedObject()
+        [When(@"I clicked on the binded object")]
+        public void WhenIClickedOnTheBindedObject()
         {
-            materialsSectionPage.ConnectedObjectLink.Click();
+            materialsSectionPage.BindedObjectLink.Click();
         }
 
         [When(@"I clicked Back button in the browser")]
@@ -290,7 +285,31 @@ namespace AcceptanceTests.UISteps
             materialsSectionPage.AccessLevelField.SendKeys(Keys.Down);
             materialsSectionPage.AccessLevelField.SendKeys(Keys.Enter);
             materialsSectionPage.AccessLevelField.SendKeys(Keys.Escape);
+        }
 
+        [When(@"I enter (.*) value in the objects search input")] 
+        public void ThenIEnter_ValueInTheDialogWindowForSearchingObjects(string inputValue)
+        {
+            materialsSectionPage.ObjectsSearchTextBox.SendKeys(inputValue);
+            driver.WaitFor(10);
+            materialsSectionPage.ObjectsSearchTextBox.SendKeys(Keys.Down);
+            materialsSectionPage.ObjectsSearchTextBox.SendKeys(Keys.Enter);
+            driver.WaitFor(2);
+            materialsSectionPage.ObjectsSearchTextBox.SendKeys(Keys.Escape);
+            
+        }
+
+        [When(@"I pressed the save changes button")]
+        public void WhenIPressedTheSaveChangesButton()
+        {
+            materialsSectionPage.SaveChangesButton.Click();
+            driver.WaitFor(10);
+        }
+
+        [When(@"I must see (.*) binded to materials")]
+        public void WhenIMustSeeBindedToMaterials(string DorName)
+        {
+            Assert.True(materialsSectionPage.ObjectOfStudyContainer.Displayed);
         }
 
 
@@ -476,8 +495,49 @@ namespace AcceptanceTests.UISteps
             Assert.True(materialsSectionPage.AccessLevelField.Displayed);
             driver.WaitFor(2);
         }
-    
-    
+
+        [Then(@"I pressed Processed button")]
+        public void ThenIPressProcessedButton()
+        {
+            materialsSectionPage.ProcessedButton.Click();
+            driver.WaitFor(15);
+        }
+
+        [Then(@"I clicked on the general editing button")]
+        public void ThenIClickedOnTheGeneralEditingButton()
+        {
+            materialsSectionPage.GeneralEditingButton.Click();
+            driver.WaitFor(5);
+        }
+
+        [Then(@"I selected first checkbox by materials from the Materials list")]
+        public void ThenISelectedFirstThreeCheckboxByMaterialsFromTheMaterialsList()
+        {
+            materialsSectionPage.Checkbox1ByMaterials.Click();
+            driver.WaitFor(1);
+        }
+
+        [Then(@"I clicked on the dropdown on editing button")]
+        public void ThenIClickedOnTheDropdownOnEditingButton()
+        {
+            materialsSectionPage.EditDropdownButton.Click();
+            driver.WaitFor(1);
+        }
+
+        [Then(@"I selected (.*) from the list")]
+        public void ThenISelectedValueFromTheList(string ValueFromTheList)
+
+        {
+            materialsSectionPage.EditDropdownButton.Click();
+            driver.WaitFor(1);
+            materialsSectionPage.ValueFromTheList.Click();
+            driver.WaitFor(1);
+        }
+        
+
+
+
+
 
         #endregion
     }

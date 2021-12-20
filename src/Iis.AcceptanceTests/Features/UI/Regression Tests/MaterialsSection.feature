@@ -5,6 +5,7 @@ Feature: Materials - regression
     - IIS-6052 - Ability to lose the connection between a material and an event from a material
     - IIS-6051 - Ability to connect the material to an event from a material
 	- IIS-7445 - Change a material`s AccessLevel
+	- IIS-7488 - Bind military organization to materials by button "general editing"
 
 Background:
 	Given I sign in with the user olya and password 123 in the Contour
@@ -130,10 +131,40 @@ Scenario: I can upload material and find it by its name
 		| AccessLevel           | 0                                          |
 		| LoadedBy              | автотест                                   |
 		| MetaData              | {"type":"document","source":"contour.doc"} |
-        When I navigated to Materials page
-        And I clicked search button in the Materials section
-        And I searched таємн data in the materials
-        And I clicked on the first search result in the Materials section
+		When I navigated to Materials page
+		And I clicked search button in the Materials section
+		And I searched таємн data in the materials
+		And I clicked on the first search result in the Materials section
 		And I entered the Т - Таємно value in the accessLevel field 
 		Then I must see Т - Таємно value in the accessLevel field
 		When I clean up uploaded material via API
+
+		 @regression @UI @Material @upload
+    Scenario: IIS-7488 - Bind military organization to materials by button "general editing"
+	 Given I upload a new docx material via API
+		| Field                 | Value                                      |
+		| FileName              | тестовий матеріал                          |
+		| SourceReliabilityText | Здебільшого надійне                        |
+		| ReliabilityText       | Достовірна                                 |
+		| Content               | таємний контент                           |
+		| AccessLevel           | 0                                          |
+		| LoadedBy              | автотест                                   |
+		| MetaData              | {"type":"document","source":"contour.doc"} |
+	 When I navigated to Materials page
+	 Then I must see the Materials page
+	 And I clicked on the general editing button
+	 And I selected first checkbox by materials from the Materials list
+	 And I clicked on the dropdown on editing button
+	 And I selected Прив`язати до ОР from the list
+	 When I enter 1 АК value in the objects search input
+	 And I pressed the save changes button
+	 When I refreshed the page in the browser
+	 And I must see 1 АК binded to materials
+	 And I clicked on the first search result in the Materials section
+	 And I clicked on the relations tab in the material card
+	 When I clicked on the binded object
+	 Then I must see 1 АК title of the object
+	 When I clicked on the Materials tab
+	 Then I must see attached material 
+	 When I clean up uploaded material via API
+

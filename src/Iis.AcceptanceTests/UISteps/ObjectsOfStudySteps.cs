@@ -396,6 +396,13 @@ namespace AcceptanceTests.UISteps
             objectInTheList.Click();
             driver.WaitFor(2);
         }
+        
+        [When(@"I clicked on the Materials tab")]
+        public void WhenIClickedOnTheMaterialsTab()
+        {
+            objectsOfStudyPage.MaterialsTab.Click();
+        }
+
 
 
         #endregion
@@ -583,6 +590,12 @@ namespace AcceptanceTests.UISteps
         {
             var actualMilitaryRank = objectsOfStudyPage.SearchMilitaryRank.Text;
             Assert.Equal(objectOfStudyMilitaryRank, actualMilitaryRank);
+        }
+
+        [Then(@"I must see attached material")]
+        public void ThenIMustSeeAttachedMaterial()
+        {
+            Assert.True(objectsOfStudyPage.AttachedMaterialTitle.Displayed);
         }
 
 
