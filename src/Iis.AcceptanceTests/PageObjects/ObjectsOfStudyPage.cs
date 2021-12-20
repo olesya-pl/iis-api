@@ -30,7 +30,7 @@ namespace AcceptanceTests.PageObjects
         [FindsBy(How = How.CssSelector, Using = ".object-summary .text-ellipsis .title")]
         public IWebElement FirstSearchResultTitle;
 
-        [FindsBy(How = How.CssSelector, Using = ".objects-table .p-datatable-tbody tr:nth-child(1)")] 
+        [FindsBy(How = How.CssSelector, Using = ".objects-table .p-datatable-tbody tr:nth-child(1)")]
         public IWebElement FirstSearchResultRow;
 
         [FindsBy(How = How.XPath, Using = "//div[@class='icon-wrapper icon-wrapper-edit']")]
@@ -240,5 +240,11 @@ namespace AcceptanceTests.PageObjects
         [FindsBy(How = How.CssSelector, Using = ".objects-table .p-datatable-tbody .object-summary .highlight")]
         public IWebElement SearchMilitaryRank;
 
+        [FindsBy(How = How.CssSelector, Using = "ul[role='menubar'] > li:nth-of-type(2)")]
+        public IWebElement MaterialsTab;
+    
+
+    [FindsBy(How = How.XPath, Using = "//div[@class='infinity-table object-materials-table']//div[@class='p-datatable-scrollable-view']//tr[1]//td[@class='object-materials-table__title']")]
+    public IWebElement AttachedMaterialTitle;
     }
 }

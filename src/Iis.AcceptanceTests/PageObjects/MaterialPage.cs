@@ -14,5 +14,6 @@ namespace AcceptanceTests.PageObjects
         public DropDown ImportanceDropDown => new DropDown(driver, By.CssSelector(".action-select--importance"));
         public DropDown ReliabilityDropDown => new DropDown(driver, By.CssSelector(".action-select--reliability"));
         public DropDown SourceCredibilityDropDown => new DropDown(driver, By.CssSelector(".action-select--sourcereliability"));
+        public MaterialsSectionPage MaterialsSectionPage => new MaterialsSectionPage(driver);
     }
 }
