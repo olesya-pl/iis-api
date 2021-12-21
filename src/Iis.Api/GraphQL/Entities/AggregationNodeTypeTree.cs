@@ -1,6 +1,8 @@
-﻿using System;
+﻿using Microsoft.Extensions.Logging;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace IIS.Core.GraphQL.Entities
@@ -16,7 +18,7 @@ namespace IIS.Core.GraphQL.Entities
             _itemsDict = new Dictionary<string, AggregationNodeTypeItem>();
             AddItems(items);
         }
-        public void MergeBuckets(IReadOnlyList<AggregationBucket> buckets)
+        public void MergeBuckets(IReadOnlyList<AggregationBucket> buckets, ILogger logger = null)
         {
             if (buckets == null || buckets.Count == 0)
             {
@@ -31,8 +33,21 @@ namespace IIS.Core.GraphQL.Entities
                     bucket.TypeName.Substring("Entity".Length) :
                     bucket.TypeName;
 
+                if (string.IsNullOrEmpty(typeName))
+                {
+                    logger?.LogError("MergeBuckets: typeName is empty");
+                    continue;
+                }
+
                 var item = _itemsDict.GetValueOrDefault(typeName);
-                item.DocCount = bucket.DocCount;
+                if (item != null)
+                {
+                    item.DocCount = bucket.DocCount;
+                }
+                else
+                {
+                    logger?.LogError(GetItemNotFoundMessage(typeName));
+                }
             }
             SummarizeCounts(_items);
             RemoveZeroes(_items);
@@ -73,6 +88,15 @@ namespace IIS.Core.GraphQL.Entities
                     RemoveZeroes(item.Children);
                 }
             }
+        }
+
+        private string GetItemNotFoundMessage(string typeName)
+        {
+            var sb = new StringBuilder();
+            sb.AppendLine($"AggregationNodeTypeTree.MergeBuckets error: '{typeName}' is not found in _itemsTree");
+            sb.AppendLine("_itemsDict keys: ");
+            sb.Append(string.Join(", ", _itemsDict.Keys.OrderBy(_ => _)));
+            return sb.ToString();
         }
     }
 }
