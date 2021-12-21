@@ -15,6 +15,7 @@ using IIS.Core.GraphQL.Entities.InputTypes;
 using Iis.Utility;
 using Newtonsoft.Json.Linq;
 using HotChocolate.Resolvers;
+using Microsoft.Extensions.Logging;
 
 namespace IIS.Core.GraphQL.Entities
 {
@@ -39,6 +40,7 @@ namespace IIS.Core.GraphQL.Entities
             [Service] IOntologyService ontologyService,
             [Service] IOntologyNodesData nodesData,
             [Service] IMapper mapper,
+            [Service] ILogger<OntologyFilterableQuery> logger,
             PaginationInput pagination,
             AllEntitiesFilterInput filter)
         {
@@ -60,8 +62,11 @@ namespace IIS.Core.GraphQL.Entities
             EnrichWithSelectedFilteredItems(mapped.Aggregations, elasticFilter);
             mapped.Aggregations = EnrichWithNodeTypeNames(_objectNodeTypeCollection, mapped.Aggregations);
 
-            var nodeTypeAggregations = GetNodeTypeAggregations(nodesData.Schema, types,
-                mapped.Aggregations.GetValueOrDefault(ElasticConfigConstants.NodeTypeTitleAlias)?.Buckets);
+            var nodeTypeAggregations = GetNodeTypeAggregations(
+                nodesData.Schema, 
+                types,
+                mapped.Aggregations.GetValueOrDefault(ElasticConfigConstants.NodeTypeTitleAlias)?.Buckets,
+                logger);
             mapped.NodeTypeAggregations = nodeTypeAggregations.Select(_ => JObject.FromObject(_)).ToList();
 
             RemoveObsoleteAggregation(mapped);
@@ -206,7 +211,8 @@ namespace IIS.Core.GraphQL.Entities
         private IReadOnlyList<AggregationNodeTypeItem> GetNodeTypeAggregations(
             IOntologySchema schema,
             IEnumerable<string> typeNames,
-            IReadOnlyList<AggregationBucket> buckets)
+            IReadOnlyList<AggregationBucket> buckets,
+            ILogger logger)
         {
             var list = typeNames
                 .Select(name => GetAggregationNodeTypeItem(schema.GetEntityTypeByName(name)))
@@ -219,7 +225,7 @@ namespace IIS.Core.GraphQL.Entities
             }
 
             var aggregations = new AggregationNodeTypeTree(list);
-            aggregations.MergeBuckets(buckets);
+            aggregations.MergeBuckets(buckets, logger);
 
             return aggregations.Items;
         }

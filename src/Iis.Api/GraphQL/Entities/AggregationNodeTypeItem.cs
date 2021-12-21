@@ -15,5 +15,7 @@ namespace IIS.Core.GraphQL.Entities
         public string Title { get; set; }
         public int DocCount { get; set; }
         public List<AggregationNodeTypeItem> Children { get; set; }
+
+        public override string ToString() => $"{NodeTypeName}: {DocCount}";
     }
 }
