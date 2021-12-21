@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Iis.Desktop.Common.Dtos
+namespace Iis.Desktop.Common.Login
 {
     public class UserCredentials
     {

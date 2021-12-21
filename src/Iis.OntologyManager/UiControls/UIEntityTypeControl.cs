@@ -41,11 +41,6 @@ namespace Iis.OntologyManager.UiControls
         public event Action OnSetInheritance;
         public event Action<Guid> OnRemoveInheritance;
 
-        public UiEntityTypeControl(IOntologyManagerStyle appStyle)
-        {
-            _appStyle = appStyle;
-        }
-
         public IChildNodeType SelectedChild
         {
             get

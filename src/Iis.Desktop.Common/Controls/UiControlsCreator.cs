@@ -222,9 +222,19 @@ namespace Iis.Desktop.Common.Controls
         public Button GetButton(string text) =>
             new Button
             {
-                Text = "Порівняти",
+                Text = text,
                 Width = _style.ButtonWidthDefault,
                 MinimumSize = new Size { Height = _style.ButtonHeightDefault }
             };
+
+        public Panel GetPanel(Control parent)
+        {
+            var panel = new Panel
+            {
+                BackColor = _style.BackgroundColor,
+            };
+            parent.Controls.Add(panel);
+            return panel;
+        }
     }
 }

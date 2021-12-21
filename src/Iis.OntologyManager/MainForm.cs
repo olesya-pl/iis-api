@@ -26,8 +26,8 @@ using Iis.Interfaces.AccessLevels;
 using System.Threading.Tasks;
 using Iis.Services.Contracts.Params;
 using Iis.Desktop.Common.Controls;
-using Iis.Desktop.Common.Dtos;
 using Iis.Desktop.Common.Requests;
+using Iis.Desktop.Common.Login;
 
 namespace Iis.OntologyManager
 {
@@ -275,7 +275,7 @@ namespace Iis.OntologyManager
 
             btnSaveSchema = _uiControlsCreator.GetButton("Зберегти");
             btnSaveSchema.Click += btnSave_Click;
-            
+
             btnCompare = btnSaveSchema = _uiControlsCreator.GetButton("Порівняти");
             btnCompare.Click += btnCompare_Click;
             container.AddInRow(new List<Control> { btnSaveSchema, btnCompare });

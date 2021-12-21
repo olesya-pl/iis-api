@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using Serilog;
 using Iis.Services.Contracts.Params;
 using Newtonsoft.Json;
-using Iis.Desktop.Common.Dtos;
+using Iis.Desktop.Common.Login;
 
 namespace Iis.Desktop.Common.Requests
 {
