@@ -28,6 +28,7 @@ using Iis.Services.Contracts.Params;
 using Iis.Desktop.Common.Controls;
 using Iis.Desktop.Common.Requests;
 using Iis.Desktop.Common.Login;
+using Iis.Desktop.Common.Configurations;
 
 namespace Iis.OntologyManager
 {
@@ -35,7 +36,6 @@ namespace Iis.OntologyManager
     {
         #region Fields
 
-        const string EnvironmentPropertiesSectionName = "environmentProperties";
         const string UserCredentialsSectionName = "userCredentials";
         const string RequestSettingsSectionName = "requestSettings";
         const string DefaultName = "__default";
@@ -659,7 +659,7 @@ namespace Iis.OntologyManager
         {
             var result = new List<SchemaDataSource>();
 
-            var environmentProps = _configuration.GetSection(EnvironmentPropertiesSectionName)
+            var environmentProps = _configuration.GetSection(EnvConfig.SectionName)
                                         .Get<IReadOnlyDictionary<string, EnvConfig>>()
                                         .OrderBy(property => property.Value.SortOrder);
 

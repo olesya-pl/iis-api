@@ -13,6 +13,7 @@ using Microsoft.Extensions.Configuration;
 using Serilog;
 using Iis.Desktop.Common.Controls;
 using Iis.Desktop.Common.Styles;
+using Iis.Desktop.Common.Configurations;
 
 namespace Iis.Desktop.SecurityManager
 {
@@ -21,6 +22,7 @@ namespace Iis.Desktop.SecurityManager
         #region Fields
 
         private IConfiguration _configuration;
+        private IReadOnlyDictionary<string, EnvConfig> _environmentProperties;
         //private ISecurityManagerStyle _appStyle;
         private IDesktopStyle _style;
         private const string VERSION = "0.1";
@@ -49,6 +51,9 @@ namespace Iis.Desktop.SecurityManager
             _style = desktopStyleFactory.GetDefaultStyle(this);
             _logger = logger;
             _uiControlsCreator = new UiControlsCreator(_style);
+
+            _environmentProperties = _configuration.GetSection(EnvConfig.SectionName)
+                                        .Get<IReadOnlyDictionary<string, EnvConfig>>();
 
             panelMain = _uiControlsCreator.GetFillPanel(this);
 
