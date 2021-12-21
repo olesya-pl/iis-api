@@ -20,7 +20,12 @@ namespace Iis.Api.GraphQL.RadioElectronicSituation
         private const string SidcPropertyName = "affiliation.sidc";
         private const string BePartOfName = "bePartOf";
         private const string AmountName = "amount.code";
-        private const string NoValueFound = "значення відсутне";
+        private const string ClassifiersCodeName = "classifiers.sidc.code";
+        private const string CountryName = "country.name";
+        private const string RelatesToCountryName = "relatesToCountry.name";
+        private const string LastConfirmedAtName = "lastConfirmedAt";
+        private const string TitlePhotosName = "titlePhotos";
+        private const string ImageName = "image";
         private IMapper _mapper;
 
         public ResQuery(IMapper mapper)
@@ -56,22 +61,43 @@ namespace Iis.Api.GraphQL.RadioElectronicSituation
 
         private static ResNodeExtraObject GetNodesExtraObject(INode sourceItem)
         {
+            var title = sourceItem.GetTitleValue();
+            var titlePhoto = sourceItem.GetMultipleDirectProperties(TitlePhotosName).FirstOrDefault()
+                    ?.GetSingleDirectProperty(ImageName)?.Value;
+
             return new ResNodeExtraObject
             {
                 Id = sourceItem.Id,
                 Type = sourceItem.NodeType.Name,
-                Title = sourceItem.GetTitleValue() ?? NoValueFound,
+                Title = sourceItem.GetTitleValue(),
+                LastConfirmedAt = sourceItem.GetSingleProperty(LastConfirmedAtName)?.Value,
+                TitlePhoto = titlePhoto == null ? null : FileUrlGetter.GetFileUrl(new Guid(titlePhoto)),
                 Affiliation = new ResNodeExtraObjectAffiliation
                 {
-                    Sidc = sourceItem.GetSingleProperty(SidcPropertyName)?.Value ?? NoValueFound
+                    Sidc = sourceItem.GetSingleProperty(SidcPropertyName)?.Value
                 },
                 Amount = new ResNodeExtraObjectAmount
                 {
-                    Code = sourceItem.GetSingleProperty(AmountName)?.Value ?? NoValueFound
+                    Code = sourceItem.GetSingleProperty(AmountName)?.Value
                 },
                 BePartOf = new ResNodeExtraObjectBePartOf
                 {
-                    Title = sourceItem.GetSingleProperty(BePartOfName)?.GetTitleValue() //?? NoValueFound
+                    Title = sourceItem.GetSingleProperty(BePartOfName)?.GetTitleValue()
+                },
+                Classifiers = new ResNodeExtraObjectClassifiers
+                {
+                    Sidc = new ResNodeExtraObjectClassifiersSidc
+                    {
+                        Code = sourceItem.GetSingleProperty(ClassifiersCodeName)?.Value
+                    }
+                },
+                Country = new ResNodeExtraObjectCountry
+                {
+                    Name = sourceItem.GetSingleProperty(CountryName)?.Value
+                },
+                RelatesToCountry = new ResNodeExtraObjectCountry
+                {
+                    Name = sourceItem.GetSingleProperty(RelatesToCountryName)?.Value
                 }
             };
         }
@@ -120,7 +146,7 @@ namespace Iis.Api.GraphQL.RadioElectronicSituation
                     RegisteredAt = firstItem.LocationHistory.RegisteredAt,
                     Sign = new ResNodeExtraSign
                     {
-                        Value = firstItem.Sign.GetSingleDirectProperty(ValuePropertyName)?.Value ?? NoValueFound
+                        Value = firstItem.Sign.GetSingleDirectProperty(ValuePropertyName)?.Value
                     },
                     Objects = GetNodesExtraObjects(items),
                     Materials = GetNodesExtraMaterials(items)

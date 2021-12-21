@@ -244,12 +244,19 @@ namespace Iis.OntologyData.DataTypes
         public IReadOnlyList<INode> GetDirectAttributeNodes(ScalarType? scalarType = null) =>
             GetDirectChildNodes(n => n.NodeType.IsAttributeType
                && (scalarType == null || n.NodeType.AttributeType.ScalarType == scalarType));
-        
+
         public IReadOnlyList<INode> GetDirectChildNodes(Func<INode, bool> filter) =>
             _outgoingRelations
                 .Where(r => filter(r.TargetNode))
                 .Select(r => r.TargetNode)
                 .ToList();
+
+        public IReadOnlyList<INode> GetMultipleDirectProperties(string relationTypeName) =>
+            _outgoingRelations
+                .Where(r => r.TypeName == relationTypeName)
+                .Select(r => r.TargetNode)
+                .ToList();
+
         public IReadOnlyList<INode> GetAllChildNodes(Func<INode, bool> filter)
         {
             var result = new List<INode>();
