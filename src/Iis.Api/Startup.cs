@@ -408,7 +408,6 @@ namespace IIS.Core
 #if !DEBUG
             app.UseMiddleware<LoggingMiddleware>();
 #endif
-            app.UseGraphQL();
             app.UsePlayground();
             LoadHotChockolateSchema(app);
             app.UseHealthChecks("/api/server-health", new HealthCheckOptions { ResponseWriter = ReportHealthCheck });
@@ -419,6 +418,7 @@ namespace IIS.Core
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
+                endpoints.MapGraphQL();
             });
         }
 
