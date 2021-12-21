@@ -80,6 +80,7 @@ namespace AcceptanceTests.UISteps
         [Then(@"I must see first theme in the Themes list")]
         public void ThenIMustSeeFirstThemeInTheThemeList()
         {
+            driver.WaitFor(2);
             Assert.True(themesAndUpdatesPageObjects.FirstThemeInTheThemeList.Displayed);
         }
 
