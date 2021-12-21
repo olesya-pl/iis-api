@@ -168,7 +168,7 @@ namespace IIS.Core
                     return new OntologyNodesData(rawData, ontologySchema, ontologySaver);
                 });
                 services.AddSingleton<IOntologyCache, OntologyCache>();
-                services.AddSingleton<IOntologySchema>(provider => (new OntologySchemaService()).GetOntologySchema(schemaSource));
+                services.AddSingleton<IOntologySchema>(provider => new OntologySchemaService().GetOntologySchema(schemaSource));
                 services.AddSingleton<ICommonData>(provider =>
                 {
                     var ontologyData = provider.GetRequiredService<IOntologyNodesData>();
@@ -184,7 +184,7 @@ namespace IIS.Core
 
             services.AddTransient<IUnitOfWorkFactory<IIISUnitOfWork>, IISUnitOfWorkFactory>();
             services.AddTransient<IMaterialService, MaterialService<IIISUnitOfWork>>();
-            services.AddTransient<IOntologyService, OntologyServiceWithCache>();            
+            services.AddTransient<IOntologyService, OntologyServiceWithCache>();
 
             services.AddSingleton<IElasticConfiguration, IisElasticConfiguration>();
             services.AddTransient<MutationCreateResolver>();
@@ -195,7 +195,7 @@ namespace IIS.Core
             services.AddTransient<IFileService, FileService<IIISUnitOfWork>>();
             services.AddScoped<IAnalyticsRepository, AnalyticsRepository>();
             services.AddTransient<IElasticService, ElasticService>();
-            services.AddSingleton<IGroupedAggregationNameGenerator, GroupedAggregationNameGenerator>();
+            services.AddTransient<IGroupedAggregationNameGenerator, GroupedAggregationNameGenerator>();
             services.AddTransient<OntologySchemaService>();
             services.AddTransient<ExportService>();
             services.AddTransient<ExportToJsonService>();
@@ -210,8 +210,8 @@ namespace IIS.Core
             services.AddTransient<AccessObjectService>();
             services.AddTransient<IFeatureProcessorFactory, FeatureProcessorFactory>();
             services.AddTransient<NodeMapper>();
-            services.AddSingleton<FileUrlGetter>();
-            services.AddSingleton<PropertyTranslator>();
+            services.AddTransient<FileUrlGetter>();
+            services.AddTransient<PropertyTranslator>();
             services.AddTransient<ICsvService, CsvService>();
 
             services.AddTransient<IChangeHistoryService, ChangeHistoryService<IIISUnitOfWork>>();
@@ -298,7 +298,7 @@ namespace IIS.Core
                     Configuration["activeDirectory:login"],
                     Configuration["activeDirectory:password"]));
             services.AddSingleton<IElasticState, ElasticState>();
-            services.AddSingleton<IAdminOntologyElasticService, AdminOntologyElasticService>();
+            services.AddTransient<IAdminOntologyElasticService, AdminOntologyElasticService>();
             services.AddHostedService<ThemeCounterBackgroundService>();
             services.AddServices();
 
