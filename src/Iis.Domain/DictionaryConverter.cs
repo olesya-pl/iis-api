@@ -12,6 +12,20 @@ namespace Iis.Domain
             this.WriteValue(writer, value);
         }
 
+        public override object ReadJson(
+            JsonReader reader,
+            Type objectType,
+            object existingValue,
+            JsonSerializer serializer)
+        {
+            return ReadValue(reader);
+        }
+
+        public override bool CanConvert(Type objectType)
+        {
+            return typeof(IDictionary<string, object>).IsAssignableFrom(objectType);
+        }
+
         private void WriteValue(JsonWriter writer, object value)
         {
             var t = JToken.FromObject(value);
@@ -54,19 +68,15 @@ namespace Iis.Domain
             writer.WriteEndArray();
         }
 
-        public override object ReadJson(JsonReader reader, Type objectType, object existingValue,
-            JsonSerializer serializer)
-        {
-            return ReadValue(reader);
-        }
-
         private object ReadValue(JsonReader reader)
         {
             while (reader.TokenType == JsonToken.Comment)
             {
                 if (!reader.Read())
+                {
                     throw new JsonSerializationException(
                         "Unexpected Token when converting IDictionary<string, object>");
+                }
             }
 
             switch (reader.TokenType)
@@ -85,8 +95,9 @@ namespace Iis.Domain
                 case JsonToken.Bytes:
                     return reader.Value;
                 default:
-                    throw new JsonSerializationException
-                    (string.Format("Unexpected token when converting IDictionary<string, object>: {0}",
+                    throw new JsonSerializationException(
+                    string.Format(
+                        "Unexpected token when converting IDictionary<string, object>: {0}",
                         reader.TokenType));
             }
         }
@@ -143,11 +154,6 @@ namespace Iis.Domain
             }
 
             throw new JsonSerializationException("Unexpected end when reading IDictionary<string, object>");
-        }
-
-        public override bool CanConvert(Type objectType)
-        {
-            return typeof(IDictionary<string, object>).IsAssignableFrom(objectType);
         }
     }
 }

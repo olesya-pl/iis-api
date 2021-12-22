@@ -1,8 +1,5 @@
-﻿using Iis.Interfaces.Ontology.Schema;
+﻿using System.Collections.Generic;
 using Iis.OntologySchema.DataTypes;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Iis.DbLayer.OntologySchema
 {
