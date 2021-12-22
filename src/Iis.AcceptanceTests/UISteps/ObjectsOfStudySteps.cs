@@ -63,6 +63,7 @@ namespace AcceptanceTests.UISteps
         [When(@"I clicked on first object of study")]
         public void IClickedOnFirstObjectOfStudy()
         {
+            driver.WaitFor(2);
             objectsOfStudyPage.TitleOfTheFirstObject.Click();
         }
 
