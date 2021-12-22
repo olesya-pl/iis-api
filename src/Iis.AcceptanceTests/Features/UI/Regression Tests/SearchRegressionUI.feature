@@ -21,9 +21,9 @@
     @regression @UI @OOSSearchUI
 	Scenario: IIS-6081 - Possibility to search an object of study by a field name
 		When I clicked on search button in the Object of study section
-		And I searched commonInfo.OpenName:"в/ч 85683-А" data in the Objects of study section
+		And I searched commonInfo.OpenName: "в/ч 08801" data in the Objects of study section
 		When I clicked on the first search result title in the Objects of study section
-		Then I must see the title ртб in the small card
+		Then I must see the title 1 омсбр in the small card
 
     @regression @UI @OOSSearchUI
 	Scenario: IIS-6081 - Possibility to search an object by a fragment of a description
