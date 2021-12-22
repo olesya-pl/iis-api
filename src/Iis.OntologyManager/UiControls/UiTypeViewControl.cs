@@ -6,7 +6,7 @@ using System.Windows.Forms;
 
 namespace Iis.OntologyManager.UiControls
 {
-    public class UiTypeViewControl: UIBaseControl
+    public class UiTypeViewControl: UiBaseControl
     {
         protected TextBox txtId;
         protected Guid? Id => string.IsNullOrEmpty(txtId.Text) ? (Guid?)null : new Guid(txtId.Text);

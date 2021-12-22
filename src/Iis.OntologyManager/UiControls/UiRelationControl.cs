@@ -19,7 +19,7 @@ namespace Iis.OntologyManager.UiControls
         ToAttribute,
         ToEntity
     };
-    public class UiRelationControl: UIBaseControl, IUiNodeTypeControl
+    public class UiRelationControl: UiBaseControl, IUiNodeTypeControl
     {
         TextBox txtId;
         TextBox txtName;

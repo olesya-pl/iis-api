@@ -12,7 +12,7 @@ using Iis.Desktop.Common.Controls;
 
 namespace Iis.OntologyManager.UiControls
 {
-    public class RemoveEntityUiControl : UIBaseControl
+    public class RemoveEntityUiControl : UiBaseControl
     {
         private const string FindEntityBtnCaption = "Шукати сутність";
         private const string RemoveEntityBtnCaption = "Видалити сутність";

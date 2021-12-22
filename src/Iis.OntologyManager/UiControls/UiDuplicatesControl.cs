@@ -16,7 +16,7 @@ using System.Windows.Forms;
 
 namespace Iis.OntologyManager.UiControls
 {
-    public class UiDuplicatesControl: UIBaseControl
+    public class UiDuplicatesControl: UiBaseControl
     {
         TextBox txtSearch;
         TextBox txtUrl;

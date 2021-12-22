@@ -236,5 +236,13 @@ namespace Iis.Desktop.Common.Controls
             parent.Controls.Add(panel);
             return panel;
         }
+
+        public TreeView GetTreeView()
+        {
+            return new TreeView
+            {
+                BackColor = _style.BackgroundColor
+            };
+        }
     }
 }

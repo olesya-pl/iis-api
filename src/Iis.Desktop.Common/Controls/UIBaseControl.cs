@@ -7,7 +7,7 @@ using System.Windows.Forms;
 
 namespace Iis.Desktop.Common.Controls
 {
-    public abstract class UIBaseControl
+    public abstract class UiBaseControl
     {
         protected UiContainerManager _container;
         protected IDesktopStyle _style;

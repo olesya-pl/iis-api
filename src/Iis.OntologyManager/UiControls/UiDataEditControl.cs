@@ -10,7 +10,7 @@ using System.Windows.Forms;
 
 namespace Iis.OntologyManager.UiControls
 {
-    public class UiDataEditControl: UIBaseControl
+    public class UiDataEditControl: UiBaseControl
     {
         INode _node;
         List<INodeTypeLinked> _attributes;

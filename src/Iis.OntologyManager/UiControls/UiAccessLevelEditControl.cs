@@ -7,7 +7,7 @@ using System.Windows.Forms;
 
 namespace Iis.OntologyManager.UiControls
 {
-    public class UiAccessLevelEditControl: UIBaseControl
+    public class UiAccessLevelEditControl: UiBaseControl
     {
         TextBox txtName;
         Button btnSave;

@@ -11,7 +11,7 @@ using System.Windows.Forms;
 
 namespace Iis.OntologyManager.UiControls
 {
-    public class UiMigrationControl: UIBaseControl
+    public class UiMigrationControl: UiBaseControl
     {
         Label _lblTitle;
         Button _btnOpen;

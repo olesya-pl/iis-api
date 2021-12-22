@@ -10,7 +10,7 @@ using System.Windows.Forms;
 
 namespace Iis.OntologyManager.UiControls
 {
-    public class UiOntologyDataControl : UIBaseControl, IDataViewControl
+    public class UiOntologyDataControl : UiBaseControl, IDataViewControl
     {
         DataGridView grid;
         Button btnAdd;

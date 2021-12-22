@@ -15,7 +15,7 @@ using System.Windows.Forms;
 
 namespace Iis.OntologyManager.UiControls
 {
-    public class UiAccessLevelControl: UIBaseControl, IDataViewControl
+    public class UiAccessLevelControl: UiBaseControl, IDataViewControl
     {
         DataGridView grid;
         Button btnAdd;

@@ -14,6 +14,8 @@ using Serilog;
 using Iis.Desktop.Common.Controls;
 using Iis.Desktop.Common.Styles;
 using Iis.Desktop.Common.Configurations;
+using Iis.Desktop.SecurityManager.Controls;
+using Iis.Desktop.Common.Login;
 
 namespace Iis.Desktop.SecurityManager
 {
@@ -23,7 +25,6 @@ namespace Iis.Desktop.SecurityManager
 
         private IConfiguration _configuration;
         private IReadOnlyDictionary<string, EnvConfig> _environmentProperties;
-        //private ISecurityManagerStyle _appStyle;
         private IDesktopStyle _style;
         private const string VERSION = "0.1";
         private ILogger _logger;
@@ -33,6 +34,8 @@ namespace Iis.Desktop.SecurityManager
         private Panel panelRight;
         private Panel panelTop;
         private Panel panelBottom;
+        private UiAccessLevelTree _uiAccessLevelTree;
+        private UiAccessLevelEdit _uiAccessLevelEdit;
 
         #endregion
 
@@ -44,7 +47,6 @@ namespace Iis.Desktop.SecurityManager
             IDesktopStyleFactory desktopStyleFactory)
         {
             InitializeComponent();
-            this.WindowState = FormWindowState.Maximized;
             Text = $"Володар Таємниць {VERSION}";
 
             _configuration = configuration;
@@ -62,6 +64,15 @@ namespace Iis.Desktop.SecurityManager
 
             int panelTopHeight = panelRight.Height / 5;
             (panelTop, panelBottom) = _uiControlsCreator.GetTopBottomPanels(panelRight, panelTopHeight);
+
+            _uiAccessLevelTree = new UiAccessLevelTree();
+            _uiAccessLevelTree.Initialize("AccessLevelTree", panelLeft, _style);
+
+            _uiAccessLevelEdit = new UiAccessLevelEdit();
+            _uiAccessLevelEdit.Initialize("AccessLevelEdit", panelBottom, _style);
+
+            _uiAccessLevelTree.OnNodeSelect += node => { _uiAccessLevelEdit.SetUiValues(node); };
+
             ShowLogin();
         }
 
@@ -73,7 +84,9 @@ namespace Iis.Desktop.SecurityManager
         {
             var panelModal = _uiControlsCreator.GetFillPanel(this);
             var panelLogin = _uiControlsCreator.GetPanel(panelModal);
-            var loginControl = new UiLoginControl();
+            var appUriString = _environmentProperties["qa"].ApiUri;
+            var _loginRequestWrapper = new LoginRequestWrapper(new Uri(appUriString));
+            var loginControl = new UiLoginControl(_loginRequestWrapper);
             loginControl.Initialize("LoginControl", panelLogin, _style);
             loginControl.OnLogin += (credentials) => { panelMain.Visible = true; this.Controls.Remove(panelModal); };
             panelLogin.Width = loginControl.Width;

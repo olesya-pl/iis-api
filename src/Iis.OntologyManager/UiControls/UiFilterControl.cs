@@ -11,7 +11,7 @@ using System.Windows.Forms;
 
 namespace Iis.OntologyManager.UiControls
 {
-    public class UiFilterControl: UIBaseControl
+    public class UiFilterControl: UiBaseControl
     {
         private TextBox txtFilterName;
         private IOntologyManagerStyle _appStyle;

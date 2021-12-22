@@ -9,7 +9,7 @@ using System.Windows.Forms;
 
 namespace Iis.OntologyManager.UiControls
 {
-    public class UiNodeTypeSearch: UIBaseControl
+    public class UiNodeTypeSearch: UiBaseControl
     {
         RichTextBox txtLog;
         IOntologySchema _schema;

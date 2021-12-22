@@ -14,7 +14,7 @@ using System.Windows.Forms;
 
 namespace Iis.OntologyManager.UiControls
 {
-    public class UiComparisonControl: UIBaseControl
+    public class UiComparisonControl: UiBaseControl
     {
         IReadOnlyCollection<IOntologySchemaSource> _schemaSources;
         IOntologySchemaService _schemaService;
