@@ -72,7 +72,7 @@ namespace AcceptanceTests.UISteps
         {
             objectsOfStudyPage.SearchField.SendKeys(input);
             objectsOfStudyPage.SearchField.SendKeys(Keys.Enter);
-            driver.WaitFor(30);
+            driver.WaitFor(5);
         }
 
         [When(@"I searched (.*) data created today in the Objects of study section")]
