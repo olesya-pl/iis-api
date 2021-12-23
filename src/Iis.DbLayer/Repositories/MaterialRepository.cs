@@ -9,7 +9,6 @@ using Iis.DataModel.Materials;
 using Iis.DbLayer.Common;
 using Iis.DbLayer.Extensions;
 using Iis.DbLayer.MaterialEnum;
-using Iis.Domain.Materials;
 using IIS.Repository;
 using Iis.Services.Contracts.Materials.Distribution;
 using Microsoft.EntityFrameworkCore;
@@ -199,21 +198,6 @@ namespace Iis.DbLayer.Repositories
                 .Where(m => nodeIdCollection.Contains(m.MaterialFeature.NodeId))
                 .Select(m => m.MaterialInfoJoined.Material.Id)
                 .ToArrayAsync();
-        }
-
-        public Task<List<MaterialsCountByType>> GetParentMaterialByNodeIdQueryAsync(IReadOnlyCollection<Guid> nodeIdCollection)
-        {
-            return Context.Materials
-                .JoinMaterialFeaturesAsNoTracking(Context)
-                .Where(m => nodeIdCollection.Contains(m.MaterialFeature.NodeId))
-                .Select(m => m.MaterialInfoJoined.Material).Where(_ => _.ParentId == null)
-                .GroupBy(p => p.Type)
-                .Select(group => new MaterialsCountByType
-                {
-                    Count = group.Count(),
-                    Type = group.Key
-                })
-                .ToListAsync();
         }
 
         public void AddFeatureIdList(Guid materialId, IEnumerable<Guid> featureIdList)
