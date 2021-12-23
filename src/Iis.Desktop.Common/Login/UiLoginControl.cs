@@ -47,7 +47,7 @@ namespace Iis.Desktop.Common.Controls
         private async Task Login()
         {
             var userCredentials = GetCredentials();
-            var result = await _loginRequestWrapper.Login(userCredentials);
+            var result = await _loginRequestWrapper.LoginAsync(userCredentials);
 
             if (result.IsSuccess)
             {

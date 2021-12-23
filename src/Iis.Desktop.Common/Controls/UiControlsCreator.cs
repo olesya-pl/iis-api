@@ -244,5 +244,19 @@ namespace Iis.Desktop.Common.Controls
                 BackColor = _style.BackgroundColor
             };
         }
+
+        public void PutToCenterOfParent(Control control)
+        {
+            var parent = control.Parent;
+            if (parent == null) return;
+            if (control.Width < parent.Width)
+            {
+                control.Left = (parent.Width - control.Width) / 2;
+            }
+            if (control.Height < parent.Height)
+            {
+                control.Top = (parent.Height - control.Height) / 2;
+            }
+        }
     }
 }

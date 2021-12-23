@@ -29,5 +29,7 @@ namespace Iis.Desktop.Common.Requests
                 RequestUrl = requestUrl
             };
         }
+
+        public override string ToString() => $"IsSuccess = {IsSuccess}; {Message}";
     }
 }

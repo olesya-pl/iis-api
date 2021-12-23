@@ -91,23 +91,9 @@ namespace Iis.Desktop.SecurityManager
             loginControl.OnLogin += (credentials) => { panelMain.Visible = true; this.Controls.Remove(panelModal); };
             panelLogin.Width = loginControl.Width;
             panelLogin.Height = loginControl.Height;
-            Center(panelLogin);
+            _uiControlsCreator.PutToCenterOfParent(panelLogin);
             panelLogin.BorderStyle = BorderStyle.FixedSingle;
             panelMain.Visible = false;
-        }
-
-        private void Center(Control control)
-        {
-            var parent = control.Parent;
-            if (parent == null) return;
-            if (control.Width < parent.Width)
-            {
-                control.Left = (parent.Width - control.Width) / 2;
-            }
-            if (control.Height < parent.Height)
-            {
-                control.Top = (parent.Height - control.Height) / 2;
-            }
         }
 
         #endregion

@@ -67,7 +67,7 @@ namespace Iis.Desktop.Common.Requests
 
             using var httpClient = GetClient(_baseApiApiAddress, _requestSettings);
 
-            return await SendRequest(() => httpClient.PostAsync(uri, null), uri);
+            return await SendRequestAsync(() => httpClient.PostAsync(uri, null), uri);
         }
 
         public async Task<RequestResult> ReIndexAsync(IndexKeys indexKey)
@@ -80,7 +80,7 @@ namespace Iis.Desktop.Common.Requests
 
             using var httpClient = GetClient(_baseApiApiAddress, _requestSettings);
 
-            return await SendRequest(() => httpClient.GetAsync(uri), uri).ConfigureAwait(false);
+            return await SendRequestAsync(() => httpClient.GetAsync(uri), uri).ConfigureAwait(false);
         }
 
         public async Task<RequestResult> ChangeAccessLevelsAsync(ChangeAccessLevelsParams param)
@@ -91,10 +91,10 @@ namespace Iis.Desktop.Common.Requests
 
             var json = JsonConvert.SerializeObject(param);
 
-            return await SendRequest(() => httpClient.PostAsync(uri, new StringContent(json, Encoding.UTF8, "application/json")), uri);
+            return await SendRequestAsync(() => httpClient.PostAsync(uri, new StringContent(json, Encoding.UTF8, "application/json")), uri);
         }
 
-        private async Task<RequestResult> SendRequest(Func<Task<HttpResponseMessage>> func, Uri uri)
+        private async Task<RequestResult> SendRequestAsync(Func<Task<HttpResponseMessage>> func, Uri uri)
         {
             HttpResponseMessage response = BadGatewayResponseMessage(_baseApiApiAddress, uri);
 

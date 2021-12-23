@@ -16,7 +16,7 @@ namespace Iis.Desktop.Common.Login
             _graphQLRequestWrapper = new GraphQLRequestWrapper<LoginParam, LoginResult>(uri);
         }
 
-        public async Task<GraphQLResponse<LoginResult>> Login(UserCredentials userCredentials)
+        public async Task<GraphQLResponse<LoginResult>> LoginAsync(UserCredentials userCredentials)
         {
             var operationName = "login";
             var query = "mutation login($username:String, $password:String) { login(username: $username, password: $password) { token } }";
@@ -25,7 +25,7 @@ namespace Iis.Desktop.Common.Login
                 Username = userCredentials.UserName,
                 Password = userCredentials.Password
             };
-            var result = await _graphQLRequestWrapper.Send(query, param, operationName);
+            var result = await _graphQLRequestWrapper.SendAsync(query, param, operationName);
             return result;
         }
     }

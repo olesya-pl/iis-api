@@ -8,6 +8,6 @@ namespace Iis.Desktop.Common.Login
 {
     public interface ILoginRequestWrapper
     {
-        Task<GraphQLResponse<LoginResult>> Login(UserCredentials userCredentials);
+        Task<GraphQLResponse<LoginResult>> LoginAsync(UserCredentials userCredentials);
     }
 }

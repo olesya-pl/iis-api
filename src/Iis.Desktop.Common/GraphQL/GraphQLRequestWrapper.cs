@@ -1,12 +1,10 @@
-﻿using Iis.Desktop.Common.Requests;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using Newtonsoft.Json.Serialization;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using Newtonsoft.Json.Serialization;
 
 namespace Iis.Desktop.Common.GraphQL
 {
@@ -14,7 +12,7 @@ namespace Iis.Desktop.Common.GraphQL
     {
         private const string ErrorsName = "errors";
         private const string MessageName = "message";
-        private const string DataName = "data"; 
+        private const string DataName = "data";
         private const string StackTraceName = "extensions.stackTrace";
         private Uri _serverUri;
 
@@ -27,7 +25,7 @@ namespace Iis.Desktop.Common.GraphQL
             _serverUri = uri;
         }
 
-        public async Task<GraphQLResponse<TResult>> Send(string query, TParam param, string operationName = null)
+        public async Task<GraphQLResponse<TResult>> SendAsync(string query, TParam param, string operationName = null)
         {
             var request = new GraphQLRequest<TParam>
             {
