@@ -26,7 +26,7 @@
 		Then I must see the title 1 омсбр in the small card
 
     @regression @UI @OOSSearchUI
-	Scenario: IIS-6081 - Possibility to search an object by a fragment of a description
+	Scenario: IIS-6055 - Possibility to search an object by a fragment of a description
 		When I clicked on the create a new object of study button
 	    And I clicked on the create a new military organization button
 	    When I filled in the form
