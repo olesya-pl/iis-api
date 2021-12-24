@@ -60,7 +60,7 @@ Feature: MaterialsSectionUI - Sanity
         And I clicked on the first search result in the Materials section
         And I clicked on the relations tab in the material card
         And I enter Романов value in the search object field
-        When I clicked on the connected object
+        When I clicked on the binded object
         Then I must see РОМАНОВ А.Г title of the object
         When I clicked Back button in the browser
         And I clicked on the relations tab in the material card
