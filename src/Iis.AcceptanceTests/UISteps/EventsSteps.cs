@@ -98,6 +98,7 @@ namespace AcceptanceTests.UISteps
             eventPage.EventComponentDropDown.SendKeys("Кризові регіони");
             eventPage.EventComponentDropDown.SendKeys(Keys.Down);
             eventPage.EventComponentDropDown.SendKeys(Keys.Enter);
+            driver.WaitFor(5);
             eventPage.SaveEventChangesButton.Click();
             driver.WaitFor(2);
             eventPage.ConfirmSaveEventChangesButton.Click();
@@ -114,7 +115,7 @@ namespace AcceptanceTests.UISteps
             var eventUniqueName = context.Get<string>(eventName);
             eventsSection.SearchField.SendKeys($"\"{eventUniqueName}\"");
             eventsSection.SearchField.SendKeys(Keys.Enter);
-            driver.WaitFor(2);
+            driver.WaitFor(5);
         }
 
         [When(@"I pressed the review event button")]
