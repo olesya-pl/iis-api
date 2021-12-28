@@ -1,7 +1,5 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using AcceptanceTests.PageObjects;
 using Iis.AcceptanceTests.PageObjects.Controls;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Interactions;
@@ -27,7 +25,7 @@ namespace AcceptanceTests.PageObjects
         [CacheLookup]
         public IWebElement SearchField;
 
-        [FindsBy(How = How.CssSelector, Using = ".object-summary .text-ellipsis .title")]
+        [FindsBy(How = How.XPath, Using = "(//div[@class='base-page objects-page']//tr[1]//div[@class='object-summary']//div[@class='text-ellipsis title'])")]
         public IWebElement FirstSearchResultTitle;
 
         [FindsBy(How = How.CssSelector, Using = ".objects-table .p-datatable-tbody tr:nth-child(1)")]
