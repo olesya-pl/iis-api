@@ -45,15 +45,17 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Iis.MaterialLoader", "Iis.M
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Iis.EventMaterialAutoAssignment.DataModel", "Iis.EventMaterialAutoAssignment.DataModel\Iis.EventMaterialAutoAssignment.DataModel.csproj", "{48F3CAB4-F6E1-44CC-A745-73C67F49065C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Iis.EventMaterialAutoAssignment", "Iis.EventMaterialAutoAssignment\Iis.EventMaterialAutoAssignment.csproj", "{40CCFA2D-4010-4B93-9A8A-E0AE10ACE21E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Iis.EventMaterialAutoAssignment", "Iis.EventMaterialAutoAssignment\Iis.EventMaterialAutoAssignment.csproj", "{40CCFA2D-4010-4B93-9A8A-E0AE10ACE21E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Iis.RabbitMq", "Iis.RabbitMq\Iis.RabbitMq.csproj", "{91587B6C-8CB2-464B-B9A0-D669CEFF2278}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Iis.RabbitMq", "Iis.RabbitMq\Iis.RabbitMq.csproj", "{91587B6C-8CB2-464B-B9A0-D669CEFF2278}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Iis.CoordinatesHandler", "Iis.CoordinatesHandler\Iis.CoordinatesHandler.csproj", "{BC773292-50BE-41AA-A510-D74D6CB1868E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Iis.CoordinatesHandler", "Iis.CoordinatesHandler\Iis.CoordinatesHandler.csproj", "{BC773292-50BE-41AA-A510-D74D6CB1868E}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Iis.Desktop.SecurityManager", "Iis.Desktop.SecurityManager\Iis.Desktop.SecurityManager.csproj", "{FD9A183B-B13E-45E2-9E4E-C956CFF85983}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Iis.Desktop.Common", "Iis.Desktop.Common\Iis.Desktop.Common.csproj", "{D73789B5-E2CB-4661-A045-241B08E5C470}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Iis.Security", "Iis.Security\Iis.Security.csproj", "{3CA1C094-CC23-46AF-9F86-E159DD1608A0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -165,6 +167,10 @@ Global
 		{D73789B5-E2CB-4661-A045-241B08E5C470}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D73789B5-E2CB-4661-A045-241B08E5C470}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D73789B5-E2CB-4661-A045-241B08E5C470}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3CA1C094-CC23-46AF-9F86-E159DD1608A0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3CA1C094-CC23-46AF-9F86-E159DD1608A0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3CA1C094-CC23-46AF-9F86-E159DD1608A0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3CA1C094-CC23-46AF-9F86-E159DD1608A0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
