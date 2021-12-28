@@ -9,5 +9,6 @@
         public int AccessLevel;
         public string LoadedBy;
         public string MetaData;
+        public string From;
     }
 }

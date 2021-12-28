@@ -160,19 +160,20 @@ namespace AcceptanceTests.PageObjects
             return new MaterialRelatedItems(driver, title);
         }
 
+        [FindsBy(How = How.CssSelector, Using = ".p-datatable-scrollable-header-table .materials-table__source .p-sortable-column-icon")]
+        public IWebElement SourceSortable;
+
         [FindsBy(How = How.CssSelector, Using = ".material-general-access-level .material-info-card__body .el-input__inner")]
         public IWebElement AccessLevelField;
 
-         [FindsBy(How = How.CssSelector, Using = ".material-biding__trigger")]
-        public IWebElement GeneralEditingButton;
+        public bool SortedMaterialsBySource(string sourceName)
+        {
+            var SourceName = driver.FindElement(By.XPath($"//tr[1]/*[contains(@class,'materials-table__source')]//*[contains(text(),'{sourceName}')]"));
+            return SourceName.Displayed;
+        }
 
-        public IWebElement Checkbox1ByMaterials => driver.FindElement(By.XPath("//div[1]/div/div[2]/table/tbody/tr[1]/td[2]/label/input"));
-
-        [FindsBy(How = How.CssSelector, Using = ".material-biding .el-dropdown__caret-button .el-icon-arrow-down")]
-        public IWebElement EditDropdownButton;
-
-        [FindsBy(How = How.CssSelector, Using = "li.el-dropdown-menu__item:nth-of-type(1)")]
-        public IWebElement ValueFromTheList;
+        [FindsBy(How = How.XPath, Using = "//div/table/thead/tr/th[@class='materials-table__source p-sortable-column'][@aria-sort='none']")]
+        public IWebElement SortedBySourceSortingNull;
 
         [FindsBy(How = How.CssSelector, Using = ".material-relations-input .el-input__inner")]
         public IWebElement ObjectsSearchTextBox;
@@ -182,6 +183,6 @@ namespace AcceptanceTests.PageObjects
 
         [FindsBy(How = How.XPath, Using = "//tr[1]//div[@class='input-stream-related-objects']//div/a")]
         public IWebElement ObjectOfStudyContainer;
-
     }
+
 }

@@ -45,6 +45,7 @@ namespace AcceptanceTests.Helpers
             string reliability,
             string metaData,
             string loadedBy,
+            string from = "contour.doc",
             int accessLevel = 0
             )
         {
@@ -68,15 +69,9 @@ namespace AcceptanceTests.Helpers
                 Content = content,
                 ReliabilityText = reliability,
                 SourceReliabilityText = sourceReliability,
-                //Objects = processingResult.Objects,
-                //Tags = processingResult.Tags,
-                //States = processingResult.States,
-                //Code = processingResult.Code,
-                From = "contour.doc",
+                From = from,
                 LoadedBy = loadedBy,
-                //DocumentId = processingResult.DocumentId,
                 CreationDate = DateTime.UtcNow,
-                //Coordinates = processingResult.Coordinates,
                 AccessLevel = accessLevel
             };
         }
@@ -110,6 +105,7 @@ namespace AcceptanceTests.Helpers
                 materialModel.ReliabilityText,
                 materialModel.MetaData,
                 materialModel.LoadedBy,
+                materialModel.From,
                 materialModel.AccessLevel);
             var response = await AddMaterialAsync(materialInput, materialModel.FileName + ".docx", material.Item2, CancellationToken.None);
             return response.Id;

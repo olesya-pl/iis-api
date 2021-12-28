@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using HotChocolate;
 using HotChocolate.Types;
-using Iis.Interfaces.Enums;
 using Iis.Interfaces.Materials;
 using IIS.Core.GraphQL.Scalars;
 using Newtonsoft.Json.Linq;
