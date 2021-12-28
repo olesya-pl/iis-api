@@ -30,7 +30,7 @@ namespace AcceptanceTests.PageObjects
         [FindsBy(How = How.CssSelector, Using = ".object-summary .text-ellipsis .title")]
         public IWebElement FirstSearchResultTitle;
 
-        [FindsBy(How = How.CssSelector, Using = ".objects-table .p-datatable-tbody tr:nth-child(1)")]
+        [FindsBy(How = How.CssSelector, Using = ".objects-table .p-datatable-tbody tr:nth-child(1) .object-summary .title")]
         public IWebElement FirstSearchResultRow;
 
         [FindsBy(How = How.XPath, Using = "//div[@class='icon-wrapper icon-wrapper-edit']")]
