@@ -7,10 +7,12 @@ using Iis.Interfaces.Ontology.Data;
 using Iis.OntologyManager.DTO;
 using Iis.OntologyManager.Configurations;
 using System.Diagnostics;
+using Iis.OntologyManager.Style;
+using Iis.Desktop.Common.Controls;
 
 namespace Iis.OntologyManager.UiControls
 {
-    public class RemoveEntityUiControl : UIBaseControl
+    public class RemoveEntityUiControl : UiBaseControl
     {
         private const string FindEntityBtnCaption = "Шукати сутність";
         private const string RemoveEntityBtnCaption = "Видалити сутність";
@@ -25,15 +27,17 @@ namespace Iis.OntologyManager.UiControls
         private INode _selectedNode;
         private IOntologyNodesData _data;
         private bool _baseAppAdressIsValid;
+        private IOntologyManagerStyle _appStyle;
 
         public event Action<Guid> OnRemove;
         public event Func<IOntologyNodesData> OnGetOntologyData;
 
         DataGridViewRow SelectedRow => _resultGrid?.SelectedRows.Count > 0 ? _resultGrid.SelectedRows[0] : null;
 
-        public RemoveEntityUiControl(SchemaDataSource schemaDataSource)
+        public RemoveEntityUiControl(SchemaDataSource schemaDataSource, IOntologyManagerStyle appStyle)
         {
             _schemaDataSource = schemaDataSource;
+            _appStyle = appStyle;
 
             _baseAppAdressIsValid = Uri.IsWellFormedUriString(_schemaDataSource.AppAddress, UriKind.Absolute);
         }
@@ -41,8 +45,8 @@ namespace Iis.OntologyManager.UiControls
         protected override void CreateControls()
         {
             var panels = _uiControlsCreator.GetTopBottomPanels(MainPanel, 200);
-            var container = new UiContainerManager("RemoveEntityOptions", panels.panelTop);
-            var bottomContainer = new UiContainerManager("RemoveEntityResult", panels.panelBottom);
+            var container = new UiContainerManager("RemoveEntityOptions", panels.panelTop, _style);
+            var bottomContainer = new UiContainerManager("RemoveEntityResult", panels.panelBottom, _style);
 
             container.SetFullWidthColumn();
 
@@ -261,7 +265,7 @@ namespace Iis.OntologyManager.UiControls
 
             var row = grid.Rows[e.RowIndex];
 
-            var color = row.Index % 2 == 1 ? _style.RelationTypeBackColor : _style.AttributeTypeBackColor;
+            var color = row.Index % 2 == 1 ? _appStyle.RelationTypeBackColor : _appStyle.AttributeTypeBackColor;
             var style = row.DefaultCellStyle;
 
             style.BackColor = color;

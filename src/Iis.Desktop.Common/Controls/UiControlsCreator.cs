@@ -1,16 +1,16 @@
-﻿using Iis.OntologyManager.Style;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Text;
 using System.Windows.Forms;
+using Iis.Desktop.Common.Styles;
 
-namespace Iis.OntologyManager.UiControls
+namespace Iis.Desktop.Common.Controls
 {
     public class UiControlsCreator
     {
-        IOntologyManagerStyle _style;
-        public UiControlsCreator(IOntologyManagerStyle style)
+        IDesktopStyle _style;
+        public UiControlsCreator(IDesktopStyle style)
         {
             _style = style;
         }
@@ -142,7 +142,7 @@ namespace Iis.OntologyManager.UiControls
                 BackColor = _style.BackgroundColor
             };
             form.Controls.Add(rootPanel);
-            var container = new UiContainerManager("ModalComboBox", rootPanel);
+            var container = new UiContainerManager("ModalComboBox", rootPanel, _style);
             var comboBox = new ComboBox
             {
                 DropDownStyle = ComboBoxStyle.DropDownList,
@@ -171,7 +171,7 @@ namespace Iis.OntologyManager.UiControls
                 Width = parent.Width,
                 Height = parent.Height - marginVer,
                 Dock = DockStyle.None,
-                BackColor = Color.OrangeRed,
+                BackColor = _style.BackgroundColor,
                 Anchor = AnchorStyles.Left | AnchorStyles.Right | AnchorStyles.Top | AnchorStyles.Bottom,
                 Visible = visible
             };
@@ -215,5 +215,48 @@ namespace Iis.OntologyManager.UiControls
                 StartPosition = FormStartPosition.CenterParent
             };
         }
-    };
+
+        public CheckBox GetCheckBox(string text, bool isChecked) =>
+            new CheckBox { Text = text, Checked = isChecked, MinimumSize = new Size { Height = _style.CheckboxHeightDefault } };
+
+        public Button GetButton(string text) =>
+            new Button
+            {
+                Text = text,
+                Width = _style.ButtonWidthDefault,
+                MinimumSize = new Size { Height = _style.ButtonHeightDefault }
+            };
+
+        public Panel GetPanel(Control parent)
+        {
+            var panel = new Panel
+            {
+                BackColor = _style.BackgroundColor,
+            };
+            parent.Controls.Add(panel);
+            return panel;
+        }
+
+        public TreeView GetTreeView()
+        {
+            return new TreeView
+            {
+                BackColor = _style.BackgroundColor
+            };
+        }
+
+        public void PutToCenterOfParent(Control control)
+        {
+            var parent = control.Parent;
+            if (parent == null) return;
+            if (control.Width < parent.Width)
+            {
+                control.Left = (parent.Width - control.Width) / 2;
+            }
+            if (control.Height < parent.Height)
+            {
+                control.Top = (parent.Height - control.Height) / 2;
+            }
+        }
+    }
 }

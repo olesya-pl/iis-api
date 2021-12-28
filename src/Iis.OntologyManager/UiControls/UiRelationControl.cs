@@ -1,4 +1,5 @@
-﻿using Iis.Domain.Meta;
+﻿using Iis.Desktop.Common.Controls;
+using Iis.Domain.Meta;
 using Iis.Interfaces.Meta;
 using Iis.Interfaces.Ontology.Schema;
 using Iis.OntologyManager.Style;
@@ -18,7 +19,7 @@ namespace Iis.OntologyManager.UiControls
         ToAttribute,
         ToEntity
     };
-    public class UiRelationControl: UIBaseControl, IUiNodeTypeControl
+    public class UiRelationControl: UiBaseControl, IUiNodeTypeControl
     {
         TextBox txtId;
         TextBox txtName;
@@ -83,9 +84,9 @@ namespace Iis.OntologyManager.UiControls
         protected override void CreateControls()
         {
             var panels = _uiControlsCreator.GetTopBottomPanels(MainPanel, 350);
-            var containerTop = new UiContainerManager("MainOptions", panels.panelTop);
+            var containerTop = new UiContainerManager("MainOptions", panels.panelTop, _style);
             containerTop.SetColWidth((int)(_style.ControlWidthDefault * 1.5));
-            var containerBottom = new UiContainerManager("SecondaryOptions", panels.panelBottom);
+            var containerBottom = new UiContainerManager("SecondaryOptions", panels.panelBottom, _style);
 
             containerTop.Add(txtId = new TextBox { ReadOnly = true }, "ІД");
             containerTop.Add(txtName = new TextBox(), "Ім'я *");

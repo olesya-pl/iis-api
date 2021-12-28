@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Iis.OntologyManager.DTO
+namespace Iis.Desktop.Common.Requests
 {
     public class RequestResult
     {
@@ -29,5 +29,7 @@ namespace Iis.OntologyManager.DTO
                 RequestUrl = requestUrl
             };
         }
+
+        public override string ToString() => $"IsSuccess = {IsSuccess}; {Message}";
     }
 }

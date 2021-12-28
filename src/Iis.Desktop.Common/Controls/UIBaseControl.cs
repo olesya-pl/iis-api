@@ -1,16 +1,16 @@
-﻿using Iis.OntologyManager.Style;
+﻿using Iis.Desktop.Common.Styles;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Text;
 using System.Windows.Forms;
 
-namespace Iis.OntologyManager.UiControls
+namespace Iis.Desktop.Common.Controls
 {
-    public abstract class UIBaseControl
+    public abstract class UiBaseControl
     {
         protected UiContainerManager _container;
-        protected IOntologyManagerStyle _style;
+        protected IDesktopStyle _style;
         protected UiControlsCreator _uiControlsCreator;
         public Panel MainPanel { get; private set; }
         public string Name { get; private set; }
@@ -21,18 +21,17 @@ namespace Iis.OntologyManager.UiControls
             get { return MainPanel.Visible; }
             set { MainPanel.Visible = value; }
         }
-        public Panel Initialize(string name, Panel mainPanel)
+        public Panel Initialize(string name, Panel mainPanel, IDesktopStyle style)
         {
             Name = name;
-            
             MainPanel = mainPanel ?? new Panel
             {
                 BorderStyle = BorderStyle.FixedSingle,
             };
-            _style = OntologyManagerStyle.GetDefaultStyle(MainPanel);
+            _style = style;
             _uiControlsCreator = new UiControlsCreator(_style);
 
-            _container = new UiContainerManager(name, MainPanel);
+            _container = new UiContainerManager(name, MainPanel, _style);
             MainPanel.BackColor = _style.BackgroundColor;
 
             MainPanel.SuspendLayout();

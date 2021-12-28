@@ -1,4 +1,5 @@
-﻿using Iis.Interfaces.Ontology.Schema;
+﻿using Iis.Desktop.Common.Styles;
+using Iis.Interfaces.Ontology.Schema;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -9,6 +10,7 @@ namespace Iis.OntologyManager.Style
 {
     public class OntologyManagerStyle : IOntologyManagerStyle
     {
+        public IDesktopStyle Common { get; set; }
         public int MarginVer { get; set; }
         public int MarginVerSmall { get; set; }
         public int MarginHor { get; set; }
@@ -16,7 +18,6 @@ namespace Iis.OntologyManager.Style
         public int ButtonHeightDefault { get; private set; }
         public int ButtonWidthDefault { get; set; }
         public int CheckboxHeightDefault { get; set; }
-        public Color BackgroundColor { get; set; }
         public Color ComparisonBackColor { get; set; }
         public Color EntityTypeBackColor { get; set; }
         public Color AttributeTypeBackColor { get; set; }
@@ -48,22 +49,25 @@ namespace Iis.OntologyManager.Style
 
             return new OntologyManagerStyle
             {
-                MarginVer = (int)(charHeight / 8),
-                MarginVerSmall = (int)(charHeight / 16),
-                MarginHor = (int)(charWidth * 2),
-                ControlWidthDefault = (int)(charWidth * 34),
-                ButtonHeightDefault = (int)(charHeight * 2),
-                ButtonWidthDefault = (int)(charWidth * 34),
-                CheckboxHeightDefault = (int)(charHeight),
-                BackgroundColor = Color.LightYellow,
+                Common = new DesktopStyle
+                {
+                    MarginVer = (int)(charHeight / 8),
+                    MarginVerSmall = (int)(charHeight / 16),
+                    MarginHor = (int)(charWidth * 2),
+                    ControlWidthDefault = (int)(charWidth * 34),
+                    ButtonHeightDefault = (int)(charHeight * 2),
+                    ButtonWidthDefault = (int)(charWidth * 34),
+                    CheckboxHeightDefault = (int)charHeight,
+                    BackgroundColor = Color.LightYellow,
+                    DefaultFont = SystemFonts.DefaultFont,
+                    SelectedFont = new Font(SystemFonts.DefaultFont, FontStyle.Bold),
+                },
                 EntityTypeBackColor = Color.Khaki,
                 AttributeTypeBackColor = Color.PaleGreen,
                 RelationTypeBackColor = Color.Lavender,
                 ComparisonBackColor = Color.Honeydew,
-                DefaultFont = SystemFonts.DefaultFont,
-                SelectedFont = new Font(SystemFonts.DefaultFont, FontStyle.Bold),
                 TypeHeaderNameFont = new Font("Arial", 16, FontStyle.Bold)
-        };
+            };
         }
         public Color GetColorByNodeTypeKind(Kind kind)
         {
@@ -76,7 +80,7 @@ namespace Iis.OntologyManager.Style
                 case Kind.Relation:
                     return RelationTypeBackColor;
                 default:
-                    return BackgroundColor;
+                    return Common.BackgroundColor;
             }
         }
         public Color GetColorByAncestor(INodeTypeLinked nodeType)

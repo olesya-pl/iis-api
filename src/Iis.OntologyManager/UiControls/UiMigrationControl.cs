@@ -1,4 +1,5 @@
-﻿using Iis.Interfaces.Ontology.Data;
+﻿using Iis.Desktop.Common.Controls;
+using Iis.Interfaces.Ontology.Data;
 using Iis.OntologyData.Migration;
 using Newtonsoft.Json;
 using System;
@@ -10,7 +11,7 @@ using System.Windows.Forms;
 
 namespace Iis.OntologyManager.UiControls
 {
-    public class UiMigrationControl: UIBaseControl
+    public class UiMigrationControl: UiBaseControl
     {
         Label _lblTitle;
         Button _btnOpen;
@@ -25,7 +26,7 @@ namespace Iis.OntologyManager.UiControls
         protected override void CreateControls()
         {
             var panels = _uiControlsCreator.GetTopBottomPanels(MainPanel, 200);
-            var container = new UiContainerManager("MigrateOptions", panels.panelTop);
+            var container = new UiContainerManager("MigrateOptions", panels.panelTop, _style);
             container.Add(_lblTitle = new Label { Text = "Відкрийте Файл Міграции (*.omg"});
             _btnOpen = new Button { Text = "Відкрити Міграцію", MinimumSize = new Size { Height = _style.ButtonHeightDefault } };
             container.Add(_btnOpen);

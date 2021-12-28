@@ -1,4 +1,5 @@
-﻿using Iis.Interfaces.AccessLevels;
+﻿using Iis.Desktop.Common.Controls;
+using Iis.Interfaces.AccessLevels;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -6,7 +7,7 @@ using System.Windows.Forms;
 
 namespace Iis.OntologyManager.UiControls
 {
-    public class UiAccessLevelEditControl: UIBaseControl
+    public class UiAccessLevelEditControl: UiBaseControl
     {
         TextBox txtName;
         Button btnSave;

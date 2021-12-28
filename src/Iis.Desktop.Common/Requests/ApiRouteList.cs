@@ -1,4 +1,4 @@
-﻿namespace Iis.OntologyManager.Dictionaries
+﻿namespace Iis.Desktop.Common.Requests
 {
     public static class ApiRouteList
     {

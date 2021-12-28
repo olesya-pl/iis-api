@@ -14,6 +14,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Parameters\**" />
+    <EmbeddedResource Remove="Parameters\**" />
+    <None Remove="Parameters\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="7.0.0" />
     <PackageReference Include="Magick.NET-Q16-AnyCPU" Version="7.23.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="5.0.0" />
@@ -32,25 +38,13 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Iis.DataModel\Iis.DataModel.csproj" />
-    <ProjectReference Include="..\Iis.DbLayer\Iis.DbLayer.csproj" />
     <ProjectReference Include="..\Iis.Desktop.Common\Iis.Desktop.Common.csproj" />
-    <ProjectReference Include="..\Iis.OntologyData\Iis.OntologyData.csproj" />
-    <ProjectReference Include="..\Iis.OntologySchema.Saver\Iis.OntologySchema.Saver.csproj" />
-    <ProjectReference Include="..\Iis.OntologySchema\Iis.OntologySchema.csproj" />
-    <ProjectReference Include="..\Iis.Services.Contracts\Iis.Services.Contracts.csproj" />
-    <ProjectReference Include="..\Iis.Services\Iis.Services.csproj" />
   </ItemGroup>
 
   <ItemGroup>
     <None Update="appsettings.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Dictionaries\" />
-    <Folder Include="Parameters\" />
   </ItemGroup>
 
 </Project>

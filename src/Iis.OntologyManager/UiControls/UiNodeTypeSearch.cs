@@ -1,4 +1,5 @@
-﻿using Iis.Interfaces.Ontology.Schema;
+﻿using Iis.Desktop.Common.Controls;
+using Iis.Interfaces.Ontology.Schema;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -8,7 +9,7 @@ using System.Windows.Forms;
 
 namespace Iis.OntologyManager.UiControls
 {
-    public class UiNodeTypeSearch: UIBaseControl
+    public class UiNodeTypeSearch: UiBaseControl
     {
         RichTextBox txtLog;
         IOntologySchema _schema;
@@ -20,7 +21,7 @@ namespace Iis.OntologyManager.UiControls
         protected override void CreateControls()
         {
             var panels = _uiControlsCreator.GetTopBottomPanels(MainPanel, 200);
-            var container = new UiContainerManager("Filters", panels.panelTop);
+            var container = new UiContainerManager("Filters", panels.panelTop, _style);
 
             AddSearchButton(container, "IsAggregated", GetWithAggregation);
             AddSearchButton(container, "Format", GetWithFormat);

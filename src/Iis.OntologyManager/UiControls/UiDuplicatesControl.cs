@@ -1,7 +1,9 @@
 ﻿using Iis.DbLayer.OntologyData;
+using Iis.Desktop.Common.Controls;
 using Iis.Interfaces.Ontology.Data;
 using Iis.OntologyData;
 using Iis.OntologyManager.DuplicateSearch;
+using Iis.OntologyManager.Style;
 using Iis.OntologySchema;
 using System;
 using System.Collections.Generic;
@@ -14,7 +16,7 @@ using System.Windows.Forms;
 
 namespace Iis.OntologyManager.UiControls
 {
-    public class UiDuplicatesControl: UIBaseControl
+    public class UiDuplicatesControl: UiBaseControl
     {
         TextBox txtSearch;
         TextBox txtUrl;
@@ -25,6 +27,7 @@ namespace Iis.OntologyManager.UiControls
         Label lblRecordsCount;
 
         IOntologyNodesData _data;
+        IOntologyManagerStyle _appStyle;
         public OntologyPatchSaver PatchSaver { get; set; }
         const string RECORDS_COUNT_TEXT = "Знайдено записей: ";
         const string VALUES_COUNT_TEXT = "Різних значень: ";
@@ -35,18 +38,22 @@ namespace Iis.OntologyManager.UiControls
         object SelectedValue(string columnName) =>
             SelectedRow == null ? null :
             SelectedRow.Cells[grid.Columns[columnName].Index].Value;
+
+        public UiDuplicatesControl(IOntologyManagerStyle appStyle)
+        {
+            _appStyle = appStyle;
+        }
         protected override void CreateControls()
         {
             var panels = _uiControlsCreator.GetTopBottomPanels(MainPanel, 200);
-            var container = new UiContainerManager("DuplicateSearchOptions", panels.panelTop);
+            var container = new UiContainerManager("DuplicateSearchOptions", panels.panelTop, _style);
             container.SetColWidth(500);
             container.Add(txtSearch = new TextBox(), "Параметри пошуку");
             txtSearch.Text = "MilitaryOrganization: title, commonInfo.OpenName, commonInfo.RealNameShort (parent.title, parent.parent.title, parent.parent.parent.title)";
             container.Add(txtUrl = new TextBox(), "Базовий Урл");
             txtUrl.Text = "http://qa.contour.net";
 
-            container.Add(btnSearch = new Button { Text = "Шукати" });
-            btnSearch.Width = _style.ButtonWidthDefault;
+            container.Add(btnSearch = _uiControlsCreator.GetButton("Шукати"));
             btnSearch.Click += (sender, e) => { Search(true); };
             container.Add(lblRecordsCount = new Label { Text = RECORDS_COUNT_TEXT });
             container.Add(lblValuesCount = new Label { Text = VALUES_COUNT_TEXT });
@@ -62,7 +69,7 @@ namespace Iis.OntologyManager.UiControls
             menuGrid.Items[0].Click += (sender, e) => { Delete(); };
             grid.ContextMenuStrip = menuGrid;
 
-            var bottomContainer = new UiContainerManager("DuplicateSearchResult", panels.panelBottom);
+            var bottomContainer = new UiContainerManager("DuplicateSearchResult", panels.panelBottom, _style);
             bottomContainer.SetFullWidthColumn();
             bottomContainer.Add(grid, null, true);
             grid.DoubleClick += (sender, e) => { OpenUrl(); };
@@ -76,7 +83,7 @@ namespace Iis.OntologyManager.UiControls
             
             int orderNumber = Convert.ToInt32(row.Cells[grid.Columns["OrderNumber"].Index].Value);
             
-            var color = orderNumber % 2 == 1 ? _style.RelationTypeBackColor : _style.AttributeTypeBackColor;
+            var color = orderNumber % 2 == 1 ? _appStyle.RelationTypeBackColor : _appStyle.AttributeTypeBackColor;
             var style = row.DefaultCellStyle;
 
             style.BackColor = color;
