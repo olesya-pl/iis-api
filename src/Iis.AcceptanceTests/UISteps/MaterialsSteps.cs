@@ -105,7 +105,7 @@ namespace AcceptanceTests.UISteps
             context.Set(materialModel.FileName, "uploadedMaterial");
             var response = await MaterialsHelper.UploadDocxMaterial(materialModel);
             context.Set(response, "uploadedMaterial.Id");
-            driver.WaitFor(5);
+            driver.WaitFor(2);
         }
 
         [When(@"I clean up uploaded material via API")]
@@ -312,7 +312,12 @@ namespace AcceptanceTests.UISteps
             Assert.True(materialsSectionPage.ObjectOfStudyContainer.Displayed);
         }
 
-
+        [When(@"I clicked arrow for sorting by source")]
+        public void WhenIClickedArrowForSortingBySource()
+        {
+            materialsSectionPage.SourceSortable.Click();
+            driver.WaitFor(2);
+        }
 
         #endregion When
 
@@ -496,46 +501,18 @@ namespace AcceptanceTests.UISteps
             driver.WaitFor(2);
         }
 
-        [Then(@"I pressed Processed button")]
-        public void ThenIPressProcessedButton()
+        [Then(@"I must see the first (.*) source in the marerial`s table")]
+        public void ThenIMustSeeFirstMaterialsSource(string sourceName)
         {
-            materialsSectionPage.ProcessedButton.Click();
-            driver.WaitFor(15);
+            Assert.True(materialsSectionPage.SortedMaterialsBySource(sourceName));
         }
 
-        [Then(@"I clicked on the general editing button")]
-        public void ThenIClickedOnTheGeneralEditingButton()
+
+        [Then(@"I must see materials sorted by source sorting: null")]
+        public void ThenIMustSeeMaterialsSortedBySourceSortingNull()
         {
-            materialsSectionPage.GeneralEditingButton.Click();
-            driver.WaitFor(5);
+            Assert.True(materialsSectionPage.SortedBySourceSortingNull.Displayed);
         }
-
-        [Then(@"I selected first checkbox by materials from the Materials list")]
-        public void ThenISelectedFirstThreeCheckboxByMaterialsFromTheMaterialsList()
-        {
-            materialsSectionPage.Checkbox1ByMaterials.Click();
-            driver.WaitFor(1);
-        }
-
-        [Then(@"I clicked on the dropdown on editing button")]
-        public void ThenIClickedOnTheDropdownOnEditingButton()
-        {
-            materialsSectionPage.EditDropdownButton.Click();
-            driver.WaitFor(1);
-        }
-
-        [Then(@"I selected (.*) from the list")]
-        public void ThenISelectedValueFromTheList(string ValueFromTheList)
-
-        {
-            materialsSectionPage.EditDropdownButton.Click();
-            driver.WaitFor(1);
-            materialsSectionPage.ValueFromTheList.Click();
-            driver.WaitFor(1);
-        }
-        
-
-
 
 
 
