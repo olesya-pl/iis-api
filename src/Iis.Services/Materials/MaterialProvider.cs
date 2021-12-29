@@ -1,4 +1,10 @@
-﻿using AutoMapper;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Expressions;
+using System.Threading;
+using System.Threading.Tasks;
+using AutoMapper;
 using Iis.DataModel.Materials;
 using Iis.DbLayer.MaterialEnum;
 using Iis.DbLayer.Repositories;
@@ -10,7 +16,6 @@ using Iis.Interfaces.Common;
 using Iis.Interfaces.Constants;
 using Iis.Interfaces.Elastic;
 using Iis.Interfaces.Materials;
-using Iis.Interfaces.Ontology;
 using Iis.Interfaces.Ontology.Data;
 using Iis.Services.Contracts.Dtos;
 using Iis.Services.Contracts.Dtos.RadioElectronicSituation;
@@ -20,12 +25,6 @@ using IIS.Repository;
 using IIS.Repository.Factories;
 using IIS.Services.Contracts.Interfaces;
 using IIS.Services.Contracts.Materials;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Threading;
-using System.Threading.Tasks;
 using MaterialSign = Iis.Domain.Materials.MaterialSign;
 
 namespace IIS.Services.Materials
@@ -185,17 +184,18 @@ namespace IIS.Services.Materials
             return (materials, materials.Count);
         }
 
-        public Task<List<MaterialsCountByType>> CountMaterialsByTypeAndNodeAsync(Guid nodeId)
+        public async Task<IReadOnlyCollection<MaterialsCountByType>> CountMaterialsByTypeAndNodeAsync(Guid nodeId, Guid userId, CancellationToken cancellationToken = default)
         {
-            var nodeIdList = new List<Guid> { nodeId };
+            var response = await _materialElasticService.CountMaterialsByTypeAndNodeAsync(nodeId, userId, cancellationToken);
+            var result = response
+                .Select(_ => new MaterialsCountByType
+                {
+                    Type = _.Key,
+                    Count = _.Value
+                })
+                .ToArray();
 
-            var featureIdCollection = _ontologyService.GetObjectFeatureRelationCollection(nodeIdList)
-                                        .Select(e => e.FeatureId)
-                                        .ToArray();
-
-            nodeIdList.AddRange(featureIdCollection);
-
-            return RunWithoutCommitAsync(uow => uow.MaterialRepository.GetParentMaterialByNodeIdQueryAsync(nodeIdList));
+            return result;
         }
 
         public async Task<(IEnumerable<Material> Materials, int Count)> GetMaterialsByNodeId(Guid nodeId)

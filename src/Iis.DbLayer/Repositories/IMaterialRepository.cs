@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using Iis.DataModel.Materials;
 using Iis.DbLayer.Common;
 using Iis.DbLayer.MaterialEnum;
-using Iis.Domain.Materials;
 using Iis.Services.Contracts.Dtos.RadioElectronicSituation;
 using Iis.Services.Contracts.Materials.Distribution;
 
@@ -53,8 +52,6 @@ namespace Iis.DbLayer.Repositories
         Task<IReadOnlyCollection<MaterialEntity>> GetMaterialCollectionByNodeIdAsync(IReadOnlyCollection<Guid> nodeIdCollection, params MaterialIncludeEnum[] includes);
 
         Task<IReadOnlyCollection<Guid>> GetMaterialIdCollectionByNodeIdCollectionAsync(IReadOnlyCollection<Guid> nodeIdCollection);
-
-        Task<List<MaterialsCountByType>> GetParentMaterialByNodeIdQueryAsync(IReadOnlyCollection<Guid> nodeIdCollection);
 
         void AddFeatureIdList(Guid materialId, IEnumerable<Guid> featureIdList);
 
