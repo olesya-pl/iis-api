@@ -10,6 +10,7 @@
         Wiki,
         Object,
         AccessLevel,
-        Photo
+        Photo,
+        SecurityLevel
     }
 }

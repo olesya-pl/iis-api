@@ -960,6 +960,115 @@ namespace Iis.DbLayer.ModifyDataScripts
             var presPalaceGuard = GetOrAddObjectNode(data, new Guid("74b73118573b4bef8ff4b768fbe19f22"), "President Palace Guards", "neutral", "CF", "normal", "1", phone_23621622512.Id);
         }
 
+        public void AddSecurityLevels(OntologyContext context, IOntologyNodesData data)
+        {
+            if (data.Schema.GetEntityTypeByName(EntityTypeNames.SecurityLevel.ToString()) != null) return;
+
+            var securityLevelType = data.Schema.CreateEntityType(EntityTypeNames.SecurityLevel.ToString());
+            data.Schema.CreateAttributeType(securityLevelType.Id, "name", "Назва", ScalarType.String, EmbeddingOptions.Required);
+            data.Schema.CreateRelationType(securityLevelType.Id, securityLevelType.Id, "parent", "Група", EmbeddingOptions.Optional);
+
+            var objectType = data.Schema.GetEntityTypeByName(EntityTypeNames.Object.ToString());
+            data.Schema.CreateRelationType(objectType.Id, securityLevelType.Id, "securityLevels", "Рівні доступу", EmbeddingOptions.Multiple);
+
+            SaveOntologySchema(data.Schema);
+        }
+
+        public void AddSecurityLevelsData(OntologyContext context, IOntologyNodesData data)
+        {
+            const string NAME = "name";
+            const string PARENT = "parent";
+
+            var securityLevelType = data.Schema.GetEntityTypeByName(EntityTypeNames.SecurityLevel.ToString());
+            var parentRelationType = securityLevelType.GetProperty(PARENT);
+
+            data.WriteLock(() =>
+            {
+                var rootNode = data.CreateNode(securityLevelType.Id);
+                data.AddValueByDotName(rootNode.Id, "Рівні доступу", NAME);
+
+                var taemistNode = data.CreateNode(securityLevelType.Id);
+                data.AddValueByDotName(taemistNode.Id, "Таємність", NAME);
+                data.CreateRelation(taemistNode.Id, rootNode.Id, parentRelationType.Id);
+
+                var taemistNode1 = data.CreateNode(securityLevelType.Id);
+                data.AddValueByDotName(taemistNode1.Id, "Можливо таємне", NAME);
+                data.CreateRelation(taemistNode1.Id, taemistNode.Id, parentRelationType.Id);
+
+                var taemistNode2 = data.CreateNode(securityLevelType.Id);
+                data.AddValueByDotName(taemistNode2.Id, "Дуже таємне", NAME);
+                data.CreateRelation(taemistNode2.Id, taemistNode.Id, parentRelationType.Id);
+
+                var taemistNode3 = data.CreateNode(securityLevelType.Id);
+                data.AddValueByDotName(taemistNode3.Id, "Цілком таємне", NAME);
+                data.CreateRelation(taemistNode3.Id, taemistNode.Id, parentRelationType.Id);
+
+                var regionNode = data.CreateNode(securityLevelType.Id);
+                data.AddValueByDotName(regionNode.Id, "Регіон", NAME);
+                data.CreateRelation(regionNode.Id, rootNode.Id, parentRelationType.Id);
+
+                var evropaNode = data.CreateNode(securityLevelType.Id);
+                data.AddValueByDotName(evropaNode.Id, "Європа", NAME);
+                data.CreateRelation(evropaNode.Id, regionNode.Id, parentRelationType.Id);
+
+                var evropaNode1 = data.CreateNode(securityLevelType.Id);
+                data.AddValueByDotName(evropaNode1.Id, "Албанія", NAME);
+                data.CreateRelation(evropaNode1.Id, evropaNode.Id, parentRelationType.Id);
+
+                var evropaNode2 = data.CreateNode(securityLevelType.Id);
+                data.AddValueByDotName(evropaNode2.Id, "Белорусія", NAME);
+                data.CreateRelation(evropaNode2.Id, evropaNode.Id, parentRelationType.Id);
+
+                var evropaNode3 = data.CreateNode(securityLevelType.Id);
+                data.AddValueByDotName(evropaNode3.Id, "Польша", NAME);
+                data.CreateRelation(evropaNode3.Id, evropaNode.Id, parentRelationType.Id);
+
+                var asiaNode = data.CreateNode(securityLevelType.Id);
+                data.AddValueByDotName(asiaNode.Id, "Азія", NAME);
+                data.CreateRelation(asiaNode.Id, regionNode.Id, parentRelationType.Id);
+
+                var asiaNode1 = data.CreateNode(securityLevelType.Id);
+                data.AddValueByDotName(asiaNode1.Id, "Туречина", NAME);
+                data.CreateRelation(asiaNode1.Id, asiaNode.Id, parentRelationType.Id);
+
+                var asiaNode2 = data.CreateNode(securityLevelType.Id);
+                data.AddValueByDotName(asiaNode2.Id, "Сірія", NAME);
+                data.CreateRelation(asiaNode2.Id, asiaNode.Id, parentRelationType.Id);
+
+                var asiaNode3 = data.CreateNode(securityLevelType.Id);
+                data.AddValueByDotName(asiaNode3.Id, "Бахрейн", NAME);
+                data.CreateRelation(asiaNode3.Id, asiaNode.Id, parentRelationType.Id);
+
+                var africaNode = data.CreateNode(securityLevelType.Id);
+                data.AddValueByDotName(africaNode.Id, "Афріка", NAME);
+                data.CreateRelation(africaNode.Id, regionNode.Id, parentRelationType.Id);
+
+                var categoryNode = data.CreateNode(securityLevelType.Id);
+                data.AddValueByDotName(categoryNode.Id, "Категорія", NAME);
+                data.CreateRelation(categoryNode.Id, rootNode.Id, parentRelationType.Id);
+
+                var moveNode = data.CreateNode(securityLevelType.Id);
+                data.AddValueByDotName(moveNode.Id, "Переміщення військ", NAME);
+                data.CreateRelation(moveNode.Id, categoryNode.Id, parentRelationType.Id);
+
+                var moveNode1 = data.CreateNode(securityLevelType.Id);
+                data.AddValueByDotName(moveNode1.Id, "Сухопутні", NAME);
+                data.CreateRelation(moveNode1.Id, moveNode.Id, parentRelationType.Id);
+
+                var moveNode2 = data.CreateNode(securityLevelType.Id);
+                data.AddValueByDotName(moveNode2.Id, "Морські", NAME);
+                data.CreateRelation(moveNode2.Id, moveNode.Id, parentRelationType.Id);
+
+                var moveNode3 = data.CreateNode(securityLevelType.Id);
+                data.AddValueByDotName(moveNode3.Id, "Космічні", NAME);
+                data.CreateRelation(moveNode3.Id, moveNode.Id, parentRelationType.Id);
+
+                var putchNode = data.CreateNode(securityLevelType.Id);
+                data.AddValueByDotName(putchNode.Id, "Путч", NAME);
+                data.CreateRelation(putchNode.Id, categoryNode.Id, parentRelationType.Id);
+            });
+        }
+
         private static INode GetOrAddSingNode(IOntologyNodesData data, Guid signId, string phoneNumber, string imei, string tmsi)
         {
             const string singTypeName = "CellphoneSign";
