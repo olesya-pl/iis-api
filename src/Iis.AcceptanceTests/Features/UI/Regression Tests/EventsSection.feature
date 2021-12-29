@@ -58,4 +58,7 @@
         And I clicked on the first material in the Materials list
         When I clicked on the relations tab in the material card
         Then I must see Тестова подія as the related event to the material
-      
+        When I pressed the relation`s delete button between material and event
+        And I pressed the confirm save changes in the event
+        Then I must not see Тестова подія as the related event to the material
+        When I clean up uploaded material via API

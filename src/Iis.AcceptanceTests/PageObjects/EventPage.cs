@@ -5,6 +5,7 @@ using OpenQA.Selenium;
 using SeleniumExtras.PageObjects;
 using Xunit;
 
+
 namespace AcceptanceTests.PageObjects
 {
 
@@ -76,6 +77,11 @@ namespace AcceptanceTests.PageObjects
             return new Event(driver, title);
         }
 
+        public Event GetRelatedMaterislNameBindedToTheEvent(string title)
+            {
+            return new Event(driver, title);
+            }
+
         public List<Event> Events => driver.FindElements(By.CssSelector(".events-table .p-datatable-tbody > tr"))
                     .Select(webElement => new Event(driver, webElement)).ToList();
         public List<EventRelatedItems> MaterialsRelatedToEvent => driver.FindElement(By.CssSelector(".event-card__linked-materials")).FindElements(By.CssSelector(".el-tag"))
@@ -97,5 +103,8 @@ namespace AcceptanceTests.PageObjects
             var eventInTheList = driver.FindElement(By.XPath($"//div[contains(text(),'{eventName}')]"));
             return eventInTheList.Displayed;
         }
+
+        [FindsBy(How = How.XPath, Using = "//button[@name='delete']")]
+        public IWebElement DeleteRelatedMaterialButton;
     }
 }

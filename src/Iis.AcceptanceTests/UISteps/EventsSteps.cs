@@ -137,7 +137,7 @@ namespace AcceptanceTests.UISteps
         public void WhenIBindedAMaterialToTheEvent(string materialName)
         {
             var materialInput = eventPage.BindedMaterialsField.FindElement(By.TagName("input"));
-            materialInput.SendKeys(materialName);
+            materialInput.SendKeys(context.Get<string>("uploadedMaterial"));
             driver.WaitFor(4);
             materialInput.SendKeys(Keys.Down);
             materialInput.SendKeys(Keys.Enter);
@@ -180,6 +180,15 @@ namespace AcceptanceTests.UISteps
         {
             eventPage.GetRelatedObjectOfStudyNameBindedToTheEvent(objectOfStudy).Click();
         }
+
+        
+
+            [When(@"I pressed the relation`s delete button between material and event")]
+        public void WhenIPressedTheRelationSDeleteButtonBetweenMaterialAndEvent()
+        {
+            eventPage.DeleteRelatedMaterialButton.Click();
+        }
+
 
         [When(@"I pressed the delete button to delete the specified (.*) material")]
         public void WhenIPressedTheDeleteButtonToDeleteTheSpecifiedMaterial(string materialName)
