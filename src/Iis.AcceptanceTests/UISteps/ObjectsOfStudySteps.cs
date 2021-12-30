@@ -81,7 +81,7 @@ namespace AcceptanceTests.UISteps
         {
             objectsOfStudyPage.SearchField.SendKeys($"{input} AND CreatedAt:{DateTime.Now.ToString("dd.MM.yyyy")}");
             objectsOfStudyPage.SearchField.SendKeys(Keys.Enter);
-            driver.WaitFor(30);
+            driver.WaitFor(10);
         }
 
         [When(@"I entered the value (.*) in the search field")]
