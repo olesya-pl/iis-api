@@ -42,11 +42,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="AspNetCore.HealthChecks.Elasticsearch" Version="3.0.0" />
+    <PackageReference Include="AspNetCore.HealthChecks.Elasticsearch" Version="3.1.1" />
     <PackageReference Include="CsvHelper" Version="19.0.0" />
     <PackageReference Include="Nest" Version="7.8.0" />
-    <PackageReference Include="AspNetCore.HealthChecks.NpgSql" Version="3.0.0" />
-    <PackageReference Include="AspNetCore.HealthChecks.Rabbitmq" Version="3.0.4" />
+    <PackageReference Include="AspNetCore.HealthChecks.NpgSql" Version="3.1.1" />
+    <PackageReference Include="AspNetCore.HealthChecks.Rabbitmq" Version="3.1.4" />
     <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="7.0.0" />
     <PackageReference Include="DocumentFormat.OpenXml" Version="2.10.0" />
     <PackageReference Include="Flee" Version="1.2.2" />
@@ -67,6 +67,8 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="3.1.4" />
+    <PackageReference Include="prometheus-net.AspNetCore" Version="5.0.2" />
+    <PackageReference Include="prometheus-net.AspNetCore.HealthChecks" Version="5.0.2" />
     <PackageReference Include="protobuf-net" Version="2.4.4" />
     <PackageReference Include="RabbitMQ.Client" Version="5.1.2" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="3.1.0" />
@@ -92,6 +94,7 @@
     <ProjectReference Include="..\Iis.FlightRadar.DataModel\Iis.FlightRadar.DataModel.csproj" />
     <ProjectReference Include="..\Iis.Interfaces\Iis.Interfaces.csproj" />
     <ProjectReference Include="..\Iis.Messages\Iis.Messages.csproj" />
+    <ProjectReference Include="..\Iis.Metrics\Iis.Metrics.csproj" />
     <ProjectReference Include="..\Iis.OntologyData\Iis.OntologyData.csproj" />
     <ProjectReference Include="..\Iis.OntologySchema.Saver\Iis.OntologySchema.Saver.csproj" />
     <ProjectReference Include="..\Iis.OntologySchema\Iis.OntologySchema.csproj" />
