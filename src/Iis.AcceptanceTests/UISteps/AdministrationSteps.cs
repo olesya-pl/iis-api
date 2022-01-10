@@ -32,8 +32,8 @@ namespace AcceptanceTests.UISteps
             driver.WaitFor(5);
         }
 
-        [When(@"I checked of version by product")]
-        public void WhenICheckedOfVersionByProduct()
+        [When(@"I checked product version")]
+        public void WhenICheckedProductVersion()
         {
             navigationSection.ObjectOfStudyLink.SendKeys(Keys.Alt + Keys.Shift + "V");
             driver.WaitFor(5);

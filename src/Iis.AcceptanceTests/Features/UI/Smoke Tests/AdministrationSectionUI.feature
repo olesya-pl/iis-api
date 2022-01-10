@@ -14,5 +14,5 @@ Feature: AdministrationSectionUI - Smoke
 
 	@smoke @UI @AuthorizationUI
     Scenario: IIS-6566 -Check product version
-		When I checked of version by product
+		When I checked product version
 		Then I must see version by product
