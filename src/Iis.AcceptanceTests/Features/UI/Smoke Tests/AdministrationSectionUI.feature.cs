@@ -40,7 +40,8 @@ namespace AcceptanceTests.Features.UI.SmokeTests
         public static void FeatureSetup()
         {
             testRunner = TechTalk.SpecFlow.TestRunnerManager.GetTestRunner();
-            TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "Features/UI/Smoke Tests", "AdministrationSectionUI - Smoke", "\t- IIS-6330 - Ensure that Administration section is opened", ProgrammingLanguage.CSharp, ((string[])(null)));
+            TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "Features/UI/Smoke Tests", "AdministrationSectionUI - Smoke", "\t- IIS-6330 - Ensure that Administration section is opened\r\n\t- IIS-6566 -Check pr" +
+                    "oduct version", ProgrammingLanguage.CSharp, ((string[])(null)));
             testRunner.OnFeatureStart(featureInfo);
         }
         
@@ -77,9 +78,9 @@ namespace AcceptanceTests.Features.UI.SmokeTests
         
         public virtual void FeatureBackground()
         {
-#line 5
- #line hidden
 #line 6
+ #line hidden
+#line 7
   testRunner.Given("I sign in with the user olya and password 123 in the Contour", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
         }
@@ -103,7 +104,7 @@ namespace AcceptanceTests.Features.UI.SmokeTests
                     "AdministrationUI"};
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("IIS-6330 - Ensure that Administration section is opened", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
-#line 9
+#line 10
  this.ScenarioInitialize(scenarioInfo);
 #line hidden
             bool isScenarioIgnored = default(bool);
@@ -123,16 +124,16 @@ namespace AcceptanceTests.Features.UI.SmokeTests
             else
             {
                 this.ScenarioStart();
-#line 5
+#line 6
  this.FeatureBackground();
 #line hidden
-#line 10
+#line 11
   testRunner.When("I navigated to Administration page", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 11
+#line 12
   testRunner.Then("I must see the Administration page", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 12
+#line 13
   testRunner.Then("I must see first user in the user list", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
@@ -144,17 +145,17 @@ namespace AcceptanceTests.Features.UI.SmokeTests
         [Xunit.TraitAttribute("Description", "IIS-6566 -Check product version")]
         [Xunit.TraitAttribute("Category", "smoke")]
         [Xunit.TraitAttribute("Category", "UI")]
-        [Xunit.TraitAttribute("Category", "AdministrationUI")]
+        [Xunit.TraitAttribute("Category", "AuthorizationUI")]
         public virtual void IIS_6566_CheckProductVersion()
         {
             string[] tagsOfScenario = new string[] {
                     "smoke",
                     "UI",
-                    "AdministrationUI"};
+                    "AuthorizationUI"};
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("IIS-6566 -Check product version", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
-#line 15
- this.ScenarioInitialize(scenarioInfo);
+#line 16
+    this.ScenarioInitialize(scenarioInfo);
 #line hidden
             bool isScenarioIgnored = default(bool);
             bool isFeatureIgnored = default(bool);
@@ -173,13 +174,13 @@ namespace AcceptanceTests.Features.UI.SmokeTests
             else
             {
                 this.ScenarioStart();
-#line 5
+#line 6
  this.FeatureBackground();
 #line hidden
-#line 16
+#line 17
   testRunner.When("I checked of version by product", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 17
+#line 18
   testRunner.Then("I must see version by product", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
