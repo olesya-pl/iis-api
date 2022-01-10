@@ -28,7 +28,7 @@ namespace AcceptanceTests.PageObjects
         [FindsBy(How = How.XPath, Using = "(//div[@class='base-page objects-page']//tr[1]//div[@class='object-summary']//div[@class='text-ellipsis title'])")]
         public IWebElement FirstSearchResultTitle;
 
-        [FindsBy(How = How.CssSelector, Using = ".objects-table .p-datatable-tbody tr:nth-child(1) .object-summary .title")]
+        [FindsBy(How = How.CssSelector, Using = ".objects-table .p-datatable-tbody tr:nth-child(1) .object-summary")]
         public IWebElement FirstSearchResultRow;
 
         [FindsBy(How = How.XPath, Using = "//div[@class='icon-wrapper icon-wrapper-edit']")]
