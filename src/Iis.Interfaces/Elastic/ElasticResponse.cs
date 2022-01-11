@@ -1,6 +1,6 @@
 ﻿namespace Iis.Interfaces.Elastic
 {
-    public class ElasticResponse 
+    public class ElasticResponse
     {
         public bool IsSuccess { get; set; }
 

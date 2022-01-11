@@ -95,7 +95,7 @@ namespace Iis.Services
 
         private class Feature
         {
-            [JsonProperty(FeatureFields.featureId)]
+            [JsonProperty(FeatureFields.FeatureId)]
             public Guid? Id { get; set; }
         }
 

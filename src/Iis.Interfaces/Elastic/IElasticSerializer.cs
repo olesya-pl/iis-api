@@ -7,7 +7,6 @@ namespace Iis.Interfaces.Elastic
     public interface IElasticSerializer
     {
         string GetJsonByExtNode(IExtNode extNode);
-        JObject GetJsonObjectByExtNode(IExtNode extNode, bool IsHeadNode = true);
+        JObject GetJsonObjectByExtNode(IExtNode extNode, bool isHeadNode = true);
     }
-
 }
