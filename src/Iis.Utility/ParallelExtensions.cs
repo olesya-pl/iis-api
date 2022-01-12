@@ -24,7 +24,7 @@ namespace Iis.Utility
             {
                 var result = await action(_);
                 bag.Add(result);
-            }, Options); ;
+            }, Options);
 
             foreach (var item in items)
             {

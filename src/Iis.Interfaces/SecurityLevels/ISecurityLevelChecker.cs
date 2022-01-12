@@ -6,6 +6,8 @@ namespace Iis.Interfaces.SecurityLevels
 {
     public interface ISecurityLevelChecker
     {
-        bool AccessGranted(IReadOnlyList<ISecurityLevel> userLevels, IReadOnlyList<ISecurityLevel> objectLevels);
+        IReadOnlyList<ISecurityLevel> GetSecurityLevels(IReadOnlyList<Guid> securityLevelIds);
+        bool AccessGranted(IReadOnlyList<int> userIndexes, IReadOnlyList<int> objectIndexes);
+        string GetStringCode(bool includeAll, IReadOnlyList<int> indexes);
     }
 }

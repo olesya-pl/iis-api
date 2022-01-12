@@ -200,30 +200,7 @@ namespace Iis.OntologyData.DataTypes
             }
             return value;
         }
-        private object ResolveSingleFormula(string formula)
-        {
-            var replaced = ReplaceVariables(formula);
 
-            var context = new ExpressionContext();
-            context.Imports.AddType(typeof(ComputedPropertyFunctions));
-            context.Options.ParseCulture = CultureInfo.InvariantCulture;
-            var eDynamic = context.CompileDynamic(replaced);
-            var result = eDynamic.Evaluate();
-            return result;
-        }
-        private string ReplaceVariables(string formula)
-        {
-            var regex = new Regex("[^{]*{([^}]+)}");
-            var matches = regex.Matches(formula);
-            var result = formula;
-            foreach (Match match in matches)
-            {
-                var dotName = match.Groups[1].ToString();
-                var value = GetSingleProperty(dotName)?.Value?.Replace("\"", "\\\"").RemoveNewLineCharacters();
-                result = result.Replace("{" + dotName + "}", "\"" + value + "\"");
-            }
-            return result;
-        }
         public string GetComputedValue(string name)
         {
             var computedRelationType = NodeType.GetComputedRelationTypes().Where(rt => rt.NodeType.Name == name).SingleOrDefault();
@@ -321,6 +298,37 @@ namespace Iis.OntologyData.DataTypes
         {
             var node = GetSingleProperty("accessLevel.numericIndex");
             return node?.Value == null ? 0 : int.Parse(node?.Value);
+        }
+
+        public IReadOnlyList<int> GetSecurityLevelIndexes() =>
+            _outgoingRelations
+            .Where(_ => _.Node.NodeType.Name == OntologyNames.SecurityLevelField)
+            .Select(_ => int.Parse(_.TargetNode.GetSingleDirectProperty(OntologyNames.UniqueIndexField).Value))
+            .ToList();
+
+        private object ResolveSingleFormula(string formula)
+        {
+            var replaced = ReplaceVariables(formula);
+
+            var context = new ExpressionContext();
+            context.Imports.AddType(typeof(ComputedPropertyFunctions));
+            context.Options.ParseCulture = CultureInfo.InvariantCulture;
+            var eDynamic = context.CompileDynamic(replaced);
+            var result = eDynamic.Evaluate();
+            return result;
+        }
+        private string ReplaceVariables(string formula)
+        {
+            var regex = new Regex("[^{]*{([^}]+)}");
+            var matches = regex.Matches(formula);
+            var result = formula;
+            foreach (Match match in matches)
+            {
+                var dotName = match.Groups[1].ToString();
+                var value = GetSingleProperty(dotName)?.Value?.Replace("\"", "\\\"").RemoveNewLineCharacters();
+                result = result.Replace("{" + dotName + "}", "\"" + value + "\"");
+            }
+            return result;
         }
     }
 }

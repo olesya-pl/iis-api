@@ -101,6 +101,7 @@ namespace Iis.DbLayer.Repositories
         private IQueryable<UserEntity> GetUsersQuery()
         {
             return Context.Users
+                .Include(u => u.SecurityLevels)
                 .Include(u => u.UserRoles)
                 .ThenInclude(ur => ur.Role)
                 .ThenInclude(r => r.RoleAccessEntities)

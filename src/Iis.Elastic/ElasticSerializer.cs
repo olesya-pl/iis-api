@@ -53,6 +53,7 @@ namespace Iis.Elastic
                 }
                 json[nameof(extNode.CreatedAt)] = extNode.CreatedAt.ToString(DateFormat, CultureInfo.InvariantCulture);
                 json[nameof(extNode.UpdatedAt)] = extNode.UpdatedAt.ToString(DateFormat, CultureInfo.InvariantCulture);
+                json["__securityLevels"] = extNode.SecurityLevels;
             }
             else if (extNode.NodeType.IsObject)
             {

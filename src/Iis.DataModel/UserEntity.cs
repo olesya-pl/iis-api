@@ -22,5 +22,6 @@ namespace Iis.DataModel
         public UserSource Source { get; set; }
         public List<UserRoleEntity> UserRoles { get; set; }
         public List<MaterialAssigneeEntity> MaterialAssignees { get; internal set; }
+        public List<UserSecurityLevelEntity> SecurityLevels { get; internal set; }
     }
 }

@@ -39,5 +39,6 @@ namespace Iis.Interfaces.Ontology.Data
         string GetTitleValue();
         IRelation GetAccessLevelRelationId();
         int GetAccessLevelIndex();
+        IReadOnlyList<int> GetSecurityLevelIndexes();
     }
 }

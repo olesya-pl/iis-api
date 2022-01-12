@@ -86,6 +86,8 @@ using Iis.Utility.Logging;
 using Iis.Api.Authentication.OntologyBasicAuthentication;
 using Iis.Interfaces.DirectQueries;
 using Iis.DbLayer.DirectQueries;
+using Iis.Interfaces.SecurityLevels;
+using Iis.Security.SecurityLevels;
 
 namespace IIS.Core
 {
@@ -174,6 +176,7 @@ namespace IIS.Core
                     var ontologyData = provider.GetRequiredService<IOntologyNodesData>();
                     return new CommonData(ontologyData);
                 });
+                services.AddSingleton<ISecurityLevelChecker, SecurityLevelChecker>();
 
                 services.AddTransient<IFieldToAliasMapper>(provider => provider.GetRequiredService<IOntologySchema>());
                 services.AddTransient<INodeSaveService, NodeSaveService>();

@@ -5,7 +5,7 @@
         ObjectOfStudy,
         FuzzyDate,
         ObjectSign,
-        Event, 
+        Event,
         Enum,
         Wiki,
         Object,
