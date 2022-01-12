@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using Iis.DbLayer.Repositories;
+using Iis.Elastic.Entities;
 using Iis.Elastic.SearchQueryExtensions;
 
 namespace Iis.Elastic.ElasticMappingProperties

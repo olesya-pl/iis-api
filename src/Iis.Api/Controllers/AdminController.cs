@@ -22,6 +22,7 @@ using Microsoft.Extensions.Hosting;
 using MoreLinq;
 using Iis.Services.Contracts.Elastic;
 using Iis.Utility;
+using Iis.Elastic.Entities;
 
 namespace Iis.Api.Controllers
 {

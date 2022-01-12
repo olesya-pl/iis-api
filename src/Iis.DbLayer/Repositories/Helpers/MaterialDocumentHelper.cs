@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using Iis.Domain;
 using Iis.DataModel.Materials;
 using Iis.Interfaces.Ontology.Data;
+using Iis.Elastic.Entities;
+
 namespace Iis.DbLayer.Repositories.Helpers
 {
     public static class MaterialDocumentHelper
