@@ -38,7 +38,7 @@ msbuild.wrn
 
 #data storage
 data_storage/
-/src/Iis.Api/Logs/*
+src/*/Logs/*
 src/packages/*
 src/Iis.ApiTests/mono_crash*.json
 src/Iis.AcceptanceTests/mono_crash*.json
@@ -47,4 +47,3 @@ AcceptanceTests-test-result.xml
 
 *.feature.cs
 *feature.cs
-src/Iis.MaterialLoader/Logs/*

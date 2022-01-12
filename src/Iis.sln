@@ -64,6 +64,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Iis.Desktop.Common", "Iis.D
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Iis.Desktop.SecurityManager", "Iis.Desktop.SecurityManager\Iis.Desktop.SecurityManager.csproj", "{33960ECD-D747-4FB8-97BF-CEEF16C6A0CF}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Iis.MaterialDistributor", "Iis.MaterialDistributor\Iis.MaterialDistributor.csproj", "{BD861251-8B5F-49A4-A586-D6F42570BE64}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -182,6 +184,10 @@ Global
 		{33960ECD-D747-4FB8-97BF-CEEF16C6A0CF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{33960ECD-D747-4FB8-97BF-CEEF16C6A0CF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{33960ECD-D747-4FB8-97BF-CEEF16C6A0CF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BD861251-8B5F-49A4-A586-D6F42570BE64}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BD861251-8B5F-49A4-A586-D6F42570BE64}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BD861251-8B5F-49A4-A586-D6F42570BE64}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BD861251-8B5F-49A4-A586-D6F42570BE64}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
