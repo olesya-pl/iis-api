@@ -9,7 +9,6 @@ namespace AcceptanceTests.PageObjects
     public class MaterialsSectionPage
     {
         private readonly IWebDriver driver;
-        private IWebElement materialsSectionPageElement;
 
         public MaterialsSectionPage(IWebDriver driver)
         {
@@ -93,8 +92,8 @@ namespace AcceptanceTests.PageObjects
         [FindsBy(How = How.CssSelector, Using = ".action-button--prev-page span")]
         public IWebElement PreviousMaterialButton;
 
-		[FindsBy(How = How.CssSelector, Using = ".materials-table tbody.p-datatable-tbody > tr")]
-		public IWebElement FirstSearchResult;
+        [FindsBy(How = How.CssSelector, Using = ".materials-table tbody.p-datatable-tbody > tr")]
+        public IWebElement FirstSearchResult;
 
         [FindsBy(How = How.CssSelector, Using = ".meta-data__list .meta-data__list-item:nth-of-type(3) .el-button--default")]
         [CacheLookup]
@@ -143,6 +142,30 @@ namespace AcceptanceTests.PageObjects
         [FindsBy(How = How.CssSelector, Using = "button.action-button--translation")]
         public IWebElement MaterialTranslationButton;
 
+        [FindsBy(How = How.CssSelector, Using = ".p-datatable-scrollable-header-table .materials-table__source .p-sortable-column-icon")]
+        public IWebElement SourceSortable;
+
+        [FindsBy(How = How.CssSelector, Using = ".material-general-access-level .material-info-card__body .el-input__inner")]
+        public IWebElement AccessLevelField;
+
+        [FindsBy(How = How.XPath, Using = "//div/table/thead/tr/th[@class='materials-table__source p-sortable-column'][@aria-sort='none']")]
+        public IWebElement SortedBySourceSortingNull;
+
+        [FindsBy(How = How.CssSelector, Using = ".material-relations-input .el-input__inner")]
+        public IWebElement ObjectsSearchTextBox;
+
+        [FindsBy(How = How.CssSelector, Using = "button[class='el-button el-button--primary'] > span")]
+        public IWebElement SaveChangesButton;
+
+        [FindsBy(How = How.XPath, Using = "//tr[1]//div[@class='input-stream-related-objects']//div/a")]
+        public IWebElement ObjectOfStudyContainer;
+
+        [FindsBy(How = How.XPath, Using = "//div[@class='material__viewer']//div[@class='wavesurfer__instance-wrapper']//div[@class='wavesurfer__timeline']")]
+        public IWebElement ClickedOnTheHotKey;
+
+        [FindsBy(How = How.XPath, Using = "//*[contains(@class, 'toastui-editor-main toastui-editor-ww-mode')]//*[contains(@class, 'toastui-editor-ww-container')]//*[contains(@class, 'ProseMirror toastui-editor-contents')]")]
+        public IWebElement TextField;
+
         public void ScrollToEnd()
         {
             Actions actions = new Actions(driver);
@@ -160,29 +183,27 @@ namespace AcceptanceTests.PageObjects
             return new MaterialRelatedItems(driver, title);
         }
 
-        [FindsBy(How = How.CssSelector, Using = ".p-datatable-scrollable-header-table .materials-table__source .p-sortable-column-icon")]
-        public IWebElement SourceSortable;
-
-        [FindsBy(How = How.CssSelector, Using = ".material-general-access-level .material-info-card__body .el-input__inner")]
-        public IWebElement AccessLevelField;
-
         public bool SortedMaterialsBySource(string sourceName)
         {
             var SourceName = driver.FindElement(By.XPath($"//tr[1]/*[contains(@class,'materials-table__source')]//*[contains(text(),'{sourceName}')]"));
             return SourceName.Displayed;
         }
 
-        [FindsBy(How = How.XPath, Using = "//div/table/thead/tr/th[@class='materials-table__source p-sortable-column'][@aria-sort='none']")]
-        public IWebElement SortedBySourceSortingNull;
+        public void TypesFilter(string checkboxLabel)
+        {
+            var CheckboxLabel = driver.FindElement(By.XPath($"//*[contains(@class, 'materials-table')]//*[contains(@class, 'table-zones__aside-body')]//*[contains(@class, 'aggregation-group')]//*[contains(text(),'{checkboxLabel}')]"));
+            Actions actions = new Actions(driver);
+            actions.Click(CheckboxLabel).Perform();
+        }
+ 
+        [FindsBy(How = How.XPath, Using = "//div[@class='wavesurfer__timeline']//*[contains(@style, 'position: absolute; z-index: 3; left: 0px; top: 0px; bottom: 0px; overflow: hidden; width: 0px; display: block; box-sizing: border-box; border-right: 1px solid rgb(51, 51, 51); pointer-events: none;')]")]
+        public IWebElement PositionOfTimeline;
 
-        [FindsBy(How = How.CssSelector, Using = ".material-relations-input .el-input__inner")]
-        public IWebElement ObjectsSearchTextBox;
-
-        [FindsBy(How = How.CssSelector, Using = "button[class='el-button el-button--primary'] > span")]
-        public IWebElement SaveChangesButton;
-
-        [FindsBy(How = How.XPath, Using = "//tr[1]//div[@class='input-stream-related-objects']//div/a")]
-        public IWebElement ObjectOfStudyContainer;
-    }
-
+        public void ClickPauseButton()
+        {
+            var PauseButton = driver.FindElement(By.XPath($"//*[contains(@class, 'el-container material-page is-vertical')]//*[contains(@class, 'material__viewer')]//*[contains(@class, 'wavesurfer__control wavesurfer__control--play')]//*[contains(@class, 'el-tooltip wavesurfer__control-button')]"));
+            Actions actions = new Actions(driver);
+            actions.Click(PauseButton).Perform();
+        }
+     }
 }
