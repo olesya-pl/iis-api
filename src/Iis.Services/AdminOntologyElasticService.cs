@@ -1,7 +1,13 @@
-﻿using Iis.DataModel.ChangeHistory;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 using Iis.DataModel.Reports;
 using Iis.Elastic;
 using Iis.Elastic.ElasticMappingProperties;
+using Iis.Elastic.Entities;
 using Iis.Interfaces.Elastic;
 using Iis.Interfaces.Enums;
 using Iis.Interfaces.Ontology.Data;
@@ -9,12 +15,6 @@ using Iis.Interfaces.Ontology.Schema;
 using Iis.OntologySchema.DataTypes;
 using Iis.Services.Contracts.Interfaces;
 using Iis.Utility;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace Iis.Services
 {

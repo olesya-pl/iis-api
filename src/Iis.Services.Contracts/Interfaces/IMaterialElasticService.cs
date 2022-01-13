@@ -5,10 +5,10 @@ using System.Collections.Generic;
 using Iis.Interfaces.Elastic;
 using Iis.DataModel.ChangeHistory;
 using Iis.DataModel.Materials;
-using Iis.DbLayer.Repositories;
 using Iis.Domain.Materials;
 using Iis.Interfaces.Common;
 using Iis.Interfaces.Materials;
+using Iis.Elastic.Entities;
 
 namespace Iis.Services.Contracts.Interfaces
 {

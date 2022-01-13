@@ -12,6 +12,7 @@ using Iis.Domain;
 using Iis.Domain.MachineLearning;
 using Iis.Domain.Materials;
 using Iis.Domain.Users;
+using Iis.Elastic.Entities;
 using Iis.Interfaces.Common;
 using Iis.Interfaces.Constants;
 using Iis.Interfaces.Elastic;

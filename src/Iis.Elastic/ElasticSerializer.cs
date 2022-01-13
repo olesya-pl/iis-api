@@ -7,7 +7,7 @@ using Iis.Interfaces.Ontology;
 using Iis.Interfaces.Ontology.Schema;
 using Iis.Elastic.SearchQueryExtensions;
 using AutoMapper;
-using Iis.DataModel.ChangeHistory;
+using Iis.Elastic.Entities;
 
 namespace Iis.Elastic
 {

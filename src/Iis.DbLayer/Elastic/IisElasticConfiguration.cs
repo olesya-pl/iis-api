@@ -1,10 +1,10 @@
-﻿using Iis.DbLayer.Repositories;
-using Iis.Domain.Elastic;
-using Iis.Interfaces.Elastic;
-using Iis.Interfaces.Ontology.Schema;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Iis.Domain.Elastic;
+using Iis.Elastic.Entities;
+using Iis.Interfaces.Elastic;
+using Iis.Interfaces.Ontology.Schema;
 
 namespace Iis.DbLayer.Elastic
 {

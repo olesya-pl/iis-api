@@ -2,10 +2,9 @@
 using System.Collections.Generic;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using Iis.DataModel;
 using Iis.Interfaces.Common;
 
-namespace Iis.DbLayer.Repositories
+namespace Iis.Elastic.Entities
 {
     public class MaterialDocument
     {
@@ -140,5 +139,10 @@ namespace Iis.DbLayer.Repositories
         public string Importance { get; set; }
         public int ImportanceSortOrder { get; set; }
         public Guid? RelatedSignId { get; set; }
+    }
+
+    public class SecurityAttributes
+    {
+        public int AccessLevel { get; set; }
     }
 }

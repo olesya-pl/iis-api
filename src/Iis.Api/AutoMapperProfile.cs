@@ -39,6 +39,7 @@ using Iis.Utility.Automapper;
 using Iis.DbLayer.Repositories;
 using Iis.Interfaces.Ontology;
 using Iis.Api.GraphQL.RadioElectronicSituation;
+using Iis.Elastic.Entities;
 
 namespace Iis.Api
 {
@@ -240,10 +241,10 @@ namespace Iis.Api
                 .ForMember(dest => dest.Tags, opts => opts.MapFrom(src => src.Tags))
                 .ForMember(dest => dest.States, opts => opts.MapFrom(src => src.States));
 
-            CreateMap<UserEntity, DbLayer.Repositories.Assignee>();
-            CreateMap<UserEntity, DbLayer.Repositories.Editor>();
-            CreateMap<MaterialSignEntity, DbLayer.Repositories.MaterialSign>();
-            CreateMap<MaterialEntity, DbLayer.Repositories.MaterialDocument>()
+            CreateMap<UserEntity, Elastic.Entities.Assignee >();
+            CreateMap<UserEntity, Elastic.Entities.Editor>();
+            CreateMap<MaterialSignEntity, Elastic.Entities.MaterialSign>();
+            CreateMap<MaterialEntity, MaterialDocument>()
                 .ForMember(dest => dest.CreatedDate, opts => opts.MapFrom(src => src.CreatedDate.ToString(DateTimeExtensions.Iso8601DateFormat, CultureInfo.InvariantCulture)))
                 .ForMember(dest => dest.UpdatedAt, opts => opts.MapFrom(src => src.UpdatedAt.ToString(DateTimeExtensions.Iso8601DateFormat, CultureInfo.InvariantCulture)))
                 .ForMember(dest => dest.RegistrationDate, opts => opts.MapFrom(src => src.RegistrationDate.ToString(DateTimeExtensions.Iso8601DateFormat, CultureInfo.InvariantCulture)))
@@ -251,34 +252,34 @@ namespace Iis.Api
                 .ForMember(dest => dest.FileName, opts => opts.MapFrom(src => src.File == null ? null : src.File.Name))
                 .ForPath(dest => dest.SecurityAttributes.AccessLevel, opts => opts.MapFrom(src => src.AccessLevel))
                 .ForMember(dest => dest.Importance, src => src.MapFrom((MaterialEntity, Material, MaterialSign, context) =>
-                    context.Mapper.Map<DbLayer.Repositories.MaterialSign>(MaterialEntity.Importance)))
+                    context.Mapper.Map<Elastic.Entities.MaterialSign>(MaterialEntity.Importance)))
                 .ForMember(dest => dest.Reliability, src => src.MapFrom((MaterialEntity, Material, MaterialSign, context) =>
-                    context.Mapper.Map<DbLayer.Repositories.MaterialSign>(MaterialEntity.Reliability)))
+                    context.Mapper.Map<Elastic.Entities.MaterialSign>(MaterialEntity.Reliability)))
                 .ForMember(dest => dest.Relevance, src => src.MapFrom((MaterialEntity, Material, MaterialSign, context) =>
-                    context.Mapper.Map<DbLayer.Repositories.MaterialSign>(MaterialEntity.Relevance)))
+                    context.Mapper.Map<Elastic.Entities.MaterialSign>(MaterialEntity.Relevance)))
                 .ForMember(dest => dest.Completeness, src => src.MapFrom((MaterialEntity, Material, MaterialSign, context) =>
-                    context.Mapper.Map<DbLayer.Repositories.MaterialSign>(MaterialEntity.Completeness)))
+                    context.Mapper.Map<Elastic.Entities.MaterialSign>(MaterialEntity.Completeness)))
                 .ForMember(dest => dest.SourceReliability, src => src.MapFrom((MaterialEntity, Material, MaterialSign, context) =>
-                    context.Mapper.Map<DbLayer.Repositories.MaterialSign>(MaterialEntity.SourceReliability)))
+                    context.Mapper.Map<Elastic.Entities.MaterialSign>(MaterialEntity.SourceReliability)))
                 .ForMember(dest => dest.ProcessedStatus, src => src.MapFrom((MaterialEntity, Material, MaterialSign, context) =>
-                    context.Mapper.Map<DbLayer.Repositories.MaterialSign>(MaterialEntity.ProcessedStatus)))
+                    context.Mapper.Map<Elastic.Entities.MaterialSign>(MaterialEntity.ProcessedStatus)))
                 .ForMember(dest => dest.SessionPriority, src => src.MapFrom((MaterialEntity, Material, MaterialSign, context) =>
-                    context.Mapper.Map<DbLayer.Repositories.MaterialSign>(MaterialEntity.SessionPriority)))
+                    context.Mapper.Map<Elastic.Entities.MaterialSign>(MaterialEntity.SessionPriority)))
                 .ForMember(dest => dest.LoadData, opts =>
-                    opts.MapFrom(src => JsonConvert.DeserializeObject<DbLayer.Repositories.MaterialLoadData>(src.LoadData)))
+                    opts.MapFrom(src => JsonConvert.DeserializeObject<Elastic.Entities.MaterialLoadData>(src.LoadData)))
                 .ForMember(dest => dest.Assignees, src => src.MapFrom(_ => _.MaterialAssignees));
 
-            CreateMap<MaterialAssigneeEntity, DbLayer.Repositories.Assignee>()
-                .ConstructUsing((entity, context) => context.Mapper.Map<DbLayer.Repositories.Assignee>(entity.Assignee));
+            CreateMap<MaterialAssigneeEntity, Elastic.Entities.Assignee>()
+                .ConstructUsing((entity, context) => context.Mapper.Map<Elastic.Entities.Assignee>(entity.Assignee));
 
-            CreateMap<DbLayer.Repositories.Assignee, Iis.Domain.Users.User>();
-            CreateMap<DbLayer.Repositories.Editor, Iis.Domain.Users.User>();
-            CreateMap<DbLayer.Repositories.MaterialLoadData, Iis.Domain.Materials.MaterialLoadData>();
-            CreateMap<DbLayer.Repositories.MaterialSign, Iis.Domain.Materials.MaterialSign>();
-            CreateMap<DbLayer.Repositories.RelatedObject, Iis.Domain.Materials.RelatedObject>()
-                .Include<DbLayer.Repositories.RelatedObjectOfStudy, Iis.Domain.Materials.RelatedObjectOfStudy>();
-            CreateMap<DbLayer.Repositories.RelatedObjectOfStudy, Iis.Domain.Materials.RelatedObjectOfStudy>();
-            CreateMap<DbLayer.Repositories.MaterialDocument, Iis.Domain.Materials.Material>()
+            CreateMap<Elastic.Entities.Assignee, Iis.Domain.Users.User>();
+            CreateMap<Elastic.Entities.Editor, Iis.Domain.Users.User>();
+            CreateMap<Elastic.Entities.MaterialLoadData, Iis.Domain.Materials.MaterialLoadData>();
+            CreateMap<Elastic.Entities.MaterialSign, Iis.Domain.Materials.MaterialSign>();
+            CreateMap<Elastic.Entities.RelatedObject, Iis.Domain.Materials.RelatedObject>()
+                .Include<Elastic.Entities.RelatedObjectOfStudy, Iis.Domain.Materials.RelatedObjectOfStudy>();
+            CreateMap<Elastic.Entities.RelatedObjectOfStudy, Iis.Domain.Materials.RelatedObjectOfStudy>();
+            CreateMap<Elastic.Entities.MaterialDocument, Iis.Domain.Materials.Material>()
                 .ForMember(dest => dest.File, opts => opts.MapFrom(src => src.FileId.HasValue ? new File(src.FileId.Value) : null))
                 .ForMember(dest => dest.CreatedDate, opts => opts.MapFrom(src => DateTime.ParseExact(src.CreatedDate, DateTimeExtensions.Iso8601DateFormat, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind)))
                 .ForMember(dest => dest.UpdatedAt, opts => opts.MapFrom(src => DateTime.ParseExact(src.UpdatedAt, DateTimeExtensions.Iso8601DateFormat, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind)))

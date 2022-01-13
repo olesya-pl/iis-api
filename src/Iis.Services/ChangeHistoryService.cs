@@ -1,19 +1,20 @@
-﻿using AutoMapper;
-using Iis.DataModel.ChangeHistory;
-using Iis.DataModel.FlightRadar;
-using Iis.DbLayer.Repositories;
-using Iis.Interfaces.Enums;
-using Iis.Interfaces.Ontology.Data;
-using Iis.Services.Contracts.Dtos;
-using Iis.Services.Contracts.Interfaces;
-using Iis.Services.Contracts.Params;
-using IIS.Repository;
-using IIS.Repository.Factories;
-using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
+using Iis.DataModel.ChangeHistory;
+using Iis.DataModel.FlightRadar;
+using Iis.DbLayer.Repositories;
+using Iis.Elastic.Entities;
+using Iis.Interfaces.Enums;
+using Iis.Interfaces.Ontology.Data;
+using IIS.Repository;
+using IIS.Repository.Factories;
+using Iis.Services.Contracts.Dtos;
+using Iis.Services.Contracts.Interfaces;
+using Iis.Services.Contracts.Params;
+using Newtonsoft.Json;
 
 namespace Iis.Services
 {

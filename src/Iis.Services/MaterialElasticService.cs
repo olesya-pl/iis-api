@@ -6,7 +6,6 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Threading.Tasks;
 using System.Collections.Generic;
-using System.Text.RegularExpressions;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Microsoft.Extensions.Logging;
@@ -36,6 +35,7 @@ using IIS.Repository;
 using IIS.Repository.Factories;
 using Iis.Domain.Materials;
 using Iis.Domain;
+using Iis.Elastic.Entities;
 
 namespace Iis.Services
 {
@@ -718,7 +718,7 @@ namespace Iis.Services
             return propertyName;
         }
 
-        private static string GetRelationTypeFieldName() => $"{nameof(MaterialDocument.RelatedObjectCollection)}.{nameof(DbLayer.Repositories.RelatedObject.RelationCreatingType)}";
+        private static string GetRelationTypeFieldName() => $"{nameof(MaterialDocument.RelatedObjectCollection)}.{nameof(Iis.Elastic.Entities.RelatedObject.RelationCreatingType)}";
 
         private static bool ItemsCountPossiblyExceedsMaxThreshold(SearchResult searchResult)
         {
