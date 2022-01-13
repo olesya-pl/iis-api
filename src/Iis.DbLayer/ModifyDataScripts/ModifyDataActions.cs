@@ -84,6 +84,10 @@ namespace Iis.DbLayer.ModifyDataScripts
             }
 
             var eventType = data.Schema.GetEntityTypeByName(EntityTypeNames.Event.ToString());
+            if (eventType == null)
+            {
+                return;
+            }
             if (!eventType.IsInheritedFrom(EntityTypeNames.Object.ToString()))
             {
                 data.Schema.SetInheritance(eventType.Id, objectType.Id);
@@ -116,6 +120,11 @@ namespace Iis.DbLayer.ModifyDataScripts
         public void FixFlightRadarLocationHistory(OntologyContext context, IOntologyNodesData data)
         {
             var signType = data.Schema.GetEntityTypeByName("ICAOSign");
+
+            if (signType == null)
+            {
+                return;
+            }
 
             var signList = data.GetNodesByTypeId(signType.Id)
                 .Select(sign => sign.Id)
@@ -621,6 +630,11 @@ namespace Iis.DbLayer.ModifyDataScripts
             var satIridiumPhoneSignType = GetOrCreateSatelliteIridiumPhoneSignType(data);
             var satPhoneSignType = data.Schema.GetEntityTypeByName("SatellitePhoneSign");
 
+            if (objectSignType == null || satIridiumPhoneSignType == null || satPhoneSignType == null)
+            {
+                return;
+            }
+
             var iridiumSignList = data.GetNodesByTypeId(satIridiumPhoneSignType.Id);
             var satPhoneSignList = data.GetNodesByTypeId(satPhoneSignType.Id);
 
@@ -852,6 +866,11 @@ namespace Iis.DbLayer.ModifyDataScripts
             const string ImportanceTypeName = "ObjectImportance";
 
             var objectImportanceType = data.Schema.GetEntityTypeByName(ImportanceTypeName);
+
+            if (objectImportanceType == null)
+            {
+                return;
+            }
 
             var importanceCollection = data.GetNodesByTypeId(objectImportanceType.Id);
 

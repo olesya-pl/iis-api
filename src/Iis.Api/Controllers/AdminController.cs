@@ -381,7 +381,7 @@ namespace Iis.Api.Controllers
         }
 
         [HttpGet("GetCsv/{typeName}")]
-        public Task<IActionResult> GetCsv(string typeName, CancellationToken cancellationToken)
+        public Task<IActionResult> GetCsv(string typeName)
         {
             var result = _csvService.GetDorCsvByTypeName(typeName);
             var bytes = Encoding.Unicode.GetBytes(result);
