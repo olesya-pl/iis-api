@@ -1,23 +1,26 @@
-﻿using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 
 namespace IIS.Core.GraphQL.Entities
 {
     public class AggregationNodeTypeTree
     {
+        private const string EntityName = "Entity";
+
         private List<AggregationNodeTypeItem> _items;
         private Dictionary<string, AggregationNodeTypeItem> _itemsDict;
-        public IReadOnlyList<AggregationNodeTypeItem> Items => _items;
+
         public AggregationNodeTypeTree(IEnumerable<AggregationNodeTypeItem> items)
         {
             _items = items.ToList();
             _itemsDict = new Dictionary<string, AggregationNodeTypeItem>();
             AddItems(items);
         }
+
+        public IReadOnlyList<AggregationNodeTypeItem> Items => _items;
+
         public void MergeBuckets(IReadOnlyList<AggregationBucket> buckets, ILogger logger = null)
         {
             if (buckets == null || buckets.Count == 0)
@@ -29,10 +32,9 @@ namespace IIS.Core.GraphQL.Entities
 
             foreach (var bucket in buckets)
             {
-                var typeName = bucket.TypeName.StartsWith("Entity") ?
-                    bucket.TypeName.Substring("Entity".Length) :
-                    bucket.TypeName;
-
+                var typeName = bucket.TypeName?.StartsWith(EntityName) ?? false
+                    ? bucket.TypeName.Substring(EntityName.Length)
+                    : bucket.TypeName;
                 if (string.IsNullOrEmpty(typeName))
                 {
                     logger?.LogError("MergeBuckets: typeName is empty");
@@ -43,15 +45,16 @@ namespace IIS.Core.GraphQL.Entities
                 if (item != null)
                 {
                     item.DocCount = bucket.DocCount;
+                    continue;
                 }
-                else
-                {
-                    logger?.LogError(GetItemNotFoundMessage(typeName));
-                }
+
+                logger?.LogError(GetItemNotFoundMessage(typeName));
             }
+
             SummarizeCounts(_items);
             RemoveZeroes(_items);
         }
+
         private void AddItems(IEnumerable<AggregationNodeTypeItem> items)
         {
             if (items == null) return;
@@ -62,6 +65,7 @@ namespace IIS.Core.GraphQL.Entities
                 AddItems(item.Children);
             }
         }
+
         private void SummarizeCounts(IReadOnlyList<AggregationNodeTypeItem> items)
         {
             if (items == null) return;
@@ -72,6 +76,7 @@ namespace IIS.Core.GraphQL.Entities
                 item.DocCount += item.Children?.Sum(_ => _.DocCount) ?? 0;
             }
         }
+
         private void RemoveZeroes(List<AggregationNodeTypeItem> items)
         {
             if (items == null) return;
