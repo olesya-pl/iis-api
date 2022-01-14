@@ -15,7 +15,7 @@ namespace AcceptanceTests.UISteps
         private readonly NavigationSection navigationSection;
 
         public IWebElement VersionInfo =>
-            driver.FindElement(By.CssSelector(".el-notification .el-notification__group .el-notification__title"));
+        driver.FindElement(By.CssSelector(".el-notification .el-notification__group .el-notification__title"));
 
         public AdministrationSteps(ScenarioContext injectedContext, IWebDriver driver)
         {
@@ -32,7 +32,7 @@ namespace AcceptanceTests.UISteps
             driver.WaitFor(5);
         }
 
-        [When(@"I checked of version by product")]
+        [When(@"I checked product version")]
         public void WhenICheckedOfVersionByProduct()
         {
             navigationSection.ObjectOfStudyLink.SendKeys(Keys.Alt + Keys.Shift + "V");
@@ -51,7 +51,7 @@ namespace AcceptanceTests.UISteps
             Assert.True(administrationPage.FirstUserOnTheAdminPage.Displayed);
         }
 
-        [Then(@"I must see version by product")]
+        [Then(@"I must see product version")]
         public void ThenIMustSeeVersionByProduct()
         {
             Assert.True(VersionInfo.Displayed);

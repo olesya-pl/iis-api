@@ -3,6 +3,9 @@ using AcceptanceTests.Helpers;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Support.UI;
 using SeleniumExtras.PageObjects;
+using System.Windows.Input;
+using System.Windows.Markup;
+
 
 namespace AcceptanceTests.PageObjects
 {
@@ -44,6 +47,5 @@ namespace AcceptanceTests.PageObjects
 
         [FindsBy(How = How.XPath, Using = "//span[contains(text(),'Підтвердити')]")]
         public IWebElement ConfirmLogOutButton;
-
     }
 }
