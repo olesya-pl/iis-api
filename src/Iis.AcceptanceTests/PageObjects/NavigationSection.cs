@@ -51,5 +51,9 @@ namespace AcceptanceTests.PageObjects
         [FindsBy(How = How.CssSelector, Using = ".sidebar__nav .uploaderInputStream")]
         [CacheLookup]
         public IWebElement UploaderInputStreamLink;
+
+        [FindsBy(How = How.CssSelector, Using = ".sidebar__nav .res")]
+        [CacheLookup]
+        public IWebElement ReoLink;
     }
 }
