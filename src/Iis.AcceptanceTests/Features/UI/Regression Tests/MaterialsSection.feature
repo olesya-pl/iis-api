@@ -7,6 +7,7 @@ Feature: Materials - regression
 	- IIS-7445 - Change a material`s AccessLevel
 	- IIS-6470 - Sorting materials by source
 	- IIS-8238 - Hotkeys for audio rewind
+	- IIS-8441 - Display the length of the audio track
 
 Background:
 	Given I sign in with the user olya and password 123 in the Contour
@@ -184,3 +185,14 @@ Scenario: IIS-8238 - Hotkeys for audio rewind
 	When I clicked Ctrl and left arrow on the keyboard
 	Then I see that position of timeline changed
 	And I clicked Ctrl and right arrow on the keyboard
+
+	@regression @UI @Materials
+Scenario: IIS-8441 - Display the length of the audio track
+	When I navigated to Materials page
+	When I clicked search button in the Materials section
+	And I searched neizvesten-peregovory-po-racii.mp3 data in the materials
+	And I clicked on the material-type icon
+	Then I must see player controls panel with total time
+	When I clicked on the first material in the Materials list
+	Then I must see the length of the audio track
+	When I close the material card
