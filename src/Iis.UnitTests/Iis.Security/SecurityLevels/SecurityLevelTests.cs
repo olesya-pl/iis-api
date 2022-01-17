@@ -17,7 +17,6 @@ namespace Iis.UnitTests.Iis.Security.SecurityLevels
             Assert.Null(top.Parent);
             Assert.Empty(top.Children);
         }
-
         [Fact]
         public void ConstructorTest_WithChildren()
         {
