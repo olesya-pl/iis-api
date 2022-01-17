@@ -199,29 +199,59 @@ namespace AcceptanceTests.Features.UI.SanityTests
 #line 10
     this.FeatureBackground();
 #line hidden
+                TechTalk.SpecFlow.Table table9 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Field",
+                            "Value"});
+                table9.AddRow(new string[] {
+                            "FileName",
+                            "тестовий матеріал"});
+                table9.AddRow(new string[] {
+                            "SourceReliabilityText",
+                            "Здебільшого надійне"});
+                table9.AddRow(new string[] {
+                            "ReliabilityText",
+                            "Достовірна"});
+                table9.AddRow(new string[] {
+                            "Content",
+                            "таємний контент"});
+                table9.AddRow(new string[] {
+                            "AccessLevel",
+                            "0"});
+                table9.AddRow(new string[] {
+                            "LoadedBy",
+                            "автотест"});
+                table9.AddRow(new string[] {
+                            "MetaData",
+                            "{\"type\":\"document\",\"source\":\"contour.doc\"}"});
 #line 27
+        testRunner.Given("I upload a new docx material via API", ((string)(null)), table9, "Given ");
+#line hidden
+#line 36
         testRunner.When("I navigated to Materials page", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 28
+#line 37
         testRunner.And("I clicked search button in the Materials section", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 29
-        testRunner.And("I searched 130403-Project_Application_Guidelines.docx data in the materials", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 38
+        testRunner.And("I searched таємн data in the materials", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 30
+#line 39
         testRunner.And("I clicked on the first search result in the Materials section", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 31
+#line 40
         testRunner.And("I clicked on the ML tab in the material card", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 32
+#line 41
         testRunner.And("I pressed Show button to show Text classifier ML output", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 33
+#line 42
         testRunner.Then("I must see Text classifier ML output form", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 34
+#line 43
         testRunner.When("I close the material card", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+#line hidden
+#line 44
+        testRunner.And("I clean up uploaded material via API", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
             }
             this.ScenarioCleanup();
@@ -241,7 +271,7 @@ namespace AcceptanceTests.Features.UI.SanityTests
                     "MaterialsSanityUI"};
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("IIS-5837- Connect a material with an object of study from material", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
-#line 37
+#line 47
     this.ScenarioInitialize(scenarioInfo);
 #line hidden
             bool isScenarioIgnored = default(bool);
@@ -264,48 +294,78 @@ namespace AcceptanceTests.Features.UI.SanityTests
 #line 10
     this.FeatureBackground();
 #line hidden
-#line 38
+                TechTalk.SpecFlow.Table table10 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Field",
+                            "Value"});
+                table10.AddRow(new string[] {
+                            "FileName",
+                            "тестовий матеріал"});
+                table10.AddRow(new string[] {
+                            "SourceReliabilityText",
+                            "Здебільшого надійне"});
+                table10.AddRow(new string[] {
+                            "ReliabilityText",
+                            "Достовірна"});
+                table10.AddRow(new string[] {
+                            "Content",
+                            "таємний контент"});
+                table10.AddRow(new string[] {
+                            "AccessLevel",
+                            "0"});
+                table10.AddRow(new string[] {
+                            "LoadedBy",
+                            "автотест"});
+                table10.AddRow(new string[] {
+                            "MetaData",
+                            "{\"type\":\"document\",\"source\":\"contour.doc\"}"});
+#line 48
+         testRunner.Given("I upload a new docx material via API", ((string)(null)), table10, "Given ");
+#line hidden
+#line 57
         testRunner.When("I navigated to Materials page", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 39
+#line 58
         testRunner.And("I clicked search button in the Materials section", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 40
-        testRunner.And("I searched 130403-Project_Application_Guidelines.docx data in the materials", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 59
+        testRunner.And("I searched таємн data in the materials", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 41
+#line 60
         testRunner.And("I clicked on the first search result in the Materials section", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 42
+#line 61
         testRunner.And("I clicked on the relations tab in the material card", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 43
+#line 62
         testRunner.And("I enter Романов value in the search object field", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 44
-        testRunner.When("I clicked on the connected object", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+#line 63
+        testRunner.When("I clicked on the binded object", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 45
+#line 64
         testRunner.Then("I must see РОМАНОВ А.Г title of the object", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 46
+#line 65
         testRunner.When("I clicked Back button in the browser", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 47
+#line 66
         testRunner.And("I clicked on the relations tab in the material card", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 48
+#line 67
         testRunner.And("I clicked on the delete button to destroy relation between the material and the Р" +
                         "ОМАНОВ А.Г object", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 49
+#line 68
         testRunner.When("I pressed the confirm button", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 50
+#line 69
         testRunner.Then("I must not see the related РОМАНОВ А.Г object in the material", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 51
+#line 70
         testRunner.When("I close the material card", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+#line hidden
+#line 71
+        testRunner.And("I clean up uploaded material via API", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
             }
             this.ScenarioCleanup();
@@ -325,7 +385,7 @@ namespace AcceptanceTests.Features.UI.SanityTests
                     "MaterialsSanityUI"};
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("IIS-6363 - Search a material by keyword from the material", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
-#line 54
+#line 74
     this.ScenarioInitialize(scenarioInfo);
 #line hidden
             bool isScenarioIgnored = default(bool);
@@ -348,44 +408,47 @@ namespace AcceptanceTests.Features.UI.SanityTests
 #line 10
     this.FeatureBackground();
 #line hidden
-                TechTalk.SpecFlow.Table table4 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table11 = new TechTalk.SpecFlow.Table(new string[] {
                             "Field",
                             "Value"});
-                table4.AddRow(new string[] {
+                table11.AddRow(new string[] {
                             "FileName",
                             "тестовий матеріал"});
-                table4.AddRow(new string[] {
+                table11.AddRow(new string[] {
                             "SourceReliabilityText",
                             "Здебільшого надійне"});
-                table4.AddRow(new string[] {
+                table11.AddRow(new string[] {
                             "ReliabilityText",
                             "Достовірна"});
-                table4.AddRow(new string[] {
+                table11.AddRow(new string[] {
                             "Content",
                             "таємний контент"});
-                table4.AddRow(new string[] {
+                table11.AddRow(new string[] {
                             "AccessLevel",
                             "0"});
-                table4.AddRow(new string[] {
+                table11.AddRow(new string[] {
                             "LoadedBy",
                             "автотест"});
-                table4.AddRow(new string[] {
+                table11.AddRow(new string[] {
                             "MetaData",
                             "{\"type\":\"document\",\"source\":\"contour.doc\"}"});
-#line 55
-        testRunner.Given("I upload a new docx material via API", ((string)(null)), table4, "Given ");
+#line 75
+        testRunner.Given("I upload a new docx material via API", ((string)(null)), table11, "Given ");
 #line hidden
-#line 64
+#line 84
  testRunner.When("I navigated to Materials page", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 65
+#line 85
  testRunner.And("I clicked search button in the Materials section", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 66
+#line 86
  testRunner.And("I searched таємн data in the materials", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 67
+#line 87
     testRunner.Then("I must see a material that contains таємн word in the Materials search result", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 88
+    testRunner.When("I clean up uploaded material via API", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
             }
             this.ScenarioCleanup();
@@ -405,7 +468,7 @@ namespace AcceptanceTests.Features.UI.SanityTests
                     "MaterialsSanityUI"};
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("IIS-8102 - Go to Events page from the material", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
-#line 70
+#line 92
     this.ScenarioInitialize(scenarioInfo);
 #line hidden
             bool isScenarioIgnored = default(bool);
@@ -428,50 +491,53 @@ namespace AcceptanceTests.Features.UI.SanityTests
 #line 10
     this.FeatureBackground();
 #line hidden
-                TechTalk.SpecFlow.Table table5 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table12 = new TechTalk.SpecFlow.Table(new string[] {
                             "Field",
                             "Value"});
-                table5.AddRow(new string[] {
+                table12.AddRow(new string[] {
                             "FileName",
                             "тестовий матеріал"});
-                table5.AddRow(new string[] {
+                table12.AddRow(new string[] {
                             "SourceReliabilityText",
                             "Здебільшого надійне"});
-                table5.AddRow(new string[] {
+                table12.AddRow(new string[] {
                             "ReliabilityText",
                             "Достовірна"});
-                table5.AddRow(new string[] {
+                table12.AddRow(new string[] {
                             "Content",
                             "таємний контент"});
-                table5.AddRow(new string[] {
+                table12.AddRow(new string[] {
                             "AccessLevel",
                             "0"});
-                table5.AddRow(new string[] {
+                table12.AddRow(new string[] {
                             "LoadedBy",
                             "автотест"});
-                table5.AddRow(new string[] {
+                table12.AddRow(new string[] {
                             "MetaData",
                             "{\"type\":\"document\",\"source\":\"contour.doc\"}"});
-#line 71
-        testRunner.Given("I upload a new docx material via API", ((string)(null)), table5, "Given ");
+#line 93
+        testRunner.Given("I upload a new docx material via API", ((string)(null)), table12, "Given ");
 #line hidden
-#line 80
+#line 102
  testRunner.When("I navigated to Materials page", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 81
+#line 103
  testRunner.And("I clicked search button in the Materials section", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 82
+#line 104
  testRunner.And("I searched таємн data in the materials", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 83
+#line 105
     testRunner.And("I clicked on the first material in the Materials list", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 84
+#line 106
     testRunner.When("I clicked on the Events section", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 85
+#line 107
  testRunner.Then("I must see first event in the events list", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 108
+    testRunner.When("I clean up uploaded material via API", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
             }
             this.ScenarioCleanup();
@@ -491,7 +557,7 @@ namespace AcceptanceTests.Features.UI.SanityTests
                     "MaterialsSanityUI"};
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("IIS-8105 - Go to Report page from the material", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
-#line 89
+#line 112
     this.ScenarioInitialize(scenarioInfo);
 #line hidden
             bool isScenarioIgnored = default(bool);
@@ -514,50 +580,53 @@ namespace AcceptanceTests.Features.UI.SanityTests
 #line 10
     this.FeatureBackground();
 #line hidden
-                TechTalk.SpecFlow.Table table6 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table13 = new TechTalk.SpecFlow.Table(new string[] {
                             "Field",
                             "Value"});
-                table6.AddRow(new string[] {
+                table13.AddRow(new string[] {
                             "FileName",
                             "тестовий матеріал"});
-                table6.AddRow(new string[] {
+                table13.AddRow(new string[] {
                             "SourceReliabilityText",
                             "Здебільшого надійне"});
-                table6.AddRow(new string[] {
+                table13.AddRow(new string[] {
                             "ReliabilityText",
                             "Достовірна"});
-                table6.AddRow(new string[] {
+                table13.AddRow(new string[] {
                             "Content",
                             "таємний контент"});
-                table6.AddRow(new string[] {
+                table13.AddRow(new string[] {
                             "AccessLevel",
                             "0"});
-                table6.AddRow(new string[] {
+                table13.AddRow(new string[] {
                             "LoadedBy",
                             "автотест"});
-                table6.AddRow(new string[] {
+                table13.AddRow(new string[] {
                             "MetaData",
                             "{\"type\":\"document\",\"source\":\"contour.doc\"}"});
-#line 90
-        testRunner.Given("I upload a new docx material via API", ((string)(null)), table6, "Given ");
+#line 113
+        testRunner.Given("I upload a new docx material via API", ((string)(null)), table13, "Given ");
 #line hidden
-#line 99
+#line 122
  testRunner.When("I navigated to Materials page", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 100
+#line 123
  testRunner.And("I clicked search button in the Materials section", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 101
+#line 124
  testRunner.And("I searched таємн data in the materials", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 102
+#line 125
     testRunner.And("I clicked on the first material in the Materials list", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 103
+#line 126
     testRunner.When("I navigated to Report section", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 104
+#line 127
  testRunner.Then("I must see first report in the report list", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 128
+    testRunner.When("I clean up uploaded material via API", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
             }
             this.ScenarioCleanup();

@@ -340,6 +340,12 @@ namespace AcceptanceTests.UISteps
             driver.WaitFor(5);
         }
 
+        [When(@"I clicked on the material-type icon")]
+        public void WhenIClickedOnTheMaterialTypeIcon()
+        {
+            materialsSectionPage.MaterialTypeIcon.Click();
+            driver.WaitFor(2);
+        }
 
         #endregion When
 
@@ -552,6 +558,19 @@ namespace AcceptanceTests.UISteps
         {
             materialsSectionPage.TextField.SendKeys(Keys.Control + Keys.ArrowRight + Keys.Control + Keys.ArrowRight);
             driver.WaitFor(2);
+        }
+
+        [Then(@"I must see the length of the audio track")]
+        public void ThenIMustSeeTheLengthOfTheAudioTrack()
+        {
+            driver.WaitFor(5);
+            Assert.True(materialsSectionPage.LengthAudioTrack.Displayed);
+        }
+
+        [Then(@"I must see player controls panel with total time")]
+        public void ThenIMustSeePlayerControlsPanelWithTotalTime()
+        {
+            Assert.True(materialsSectionPage.PlayerControlsPanelWithTotalTime.Displayed);
         }
         #endregion
     }

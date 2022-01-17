@@ -205,5 +205,17 @@ namespace AcceptanceTests.PageObjects
             Actions actions = new Actions(driver);
             actions.Click(PauseButton).Perform();
         }
-     }
+
+        [FindsBy(How = How.XPath, Using = "//div[@class='material__viewer']//div[@class='wavesurfer__instance-wrapper']//div[@class='wave-timeline__overview']")]
+        public IWebElement LengthAudioTrack;
+
+        [FindsBy(How = How.XPath, Using = "//div[@class='p-datatable-scrollable-body']//tr[1]//div[@class='material-type material-type--hoverable']")]
+        public IWebElement MaterialTypeIcon;
+
+        [FindsBy(How = How.XPath, Using = "//div[@class='p-datatable-scrollable-body']//div[@class='audio-player wavesurfer']")]
+        public IWebElement AudioPlayer;
+
+        [FindsBy(How = How.XPath, Using = "//div[@class='p-datatable-scrollable-body']//div[@class='player']//div[@class='player__controls-panel']//*[@class='player__timer-total']")]
+        public IWebElement PlayerControlsPanelWithTotalTime;
+    }
 }
