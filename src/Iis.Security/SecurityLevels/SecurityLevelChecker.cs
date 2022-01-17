@@ -85,7 +85,5 @@ namespace Iis.Security.SecurityLevels
 
         private IReadOnlyList<SecurityLevel> GetAllAccessibleLevels(IReadOnlyList<SecurityLevel> baseItems) =>
             _rootLevel.GetAllItems().Where(_ => AccessGranted(baseItems, _)).ToList();
-
-
     }
 }
