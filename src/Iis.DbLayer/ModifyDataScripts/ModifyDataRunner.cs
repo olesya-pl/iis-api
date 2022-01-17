@@ -52,8 +52,8 @@ namespace Iis.DbLayer.ModifyDataScripts
             _items.Add("ClosePersinMultiple", actions.ClosePersinMultiple);
             _items.Add("MaterialChannel", actions.MaterialChannel);
             _items.Add("SetupObjectImportanceSortOrder", actions.SetupObjectImportanceSortOrder);
-            _items.Add("AddSecurityLevels", actions.AddSecurityLevels);
-            _items.Add("AddSecurityLevelsData", actions.AddSecurityLevelsData);
+            //_items.Add("AddSecurityLevels", actions.AddSecurityLevels);
+            //_items.Add("AddSecurityLevelsData", actions.AddSecurityLevelsData);
         }
         public bool Run()
         {
