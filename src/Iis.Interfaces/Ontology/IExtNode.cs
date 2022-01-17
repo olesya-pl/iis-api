@@ -14,6 +14,7 @@ namespace Iis.Interfaces.Ontology
         object AttributeValue { get; }
         ScalarType? ScalarType { get; }
         int? AccessLevel { get; }
+        string SecurityLevels { get; }
         DateTime CreatedAt { get; }
         DateTime UpdatedAt { get; }
         IReadOnlyList<IExtNode> Children { get; }

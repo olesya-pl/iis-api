@@ -2,6 +2,7 @@
 using Iis.Interfaces.Ontology;
 using Iis.Interfaces.Ontology.Data;
 using Iis.Interfaces.Ontology.Schema;
+using Iis.Interfaces.SecurityLevels;
 using Iis.Utility;
 
 using Newtonsoft.Json.Linq;
@@ -16,6 +17,12 @@ namespace Iis.DbLayer.Ontology.EntityFramework
     public class ExtNodeService: IExtNodeService
     {
         private readonly IReadOnlyCollection<string> _filterNodeTypeNames = new [] {"__title", "title", "lastConfirmedAt"};
+        private readonly ISecurityLevelChecker _securityLevelChecker;
+
+        public ExtNodeService(ISecurityLevelChecker securityLevelChecker)
+        {
+            _securityLevelChecker = securityLevelChecker;
+        }
 
         public IExtNode GetExtNode(INode node)
         {
@@ -150,7 +157,8 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                 NodeTypeTitle = nodeTypeTitle,
                 CreatedAt = node.CreatedAt,
                 UpdatedAt = node.UpdatedAt,
-                AccessLevel = node.NodeType.IsObject ? node.GetAccessLevelIndex() : (int?)null
+                AccessLevel = node.NodeType.IsObject ? node.GetAccessLevelIndex() : (int?)null,
+                SecurityLevels = _securityLevelChecker.GetStringCode(false, node.GetSecurityLevelIndexes())
             };
         }
 

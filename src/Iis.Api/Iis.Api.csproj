@@ -21,6 +21,16 @@
     <None Remove="Logs\**" />
   </ItemGroup>
 
+
+	<ItemGroup>
+	  <None Remove="data\elastic\SecurityLevelFilter.painless" />
+	</ItemGroup>
+
+
+	<ItemGroup>
+	  <Content Include="data\elastic\SecurityLevelFilter.painless" />
+	</ItemGroup>
+
   <ItemGroup>
     <None Include="..\..\scripts\script-find-wrongValue-PropertyName.sql" Link="data\scripts\script-find-wrongValue-PropertyName.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
@@ -85,6 +95,7 @@
     <ProjectReference Include="..\Iis.OntologyData\Iis.OntologyData.csproj" />
     <ProjectReference Include="..\Iis.OntologySchema.Saver\Iis.OntologySchema.Saver.csproj" />
     <ProjectReference Include="..\Iis.OntologySchema\Iis.OntologySchema.csproj" />
+    <ProjectReference Include="..\Iis.Security\Iis.Security.csproj" />
     <ProjectReference Include="..\Iis.Services\Iis.Services.csproj" />
     <ProjectReference Include="..\Iis.Services.Contracts\Iis.Services.Contracts.csproj" />
     <ProjectReference Include="..\Iis.Utility\Iis.Utility.csproj" />

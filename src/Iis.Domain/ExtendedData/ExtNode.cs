@@ -1,5 +1,6 @@
 ﻿using Iis.Interfaces.Ontology;
 using Iis.Interfaces.Ontology.Schema;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
@@ -16,6 +17,7 @@ namespace Iis.Domain.ExtendedData
         public string NodeTypeTitle { get; set; }
         public string EntityTypeName { get; set; }
         public object AttributeValue { get; set; }
+        public string SecurityLevels { get; set; }
         public ScalarType? ScalarType { get; set; }
         public int? AccessLevel { get; set; }
         public DateTime CreatedAt { get; set; }

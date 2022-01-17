@@ -14,6 +14,8 @@ using Iis.Elastic.SearchResult;
 using Iis.Elastic.ElasticMappingProperties;
 using Iis.Elastic.SearchQueryExtensions;
 using Newtonsoft.Json;
+using System.IO;
+using System.Text.RegularExpressions;
 
 namespace Iis.Elastic
 {
@@ -284,6 +286,7 @@ namespace Iis.Elastic
             mappingConfiguration.Properties.Add(AliasProperty.Create(ElasticConfigConstants.NodeTypeTitleAlias, ElasticConfigConstants.NodeTypeTitleAggregateField));
             mappingConfiguration.Properties.Add(DateProperty.Create(ElasticConfigConstants.CreatedAtField, ElasticConfiguration.DefaultDateFormats));
             mappingConfiguration.Properties.Add(DateProperty.Create(ElasticConfigConstants.UpdatedAtField, ElasticConfiguration.DefaultDateFormats));
+            mappingConfiguration.Properties.Add(KeywordProperty.Create(ElasticConfigConstants.SecurityLevelsField, true));
 
             var indexUrl = GetRealIndexName(attributesList.EntityTypeName);
             var jObject = mappingConfiguration.ToJObject();
@@ -374,6 +377,10 @@ namespace Iis.Elastic
                 string accessLevelFieldName)> parameters,
             CancellationToken cancellationToken)
         {
+            var sectionBaseText = File.ReadAllText(@"data\elastic\RoleIndexSection.json");
+            var scriptBaseText = File.ReadAllText(@"data\elastic\SecurityLevelFilter.painless");
+            var scriptText = Regex.Replace(scriptBaseText, @"\s+", " ");
+            var sectionText = sectionBaseText.Replace("{SCRIPT}", scriptText, StringComparison.Ordinal);
             var settings = new StringBuilder("{\"indices\": [");
             for (int i = 0; i < parameters.Count; i++)
             {
@@ -382,16 +389,7 @@ namespace Iis.Elastic
 
                 var stringifiedIndexes = string.Join(',', param.indexNames.Select(p => $"\"{GetRealIndexName(p)}\""));
                 settings.AppendLine();
-                var indexSection = $@"
-{{
-    ""names"": [{stringifiedIndexes}],
-    ""privileges"": [""read""],
-    ""query"": {{
-        ""template"": {{
-            ""source"": ""{{\""bool\"":{{\""filter\"":[{{\""range\"":{{\""{param.accessLevelFieldName}\"":{{\""lte\"":\""{{{{_user.metadata.accessLevel}}}}\""}}}}}}]}}}}""
-        }}
-    }}
-}}";
+                var indexSection = sectionText.Replace("{NAMES}", stringifiedIndexes, StringComparison.Ordinal);
                 settings.AppendLine(indexSection);
             }
             settings.AppendLine("]}");

@@ -27,6 +27,7 @@ using Iis.Services.Contracts.Extensions;
 using Microsoft.Extensions.Logging;
 using Iis.Services.Contracts.ExternalUserServices;
 using Iis.Interfaces.Elastic;
+using Iis.Interfaces.SecurityLevels;
 
 namespace Iis.Services
 {
@@ -42,6 +43,7 @@ namespace Iis.Services
         private IConfiguration _configuration;
         private IExternalUserService _externalUserService;
         private IMatrixService _matrixService;
+        private ISecurityLevelChecker _securityLevelChecker;
 
         public UserService(
             ILogger<UserService<TUnitOfWork>> logger,
@@ -52,7 +54,8 @@ namespace Iis.Services
             IUnitOfWorkFactory<TUnitOfWork> unitOfWorkFactory,
             IConfiguration configuration,
             IExternalUserService externalUserService,
-            IMatrixService matrixService) : base(unitOfWorkFactory)
+            IMatrixService matrixService,
+            ISecurityLevelChecker securityLevelChecker) : base(unitOfWorkFactory)
         {
             _logger = logger;
             _context = context;
@@ -62,6 +65,7 @@ namespace Iis.Services
             _configuration = configuration;
             _externalUserService = externalUserService;
             _matrixService = matrixService;
+            _securityLevelChecker = securityLevelChecker;
         }
 
         public async Task<Guid> CreateUserAsync(User newUser)
@@ -164,6 +168,8 @@ namespace Iis.Services
             await _context.SaveChangesAsync(cancellationToken);
 
             var elasticUser = _mapper.Map<ElasticUserDto>(userEntity);
+            var securityLevels = _securityLevelChecker.GetSecurityLevels(userEntity.SecurityLevels.Select(_ => _.Id).ToList());
+            elasticUser.Metadata.SecurityLevels = _securityLevelChecker.GetStringCode(true, securityLevels.Select(_ => _.UniqueIndex).ToList());
             await _userElasticService.SaveUserAsync(elasticUser, cancellationToken);
 
             return userEntity.Id;

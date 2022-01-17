@@ -6,6 +6,7 @@ using Iis.DbLayer.Ontology.EntityFramework;
 using Iis.DbLayer.Repositories;
 using Iis.Interfaces.Ontology.Data;
 using Iis.Interfaces.Ontology.Schema;
+using Iis.Interfaces.SecurityLevels;
 using Iis.OntologyData.DataTypes;
 using Iis.Utility;
 
@@ -40,7 +41,7 @@ namespace Iis.UnitTests.Iis.DbLayer
             nodeMock.Setup(e => e.OutgoingRelations).Returns(new List<RelationData>());
 
             //act
-            var sut = new ExtNodeService();
+            var sut = GetExtNodeService();
             var res = sut.GetExtNode(nodeMock.Object);
 
             //assert
@@ -70,7 +71,7 @@ namespace Iis.UnitTests.Iis.DbLayer
             nodeMock.Setup(e => e.OutgoingRelations).Returns(new List<RelationData>());
 
             //act
-            var sut = new ExtNodeService();
+            var sut = GetExtNodeService();
             var res = sut.GetExtNode(nodeMock.Object);
 
             //assert
@@ -100,7 +101,7 @@ namespace Iis.UnitTests.Iis.DbLayer
             nodeMock.Setup(e => e.OutgoingRelations).Returns(new List<RelationData>());
 
             //act
-            var sut = new ExtNodeService();
+            var sut = GetExtNodeService();
             var res = sut.GetExtNode(nodeMock.Object);
 
             //assert
@@ -130,7 +131,7 @@ namespace Iis.UnitTests.Iis.DbLayer
             nodeMock.Setup(e => e.OutgoingRelations).Returns(new List<RelationData>());
 
             //act
-            var sut = new ExtNodeService();
+            var sut = GetExtNodeService();
             var res = sut.GetExtNode(nodeMock.Object);
 
             //assert
@@ -160,7 +161,7 @@ namespace Iis.UnitTests.Iis.DbLayer
             nodeMock.Setup(e => e.OutgoingRelations).Returns(new List<RelationData>());
 
             //act
-            var sut = new ExtNodeService();
+            var sut = GetExtNodeService();
             var res = sut.GetExtNode(nodeMock.Object);
 
             //assert
@@ -190,7 +191,7 @@ namespace Iis.UnitTests.Iis.DbLayer
             nodeMock.Setup(e => e.OutgoingRelations).Returns(new List<RelationData>());
 
             //act
-            var sut = new ExtNodeService();
+            var sut = GetExtNodeService();
             var res = sut.GetExtNode(nodeMock.Object);
 
             //assert
@@ -198,6 +199,13 @@ namespace Iis.UnitTests.Iis.DbLayer
             var lte = res.AttributeValue.GetType().GetProperty("lte").GetValue(res.AttributeValue, null);
             Assert.Equal(minValue.ToString(), gte.ToString());
             Assert.Equal(maxValue.ToString(), lte.ToString());
+        }
+
+        private ExtNodeService GetExtNodeService()
+        {
+            var securityLevelChecker = new Mock<ISecurityLevelChecker>();
+            securityLevelChecker.Setup(_ => _.GetStringCode(It.IsAny<bool>(), It.IsAny<IReadOnlyList<int>>())).Returns(string.Empty);
+            return new ExtNodeService(securityLevelChecker.Object);
         }
     }
 }

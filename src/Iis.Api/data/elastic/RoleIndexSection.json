@@ -1,0 +1,18 @@
+{
+  "names": [ {NAMES} ],
+  "privileges": [ "read" ],
+  "query": {
+    "template": {
+      "source": {
+        "bool": {
+          "filter": {
+            "script": {
+              "script": "{SCRIPT}"
+            }
+          }
+        }
+      }
+
+    }
+  }
+}

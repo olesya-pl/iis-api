@@ -5,11 +5,12 @@
         ObjectOfStudy,
         FuzzyDate,
         ObjectSign,
-        Event, 
+        Event,
         Enum,
         Wiki,
         Object,
         AccessLevel,
-        Photo
+        Photo,
+        SecurityLevel
     }
 }

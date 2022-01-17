@@ -59,9 +59,9 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             if (property == null) throw new Exception($"Property does not exist: {EntityTypeNames.Event}.{propertyName}");
 
             var node = _data.GetNode(entityId);
-            var events = node.IncomingRelations
+            var events = node?.IncomingRelations
                 .Where(r => r.Node.NodeTypeId == property.Id)
-                .Select(r => r.SourceNode);
+                .Select(r => r.SourceNode) ?? new List<INode>();
             return events;
         }
 

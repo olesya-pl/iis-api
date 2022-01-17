@@ -1,0 +1,25 @@
+if (doc['__securityLevels.keyword'].size() == 0) return true;
+String userAccess = ';{{_user.metadata.securityLevels}};';
+String docAccess = doc['__securityLevels.keyword'][0];
+docAccess = docAccess + ';';
+ 
+while (docAccess != '') {
+    String docSingleAccess = docAccess.substring(0, docAccess.indexOf(';'));
+    String groupId = docSingleAccess.substring(0, docSingleAccess.indexOf(':'));
+    String docAccessIds = docSingleAccess.substring(docSingleAccess.indexOf(':') + 1) + ',';
+    int n = userAccess.indexOf(';' + groupId + ':');
+    if (n == -1) return false;
+    int semicolon = userAccess.indexOf(':', n + 1);
+    int next = userAccess.indexOf(';', n+1);
+    String userAccessIds = ',' + userAccess.substring(semicolon + 1, next - 1) + ',';
+    boolean found = false;
+    while (!found && docAccessIds != '') {
+        int k = docAccessIds.indexOf(',');
+        String accessId = ',' + docAccessIds.substring(0, k) + ',';
+        if (userAccessIds.indexOf(accessId) > -1) found = true;
+        if (!found) docAccessIds = docAccessIds.substring(k + 1);
+    }
+    if (!found) return false;
+    docAccess = docAccess.substring(docAccess.indexOf(';') + 1);
+}
+return true;

@@ -200,6 +200,7 @@ namespace Iis.OntologyData.DataTypes
             }
             return value;
         }
+
         public string GetComputedValue(string name)
         {
             var computedRelationType = NodeType.GetComputedRelationTypes().Where(rt => rt.NodeType.Name == name).SingleOrDefault();
@@ -298,6 +299,12 @@ namespace Iis.OntologyData.DataTypes
             var node = GetSingleProperty("accessLevel.numericIndex");
             return node?.Value == null ? 0 : int.Parse(node?.Value);
         }
+
+        public IReadOnlyList<int> GetSecurityLevelIndexes() =>
+            _outgoingRelations
+            .Where(_ => _.Node.NodeType.Name == OntologyNames.SecurityLevelField)
+            .Select(_ => int.Parse(_.TargetNode.GetSingleDirectProperty(OntologyNames.UniqueIndexField).Value))
+            .ToList();
         private object ResolveSingleFormula(string formula)
         {
             var replaced = ReplaceVariables(formula);

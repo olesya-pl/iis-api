@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Iis.Interfaces.Enums;
 using Iis.Interfaces.Roles;
+using Iis.Interfaces.SecurityLevels;
 using Iis.Interfaces.Users;
 
 namespace Iis.Domain.Users
@@ -22,6 +23,7 @@ namespace Iis.Domain.Users
         public int AccessLevel { get; set; }
         public UserSource Source { get; set; }
         public IEnumerable<Role> Roles { get; set; } = new List<Role>();
+        public IReadOnlyList<ISecurityLevel> SecurityLevels { get; set; } = new List<ISecurityLevel>();
         public AccessGrantedList AccessGrantedItems { get; set; } = new AccessGrantedList();
         public List<AccessGranted> Tabs => AccessGrantedItems.Where(ag => ag.Category == AccessCategory.Tab).ToList();
         public List<AccessGranted> Entities => AccessGrantedItems.Where(ag => ag.Category == AccessCategory.Entity).ToList();
