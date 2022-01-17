@@ -1,9 +1,9 @@
 ﻿using System;
 using AutoMapper;
 using Iis.DataModel.Materials;
-using Iis.DbLayer.Repositories;
 using Iis.Domain;
 using Iis.Domain.Materials;
+using Iis.Elastic.Entities;
 using Iis.Interfaces.Ontology.Schema;
 using Iis.Services;
 using IIS.Services.Materials;
@@ -31,7 +31,7 @@ namespace Iis.UnitTests.Materials
         {
             //arrange
             document.Editor = null;
-            document.ProcessedStatus = new DbLayer.Repositories.MaterialSign { Id = MaterialEntity.ProcessingStatusNotProcessedSignId };
+            document.ProcessedStatus = new Elastic.Entities.MaterialSign { Id = MaterialEntity.ProcessingStatusNotProcessedSignId };
 
             var mapperMock = new Mock<IMapper>();
             mapperMock.Setup(e => e.Map<Material>(document)).Returns(material);
@@ -50,7 +50,7 @@ namespace Iis.UnitTests.Materials
         {
             //arrange
             document.Editor = new Editor { Id = otherUserId };
-            document.ProcessedStatus = new DbLayer.Repositories.MaterialSign { Id = MaterialEntity.ProcessingStatusNotProcessedSignId };
+            document.ProcessedStatus = new Elastic.Entities.MaterialSign { Id = MaterialEntity.ProcessingStatusNotProcessedSignId };
 
             var mapperMock = new Mock<IMapper>();
             mapperMock.Setup(e => e.Map<Material>(document)).Returns(material);
@@ -69,7 +69,7 @@ namespace Iis.UnitTests.Materials
         {
             //arrange
             document.Editor = new Editor { Id = userId };
-            document.ProcessedStatus = new DbLayer.Repositories.MaterialSign { Id = MaterialEntity.ProcessingStatusNotProcessedSignId };
+            document.ProcessedStatus = new Elastic.Entities.MaterialSign { Id = MaterialEntity.ProcessingStatusNotProcessedSignId };
 
             var mapperMock = new Mock<IMapper>();
             mapperMock.Setup(e => e.Map<Material>(document)).Returns(material);
@@ -88,7 +88,7 @@ namespace Iis.UnitTests.Materials
         {
             //arrange
             document.Editor = null;
-            document.ProcessedStatus = new DbLayer.Repositories.MaterialSign { Id = MaterialEntity.ProcessingStatusProcessingSignId };
+            document.ProcessedStatus = new Elastic.Entities.MaterialSign { Id = MaterialEntity.ProcessingStatusProcessingSignId };
 
             var mapperMock = new Mock<IMapper>();
             mapperMock.Setup(e => e.Map<Material>(document)).Returns(material);
@@ -107,7 +107,7 @@ namespace Iis.UnitTests.Materials
         {
             //arrange
             document.Editor = new Editor { Id = otherUserId };
-            document.ProcessedStatus = new DbLayer.Repositories.MaterialSign { Id = MaterialEntity.ProcessingStatusProcessingSignId };
+            document.ProcessedStatus = new Elastic.Entities.MaterialSign { Id = MaterialEntity.ProcessingStatusProcessingSignId };
 
             var mapperMock = new Mock<IMapper>();
             mapperMock.Setup(e => e.Map<Material>(document)).Returns(material);
@@ -126,7 +126,7 @@ namespace Iis.UnitTests.Materials
         {
             //arrange
             document.Editor = new Editor { Id = userId };
-            document.ProcessedStatus = new DbLayer.Repositories.MaterialSign { Id = MaterialEntity.ProcessingStatusProcessingSignId };
+            document.ProcessedStatus = new Elastic.Entities.MaterialSign { Id = MaterialEntity.ProcessingStatusProcessingSignId };
 
             var mapperMock = new Mock<IMapper>();
             mapperMock.Setup(e => e.Map<Material>(document)).Returns(material);

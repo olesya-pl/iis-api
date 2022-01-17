@@ -20,6 +20,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Iis.Domain\Iis.Domain.csproj" />
+    <ProjectReference Include="..\Iis.Elastic\Iis.Elastic.csproj" />
     <ProjectReference Include="..\Iis.Interfaces\Iis.Interfaces.csproj" />
     <ProjectReference Include="..\Iis.RabbitMq\Iis.RabbitMq.csproj" />
   </ItemGroup>

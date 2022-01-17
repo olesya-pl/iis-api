@@ -47,7 +47,7 @@ namespace IIS.Services.Contracts.Interfaces
             SortingParams sorting,
             CancellationToken ct = default);
         Task<Dictionary<Guid, int>> CountMaterialsByNodeIdSetAsync(ISet<Guid> nodeIdSet, Guid userId, CancellationToken cancellationToken);
-        Task<List<MaterialsCountByType>> CountMaterialsByTypeAndNodeAsync(Guid nodeId);
+        Task<IReadOnlyCollection<MaterialsCountByType>> CountMaterialsByTypeAndNodeAsync(Guid nodeId, Guid userId, CancellationToken cancellationToken = default);
         Task<(List<Material> Materials, int Count)> GetMaterialsByAssigneeIdAsync(Guid assigneeId);
         Task<(IEnumerable<Material> Materials,  int Count)> GetMaterialsLikeThisAsync(Guid userId, Guid materialId, PaginationParams page, SortingParams sorting);
         Task<bool> MaterialExists(Guid materialId);

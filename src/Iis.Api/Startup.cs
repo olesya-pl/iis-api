@@ -272,10 +272,10 @@ namespace IIS.Core
             services.RegisterMqFactory(Configuration, out string mqConnectionString)
                     .RegisterMaterialEventServices(Configuration);
 
-            ElasticConfiguration elasticConfiguration = Configuration.GetSection("elasticSearch").Get<ElasticConfiguration>();
+            services.RegisterElasticManager(Configuration, out ElasticConfiguration elasticConfiguration);
+
             var maxOperatorsConfig = Configuration.GetSection("maxMaterialsPerOperator").Get<MaxMaterialsPerOperatorConfig>();
             services.AddSingleton(maxOperatorsConfig);
-
             services.RegisterFlightRadarServices(Configuration);
 
             if (enableContext)
@@ -289,7 +289,6 @@ namespace IIS.Core
             }
 
             services.AddTransient<IElasticSerializer, ElasticSerializer>();
-            services.AddSingleton(elasticConfiguration);
             services.AddTransient<IIisElasticConfigService, IisElasticConfigService<IIISUnitOfWork>>();
 
             services.AddTransient<IAutocompleteService, AutocompleteService>();
@@ -314,7 +313,6 @@ namespace IIS.Core
             services.AddTransient<GraphQLAccessList>();
 
             services.RegisterRepositories();
-            services.RegisterElasticModules();
             services.AddMediatR(typeof(ReportEventHandler));
             services.AddTransient<ModifyDataRunner>();
             services.RegisterEventMaterialAutoAssignment(Configuration);

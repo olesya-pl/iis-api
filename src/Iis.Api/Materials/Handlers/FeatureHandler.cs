@@ -138,7 +138,7 @@ namespace Iis.Api.Materials.Handlers
 
             foreach (JObject feature in features)
             {
-                var featureId = feature.GetValue(FeatureFields.featureId)?.Value<string>();
+                var featureId = feature.GetValue(FeatureFields.FeatureId)?.Value<string>();
 
                 if (string.IsNullOrWhiteSpace(featureId)) continue;
 

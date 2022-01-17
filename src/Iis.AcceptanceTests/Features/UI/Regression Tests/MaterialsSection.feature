@@ -6,6 +6,7 @@ Feature: Materials - regression
     - IIS-6051 - Ability to connect the material to an event from a material
 	- IIS-7445 - Change a material`s AccessLevel
 	- IIS-6470 - Sorting materials by source
+	- IIS-8238 - Hotkeys for audio rewind
 
 Background:
 	Given I sign in with the user olya and password 123 in the Contour
@@ -170,3 +171,16 @@ Scenario: IIS-6470 - Sorting materials by source
 		When I clicked arrow for sorting by source
 		Then I must see materials sorted by source sorting: null
 		When I clean up uploaded material via API
+
+@regression @UI @Material @upload
+Scenario: IIS-8238 - Hotkeys for audio rewind
+	When I navigated to Materials page
+	Then I clicked on the type`s filter audio
+	When I clicked search button in the Materials section
+	And I searched neizvesten-peregovory-po-racii.mp3 data in the materials
+	And I clicked on the first material in the Materials list
+	And I clicked pause button
+	Then I cliced on the text field
+	When I clicked Ctrl and left arrow on the keyboard
+	Then I see that position of timeline changed
+	And I clicked Ctrl and right arrow on the keyboard

@@ -8,16 +8,16 @@ using TechTalk.SpecFlow;
 using TechTalk.SpecFlow.Assist;
 using Xunit;
 
+
 namespace AcceptanceTests.UISteps
 {
     [Binding]
     public class MaterialsSteps
     {
-        private readonly IWebDriver driver;
+        private IWebDriver driver;
         private readonly ScenarioContext context;
         private readonly MaterialsSectionPage materialsSectionPage;
         private readonly NavigationSection navigationSection;
-       
 
         public MaterialsSteps(ScenarioContext injectedContext, IWebDriver driver)
         {
@@ -41,7 +41,7 @@ namespace AcceptanceTests.UISteps
         {
             driver.WaitFor(2);
             materialsSectionPage.FirstMaterialInTheMaterialsList.Click();
-            driver.WaitFor(1);
+            driver.WaitFor(2);
         }
 
         [When(@"I clicked on the relations tab in the material card")]
@@ -151,7 +151,6 @@ namespace AcceptanceTests.UISteps
             materialsSectionPage.MaterialPage.SourceCredibilityDropDown.Select(sourceCredibility);
         }
 
-
         [When(@"I pressed Processed button")]
         public void WhenIPressProcessedButton()
         {
@@ -222,7 +221,6 @@ namespace AcceptanceTests.UISteps
             var eventToUnlink = materialsSectionPage.GetItemTitleRelatedToMaterial(eventUniqueName);
             eventToUnlink.DeleteRelation();
         }
-
 
         [When(@"I refreshed the page in the browser")]
         public void WhenIRefreshedThePageInTheBrowser()
@@ -296,7 +294,6 @@ namespace AcceptanceTests.UISteps
             materialsSectionPage.ObjectsSearchTextBox.SendKeys(Keys.Enter);
             driver.WaitFor(2);
             materialsSectionPage.ObjectsSearchTextBox.SendKeys(Keys.Escape);
-            
         }
 
         [When(@"I pressed the save changes button")]
@@ -318,6 +315,21 @@ namespace AcceptanceTests.UISteps
             materialsSectionPage.SourceSortable.Click();
             driver.WaitFor(2);
         }
+
+        [When(@"I clicked Ctrl and left arrow on the keyboard")]
+        public void WhenIClickedCtrlAndLeftArrowOnTheKeyboard()
+        {
+            materialsSectionPage.TextField.SendKeys(Keys.Control + Keys.ArrowLeft + Keys.Control + Keys.ArrowLeft);
+            driver.WaitFor(2);
+        }
+
+        [When(@"I clicked pause button")]
+        public void WhenIClickedPauseButton()
+        {
+            materialsSectionPage.ClickPauseButton();
+            driver.WaitFor(5);
+        }
+
 
         #endregion When
 
@@ -414,13 +426,6 @@ namespace AcceptanceTests.UISteps
             Assert.Equal(expectedValue, actualValue);
         }
 
-        //[Then(@"I must see that the session priority value must be set to the (.*) value")]
-        //public void ThenIMustSeeThatTheSessionPriorityValueMustBeSetToTheValue(string expectedValue)
-        //{
-        //    var actualValue = materialsSectionPage.MaterialPage.SessionPriorityDropDown.Text;
-        //    Assert.Equal(expectedValue, actualValue);
-        //}
-
         [Then(@"I must see that the session priority value must be set to Important")]
         public void ThenIMustSeeThatTheSessionPriorityValueMustBeSetToTheImportantValue()
         {
@@ -507,15 +512,37 @@ namespace AcceptanceTests.UISteps
             Assert.True(materialsSectionPage.SortedMaterialsBySource(sourceName));
         }
 
-
         [Then(@"I must see materials sorted by source sorting: null")]
         public void ThenIMustSeeMaterialsSortedBySourceSortingNull()
         {
             Assert.True(materialsSectionPage.SortedBySourceSortingNull.Displayed);
         }
 
+        [Then(@"I clicked on the type`s filter (.*)")]
+        public void WhenIClickedOnTheTypeSFilterAudio(string checkboxLabel)
+        {
+            materialsSectionPage.TypesFilter(checkboxLabel);
+            driver.WaitFor(5);
+        }
 
+        [Then(@"I see that position of timeline changed")]
+        public void ThenISeeThatPositionOfTimelineChanged()
+        {
+            Assert.True(materialsSectionPage.PositionOfTimeline.Displayed);
+        }
 
+        [Then(@"I cliced on the text field")]
+        public void ThenIClickedOnTheTextField()
+        {
+            materialsSectionPage.TextField.Click();
+        }
+
+        [Then(@"I clicked Ctrl and right arrow on the keyboard")]
+        public void WhenIClickedCtrlAndRightArrowOnTheKeyboard()
+        {
+            materialsSectionPage.TextField.SendKeys(Keys.Control + Keys.ArrowRight + Keys.Control + Keys.ArrowRight);
+            driver.WaitFor(2);
+        }
         #endregion
     }
 }

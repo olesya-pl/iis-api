@@ -1,14 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Iis.Interfaces.AccessLevels
 {
     public class AccessLevel : IAccessLevel
     {
-        public Guid Id { get; set; }
-        public string Name { get; set; }
-        public int NumericIndex { get; set; }
         public AccessLevel() { }
         public AccessLevel(Guid id, string name, int numericIndex)
         {
@@ -22,5 +17,9 @@ namespace Iis.Interfaces.AccessLevels
             Name = accessLevel.Name;
             NumericIndex = accessLevel.NumericIndex;
         }
+        public Guid Id { get; set; }
+        public string Name { get; set; }
+        public int NumericIndex { get; set; }
+
     }
 }

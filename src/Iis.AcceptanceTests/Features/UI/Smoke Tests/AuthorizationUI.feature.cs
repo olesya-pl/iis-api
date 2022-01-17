@@ -40,7 +40,8 @@ namespace AcceptanceTests.Features.UI.SmokeTests
         public static void FeatureSetup()
         {
             testRunner = TechTalk.SpecFlow.TestRunnerManager.GetTestRunner();
-            TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "Features/UI/Smoke Tests", "Authorization UI", "\t- Authorize by using valid credentials\r\n\t- IIS-5795 - Invalid authorization", ProgrammingLanguage.CSharp, ((string[])(null)));
+            TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "Features/UI/Smoke Tests", "Authorization UI", "\t- Authorize by using valid credentials\r\n\t- IIS-5795 - Invalid authorization\r\n\t- " +
+                    "IIS-5796 - Authorize by using valid credentials", ProgrammingLanguage.CSharp, ((string[])(null)));
             testRunner.OnFeatureStart(featureInfo);
         }
         
@@ -80,21 +81,21 @@ namespace AcceptanceTests.Features.UI.SmokeTests
             this.TestTearDown();
         }
         
-        [Xunit.SkippableFactAttribute(DisplayName="Authorize by using valid credentials")]
+        [Xunit.SkippableFactAttribute(DisplayName="IIS-5796 - Authorize by using valid credentials")]
         [Xunit.TraitAttribute("FeatureTitle", "Authorization UI")]
-        [Xunit.TraitAttribute("Description", "Authorize by using valid credentials")]
+        [Xunit.TraitAttribute("Description", "IIS-5796 - Authorize by using valid credentials")]
         [Xunit.TraitAttribute("Category", "smoke")]
         [Xunit.TraitAttribute("Category", "UI")]
         [Xunit.TraitAttribute("Category", "AuthorizationSmokeUI")]
-        public virtual void AuthorizeByUsingValidCredentials()
+        public virtual void IIS_5796_AuthorizeByUsingValidCredentials()
         {
             string[] tagsOfScenario = new string[] {
                     "smoke",
                     "UI",
                     "AuthorizationSmokeUI"};
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Authorize by using valid credentials", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
-#line 7
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("IIS-5796 - Authorize by using valid credentials", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
+#line 8
  this.ScenarioInitialize(scenarioInfo);
 #line hidden
             bool isScenarioIgnored = default(bool);
@@ -114,10 +115,10 @@ namespace AcceptanceTests.Features.UI.SmokeTests
             else
             {
                 this.ScenarioStart();
-#line 8
+#line 9
   testRunner.Given("I sign in with the user olya and password 123 in the Contour", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-#line 9
+#line 10
   testRunner.Then("I redirected to objects page", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
@@ -138,7 +139,7 @@ namespace AcceptanceTests.Features.UI.SmokeTests
                     "AuthorizationSmokeUI"};
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("IIS-5795 - Try to authorize by using invalid credentials", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
-#line 12
+#line 13
  this.ScenarioInitialize(scenarioInfo);
 #line hidden
             bool isScenarioIgnored = default(bool);
@@ -158,13 +159,13 @@ namespace AcceptanceTests.Features.UI.SmokeTests
             else
             {
                 this.ScenarioStart();
-#line 13
+#line 14
   testRunner.Given("I sign in with the user olya and password hammer691 in the Contour", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-#line 14
+#line 15
   testRunner.Then("Login button is active", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 15
+#line 16
   testRunner.Then("Login and password inputs are highlighted with red", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }

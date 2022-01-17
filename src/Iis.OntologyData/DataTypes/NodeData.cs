@@ -1,37 +1,33 @@
-﻿using Flee.PublicTypes;
-using Iis.Interfaces.Ontology.Data;
-using Iis.Interfaces.Ontology.Schema;
-using Iis.Utility;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using Flee.PublicTypes;
+using Iis.Interfaces.Ontology.Data;
+using Iis.Interfaces.Ontology.Schema;
+using Iis.Utility;
 
 namespace Iis.OntologyData.DataTypes
 {
     public class NodeData : INode
     {
+        internal List<RelationData> _incomingRelations = new List<RelationData>();
+        internal List<RelationData> _outgoingRelations = new List<RelationData>();
         public Guid Id { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
         public bool IsArchived { get; set; }
-        internal OntologyNodesData AllData { get; set; }
-
         public Guid NodeTypeId { get; set; }
         public INodeTypeLinked NodeType { get; internal set; }
-
-        internal List<RelationData> _incomingRelations = new List<RelationData>();
         public IReadOnlyList<IRelation> IncomingRelations => _incomingRelations;
-
-        internal List<RelationData> _outgoingRelations = new List<RelationData>();
         public IReadOnlyList<IRelation> OutgoingRelations => _outgoingRelations;
-
-        internal IRelation _relation { get; set; }
+        public string Value => Attribute?.Value;
         public IRelation Relation => _relation;
         public IAttribute Attribute { get; internal set; }
-        public string Value => Attribute?.Value;
+        internal OntologyNodesData AllData { get; set; }
+        internal IRelation _relation { get; set; }
 
         public IReadOnlyList<IRelation> GetDirectRelations() =>
             AllData.Locker.ReadLock(() => _outgoingRelations.ToList());
@@ -87,8 +83,8 @@ namespace Iis.OntologyData.DataTypes
                     {
                         list.Add(new DotNameValue(
                             relation.TypeName,
-                            showTitlesForSeparateObjects ? 
-                                relation._targetNode.GetTitleValue() : 
+                            showTitlesForSeparateObjects ?
+                                relation._targetNode.GetTitleValue() :
                                 relation.TargetNodeId.ToString(),
                             new List<INode> { relation.Node }));
                     }
@@ -128,7 +124,7 @@ namespace Iis.OntologyData.DataTypes
         }
         public INode GetSingleDirectProperty(string name)
         {
-            return AllData.Locker.ReadLock(() => 
+            return AllData.Locker.ReadLock(() =>
             {
                 return _outgoingRelations
                     .SingleOrDefault(r => r.Node.NodeType.Name == name)
@@ -191,6 +187,10 @@ namespace Iis.OntologyData.DataTypes
         }
         public string ResolveFormula(string formula)
         {
+            if (string.IsNullOrEmpty(formula))
+            {
+                return string.Empty;
+            }
             var singleFormulas = formula.Split(';').Select(s => s.Trim());
             string value = null;
             foreach (var singleFormula in singleFormulas)
@@ -283,12 +283,12 @@ namespace Iis.OntologyData.DataTypes
 
                 return sb.ToString();
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 throw;
             }
         }
-        public string GetTitleValue() => GetSingleProperty(NodeType.TitleAttributeName)?.Value 
+        public string GetTitleValue() => GetSingleProperty(NodeType.TitleAttributeName)?.Value
             ?? GetComputedValue(NodeType.TitleAttributeName);
 
         public IRelation GetAccessLevelRelationId() =>
@@ -305,7 +305,6 @@ namespace Iis.OntologyData.DataTypes
             .Where(_ => _.Node.NodeType.Name == OntologyNames.SecurityLevelField)
             .Select(_ => int.Parse(_.TargetNode.GetSingleDirectProperty(OntologyNames.UniqueIndexField).Value))
             .ToList();
-
         private object ResolveSingleFormula(string formula)
         {
             var replaced = ReplaceVariables(formula);

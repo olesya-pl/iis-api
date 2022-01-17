@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Iis.DataModel.ChangeHistory
+namespace Iis.Elastic.Entities
 {
     public class ChangeHistoryDocument
     {

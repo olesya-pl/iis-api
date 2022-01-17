@@ -28,7 +28,7 @@ namespace AcceptanceTests.UISteps
             loginPageObjects.Navigate();
             loginPageObjects.LoginField.SendKeys(login);
             loginPageObjects.PasswordField.SendKeys(password);
-            loginPageObjects.LoginButton.Click();       
+            loginPageObjects.LoginButton.Click();
             driver.WaitFor(15);
         }
 
@@ -43,6 +43,7 @@ namespace AcceptanceTests.UISteps
         {
             loginPageObjects.ConfirmLogOutButton.Click();
         }
+
         #endregion
 
         #region Then

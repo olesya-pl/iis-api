@@ -1,6 +1,6 @@
 ﻿namespace Iis.Interfaces.Elastic
 {
-    public class ElasticBulkResponse: ElasticResponse
+    public class ElasticBulkResponse : ElasticResponse
     {
         public string Id { get; set; }
 

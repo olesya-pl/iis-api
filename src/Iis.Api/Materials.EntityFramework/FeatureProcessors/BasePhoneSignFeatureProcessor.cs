@@ -72,7 +72,7 @@ namespace IIS.Core.Materials.EntityFramework.FeatureProcessors
 
                 if (searchResult.isExist)
                 {
-                    originalFeature[FeatureFields.featureId] = searchResult.featureId.ToString();
+                    originalFeature[FeatureFields.FeatureId] = searchResult.featureId.ToString();
 
                     var updatesResult = ShouldExistingBeUpdated(searchResult.feature, feature);
 
@@ -82,7 +82,7 @@ namespace IIS.Core.Materials.EntityFramework.FeatureProcessors
 
                         var entity = await _updateResolver.UpdateEntityAsync(signType, searchResult.featureId.Value, properties);
 
-                        originalFeature[FeatureFields.featureId] = entity.Id.ToString();
+                        originalFeature[FeatureFields.FeatureId] = entity.Id.ToString();
 
                         if (searchResult.featureId.Value != entity.Id)
                         {
@@ -100,7 +100,7 @@ namespace IIS.Core.Materials.EntityFramework.FeatureProcessors
 
                     var entity = await _createResolver.CreateEntity(Guid.NewGuid(), signType, string.Empty, properties, Guid.NewGuid());
 
-                    originalFeature[FeatureFields.featureId] = entity.Id.ToString();
+                    originalFeature[FeatureFields.FeatureId] = entity.Id.ToString();
                 }
             }
 
@@ -166,7 +166,7 @@ namespace IIS.Core.Materials.EntityFramework.FeatureProcessors
 
                 if (property is null) continue;
 
-                if (featureFieldName == FeatureFields.featureId) continue;
+                if (featureFieldName == FeatureFields.FeatureId) continue;
 
                 var propertyValue = property.Value.Value<string>();
 
@@ -323,7 +323,7 @@ namespace IIS.Core.Materials.EntityFramework.FeatureProcessors
 
         private (Guid FeatureId, bool IsSuccess) TryFetchEntityIdFromFeature(JObject feature)
         {
-            var featureIdStringValue = feature.Property(FeatureFields.featureId).Value.Value<string>();
+            var featureIdStringValue = feature.Property(FeatureFields.FeatureId).Value.Value<string>();
 
             var parseResult = Guid.TryParse(featureIdStringValue, out Guid featureId);
 

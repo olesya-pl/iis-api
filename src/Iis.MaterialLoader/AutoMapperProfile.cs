@@ -65,7 +65,7 @@ namespace Iis.MaterialLoader
                 .ForMember(dest => dest.Tags, opts => opts.MapFrom(src => src.Tags))
                 .ForMember(dest => dest.States, opts => opts.MapFrom(src => src.States));
 
-            CreateMap<MaterialSignEntity, DbLayer.Repositories.MaterialSign>();
+            CreateMap<MaterialSignEntity, Elastic.Entities.MaterialSign >();
             CreateMap<ChangeHistoryEntity, ChangeHistoryDto>().ReverseMap();
         }
     }

@@ -6,7 +6,6 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Threading.Tasks;
 using System.Collections.Generic;
-using System.Text.RegularExpressions;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Microsoft.Extensions.Logging;
@@ -36,6 +35,7 @@ using IIS.Repository;
 using IIS.Repository.Factories;
 using Iis.Domain.Materials;
 using Iis.Domain;
+using Iis.Elastic.Entities;
 
 namespace Iis.Services
 {
@@ -261,6 +261,29 @@ namespace Iis.Services
                             .CountAsync(query, _elasticState.MaterialIndexes, cancellationToken);
 
             return result;
+        }
+
+        public async Task<IReadOnlyDictionary<string, int>> CountMaterialsByTypeAndNodeAsync(Guid nodeId, Guid userId, CancellationToken cancellationToken = default)
+        {
+            var node = _ontologyData.GetNode(nodeId);
+            if (node is null) return new Dictionary<string, int>();
+
+            var queryString = GetQueryStringForNode(node.NodeType, node.Id);
+            var query = new SimpleQueryStringQueryBuilder(queryString)
+                .WithResultFields(nameof(MaterialDocument.Type).AsArray())
+                .BuildSearchQuery()
+                .ToString(Formatting.None);
+
+            var result = await _elasticManager
+                            .WithUserId(userId)
+                            .SearchAsync(query, _elasticState.MaterialIndexes, cancellationToken);
+
+            if (result.Count == 0) return new Dictionary<string, int>();
+
+            return result.Items
+                .Select(_ => _.SearchResult[nameof(MaterialDocument.Type)].Value<string>())
+                .GroupBy(_ => _)
+                .ToDictionary(_ => _.Key, _ => _.Count());
         }
 
         public async Task<SearchResult> SearchMaterialsAsync(
@@ -695,7 +718,7 @@ namespace Iis.Services
             return propertyName;
         }
 
-        private static string GetRelationTypeFieldName() => $"{nameof(MaterialDocument.RelatedObjectCollection)}.{nameof(DbLayer.Repositories.RelatedObject.RelationCreatingType)}";
+        private static string GetRelationTypeFieldName() => $"{nameof(MaterialDocument.RelatedObjectCollection)}.{nameof(Iis.Elastic.Entities.RelatedObject.RelationCreatingType)}";
 
         private static bool ItemsCountPossiblyExceedsMaxThreshold(SearchResult searchResult)
         {

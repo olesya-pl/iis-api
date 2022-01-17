@@ -22,6 +22,7 @@ using Microsoft.Extensions.Hosting;
 using MoreLinq;
 using Iis.Services.Contracts.Elastic;
 using Iis.Utility;
+using Iis.Elastic.Entities;
 
 namespace Iis.Api.Controllers
 {
@@ -380,7 +381,7 @@ namespace Iis.Api.Controllers
         }
 
         [HttpGet("GetCsv/{typeName}")]
-        public Task<IActionResult> GetCsv(string typeName, CancellationToken cancellationToken)
+        public Task<IActionResult> GetCsv(string typeName)
         {
             var result = _csvService.GetDorCsvByTypeName(typeName);
             var bytes = Encoding.Unicode.GetBytes(result);

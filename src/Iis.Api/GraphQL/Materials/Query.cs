@@ -181,11 +181,14 @@ namespace IIS.Core.GraphQL.Materials
         }
 
         public async Task<List<MaterialsCountByType>> CountMaterialsByTypeAndNodeAsync(
+            IResolverContext context,
             [Service] IMaterialProvider materialProvider,
             [Service] IMapper mapper,
             Guid nodeId)
         {
-            var items = await materialProvider.CountMaterialsByTypeAndNodeAsync(nodeId);
+            var tokenPayload = context.GetToken();
+            var items = await materialProvider.CountMaterialsByTypeAndNodeAsync(nodeId, tokenPayload.UserId, context.RequestAborted);
+
             return mapper.Map<List<MaterialsCountByType>>(items);
         }
 

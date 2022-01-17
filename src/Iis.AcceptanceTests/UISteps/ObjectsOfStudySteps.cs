@@ -71,6 +71,7 @@ namespace AcceptanceTests.UISteps
         public void IEnteredDataInTheSearchField(string input)
         {
             objectsOfStudyPage.SearchField.SendKeys(input);
+            driver.WaitFor(2);
             objectsOfStudyPage.SearchField.SendKeys(Keys.Enter);
             driver.WaitFor(10);
         }
@@ -80,7 +81,7 @@ namespace AcceptanceTests.UISteps
         {
             objectsOfStudyPage.SearchField.SendKeys($"{input} AND CreatedAt:{DateTime.Now.ToString("dd.MM.yyyy")}");
             objectsOfStudyPage.SearchField.SendKeys(Keys.Enter);
-            driver.WaitFor(30);
+            driver.WaitFor(10);
         }
 
         [When(@"I entered the value (.*) in the search field")]
@@ -95,7 +96,7 @@ namespace AcceptanceTests.UISteps
         public void WhenIClickedOnTheFirstSearchResultTitle()
         {
             objectsOfStudyPage.FirstSearchResultRow.Click();
-            driver.WaitFor(1);
+            driver.WaitFor(5);
         }
 
         [When(@"I clicked on the Edit button in the Objects of study section")]

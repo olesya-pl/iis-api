@@ -14,6 +14,9 @@ namespace AcceptanceTests.UISteps
         private AdministrationPageObjects administrationPage;
         private readonly NavigationSection navigationSection;
 
+        public IWebElement VersionInfo =>
+        driver.FindElement(By.CssSelector(".el-notification .el-notification__group .el-notification__title"));
+
         public AdministrationSteps(ScenarioContext injectedContext, IWebDriver driver)
         {
             administrationPage = new AdministrationPageObjects(driver);
@@ -29,6 +32,13 @@ namespace AcceptanceTests.UISteps
             driver.WaitFor(5);
         }
 
+        [When(@"I checked product version")]
+        public void WhenICheckedOfVersionByProduct()
+        {
+            navigationSection.ObjectOfStudyLink.SendKeys(Keys.Alt + Keys.Shift + "V");
+            driver.WaitFor(5);
+        }
+
         [Then(@"I must see the Administration page")]
         public void ThenIMustSeeAdminPage()
         {
@@ -39,6 +49,12 @@ namespace AcceptanceTests.UISteps
         public void ThenIMustSeeFirstUserInTheUsersList()
         {
             Assert.True(administrationPage.FirstUserOnTheAdminPage.Displayed);
+        }
+
+        [Then(@"I must see product version")]
+        public void ThenIMustSeeVersionByProduct()
+        {
+            Assert.True(VersionInfo.Displayed);
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Threading.Tasks;
@@ -14,21 +15,34 @@ using IIS.Core.GraphQL.Entities.InputTypes;
 using Iis.Utility;
 using Newtonsoft.Json.Linq;
 using HotChocolate.Resolvers;
+using Microsoft.Extensions.Logging;
 
 namespace IIS.Core.GraphQL.Entities
 {
     public class OntologyFilterableQuery
     {
-        private static readonly string[] ObjectOfStudyTypeList = new[] { EntityTypeNames.ObjectOfStudy.ToString()};
+        private static readonly string[] ObjectOfStudyTypeList = new[] { EntityTypeNames.ObjectOfStudy.ToString() };
         private static readonly string[] EntityList = new[] { EntityTypeNames.ObjectOfStudy.ToString(), EntityTypeNames.Wiki.ToString() };
+        private static IReadOnlyCollection<INodeTypeLinked> _objectNodeTypeCollection;
+
+        public OntologyFilterableQuery(IOntologyNodesData nodesData)
+        {
+            if (_objectNodeTypeCollection is null || !_objectNodeTypeCollection.Any())
+            {
+                _objectNodeTypeCollection = nodesData.Schema
+                                                .GetEntityTypesByName(EntityList, true)
+                                                .ToArray();
+            }
+        }
+
         public async Task<OntologyFilterableQueryResponse> EntityObjectOfStudyFilterableList(
             IResolverContext ctx,
             [Service] IOntologyService ontologyService,
             [Service] IOntologyNodesData nodesData,
             [Service] IMapper mapper,
+            [Service] ILogger<OntologyFilterableQuery> logger,
             PaginationInput pagination,
-            AllEntitiesFilterInput filter
-            )
+            AllEntitiesFilterInput filter)
         {
             var tokenPayload = ctx.GetToken();
             var types = filter.Types is null || !filter.Types.Any() ? EntityList : filter.Types;
@@ -46,10 +60,13 @@ namespace IIS.Core.GraphQL.Entities
             var response = await ontologyService.FilterNodeAsync(types, elasticFilter, tokenPayload.User);
             var mapped = mapper.Map<OntologyFilterableQueryResponse>(response);
             EnrichWithSelectedFilteredItems(mapped.Aggregations, elasticFilter);
-            mapped.Aggregations = EnrichWithNodeTypeNames(nodesData, mapped.Aggregations);
+            mapped.Aggregations = EnrichWithNodeTypeNames(_objectNodeTypeCollection, mapped.Aggregations);
 
-            var nodeTypeAggregations = GetNodeTypeAggregations(nodesData.Schema, types,
-                mapped.Aggregations.GetValueOrDefault(ElasticConfigConstants.NodeTypeTitleAlias)?.Buckets);
+            var nodeTypeAggregations = GetNodeTypeAggregations(
+                nodesData.Schema, 
+                types,
+                mapped.Aggregations.GetValueOrDefault(ElasticConfigConstants.NodeTypeTitleAlias)?.Buckets,
+                logger);
             mapped.NodeTypeAggregations = nodeTypeAggregations.Select(_ => JObject.FromObject(_)).ToList();
 
             RemoveObsoleteAggregation(mapped);
@@ -132,17 +149,17 @@ namespace IIS.Core.GraphQL.Entities
         }
 
         [Pure]
-        private static Dictionary<string, AggregationItem> EnrichWithNodeTypeNames(IOntologyNodesData nodesData, 
+        private static Dictionary<string, AggregationItem> EnrichWithNodeTypeNames(
+            IReadOnlyCollection<INodeTypeLinked> _objectNodeTypeCollection,
             Dictionary<string, AggregationItem> aggregations)
         {
             var res = new Dictionary<string, AggregationItem>(aggregations);
             if (aggregations.ContainsKey(ElasticConfigConstants.NodeTypeTitleAlias))
             {
-                var nodeTypes = nodesData.Schema.GetAllNodeTypes();
                 var titleAggregation = res[ElasticConfigConstants.NodeTypeTitleAlias];
                 foreach (var bucket in titleAggregation.Buckets)
                 {
-                    var nodeTypeName = nodeTypes
+                    var nodeTypeName = _objectNodeTypeCollection
                         .FirstOrDefault(p => string.Equals(p.Title, bucket.Key, System.StringComparison.Ordinal))?
                         .Name;
                     if (!string.IsNullOrEmpty(nodeTypeName))
@@ -162,7 +179,7 @@ namespace IIS.Core.GraphQL.Entities
             {
                 if (!aggregations.ContainsKey(item.Key))
                     continue;
-                
+
                 foreach (var value in item.Value)
                 {
                     if (aggregations[item.Key].Buckets.All(x => x.Key != value))
@@ -192,9 +209,10 @@ namespace IIS.Core.GraphQL.Entities
         }
 
         private IReadOnlyList<AggregationNodeTypeItem> GetNodeTypeAggregations(
-            IOntologySchema schema, 
+            IOntologySchema schema,
             IEnumerable<string> typeNames,
-            IReadOnlyList<AggregationBucket> buckets)
+            IReadOnlyList<AggregationBucket> buckets,
+            ILogger logger)
         {
             var list = typeNames
                 .Select(name => GetAggregationNodeTypeItem(schema.GetEntityTypeByName(name)))
@@ -207,7 +225,7 @@ namespace IIS.Core.GraphQL.Entities
             }
 
             var aggregations = new AggregationNodeTypeTree(list);
-            aggregations.MergeBuckets(buckets);
+            aggregations.MergeBuckets(buckets, logger);
 
             return aggregations.Items;
         }

@@ -21,6 +21,16 @@
     <None Remove="Logs\**" />
   </ItemGroup>
 
+
+	<ItemGroup>
+	  <None Remove="data\elastic\SecurityLevelFilter.painless" />
+	</ItemGroup>
+
+
+	<ItemGroup>
+	  <Content Include="data\elastic\SecurityLevelFilter.painless" />
+	</ItemGroup>
+
   <ItemGroup>
     <None Include="..\..\scripts\script-find-wrongValue-PropertyName.sql" Link="data\scripts\script-find-wrongValue-PropertyName.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>

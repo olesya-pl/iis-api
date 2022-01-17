@@ -1,19 +1,19 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using System.Collections.Generic;
 using Iis.Domain.Elastic;
+using Iis.Elastic;
+using Iis.Elastic.Entities;
 using Iis.Elastic.SearchQueryExtensions;
-using Iis.Services.Contracts.Interfaces;
 using Iis.Interfaces.Elastic;
 using Iis.Interfaces.Ontology.Data;
 using Iis.Interfaces.Ontology.Schema;
+using Iis.Services.Contracts.Interfaces;
 using Iis.Utility;
-using Iis.Elastic;
-using Iis.DataModel.ChangeHistory;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace IIS.Core.Ontology.EntityFramework
 {
