@@ -108,6 +108,16 @@ namespace AcceptanceTests.UISteps
             driver.WaitFor(2);
         }
 
+        [Given(@"I upload a new mp3 material via API")]
+        public async Task GivenIUploadANewMp3MaterialViaAPI(Table table)
+        {
+            var materialModel = table.CreateInstance<MaterialModel>();
+            context.Set(materialModel.FileName, "uploadedMaterial");
+            var response = await MaterialsHelper.UploadMp3Material(materialModel);
+            context.Set(response, "uploadedMaterial.Id");
+            driver.WaitFor(5);
+        }
+
         [When(@"I clean up uploaded material via API")]
         public async Task WhenICleanUpUploadedMaterialViaAPI()
         {

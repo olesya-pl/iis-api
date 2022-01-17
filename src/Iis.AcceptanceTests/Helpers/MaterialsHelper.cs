@@ -5,39 +5,15 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading;
 using System.Threading.Tasks;
+using AcceptanceTests.Helpers.FileGenerators;
 using IIS.Core.GraphQL.Materials;
 using Newtonsoft.Json;
 using NPOI.XWPF.UserModel;
-using Org.BouncyCastle.Bcpg.OpenPgp;
-using Xunit;
 
 namespace AcceptanceTests.Helpers
 {
     public class MaterialsHelper
     {
-        private static (long, byte[]) GenerateDocxMaterial(string fileName, string content)
-        {
-            XWPFDocument doc = new XWPFDocument();
-            var p = doc.CreateParagraph();
-            var run = p.CreateRun();
-            run.SetText(content);
-            using var ms = new MemoryStream();
-
-            using var fs1 = new FileStream(fileName + ".docx", FileMode.Create);
-
-            doc.Write(fs1);
-            doc.Close();
-            using var fs = new FileStream(fileName + ".docx", FileMode.Open);
-
-            fs.Position = 0;
-            var size = fs.Length;
-            fs.CopyTo(ms);
-
-            ms.Position = 0;
-            var bytes = ms.ToArray();
-            return (size, bytes);
-        }
-
         private static MaterialInput Create(long fileSize,
             Guid? parentMaterialId,
             string content,
@@ -45,16 +21,17 @@ namespace AcceptanceTests.Helpers
             string reliability,
             string metaData,
             string loadedBy,
-            string from = "contour.doc",
+            string source = "contour.doc",
+            string fileExtension = "docx",
             int accessLevel = 0
             )
         {
-            var data = new List<Data>
+            var data = new Data[]
             {
                 new Data {Type = "createdDate", Text = DateTime.UtcNow.ToString()},
                 new Data {Type = "modifiedDate", Text = DateTime.UtcNow.ToString()},
                 new Data {Type = "size", Text = fileSize.ToString("D")},
-                new Data {Type = "fileName", Text = content+".docx"},
+                new Data {Type = "fileName", Text = $"content.{fileExtension}"},
                 new Data {Type = "originalContent", Text = content}
             };
 
@@ -69,7 +46,7 @@ namespace AcceptanceTests.Helpers
                 Content = content,
                 ReliabilityText = reliability,
                 SourceReliabilityText = sourceReliability,
-                From = from,
+                From = source,
                 LoadedBy = loadedBy,
                 CreationDate = DateTime.UtcNow,
                 AccessLevel = accessLevel
@@ -91,14 +68,14 @@ namespace AcceptanceTests.Helpers
             };
             var response = await httpClient.PostAsync("api/Files/CreateMaterial", form, cancellation);
             response.EnsureSuccessStatusCode();
-            File.Delete(fileName + ".docx");
+            File.Delete(fileName);
             var fileResult = JsonConvert.DeserializeObject<CreateMaterialResponse>(await response.Content.ReadAsStringAsync());
             return fileResult;
         }
 
         public static async Task<Guid> UploadDocxMaterial(MaterialModel materialModel)
         {
-            var material = GenerateDocxMaterial(materialModel.FileName, materialModel.Content);
+            var material = DocxGenerator.GenerateDocxMaterial(materialModel.FileName, materialModel.Content);
             var materialInput = Create(material.Item1,
                 null, materialModel.Content,
                 materialModel.SourceReliabilityText,
@@ -106,8 +83,25 @@ namespace AcceptanceTests.Helpers
                 materialModel.MetaData,
                 materialModel.LoadedBy,
                 materialModel.From,
+                "docx",
                 materialModel.AccessLevel);
-            var response = await AddMaterialAsync(materialInput, materialModel.FileName + ".docx", material.Item2, CancellationToken.None);
+            var response = await AddMaterialAsync(materialInput, $"{materialModel.FileName}.docx", material.Item2, CancellationToken.None);
+            return response.Id;
+        }
+
+        public static async Task<Guid> UploadMp3Material(MaterialModel materialModel)
+        {
+            var material = Mp3Generator.Generate();
+            var materialInput = Create(material.Item1,
+                null, materialModel.Content,
+                materialModel.SourceReliabilityText,
+                materialModel.ReliabilityText,
+                materialModel.MetaData,
+                materialModel.LoadedBy,
+                materialModel.From,
+                "mp3",
+                materialModel.AccessLevel);
+            var response = await AddMaterialAsync(materialInput, $"{materialModel.FileName}.mp3", material.Item2, CancellationToken.None);
             return response.Id;
         }
 
