@@ -1,4 +1,5 @@
 ﻿using Iis.Interfaces.Ontology.Data;
+using Iis.Interfaces.Ontology.Schema;
 using Iis.Interfaces.SecurityLevels;
 using System;
 using System.Collections.Generic;
@@ -10,9 +11,9 @@ namespace Iis.Security.SecurityLevels
     public class SecurityLevelChecker : ISecurityLevelChecker
     {
         private SecurityLevel _rootLevel;
-        internal SecurityLevelChecker(SecurityLevel topLevel)
+        internal SecurityLevelChecker(SecurityLevel rootLevel)
         {
-            _rootLevel = topLevel;
+            _rootLevel = rootLevel;
         }
         public SecurityLevelChecker(IOntologyNodesData ontologyData)
         {
@@ -20,7 +21,7 @@ namespace Iis.Security.SecurityLevels
             const string UNIQUE_INDEX = "uniqueIndex";
             const string PARENT = "parent";
 
-            var levelsNodes = ontologyData.GetEntitiesByTypeName("SecurityLevel");
+            var levelsNodes = ontologyData.GetEntitiesByTypeName(EntityTypeNames.SecurityLevel.ToString());
             var rowLevels = levelsNodes.Select(_ => 
                 new
                 {
@@ -51,23 +52,10 @@ namespace Iis.Security.SecurityLevels
         {
             return true;
         }
-        private bool AccessGranted(IReadOnlyList<SecurityLevel> userLevels, IReadOnlyList<SecurityLevel> objectLevels)
-        {
-            return true;
-        }
-        private bool AccessGranted(IReadOnlyList<SecurityLevel> userLevels, SecurityLevel objectLevel) =>
-            userLevels.Any(userLevel => AccessGranted(userLevel, objectLevel));
-        private bool AccessGranted(SecurityLevel userLevel, SecurityLevel objectLevel) =>
-            userLevel == objectLevel ||
-            userLevel.IsParentOf(objectLevel) ||
-            userLevel.IsChildOf(objectLevel);
-
-        private IReadOnlyList<SecurityLevel> GetAllAccessibleLevels(IReadOnlyList<SecurityLevel> baseItems) =>
-            _rootLevel.GetAllItems().Where(_ => AccessGranted(baseItems, _)).ToList();
-
-        // see details here: https://confluence.infozahyst.com/pages/viewpage.action?pageId=192484154
-        public string GetStringCode(bool includeAll, params int[] indexes) => GetStringCode(includeAll, indexes.ToList());
-        public string GetStringCode(bool includeAll, IReadOnlyList<int> indexes) => GetStringCode(includeAll, _rootLevel.GetAllItems(indexes));
+        /// This is security code for elastic painless script.
+        /// See details here: https://confluence.infozahyst.com/pages/viewpage.action?pageId=192484154 
+        public string GetStringCode(bool includeAll, params int[] uniqueIndexes) => GetStringCode(includeAll, uniqueIndexes.ToList());
+        public string GetStringCode(bool includeAll, IReadOnlyList<int> uniqueIndexes) => GetStringCode(includeAll, _rootLevel.GetAllItems(uniqueIndexes));
         internal string GetStringCode(bool includeAll, IReadOnlyList<SecurityLevel> baseLevels)
         {
             var sb = new StringBuilder();
@@ -84,6 +72,20 @@ namespace Iis.Security.SecurityLevels
             return sb.ToString();
         }
 
-        //private SecurityLevel Map(INode node) =>
+        private bool AccessGranted(IReadOnlyList<SecurityLevel> userLevels, IReadOnlyList<SecurityLevel> objectLevels)
+        {
+            return true;
+        }
+        private bool AccessGranted(IReadOnlyList<SecurityLevel> userLevels, SecurityLevel objectLevel) =>
+            userLevels.Any(userLevel => AccessGranted(userLevel, objectLevel));
+        private bool AccessGranted(SecurityLevel userLevel, SecurityLevel objectLevel) =>
+            userLevel == objectLevel ||
+            userLevel.IsParentOf(objectLevel) ||
+            userLevel.IsChildOf(objectLevel);
+
+        private IReadOnlyList<SecurityLevel> GetAllAccessibleLevels(IReadOnlyList<SecurityLevel> baseItems) =>
+            _rootLevel.GetAllItems().Where(_ => AccessGranted(baseItems, _)).ToList();
+
+
     }
 }

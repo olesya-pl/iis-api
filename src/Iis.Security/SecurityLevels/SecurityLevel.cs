@@ -14,12 +14,13 @@ namespace Iis.Security.SecurityLevels
         public Guid Id { get;  set; }
         public string Name { get; set; }
         public int UniqueIndex { get; set; }
-        internal SecurityLevel _parent;
         public ISecurityLevel Parent => _parent;
-        internal List<SecurityLevel> _children = new List<SecurityLevel>();
         public IReadOnlyList<ISecurityLevel> Children => _children;
-        public SecurityLevel() { }
-        public override string ToString() => $"{UniqueIndex} : {Name}";
+
+        internal SecurityLevel _parent;
+        internal List<SecurityLevel> _children = new List<SecurityLevel>();
+
+        internal SecurityLevel() { }
         internal SecurityLevel(string name, int uniqueIndex, IReadOnlyList<SecurityLevel> children = null)
         {
             Id = new Guid();
@@ -34,6 +35,8 @@ namespace Iis.Security.SecurityLevels
                 }
             }
         }
+
+        public override string ToString() => $"{UniqueIndex} : {Name}";
 
         internal bool IsRoot => _parent == null;
         internal SecurityLevel Root => IsRoot ? this : _parent.Root;
