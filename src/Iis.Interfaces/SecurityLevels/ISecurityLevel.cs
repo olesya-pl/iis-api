@@ -4,11 +4,8 @@ using System.Text;
 
 namespace Iis.Interfaces.SecurityLevels
 {
-    public interface ISecurityLevel
+    public interface ISecurityLevel : ISecurityLevelPlain
     {
-        public Guid Id { get; }
-        public string Name { get; }
-        public int UniqueIndex { get; }
         public ISecurityLevel Parent { get; }
         public IReadOnlyList<ISecurityLevel> Children { get; }
     }

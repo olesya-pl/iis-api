@@ -34,6 +34,7 @@ namespace Iis.Security.SecurityLevels
         public Guid Id { get; set; }
         public string Name { get; set; }
         public int UniqueIndex { get; set; }
+        public int? ParentUniqueIndex => Parent?.UniqueIndex;
         public ISecurityLevel Parent => _parent;
         public IReadOnlyList<ISecurityLevel> Children => _children;
 

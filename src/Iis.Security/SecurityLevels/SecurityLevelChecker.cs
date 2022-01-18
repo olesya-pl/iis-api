@@ -46,8 +46,14 @@ namespace Iis.Security.SecurityLevels
             }
             _rootLevel = rowLevels.Values.First().SecurityLevel.Root;
         }
+
+        public ISecurityLevel RootLevel => _rootLevel;
+
         public IReadOnlyList<ISecurityLevel> GetSecurityLevels(IReadOnlyList<Guid> securityLevelIds) =>
             _rootLevel.GetAllItems().Where(_ => securityLevelIds.Contains(_.Id)).ToList();
+        public IReadOnlyList<SecurityLevelPlain> GetSecurityLevelsPlain() =>
+            _rootLevel.GetAllItems().Select(_ => new SecurityLevelPlain(_)).ToList();
+            
         public bool AccessGranted(IReadOnlyList<int> userIndexes, IReadOnlyList<int> objectIndexes)
         {
             return true;
