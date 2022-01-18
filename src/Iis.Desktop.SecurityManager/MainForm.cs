@@ -32,10 +32,9 @@ namespace Iis.Desktop.SecurityManager
         private Panel panelMain;
         private Panel panelLeft;
         private Panel panelRight;
-        private Panel panelTop;
-        private Panel panelBottom;
         private UiAccessLevelTree _uiAccessLevelTree;
         private UiAccessLevelEdit _uiAccessLevelEdit;
+        private TabControl tabControl;
 
         #endregion
 
@@ -59,19 +58,13 @@ namespace Iis.Desktop.SecurityManager
 
             panelMain = _uiControlsCreator.GetFillPanel(this);
 
-            int panelLeftWidth = panelMain.Width / 3;
-            (panelLeft, panelRight) = _uiControlsCreator.GetLeftRightPanels(panelMain, panelLeftWidth);
+            tabControl = new TabControl();
+            panelMain.Controls.Add(tabControl);
+            tabControl.Dock = DockStyle.Fill;
 
-            int panelTopHeight = panelRight.Height / 5;
-            (panelTop, panelBottom) = _uiControlsCreator.GetTopBottomPanels(panelRight, panelTopHeight);
+            tabControl.TabPages.Add("Користувачи");
 
-            _uiAccessLevelTree = new UiAccessLevelTree();
-            _uiAccessLevelTree.Initialize("AccessLevelTree", panelLeft, _style);
-
-            _uiAccessLevelEdit = new UiAccessLevelEdit();
-            _uiAccessLevelEdit.Initialize("AccessLevelEdit", panelBottom, _style);
-
-            _uiAccessLevelTree.OnNodeSelect += node => { _uiAccessLevelEdit.SetUiValues(node); };
+            CreateSecurityAttributesTab(tabControl);
 
             ShowLogin();
         }
@@ -95,6 +88,26 @@ namespace Iis.Desktop.SecurityManager
             panelLogin.BorderStyle = BorderStyle.FixedSingle;
             panelMain.Visible = false;
         }
+
+        private void CreateSecurityAttributesTab(TabControl tabControl)
+        {
+            var pageAttributes = new TabPage("Атрибути доступу");
+            tabControl.TabPages.Add(pageAttributes);
+
+            int panelLeftWidth = tabControl.Width / 3;
+            (panelLeft, panelRight) = _uiControlsCreator.GetLeftRightPanels(pageAttributes, panelLeftWidth);
+
+            int panelTopHeight = panelRight.Height / 3;
+
+            _uiAccessLevelTree = new UiAccessLevelTree();
+            _uiAccessLevelTree.Initialize("AccessLevelTree", panelLeft, _style);
+
+            _uiAccessLevelEdit = new UiAccessLevelEdit();
+            _uiAccessLevelEdit.Initialize("AccessLevelEdit", panelRight, _style);
+
+            _uiAccessLevelTree.OnNodeSelect += node => { _uiAccessLevelEdit.SetUiValues(node); };
+        }
+
 
         #endregion
     }

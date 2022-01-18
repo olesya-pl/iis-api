@@ -37,7 +37,6 @@ namespace Iis.Desktop.SecurityManager
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1000, 450);
             this.Controls.Add(this.panelMain);
-            this.Controls.Add(this.panelTop);
             this.Name = "MainForm";
             this.Text = "Security Manager";
         }
