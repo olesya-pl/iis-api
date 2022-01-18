@@ -47,6 +47,28 @@ namespace Iis.Security.SecurityLevels
             _rootLevel = rowLevels.Values.First().SecurityLevel.Root;
         }
 
+        public SecurityLevelChecker(IReadOnlyList<SecurityLevelPlain> plainLevels)
+        {
+            var levelsDict = plainLevels.Select(_ => new SecurityLevel
+            {
+                Id = _.Id,
+                Name = _.Name,
+                UniqueIndex = _.UniqueIndex
+            }).ToDictionary(_ => _.UniqueIndex);
+
+            foreach (var plainLevel in plainLevels)
+            {
+                if (plainLevel.ParentUniqueIndex == null) continue;
+
+                var level = levelsDict[plainLevel.UniqueIndex];
+                var parentLevel = levelsDict[(int)plainLevel.ParentUniqueIndex];
+                level._parent = parentLevel;
+                parentLevel._children.Add(level);
+            }
+
+            _rootLevel = levelsDict.Values.First().Root;
+        }
+
         public ISecurityLevel RootLevel => _rootLevel;
 
         public IReadOnlyList<ISecurityLevel> GetSecurityLevels(IReadOnlyList<Guid> securityLevelIds) =>

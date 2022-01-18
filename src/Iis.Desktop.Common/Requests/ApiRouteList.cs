@@ -12,5 +12,6 @@
         public const string ApplicationRestart = "admin/RestartApplication";
         public const string OntologyReloadData = "admin/ReloadOntologyData";
         public const string AccessLevelChange = "admin/ChangeAccessLevels";
+        public const string GetSecurityLevels = "securityLevel/GetSecurityLevels";
     }
 }

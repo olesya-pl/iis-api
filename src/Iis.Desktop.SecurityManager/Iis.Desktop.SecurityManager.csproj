@@ -39,6 +39,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Iis.Desktop.Common\Iis.Desktop.Common.csproj" />
+    <ProjectReference Include="..\Iis.Security\Iis.Security.csproj" />
   </ItemGroup>
 
   <ItemGroup>

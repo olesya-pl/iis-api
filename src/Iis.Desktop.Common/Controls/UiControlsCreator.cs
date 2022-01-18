@@ -258,5 +258,34 @@ namespace Iis.Desktop.Common.Controls
                 control.Top = (parent.Height - control.Height) / 2;
             }
         }
+
+        public void FillTreeView<T>(
+            TreeView treeView,
+            IReadOnlyList<T> rootItems,
+            Func<T, string> getTitle,
+            Func<T, IReadOnlyList<T>> getChildren)
+        {
+            foreach (var rootItem in rootItems)
+            {
+                var node = new TreeNode(getTitle(rootItem));
+                FillTreeNodeChildren(node, rootItem, getTitle, getChildren);
+                treeView.Nodes.Add(node);
+            }
+        }
+
+        private void FillTreeNodeChildren<T>(
+            TreeNode node,
+            T item,
+            Func<T, string> getTitle,
+            Func<T, IReadOnlyList<T>> getChildren)
+        {
+            var children = getChildren(item);
+            foreach (var child in children)
+            {
+                var childNode = new TreeNode(getTitle(child));
+                FillTreeNodeChildren(childNode, child, getTitle, getChildren);
+                node.Nodes.Add(childNode);
+            }
+        }
     }
 }

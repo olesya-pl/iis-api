@@ -20,5 +20,7 @@ namespace Iis.Interfaces.SecurityLevels
             UniqueIndex = level.UniqueIndex;
             ParentUniqueIndex = level.ParentUniqueIndex;
         }
+
+        public override string ToString() => $"{UniqueIndex} : {Name}";
     }
 }

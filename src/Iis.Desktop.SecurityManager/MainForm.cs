@@ -16,6 +16,10 @@ using Iis.Desktop.Common.Styles;
 using Iis.Desktop.Common.Configurations;
 using Iis.Desktop.SecurityManager.Controls;
 using Iis.Desktop.Common.Login;
+using Iis.Desktop.Common.Requests;
+using System.Threading.Tasks;
+using Iis.Interfaces.SecurityLevels;
+using Iis.Security.SecurityLevels;
 
 namespace Iis.Desktop.SecurityManager
 {
@@ -35,6 +39,10 @@ namespace Iis.Desktop.SecurityManager
         private UiAccessLevelTree _uiAccessLevelTree;
         private UiAccessLevelEdit _uiAccessLevelEdit;
         private TabControl tabControl;
+        private EnvConfig _currentConfig;
+        private UserCredentials _userCredentials;
+        private RequestSettings _requestSettings;
+        private SecurityLevelChecker _securityLevelChecker;
 
         #endregion
 
@@ -62,9 +70,11 @@ namespace Iis.Desktop.SecurityManager
             panelMain.Controls.Add(tabControl);
             tabControl.Dock = DockStyle.Fill;
 
-            tabControl.TabPages.Add("Користувачи");
+            _currentConfig = _environmentProperties["local"];
+            _requestSettings = new RequestSettings { ReIndexTimeOutInMins = 25 };
 
             CreateSecurityAttributesTab(tabControl);
+            tabControl.TabPages.Add("Користувачи");
 
             ShowLogin();
         }
@@ -77,11 +87,11 @@ namespace Iis.Desktop.SecurityManager
         {
             var panelModal = _uiControlsCreator.GetFillPanel(this);
             var panelLogin = _uiControlsCreator.GetPanel(panelModal);
-            var appUriString = _environmentProperties["qa"].ApiUri;
+            var appUriString = _environmentProperties["local"].ApiUri;
             var _loginRequestWrapper = new LoginRequestWrapper(new Uri(appUriString));
             var loginControl = new UiLoginControl(_loginRequestWrapper);
             loginControl.Initialize("LoginControl", panelLogin, _style);
-            loginControl.OnLogin += (credentials) => { panelMain.Visible = true; this.Controls.Remove(panelModal); };
+            loginControl.OnLogin += async (credentials) => { await OnLogin(credentials, panelModal).ConfigureAwait(false); };
             panelLogin.Width = loginControl.Width;
             panelLogin.Height = loginControl.Height;
             _uiControlsCreator.PutToCenterOfParent(panelLogin);
@@ -108,7 +118,24 @@ namespace Iis.Desktop.SecurityManager
             _uiAccessLevelTree.OnNodeSelect += node => { _uiAccessLevelEdit.SetUiValues(node); };
         }
 
+        #endregion
+
+        #region Event Handlers
+
+        private async Task OnLogin(UserCredentials userCredentials, Panel panelToHide)
+        {
+            panelMain.Visible = true;
+            Controls.Remove(panelToHide);
+            _userCredentials = userCredentials;
+            var plainLevels = await GetRequestWrapper().GetSecurityLevels().ConfigureAwait(false);
+            _securityLevelChecker = new SecurityLevelChecker(plainLevels);
+            Invoke((Action)(() => _uiAccessLevelTree.SetUiValues(_securityLevelChecker.RootLevel)));
+        }
 
         #endregion
+
+        private RequestWraper GetRequestWrapper() =>
+            new RequestWraper(_currentConfig.ApiUri, _userCredentials, _requestSettings, _logger);
+
     }
 }
