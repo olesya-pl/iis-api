@@ -36,8 +36,9 @@ namespace Iis.Desktop.SecurityManager
         private Panel panelMain;
         private Panel panelLeft;
         private Panel panelRight;
-        private UiAccessLevelTree _uiAccessLevelTree;
-        private UiAccessLevelEdit _uiAccessLevelEdit;
+        private UiAccessLevelTreeControl _uiAccessLevelTreeControl;
+        private UiAccessLevelEditControl _uiAccessLevelEditControl;
+        private UiUserSecurityControl _uiUserSecurityControl;
         private TabControl tabControl;
         private EnvConfig _currentConfig;
         private UserCredentials _userCredentials;
@@ -74,7 +75,7 @@ namespace Iis.Desktop.SecurityManager
             _requestSettings = new RequestSettings { ReIndexTimeOutInMins = 25 };
 
             CreateSecurityAttributesTab(tabControl);
-            tabControl.TabPages.Add("Користувачи");
+            CreateUsersTab(tabControl);
 
             ShowLogin();
         }
@@ -103,19 +104,28 @@ namespace Iis.Desktop.SecurityManager
         {
             var pageAttributes = new TabPage("Атрибути доступу");
             tabControl.TabPages.Add(pageAttributes);
+            var pnlAttributes = _uiControlsCreator.GetFillPanel(pageAttributes);
 
-            int panelLeftWidth = tabControl.Width / 3;
-            (panelLeft, panelRight) = _uiControlsCreator.GetLeftRightPanels(pageAttributes, panelLeftWidth);
+            int panelLeftWidth = pnlAttributes.Width / 3;
+            (panelLeft, panelRight) = _uiControlsCreator.GetLeftRightPanels(pnlAttributes, panelLeftWidth);
 
-            int panelTopHeight = panelRight.Height / 3;
+            _uiAccessLevelTreeControl = new UiAccessLevelTreeControl();
+            _uiAccessLevelTreeControl.Initialize("AccessLevelTree", panelLeft, _style);
 
-            _uiAccessLevelTree = new UiAccessLevelTree();
-            _uiAccessLevelTree.Initialize("AccessLevelTree", panelLeft, _style);
+            _uiAccessLevelEditControl = new UiAccessLevelEditControl();
+            _uiAccessLevelEditControl.Initialize("AccessLevelEdit", panelRight, _style);
 
-            _uiAccessLevelEdit = new UiAccessLevelEdit();
-            _uiAccessLevelEdit.Initialize("AccessLevelEdit", panelRight, _style);
+            _uiAccessLevelTreeControl.OnNodeSelect += node => { _uiAccessLevelEditControl.SetUiValues(node); };
+        }
 
-            _uiAccessLevelTree.OnNodeSelect += node => { _uiAccessLevelEdit.SetUiValues(node); };
+        private void CreateUsersTab(TabControl tabControl)
+        {
+            var pageUser = new TabPage("Користувачи");
+            tabControl.TabPages.Add(pageUser);
+            var pnlUser = _uiControlsCreator.GetFillPanel(pageUser);
+
+            _uiUserSecurityControl = new UiUserSecurityControl(GetRequestWrapper());
+            _uiUserSecurityControl.Initialize("UserSecurityControl", pnlUser, _style);
         }
 
         #endregion
@@ -129,7 +139,7 @@ namespace Iis.Desktop.SecurityManager
             _userCredentials = userCredentials;
             var plainLevels = await GetRequestWrapper().GetSecurityLevels().ConfigureAwait(false);
             _securityLevelChecker = new SecurityLevelChecker(plainLevels);
-            Invoke((Action)(() => _uiAccessLevelTree.SetUiValues(_securityLevelChecker.RootLevel)));
+            Invoke((Action)(() => _uiAccessLevelTreeControl.SetUiValues(_securityLevelChecker.RootLevel)));
         }
 
         #endregion
