@@ -17,14 +17,16 @@ namespace Iis.Services
     {
         private readonly IOntologySchema _ontologySchema;
         private readonly IElasticService _elasticService;
+        private readonly IElasticManager _elasticManager;
         private static readonly IReadOnlyCollection<AutocompleteEntityDto> EmptyAutoCompleteList = Array.Empty<AutocompleteEntityDto>();
         private static readonly List<string> KeyWords = new List<string>();
-        private static readonly string[] SearchableFields = { "__title", "commonInfo.RealNameShort", "title" };
+        private static readonly string[] SearchableFields = { "__title" };
 
-        public AutocompleteService(IOntologySchema ontologySchema, IElasticService elasticService)
+        public AutocompleteService(IOntologySchema ontologySchema, IElasticService elasticService, IElasticManager elasticManager)
         {
             _ontologySchema = ontologySchema;
             _elasticService = elasticService;
+            _elasticManager = elasticManager;
         }
 
         public IReadOnlyCollection<string> GetTips(string query, int count)
@@ -47,8 +49,6 @@ namespace Iis.Services
         {
             if(SearchQueryExtension.IsMatchAll(query)) return EmptyAutoCompleteList;
 
-            if (!query.Contains('*')) query = $"*{query}*";
-
             var typeNameList = _ontologySchema.GetEntityTypesByName(types, includeChildren: true)
                                 .Select(e => e.Name)
                                 .Distinct()
@@ -56,9 +56,14 @@ namespace Iis.Services
 
             if(!_elasticService.TypesAreSupported(typeNameList)) return EmptyAutoCompleteList;
 
-            var response = await _elasticService.SearchByFieldsAsync(query, SearchableFields, typeNameList, size, user.Id, ct);
+            var autocompleteQuery = new SearchAsYouTypeQueryBuilder(query, SearchableFields)
+                .WithPagination(0, size)
+                .BuildSearchQuery()
+                .ToString();
 
-            return response.Select(x => new AutocompleteEntityDto
+            var response = await _elasticManager.SearchAsync(autocompleteQuery, typeNameList, ct);
+
+            return response.Items.Select(x => new AutocompleteEntityDto
             {
                 Id = x.Identifier,
                 Title = GetFirstNotNullField(x.SearchResult),
