@@ -16,7 +16,8 @@ namespace Iis.MaterialDistributor
         {
             httpContext.Response.ContentType = ContentType;
 
-            var response = JsonSerializer.Serialize(new
+            var response = JsonSerializer.Serialize(
+            new
             {
                 Version = _appVersion,
                 Status = healthReport.Status.ToString(),
