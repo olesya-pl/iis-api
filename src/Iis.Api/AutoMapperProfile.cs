@@ -40,6 +40,7 @@ using Iis.DbLayer.Repositories;
 using Iis.Interfaces.Ontology;
 using Iis.Api.GraphQL.RadioElectronicSituation;
 using Iis.Elastic.Entities;
+using Iis.Interfaces.SecurityLevels;
 
 namespace Iis.Api
 {
