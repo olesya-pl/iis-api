@@ -8,8 +8,10 @@ namespace Iis.Interfaces.SecurityLevels
     {
         ISecurityLevel RootLevel { get; }
         IReadOnlyList<ISecurityLevel> GetSecurityLevels(IReadOnlyList<Guid> securityLevelIds);
+        IReadOnlyList<ISecurityLevel> GetSecurityLevels(IReadOnlyList<int> securityLevelIndexes);
+        IReadOnlyList<int> GetSecurityLevelIndexes(IReadOnlyList<Guid> securityLevelIds);
         IReadOnlyList<SecurityLevelPlain> GetSecurityLevelsPlain();
         bool AccessGranted(IReadOnlyList<int> userIndexes, IReadOnlyList<int> objectIndexes);
-        string GetStringCode(bool includeAll, IReadOnlyList<int> indexes);
+        string GetStringCode(bool includeAll, IReadOnlyList<int> indexes); 
     }
 }

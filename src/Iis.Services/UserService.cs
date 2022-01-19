@@ -471,6 +471,38 @@ namespace Iis.Services
             return sb.ToString();
         }
 
+        public async Task<IReadOnlyList<UserSecurityDto>> GetUserSecurityDtosAsync()
+        {
+            var userEntityList = await RunWithoutCommitAsync(_ => _.UserRepository.GetUsersAsync(_ => true));
+            return userEntityList.Select(_ => new UserSecurityDto
+            {
+                Id = _.Id,
+                Username = _.Username,
+                SecurityIndexes = _securityLevelChecker.GetSecurityLevelIndexes(_.SecurityLevels.Select(sl => sl.Id).ToList())
+            }).ToList();
+        }
+
+        public async Task SaveUserSecurityAsync(UserSecurityDto userSecurityDto)
+        {
+            var userEntity = await RunWithoutCommitAsync(_ => _.UserRepository.GetByIdAsync(userSecurityDto.Id));
+            var userLevelIds = userEntity.SecurityLevels.Select(_ => _.Id).ToList();
+            var newLevels = _securityLevelChecker.GetSecurityLevels(userSecurityDto.SecurityIndexes);
+            var newLevelIds = newLevels.Select(_ => _.Id).ToList();
+
+            var idsToDelete = userLevelIds.Where(_ => !newLevelIds.Contains(_));
+            _context.RemoveRange(userEntity.SecurityLevels.Where(_ => idsToDelete.Contains(_.Id)));
+
+            var levelsToAdd = newLevels.Where(_ => !userLevelIds.Contains(_.Id));
+
+            _context.AddRange(levelsToAdd.Select(_ => new UserSecurityLevelEntity
+            {
+                Id = Guid.NewGuid(),
+                UserId = userSecurityDto.Id,
+                SecurityLevelIndex = _.UniqueIndex
+            }));
+            _context.SaveChanges();
+        }
+
         private RoleEntity GetDefaultRole(IEnumerable<RoleEntity> roles)
         {
             var defaultRole = roles.SingleOrDefault(_ => _.Name == DefaultRoleName);

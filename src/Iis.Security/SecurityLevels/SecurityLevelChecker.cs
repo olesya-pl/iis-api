@@ -73,6 +73,10 @@ namespace Iis.Security.SecurityLevels
 
         public IReadOnlyList<ISecurityLevel> GetSecurityLevels(IReadOnlyList<Guid> securityLevelIds) =>
             _rootLevel.GetAllItems().Where(_ => securityLevelIds.Contains(_.Id)).ToList();
+        public IReadOnlyList<ISecurityLevel> GetSecurityLevels(IReadOnlyList<int> securityLevelIndexes) =>
+            _rootLevel.GetAllItems().Where(_ => securityLevelIndexes.Contains(_.UniqueIndex)).ToList();
+        public IReadOnlyList<int> GetSecurityLevelIndexes(IReadOnlyList<Guid> securityLevelIds) =>
+            GetSecurityLevels(securityLevelIds).Select(_ => _.UniqueIndex).ToList();
         public IReadOnlyList<SecurityLevelPlain> GetSecurityLevelsPlain() =>
             _rootLevel.GetAllItems().Select(_ => new SecurityLevelPlain(_)).ToList();
             

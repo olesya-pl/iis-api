@@ -4,6 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Iis.Domain.Users;
 using Iis.Interfaces.Elastic;
+using Iis.Interfaces.SecurityLevels;
 using Iis.Services.Contracts.Enums;
 using Iis.Services.Contracts.Materials.Distribution;
 
@@ -26,5 +27,7 @@ namespace Iis.Services.Contracts.Interfaces
         Task<string> ImportUsersFromExternalSourceAsync(IEnumerable<string> userNames = null, CancellationToken cancellationToken = default);
         Task<string> GetUserMatrixInfoAsync();
         Task<string> CreateMatrixUsersAsync(List<string> userNames = null);
+        Task<IReadOnlyList<UserSecurityDto>> GetUserSecurityDtosAsync();
+        Task SaveUserSecurityAsync(UserSecurityDto userSecurityDto);
     }
 }
