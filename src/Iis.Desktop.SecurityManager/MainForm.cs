@@ -44,6 +44,7 @@ namespace Iis.Desktop.SecurityManager
         private UserCredentials _userCredentials;
         private RequestSettings _requestSettings;
         private SecurityLevelChecker _securityLevelChecker;
+        private IReadOnlyList<UserSecurityDto> _users;
 
         #endregion
 
@@ -126,6 +127,7 @@ namespace Iis.Desktop.SecurityManager
 
             _uiUserSecurityControl = new UiUserSecurityControl(GetRequestWrapper());
             _uiUserSecurityControl.Initialize("UserSecurityControl", pnlUser, _style);
+            _uiUserSecurityControl.OnSave += async () => { await RefreshUsers(); };
         }
 
         #endregion
@@ -137,9 +139,26 @@ namespace Iis.Desktop.SecurityManager
             panelMain.Visible = true;
             Controls.Remove(panelToHide);
             _userCredentials = userCredentials;
-            var plainLevels = await GetRequestWrapper().GetSecurityLevels().ConfigureAwait(false);
+            var requestWrapper = GetRequestWrapper();
+            var plainLevels = await requestWrapper.GetSecurityLevels().ConfigureAwait(false);
             _securityLevelChecker = new SecurityLevelChecker(plainLevels);
-            Invoke((Action)(() => _uiAccessLevelTreeControl.SetUiValues(_securityLevelChecker.RootLevel)));
+            _uiUserSecurityControl.SetSecurityLevelChecker(_securityLevelChecker);
+            await RefreshUsers();
+
+            Invoke((Action)(() =>
+            {
+                _uiAccessLevelTreeControl.SetUiValues(_securityLevelChecker.RootLevel);
+            }));
+        }
+
+        private async Task RefreshUsers()
+        {
+            _users = await GetRequestWrapper().GetUserSecurityDtos().ConfigureAwait(false);
+
+            Invoke((Action)(() =>
+            {
+                _uiUserSecurityControl.SetUiValues(_users);
+            }));
         }
 
         #endregion

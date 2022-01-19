@@ -110,6 +110,33 @@ namespace Iis.Desktop.Common.Requests
             return result;
         }
 
+        public async Task<IReadOnlyList<UserSecurityDto>> GetUserSecurityDtos()
+        {
+            var uri = new Uri(ApiRouteList.GetUserSecurityDtos, UriKind.Relative);
+
+            using var httpClient = GetClient(_baseApiApiAddress, _requestSettings);
+
+            var response = await SendRequestAsync(() => httpClient.GetAsync(uri), uri).ConfigureAwait(false);
+
+            var result = response.IsSuccess ?
+                JsonConvert.DeserializeObject<List<UserSecurityDto>>(response.Message) :
+                new List<UserSecurityDto>();
+
+            return result;
+        }
+
+        public async Task SaveUserSecurityDto(UserSecurityDto userSecurityDto)
+        {
+            var uri = new Uri(ApiRouteList.SaveUserSecurityDtos, UriKind.Relative);
+
+            using var httpClient = GetClient(_baseApiApiAddress, _requestSettings);
+
+            var json = JsonConvert.SerializeObject(userSecurityDto);
+
+            var response = await SendRequestAsync(() => httpClient.PostAsync(uri, new StringContent(json, Encoding.UTF8, "application/json")), uri)
+                .ConfigureAwait(false);
+        }
+
         private async Task<RequestResult> SendRequestAsync(Func<Task<HttpResponseMessage>> func, Uri uri)
         {
             HttpResponseMessage response = BadGatewayResponseMessage(_baseApiApiAddress, uri);

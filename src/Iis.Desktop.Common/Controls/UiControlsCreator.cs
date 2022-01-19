@@ -266,6 +266,17 @@ namespace Iis.Desktop.Common.Controls
             }
         }
 
+        public IReadOnlyList<TreeNode> GetAllNodes(TreeNodeCollection nodes)
+        {
+            var result = new List<TreeNode>();
+            foreach (TreeNode node in nodes)
+            {
+                result.Add(node);
+                result.AddRange(GetAllNodes(node.Nodes));
+            }
+            return result;
+        }
+
         public void FillTreeView<T>(
             TreeView treeView,
             IReadOnlyList<T> rootItems,
@@ -273,6 +284,7 @@ namespace Iis.Desktop.Common.Controls
             Func<T, IReadOnlyList<T>> getChildren,
             Func<T, bool> getChecked)
         {
+            treeView.Nodes.Clear();
             foreach (var rootItem in rootItems)
             {
                 var node = new TreeNode(getTitle(rootItem));
@@ -301,7 +313,7 @@ namespace Iis.Desktop.Common.Controls
                 FillTreeNodeChildren(childNode, child, getTitle, getChildren, getChecked);
                 if (getChecked?.Invoke(child) == true)
                 {
-                    node.Checked = true;
+                    childNode.Checked = true;
                 }
                 node.Nodes.Add(childNode);
             }
