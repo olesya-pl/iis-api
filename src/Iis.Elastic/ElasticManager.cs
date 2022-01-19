@@ -184,14 +184,14 @@ namespace Iis.Elastic
             return _resultExtractor.GetFromResponse(response);
         }
 
-        public async Task<IElasticSearchResult> SearchByScrollAsync(string scrollId, TimeSpan scrollDuration)
+        public async Task<IElasticSearchResult> SearchByScrollAsync(string scrollId, TimeSpan scrollDuration, CancellationToken cancellationToken = default)
         {
             var path = "_search/scroll";
             var postData = $@"{{
-                ""scroll"" : ""{ scrollDuration.TotalSeconds }s"",                                                                 
+                ""scroll"" : ""{ scrollDuration.TotalSeconds }s"",
                 ""scroll_id"" : ""{scrollId}""
             }}";
-            var response = await PostAsync(path, postData, cancellationToken: CancellationToken.None);
+            var response = await PostAsync(path, postData, cancellationToken: cancellationToken);
             return _resultExtractor.GetFromResponse(response);
         }
 
@@ -563,6 +563,12 @@ namespace Iis.Elastic
         public IElasticManager WithUserId(Guid userId)
         {
             CreateLowlevelClient(userId.ToString("N"), ElasticConstants.DefaultPassword);
+            return this;
+        }
+
+        public IElasticManager WithDefaultUser()
+        {
+            CreateLowlevelClient(_configuration.DefaultLogin, _configuration.DefaultPassword);
             return this;
         }
 
