@@ -28,6 +28,9 @@ namespace AcceptanceTests.UISteps
             this.driver = driver;
         }
 
+        public IWebElement GetEventByRelevantDate(string eventsDates) =>
+            driver.FindElement(By.XPath($"//div[@class='events-table__dates-cell']//*[@class = 'date-time']//*[contains(text(),'{eventsDates}')]"));
+
         [When(@"I navigated to Events page")]
         public void IWantNavigateToEventsPage()
         {
@@ -125,7 +128,6 @@ namespace AcceptanceTests.UISteps
             driver.WaitFor(1);
         }
 
-
         [When(@"I pressed the edit event button")]
         public void WhenIPressedTheEditEventButton()
         {
@@ -210,6 +212,15 @@ namespace AcceptanceTests.UISteps
             driver.WaitFor(5);
         }
 
+        [When(@"I searched event (.*)")]
+        public void WhenISearchedEvent(string Event)
+        {
+            eventsSection.SearchButton.Click();
+            eventsSection.SearchField.SendKeys($"{Event}");
+            eventsSection.SearchField.SendKeys(Keys.Enter);
+            driver.WaitFor(5);
+        }
+
         #endregion
 
         #region Then
@@ -237,6 +248,14 @@ namespace AcceptanceTests.UISteps
             var eventUniqueName = context.Get<string>(eventName);
             Assert.True(eventPage.IsEventVisible(eventUniqueName));
         }
+
+        [Then(@"I must see events with relevant dates (.*)")]
+        public void ThenIMustSeeEventsWithRelevantDates(string eventsDates)
+        {
+            var eventWithRelevantDate = GetEventByRelevantDate(eventsDates);
+            Assert.True(eventWithRelevantDate.Displayed);
+        }
+
         [Then(@"I must not see the (.*) material binded to the event")]
         public void ThenIMustNotSeeTheMaterialBindedToTheEvent(string materialName)
         {

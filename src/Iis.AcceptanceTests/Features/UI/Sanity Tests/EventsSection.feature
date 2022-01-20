@@ -1,9 +1,11 @@
 Feature: EventsSection - sanity
 
-    - IIS-6364 - Bind a material to an event in the event section
+
+    - IIS-5826 - Change event in the event section
     - IIS-5831 - Bind an object of study to an event in the event section
     - IIS-6158 - Create an event in the event section
-    - IIS-5826 - Change event in the event section
+    - IIS-6364 - Bind a material to an event in the event section
+    - IIS-6992 - Ability to search event in the events section by date
 
     Background: Authorize
         Given I sign in with the user olya and password 123 in the Contour
@@ -64,3 +66,15 @@ Feature: EventsSection - sanity
         And I pressed the confirm save changes in the event
         And I reloaded the event page
         Then I must see the Додаткові дані text in the additional data text field
+        
+        @sanity @EventsSectionSanity @UI
+    Scenario: IIS-6992 - Ability to search event in the events section by date
+    When I navigated to Events page
+    When I searched event startsAt: 2019-11-04
+    Then I must see events with relevant dates  04 лист. 2019 
+    When I searched event endsAt: 06,11,2019
+    Then I must see events with relevant dates  06 лист. 2019 
+    When I searched event startsAt: 04.11.2019
+    Then I must see events with relevant dates  04 лист. 2019 
+    When I searched event endsAt: 2019,11,06
+    Then I must see events with relevant dates  06 лист. 2019 
