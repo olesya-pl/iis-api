@@ -4,8 +4,8 @@
     {
         public static class Materials
         {
-            public const string MaterialsTotalCount = "materials_total_count";
-            public const string MaterialsCount = "materials_count";
+            public const string MaterialsTotalCount = "iz_iis_general_material_total";
+            public const string MaterialsCount = "iz_iis_general_material_count";
         }
     }
 }
