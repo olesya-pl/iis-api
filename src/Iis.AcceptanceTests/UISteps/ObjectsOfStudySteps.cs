@@ -44,6 +44,7 @@ namespace AcceptanceTests.UISteps
         public void WhenIClickedOnEnlargeSmallCardButton()
         {
             objectsOfStudyPage.EnlargeObjectOfStudySmallCardButton.Click();
+            driver.WaitFor(3);
         }
 
         [When(@"I clicked on minimize big card object of study card button")]
@@ -405,7 +406,12 @@ namespace AcceptanceTests.UISteps
             objectsOfStudyPage.MaterialsTab.Click();
         }
 
-
+        [When(@"I clicked on the comments tab in the big card window")]
+        public void WhenIClickedOnTheCommentsTabInTheBigCardWindow()
+        {
+            objectsOfStudyPage.CommentsTab.Click();
+            driver.WaitFor(2);
+        }
 
         #endregion
 
@@ -598,6 +604,12 @@ namespace AcceptanceTests.UISteps
         public void ThenIMustSeeAttachedMaterial()
         {
             Assert.True(objectsOfStudyPage.AttachedMaterialTitle.Displayed);
+        }
+
+        [Then(@"I must see text area for comments")]
+        public void ThenIMustSeeTextAreaForComments()
+        {
+            Assert.True(objectsOfStudyPage.TextAreaForComments.Displayed);
         }
 
 
