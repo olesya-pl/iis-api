@@ -9,7 +9,8 @@ namespace Iis.Metrics.Materials
     {
         private const string AppLabel = "app";
         private const string ModuleLabel = "module";
-        private const string ComponentName = "iis";
+        private const string Module = "Materials";
+        private const string ComponentName = "CoreApi";
         private const string SourceLabel = "source";
 
         private readonly ApplicationMetrics _applicationMetrics;
@@ -23,9 +24,9 @@ namespace Iis.Metrics.Materials
             _materialsCountMetric = InitGauge(MetricNames.Materials.MaterialsCount, "Count of downloaded materials", AppLabel, ModuleLabel, SourceLabel);
         }
 
-        public IGauge MaterialsTotalCountMetric => _materialsTotalCountMetric.WithLabels(ComponentName, ComponentName);
+        public IGauge MaterialsTotalCountMetric => _materialsTotalCountMetric.WithLabels(ComponentName, Module);
 
-        public IGauge GetMaterialsCountMetric(string source) => _materialsCountMetric.WithLabels(ComponentName, ComponentName, source);
+        public IGauge GetMaterialsCountMetric(string source) => _materialsCountMetric.WithLabels(ComponentName, Module, source);
 
         public void SetMetrics(MaterialMetrics materialMetrics)
         {
