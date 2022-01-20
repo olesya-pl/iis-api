@@ -8,6 +8,7 @@ using Serilog;
 using Iis.Services.Contracts.Params;
 using Newtonsoft.Json;
 using Iis.Desktop.Common.Login;
+using Iis.Interfaces.SecurityLevels;
 
 namespace Iis.Desktop.Common.Requests
 {
@@ -92,6 +93,21 @@ namespace Iis.Desktop.Common.Requests
             var json = JsonConvert.SerializeObject(param);
 
             return await SendRequestAsync(() => httpClient.PostAsync(uri, new StringContent(json, Encoding.UTF8, "application/json")), uri);
+        }
+
+        public async Task<IReadOnlyList<SecurityLevelPlain>> GetSecurityLevels()
+        {
+            var uri = new Uri(ApiRouteList.GetSecurityLevels, UriKind.Relative);
+
+            using var httpClient = GetClient(_baseApiApiAddress, _requestSettings);
+
+            var response = await SendRequestAsync(() => httpClient.GetAsync(uri), uri).ConfigureAwait(false);
+
+            var result = response.IsSuccess ?
+                JsonConvert.DeserializeObject<List<SecurityLevelPlain>>(response.Message) :
+                new List<SecurityLevelPlain>();
+
+            return result;
         }
 
         private async Task<RequestResult> SendRequestAsync(Func<Task<HttpResponseMessage>> func, Uri uri)

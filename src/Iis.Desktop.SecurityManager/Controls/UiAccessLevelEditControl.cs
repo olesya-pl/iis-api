@@ -6,7 +6,7 @@ using Iis.Desktop.Common.Controls;
 
 namespace Iis.Desktop.SecurityManager.Controls
 {
-    public class UiAccessLevelEdit : UiBaseControl
+    public class UiAccessLevelEditControl : UiBaseControl
     {
         private TextBox txtId;
         private TextBox txtName;
