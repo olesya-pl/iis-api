@@ -1,4 +1,4 @@
-using AcceptanceTests.Helpers;
+﻿using AcceptanceTests.Helpers;
 using OpenQA.Selenium;
 using SeleniumExtras.PageObjects;
 
@@ -55,5 +55,9 @@ namespace AcceptanceTests.PageObjects
         [FindsBy(How = How.CssSelector, Using = ".sidebar__nav .res")]
         [CacheLookup]
         public IWebElement ReoLink;
+
+        [FindsBy(How = How.XPath, Using = "//*[@class='sidebar__nav']//*[@class='el-menu-item sidebar__nav-item']//*[text()=' Повідомлення ']")]
+        [CacheLookup]
+        public IWebElement ChatLink;
     }
 }

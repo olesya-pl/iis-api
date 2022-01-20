@@ -11,10 +11,9 @@ namespace Iis.Security.SecurityLevels
     public class SecurityLevelChecker : ISecurityLevelChecker
     {
         private SecurityLevel _rootLevel;
-        internal SecurityLevelChecker(SecurityLevel rootLevel)
-        {
-            _rootLevel = rootLevel;
-        }
+
+        public SecurityLevelChecker() { }
+
         public SecurityLevelChecker(IOntologyNodesData ontologyData)
         {
             const string NAME = "name";
@@ -46,6 +45,12 @@ namespace Iis.Security.SecurityLevels
             }
             _rootLevel = rowLevels.Values.First().SecurityLevel.Root;
         }
+
+        internal SecurityLevelChecker(SecurityLevel rootLevel)
+        {
+            _rootLevel = rootLevel;
+        }
+
 
         public SecurityLevelChecker(IReadOnlyList<SecurityLevelPlain> plainLevels)
         {

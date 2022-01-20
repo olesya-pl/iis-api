@@ -86,6 +86,8 @@ using Iis.Utility.Logging;
 using Iis.Api.Authentication.OntologyBasicAuthentication;
 using Iis.Interfaces.DirectQueries;
 using Iis.DbLayer.DirectQueries;
+using Prometheus;
+using Iis.Api.Metrics;
 using Iis.Interfaces.SecurityLevels;
 using Iis.Security.SecurityLevels;
 
@@ -283,6 +285,7 @@ namespace IIS.Core
                 services.AddHealthChecks()
                 .AddNpgSql(dbConnectionString)
                 .AddRabbitMQ(mqConnectionString, (SslOption)null)
+                .ForwardToPrometheus()
                 .AddElasticsearch(options => options
                     .UseServer(elasticConfiguration.Uri)
                     .UseBasicAuthentication(elasticConfiguration.DefaultLogin, elasticConfiguration.DefaultPassword));
@@ -332,6 +335,8 @@ namespace IIS.Core
 
             services.Configure<FormOptions>(options => options.MultipartBodyLengthLimit = long.MaxValue);
             services.AddSingleton<IDirectQueryFactory>(new DirectQueryFactory(System.IO.Path.GetDirectoryName(Assembly.GetEntryAssembly().Location)));
+
+            services.AddMetrics();
         }
 
         private async Task AuthenticateAsync(IQueryContext context, HashSet<string> publiclyAccesible)
@@ -420,6 +425,7 @@ namespace IIS.Core
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
+                endpoints.MapMetrics();
             });
         }
 

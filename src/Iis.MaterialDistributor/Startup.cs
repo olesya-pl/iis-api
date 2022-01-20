@@ -4,6 +4,8 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Iis.Elastic;
+using Iis.MaterialDistributor.DependencyInjection;
 
 namespace Iis.MaterialDistributor
 {
@@ -20,6 +22,12 @@ namespace Iis.MaterialDistributor
         {
             services.AddControllers();
             services.AddHealthChecks();
+            services.RegisterAutoMapperProfiles();
+            services.RegisterMediatRHandlers();
+            services.RegisterElasticManager(Configuration);
+            services.RegisterRepositories();
+            services.RegisterServices();
+            services.RegisterHostedServices();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -30,6 +38,7 @@ namespace Iis.MaterialDistributor
             }
 
             app.UseHealthChecks("/api/server-health", new HealthCheckOptions { ResponseWriter = HealthResponseWriter.WriteHealthCheckAsync });
+
             app.UseRouting();
 
             app.UseAuthorization();

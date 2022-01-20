@@ -1,3 +1,4 @@
+using Iis.Interfaces.Elastic;
 using Newtonsoft.Json.Linq;
 
 namespace Iis.Elastic.SearchQueryExtensions
@@ -12,6 +13,13 @@ namespace Iis.Elastic.SearchQueryExtensions
         {
             _from = from;
             _size = size;
+
+            return this as T;
+        }
+
+        public T WithPagination(PaginationParams pagination)
+        {
+            (_from, _size) = pagination.ToElasticPage();
 
             return this as T;
         }

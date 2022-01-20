@@ -19,6 +19,9 @@ using Iis.DbLayer.OntologySchema;
 using Iis.Services.Contracts.Interfaces;
 using Iis.Interfaces.Ontology.Data;
 using Iis.Services;
+using AutoFixture.Kernel;
+using Iis.Interfaces.SecurityLevels;
+using Iis.Security.SecurityLevels;
 
 namespace Iis.UnitTests
 {
@@ -30,10 +33,9 @@ namespace Iis.UnitTests
                 fixture.Behaviors.OfType<ThrowingRecursionBehavior>()
                     .ToList().ForEach(b => fixture.Behaviors.Remove(b));
                 fixture.Behaviors.Add(new OmitOnRecursionBehavior());
+                fixture.Customize(new IisCustomization());
                 return fixture;
-            }
-
-            )
+            })
         { }
     }
 
@@ -46,6 +48,17 @@ namespace Iis.UnitTests
 
             )
         { }
+    }
+
+    public class IisCustomization : ICustomization
+    {
+        public void Customize(IFixture fixture)
+        {
+            fixture.Customizations
+                .Add(new TypeRelay(
+                      typeof(ISecurityLevel),
+                      typeof(SecurityLevel)));
+        }
     }
 
     public class Utils
@@ -109,6 +122,7 @@ namespace Iis.UnitTests
             serviceCollection.AddTransient<IOntologyService>(factory => new Mock<IOntologyService>().Object);
             serviceCollection.AddTransient<IOntologyNodesData>(factory => new Mock<IOntologyNodesData>().Object);
             serviceCollection.AddTransient<IMatrixService>(factory => new Mock<IMatrixService>().Object);
+            serviceCollection.AddTransient<ISecurityLevelChecker>(factory => new Mock<SecurityLevelChecker>().Object);
 
             return new Utils
             {

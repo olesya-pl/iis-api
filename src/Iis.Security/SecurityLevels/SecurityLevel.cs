@@ -15,7 +15,7 @@ namespace Iis.Security.SecurityLevels
 
         internal List<SecurityLevel> _children = new List<SecurityLevel>();
 
-        internal SecurityLevel() { }
+        public SecurityLevel() { }
         internal SecurityLevel(string name, int uniqueIndex, IReadOnlyList<SecurityLevel> children = null)
         {
             Id = new Guid();

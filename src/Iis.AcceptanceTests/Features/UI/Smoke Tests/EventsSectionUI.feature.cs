@@ -89,20 +89,20 @@ namespace AcceptanceTests.Features.UI.SmokeTests
             this.TestTearDown();
         }
         
-        [Xunit.SkippableFactAttribute(DisplayName="Ensure that Events section is opened")]
+        [Xunit.SkippableFactAttribute(DisplayName="IIS-6226 - Ensure that Events section is opened")]
         [Xunit.TraitAttribute("FeatureTitle", "EventsTabUI - Smoke")]
-        [Xunit.TraitAttribute("Description", "Ensure that Events section is opened")]
+        [Xunit.TraitAttribute("Description", "IIS-6226 - Ensure that Events section is opened")]
         [Xunit.TraitAttribute("Category", "smoke")]
         [Xunit.TraitAttribute("Category", "UI")]
         [Xunit.TraitAttribute("Category", "EventsUI")]
-        public virtual void EnsureThatEventsSectionIsOpened()
+        public virtual void IIS_6226_EnsureThatEventsSectionIsOpened()
         {
             string[] tagsOfScenario = new string[] {
                     "smoke",
                     "UI",
                     "EventsUI"};
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Ensure that Events section is opened", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("IIS-6226 - Ensure that Events section is opened", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
 #line 9
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
