@@ -30,7 +30,7 @@ namespace Iis.Desktop.SecurityManager
         private IConfiguration _configuration;
         private IReadOnlyDictionary<string, EnvConfig> _environmentProperties;
         private IDesktopStyle _style;
-        private const string VERSION = "0.1";
+        private const string VERSION = "0.75";
         private ILogger _logger;
         private UiControlsCreator _uiControlsCreator;
         private Panel panelMain;
@@ -39,11 +39,13 @@ namespace Iis.Desktop.SecurityManager
         private UiAccessLevelTreeControl _uiAccessLevelTreeControl;
         private UiAccessLevelEditControl _uiAccessLevelEditControl;
         private UiUserSecurityControl _uiUserSecurityControl;
+        private UiObjectSecurityControl _uiObjectSecurityControl;
         private TabControl tabControl;
         private EnvConfig _currentConfig;
         private UserCredentials _userCredentials;
         private RequestSettings _requestSettings;
         private SecurityLevelChecker _securityLevelChecker;
+        private IReadOnlyList<UserSecurityDto> _users;
 
         #endregion
 
@@ -76,6 +78,7 @@ namespace Iis.Desktop.SecurityManager
 
             CreateSecurityAttributesTab(tabControl);
             CreateUsersTab(tabControl);
+            CreateObjectsTab(tabControl);
 
             ShowLogin();
         }
@@ -126,6 +129,18 @@ namespace Iis.Desktop.SecurityManager
 
             _uiUserSecurityControl = new UiUserSecurityControl(GetRequestWrapper());
             _uiUserSecurityControl.Initialize("UserSecurityControl", pnlUser, _style);
+            _uiUserSecurityControl.OnSave += async () => { await RefreshUsers(); };
+        }
+
+        private void CreateObjectsTab(TabControl tabControl)
+        {
+            var pageObject = new TabPage("Об'єкти");
+            tabControl.TabPages.Add(pageObject);
+            var pnlObject = _uiControlsCreator.GetFillPanel(pageObject);
+
+            _uiObjectSecurityControl = new UiObjectSecurityControl(GetRequestWrapper());
+            _uiObjectSecurityControl.Initialize("ObjectSecurityControl", pnlObject, _style);
+            //_uiObjectSecurityControl.OnSave += async () => { await RefreshUsers(); };
         }
 
         #endregion
@@ -137,9 +152,27 @@ namespace Iis.Desktop.SecurityManager
             panelMain.Visible = true;
             Controls.Remove(panelToHide);
             _userCredentials = userCredentials;
-            var plainLevels = await GetRequestWrapper().GetSecurityLevels().ConfigureAwait(false);
+            var requestWrapper = GetRequestWrapper();
+            var plainLevels = await requestWrapper.GetSecurityLevels().ConfigureAwait(false);
             _securityLevelChecker = new SecurityLevelChecker(plainLevels);
-            Invoke((Action)(() => _uiAccessLevelTreeControl.SetUiValues(_securityLevelChecker.RootLevel)));
+            _uiUserSecurityControl.SetSecurityLevelChecker(_securityLevelChecker);
+            _uiObjectSecurityControl.SetSecurityLevelChecker(_securityLevelChecker);
+            await RefreshUsers();
+
+            Invoke((Action)(() =>
+            {
+                _uiAccessLevelTreeControl.SetUiValues(_securityLevelChecker.RootLevel);
+            }));
+        }
+
+        private async Task RefreshUsers()
+        {
+            _users = await GetRequestWrapper().GetUserSecurityDtos().ConfigureAwait(false);
+
+            Invoke((Action)(() =>
+            {
+                _uiUserSecurityControl.SetUiValues(_users);
+            }));
         }
 
         #endregion
