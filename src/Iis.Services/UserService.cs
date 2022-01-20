@@ -478,27 +478,25 @@ namespace Iis.Services
             {
                 Id = _.Id,
                 Username = _.Username,
-                SecurityIndexes = _securityLevelChecker.GetSecurityLevelIndexes(_.SecurityLevels.Select(sl => sl.Id).ToList())
+                SecurityIndexes = _.SecurityLevels.Select(sl => sl.SecurityLevelIndex).ToList()
             }).ToList();
         }
 
         public async Task SaveUserSecurityAsync(UserSecurityDto userSecurityDto)
         {
             var userEntity = await RunWithoutCommitAsync(_ => _.UserRepository.GetByIdAsync(userSecurityDto.Id));
-            var userLevelIds = userEntity.SecurityLevels.Select(_ => _.Id).ToList();
-            var newLevels = _securityLevelChecker.GetSecurityLevels(userSecurityDto.SecurityIndexes);
-            var newLevelIds = newLevels.Select(_ => _.Id).ToList();
+            var currentIndexes = userEntity.SecurityLevels.Select(_ => _.SecurityLevelIndex).ToList();
 
-            var idsToDelete = userLevelIds.Where(_ => !newLevelIds.Contains(_));
-            _context.RemoveRange(userEntity.SecurityLevels.Where(_ => idsToDelete.Contains(_.Id)));
+            var indexesToDelete = currentIndexes.Where(_ => !userSecurityDto.SecurityIndexes.Contains(_));
+            _context.RemoveRange(userEntity.SecurityLevels.Where(_ => indexesToDelete.Contains(_.SecurityLevelIndex)));
 
-            var levelsToAdd = newLevels.Where(_ => !userLevelIds.Contains(_.Id));
+            var indexesToAdd = userSecurityDto.SecurityIndexes.Where(_ => !currentIndexes.Contains(_));
 
-            _context.AddRange(levelsToAdd.Select(_ => new UserSecurityLevelEntity
+            _context.AddRange(indexesToAdd.Select(_ => new UserSecurityLevelEntity
             {
                 Id = Guid.NewGuid(),
                 UserId = userSecurityDto.Id,
-                SecurityLevelIndex = _.UniqueIndex
+                SecurityLevelIndex = _
             }));
             _context.SaveChanges();
         }
