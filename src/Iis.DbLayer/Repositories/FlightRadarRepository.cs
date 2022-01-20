@@ -50,13 +50,12 @@ namespace Iis.DbLayer.Repositories
 
         public Task<List<LocationHistoryEntity>> GetLocationHistoryAsync(IReadOnlyCollection<Guid> entityIdList, DateTime? dateFrom, DateTime? dateTo)
         {
-            var query = Context.LocationHistory.Where(lh => lh.EntityId != null && entityIdList.Contains(lh.EntityId.Value));
+            var query = Context.LocationHistory.Where(_ => _.EntityId != null && entityIdList.Contains(_.EntityId.Value));
 
             query = AddDatePeriod(query, dateFrom, dateTo);
 
-            return Context.LocationHistory
-                .Where(lh => lh.EntityId != null && entityIdList.Contains(lh.EntityId.Value))
-                .OrderByDescending(lh => lh.RegisteredAt)
+            return query
+                .OrderByDescending(_ => _.RegisteredAt)
                 .ToListAsync();
         }
 
