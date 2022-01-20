@@ -308,7 +308,8 @@ namespace Iis.Api
                 .ForMember(dest => dest.Roles, opts => opts.MapFrom(src => src.UserRoles.Select(ur => ur.Role)));
 
             //mapping: Roles.User -> UserEntity
-            CreateMap<Iis.Domain.Users.User, UserEntity>();
+            CreateMap<Iis.Domain.Users.User, UserEntity>()
+                .ForMember(dest => dest.SecurityLevels, opts => opts.Ignore());
 
             CreateMap<UserEntity, UserEntity>()
                 .ForMember(dest => dest.Username, opts => opts.Ignore())
