@@ -127,11 +127,38 @@ namespace Iis.Desktop.Common.Requests
 
         public async Task SaveUserSecurityDto(UserSecurityDto userSecurityDto)
         {
-            var uri = new Uri(ApiRouteList.SaveUserSecurityDtos, UriKind.Relative);
+            var uri = new Uri(ApiRouteList.SaveUserSecurityDto, UriKind.Relative);
 
             using var httpClient = GetClient(_baseApiApiAddress, _requestSettings);
 
             var json = JsonConvert.SerializeObject(userSecurityDto);
+
+            var response = await SendRequestAsync(() => httpClient.PostAsync(uri, new StringContent(json, Encoding.UTF8, "application/json")), uri)
+                .ConfigureAwait(false);
+        }
+
+        public async Task<ObjectSecurityDto> GetObjectSecurityDtos(Guid id)
+        {
+            var uri = new Uri(ApiRouteList.GetObjectSecurityDtos, UriKind.Relative);
+
+            using var httpClient = GetClient(_baseApiApiAddress, _requestSettings);
+
+            var response = await SendRequestAsync(() => httpClient.GetAsync($"{uri}/{id}"), uri).ConfigureAwait(false);
+
+            var result = response.IsSuccess ?
+                JsonConvert.DeserializeObject<ObjectSecurityDto>(response.Message) :
+                new ObjectSecurityDto { Title = String.Empty, SecurityIndexes = new List<int>() };
+
+            return result;
+        }
+
+        public async Task SaveObjectSecurityDto(ObjectSecurityDto objectSecurityDto)
+        {
+            var uri = new Uri(ApiRouteList.SaveObjectSecurityDto, UriKind.Relative);
+
+            using var httpClient = GetClient(_baseApiApiAddress, _requestSettings);
+
+            var json = JsonConvert.SerializeObject(objectSecurityDto);
 
             var response = await SendRequestAsync(() => httpClient.PostAsync(uri, new StringContent(json, Encoding.UTF8, "application/json")), uri)
                 .ConfigureAwait(false);

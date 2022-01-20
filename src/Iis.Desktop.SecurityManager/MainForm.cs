@@ -30,7 +30,7 @@ namespace Iis.Desktop.SecurityManager
         private IConfiguration _configuration;
         private IReadOnlyDictionary<string, EnvConfig> _environmentProperties;
         private IDesktopStyle _style;
-        private const string VERSION = "0.1";
+        private const string VERSION = "0.75";
         private ILogger _logger;
         private UiControlsCreator _uiControlsCreator;
         private Panel panelMain;
@@ -39,6 +39,7 @@ namespace Iis.Desktop.SecurityManager
         private UiAccessLevelTreeControl _uiAccessLevelTreeControl;
         private UiAccessLevelEditControl _uiAccessLevelEditControl;
         private UiUserSecurityControl _uiUserSecurityControl;
+        private UiObjectSecurityControl _uiObjectSecurityControl;
         private TabControl tabControl;
         private EnvConfig _currentConfig;
         private UserCredentials _userCredentials;
@@ -77,6 +78,7 @@ namespace Iis.Desktop.SecurityManager
 
             CreateSecurityAttributesTab(tabControl);
             CreateUsersTab(tabControl);
+            CreateObjectsTab(tabControl);
 
             ShowLogin();
         }
@@ -130,6 +132,17 @@ namespace Iis.Desktop.SecurityManager
             _uiUserSecurityControl.OnSave += async () => { await RefreshUsers(); };
         }
 
+        private void CreateObjectsTab(TabControl tabControl)
+        {
+            var pageObject = new TabPage("Об'єкти");
+            tabControl.TabPages.Add(pageObject);
+            var pnlObject = _uiControlsCreator.GetFillPanel(pageObject);
+
+            _uiObjectSecurityControl = new UiObjectSecurityControl(GetRequestWrapper());
+            _uiObjectSecurityControl.Initialize("ObjectSecurityControl", pnlObject, _style);
+            //_uiObjectSecurityControl.OnSave += async () => { await RefreshUsers(); };
+        }
+
         #endregion
 
         #region Event Handlers
@@ -143,6 +156,7 @@ namespace Iis.Desktop.SecurityManager
             var plainLevels = await requestWrapper.GetSecurityLevels().ConfigureAwait(false);
             _securityLevelChecker = new SecurityLevelChecker(plainLevels);
             _uiUserSecurityControl.SetSecurityLevelChecker(_securityLevelChecker);
+            _uiObjectSecurityControl.SetSecurityLevelChecker(_securityLevelChecker);
             await RefreshUsers();
 
             Invoke((Action)(() =>

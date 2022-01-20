@@ -14,6 +14,8 @@
         public const string AccessLevelChange = "admin/ChangeAccessLevels";
         public const string GetSecurityLevels = "securityLevel/getSecurityLevels";
         public const string GetUserSecurityDtos = "securityLevel/getUserSecurityDtos";
-        public const string SaveUserSecurityDtos = "securityLevel/saveUserSecurityDtos";
+        public const string SaveUserSecurityDto = "securityLevel/saveUserSecurityDto";
+        public const string GetObjectSecurityDtos = "securityLevel/getObjectSecurityDtos";
+        public const string SaveObjectSecurityDto = "securityLevel/saveObjectSecurityDto";
     }
 }
