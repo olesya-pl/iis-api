@@ -13,6 +13,10 @@
     <ItemGroup>
         <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="7.0.0" />
         <PackageReference Include="MediatR.Extensions.Microsoft.DependencyInjection" Version="8.1.0" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="3.1.4">
+          <PrivateAssets>all</PrivateAssets>
+          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
         <PackageReference Include="Serilog" Version="2.9.0" />
         <PackageReference Include="Serilog.AspNetCore" Version="3.2.0" />
         <PackageReference Include="Serilog.Enrichers.Thread" Version="3.1.0" />
@@ -25,7 +29,11 @@
     </ItemGroup>
     <ItemGroup>
         <ProjectReference Include="..\Iis.Elastic\Iis.Elastic.csproj" />
+        <ProjectReference Include="..\Iis.MaterialDistributor.DataModel\Iis.MaterialDistributor.DataModel.csproj" />
         <ProjectReference Include="..\Iis.Utility\Iis.Utility.csproj" />
         <ProjectReference Include="..\Iis.RabbitMq\Iis.RabbitMq.csproj" />
+    </ItemGroup>
+    <ItemGroup>
+      <Folder Include="Repositories\DataType\" />
     </ItemGroup>
 </Project>
