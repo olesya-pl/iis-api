@@ -28,6 +28,7 @@ namespace Iis.MaterialDistributor
             services.RegisterRepositories();
             services.RegisterServices();
             services.RegisterHostedServices();
+            services.AddPersistance();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

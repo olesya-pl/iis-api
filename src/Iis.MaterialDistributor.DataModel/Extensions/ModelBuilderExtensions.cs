@@ -4,7 +4,7 @@ using System.Reflection;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 
-namespace Iis.DataModel
+namespace Iis.MaterialDistributor.DataModel.Extensions
 {
     public static class ModelBuilderExtensions
     {
