@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Windows.Forms;
 using Iis.Desktop.Common.Controls;
+using Iis.Interfaces.SecurityLevels;
 
 namespace Iis.Desktop.SecurityManager.Controls
 {
@@ -10,23 +11,27 @@ namespace Iis.Desktop.SecurityManager.Controls
     {
         private TextBox txtId;
         private TextBox txtName;
+        private TextBox txtUniqueIndex;
+        private TextBox txtParent;
         private Button btnSave;
         private TreeNode treeNode;
-
-        //public 
+        private ISecurityLevel CurrentLevel => (ISecurityLevel)treeNode.Tag;
 
         public void SetUiValues(TreeNode node)
         {
             treeNode = node;
-            txtId.Text = Guid.NewGuid().ToString("N");
-            txtName.Text = node.Text;
+            txtId.Text = CurrentLevel.Id.ToString("N");
+            txtName.Text = CurrentLevel.Name;
+            txtUniqueIndex.Text = CurrentLevel.UniqueIndex.ToString();
+            txtParent.Text = CurrentLevel.Parent?.Name;
         }
 
         protected override void CreateControls()
         {
             _container.Add(txtId = new TextBox { ReadOnly = true }, "ИД");
             _container.Add(txtName = new TextBox(), "Назва");
-            //_container.Add(new TextBox(), "Ще якійсь контрол");
+            _container.Add(txtUniqueIndex = new TextBox { Enabled = false }, "Унікальний індекс");
+            _container.Add(txtParent = new TextBox { Enabled = false }, "Належить до");
             _container.Add(btnSave = _uiControlsCreator.GetButton("Зберегти"));
             btnSave.Click += (sender, e) => { Save(); };
         }

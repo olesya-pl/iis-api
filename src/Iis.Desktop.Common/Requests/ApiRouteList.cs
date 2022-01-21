@@ -17,5 +17,7 @@
         public const string SaveUserSecurityDto = "securityLevel/saveUserSecurityDto";
         public const string GetObjectSecurityDtos = "securityLevel/getObjectSecurityDtos";
         public const string SaveObjectSecurityDto = "securityLevel/saveObjectSecurityDto";
+        public const string SaveSecurityLevel = "securityLevel/saveSecurityLevel";
+        public const string RemoveSecurityLevel = "securityLevel/removeSecurityLevel";
     }
 }

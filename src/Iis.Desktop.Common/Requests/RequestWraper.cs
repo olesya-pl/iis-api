@@ -164,6 +164,30 @@ namespace Iis.Desktop.Common.Requests
                 .ConfigureAwait(false);
         }
 
+        public async Task SaveSecurityLevel(SecurityLevelPlain securityLevelPlain)
+        {
+            var uri = new Uri(ApiRouteList.SaveSecurityLevel, UriKind.Relative);
+
+            using var httpClient = GetClient(_baseApiApiAddress, _requestSettings);
+
+            var json = JsonConvert.SerializeObject(securityLevelPlain);
+
+            var response = await SendRequestAsync(() => httpClient.PostAsync(uri, new StringContent(json, Encoding.UTF8, "application/json")), uri)
+                .ConfigureAwait(false);
+        }
+
+        public async Task RemoveSecurityLevel(SecurityLevelPlain securityLevelPlain)
+        {
+            var uri = new Uri(ApiRouteList.RemoveSecurityLevel, UriKind.Relative);
+
+            using var httpClient = GetClient(_baseApiApiAddress, _requestSettings);
+
+            var json = JsonConvert.SerializeObject(securityLevelPlain);
+
+            var response = await SendRequestAsync(() => httpClient.PostAsync(uri, new StringContent(json, Encoding.UTF8, "application/json")), uri)
+                .ConfigureAwait(false);
+        }
+
         private async Task<RequestResult> SendRequestAsync(Func<Task<HttpResponseMessage>> func, Uri uri)
         {
             HttpResponseMessage response = BadGatewayResponseMessage(_baseApiApiAddress, uri);

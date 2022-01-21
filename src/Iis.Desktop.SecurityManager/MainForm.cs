@@ -31,6 +31,7 @@ namespace Iis.Desktop.SecurityManager
         private IReadOnlyDictionary<string, EnvConfig> _environmentProperties;
         private IDesktopStyle _style;
         private const string VERSION = "0.75";
+        private const string DEFAULT_CONFIG = "local";
         private ILogger _logger;
         private UiControlsCreator _uiControlsCreator;
         private Panel panelMain;
@@ -73,7 +74,7 @@ namespace Iis.Desktop.SecurityManager
             panelMain.Controls.Add(tabControl);
             tabControl.Dock = DockStyle.Fill;
 
-            _currentConfig = _environmentProperties["local"];
+            _currentConfig = _environmentProperties[DEFAULT_CONFIG];
             _requestSettings = new RequestSettings { ReIndexTimeOutInMins = 25 };
 
             CreateSecurityAttributesTab(tabControl);
@@ -91,11 +92,11 @@ namespace Iis.Desktop.SecurityManager
         {
             var panelModal = _uiControlsCreator.GetFillPanel(this);
             var panelLogin = _uiControlsCreator.GetPanel(panelModal);
-            var appUriString = _environmentProperties["local"].ApiUri;
+            var appUriString = _currentConfig.ApiUri;
             var _loginRequestWrapper = new LoginRequestWrapper(new Uri(appUriString));
             var loginControl = new UiLoginControl(_loginRequestWrapper);
             loginControl.Initialize("LoginControl", panelLogin, _style);
-            loginControl.OnLogin += async (credentials) => { await OnLogin(credentials, panelModal).ConfigureAwait(false); };
+            loginControl.OnLogin += async (credentials) => { await OnLoginAsync(credentials, panelModal).ConfigureAwait(false); };
             panelLogin.Width = loginControl.Width;
             panelLogin.Height = loginControl.Height;
             _uiControlsCreator.PutToCenterOfParent(panelLogin);
@@ -147,7 +148,7 @@ namespace Iis.Desktop.SecurityManager
 
         #region Event Handlers
 
-        private async Task OnLogin(UserCredentials userCredentials, Panel panelToHide)
+        private async Task OnLoginAsync(UserCredentials userCredentials, Panel panelToHide)
         {
             panelMain.Visible = true;
             Controls.Remove(panelToHide);
