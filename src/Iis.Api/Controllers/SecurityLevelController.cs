@@ -14,71 +14,33 @@ namespace Iis.Api.Controllers
     [ApiController]
     public class SecurityLevelController : ControllerBase
     {
-        private readonly IOntologyNodesData _ontologyData;
-        private readonly ISecurityLevelChecker _securityLevelChecker;
         private readonly IUserService _userService;
+        private readonly ISecurityLevelService _securityLevelService;
         public SecurityLevelController(
-            IOntologyNodesData ontologyData,
-            ISecurityLevelChecker securityLevelChecker,
+            ISecurityLevelService securityLevelService,
             IUserService userService)
         {
-            _ontologyData = ontologyData;
-            _securityLevelChecker = securityLevelChecker;
+            _securityLevelService = securityLevelService;
             _userService = userService;
         }
 
         [HttpGet("getSecurityLevels")]
-        public IReadOnlyList<SecurityLevelPlain> GetSecurityLevels() => _securityLevelChecker.GetSecurityLevelsPlain();
+        public IReadOnlyList<SecurityLevelPlain> GetSecurityLevels() => _securityLevelService.GetSecurityLevelsPlain();
 
         [HttpGet("getUserSecurityDtos")]
-        public async Task<IReadOnlyList<UserSecurityDto>> GetUserSecurityDtos()
+        public async Task<IReadOnlyList<UserSecurityDto>> GetUserSecurityDtosAsync()
             => await _userService.GetUserSecurityDtosAsync();
 
         [HttpPost("saveUserSecurityDto")]
-        public async Task SaveUserSecurityDto(UserSecurityDto userSecurityDto)
+        public async Task SaveUserSecurityDtoAsync(UserSecurityDto userSecurityDto)
             => await _userService.SaveUserSecurityAsync(userSecurityDto);
 
         [HttpGet("getObjectSecurityDtos/{id}")]
-        public async Task<ObjectSecurityDto> GetObjectSecurityDtos(Guid id)
-        {
-            var node = _ontologyData.GetNode(id);
-            if (node == null) throw new Exception($"Node with id = {id} is not found");
-            return new ObjectSecurityDto
-            {
-                Id = id,
-                Title = node.GetTitleValue(),
-                SecurityIndexes = node.GetSecurityLevelIndexes()
-            };
-        }
+        public Task<ObjectSecurityDto> GetObjectSecurityDtosAsync(Guid id) =>
+            _securityLevelService.GetObjectSecurityDtosAsync(id);
 
         [HttpPost("saveObjectSecurityDto")]
-        public async Task SaveObjectSecurityDto(ObjectSecurityDto objectSecurityDto)
-        {
-            var node = _ontologyData.GetNode(objectSecurityDto.Id);
-            if (node == null) throw new Exception($"Node with id = {objectSecurityDto.Id} is not found");
-            var newLevels = _securityLevelChecker.GetSecurityLevels(objectSecurityDto.SecurityIndexes);
-            var relations = node.GetSecurityLevelRelations();
-            var idsToDelete = relations
-                .Where(r => !newLevels.Any(l => l.Id == r.TargetNodeId))
-                .Select(r => r.Id)
-                .ToList();
-
-            var idsToAdd = newLevels
-                .Where(l => !relations.Any(r => r.TargetNodeId == l.Id))
-                .Select(l => l.Id)
-                .ToList();
-
-            _ontologyData.WriteLock(() =>
-            {
-                _ontologyData.RemoveNodes(idsToDelete);
-                var objectType = _ontologyData.Schema.GetEntityTypeByName(EntityTypeNames.Object.ToString());
-                var securityLevelType = objectType.GetRelationByName(OntologyNames.SecurityLevelField);
-
-                foreach (var id in idsToAdd)
-                {
-                    _ontologyData.CreateRelation(objectSecurityDto.Id, id, securityLevelType.Id);
-                }
-            });
-        }
+        public Task SaveObjectSecurityDtoAsync(ObjectSecurityDto objectSecurityDto) =>
+            _securityLevelService.SaveObjectSecurityDtoAsync(objectSecurityDto);
     }
 }
