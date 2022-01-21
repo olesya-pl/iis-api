@@ -1009,26 +1009,6 @@ namespace Iis.DbLayer.ModifyDataScripts
                 data.AddValueByDotName(rootNode.Id, "Рівні доступу", NAME);
                 data.AddValueByDotName(rootNode.Id, 0, UNIQUE_INDEX);
 
-                var taemistNode = data.CreateNode(securityLevelType.Id);
-                data.AddValueByDotName(taemistNode.Id, "Таємність", NAME);
-                data.AddValueByDotName(taemistNode.Id, 1, UNIQUE_INDEX);
-                data.CreateRelation(taemistNode.Id, rootNode.Id, parentRelationType.Id);
-
-                var taemistNode1 = data.CreateNode(securityLevelType.Id);
-                data.AddValueByDotName(taemistNode1.Id, "Можливо таємне", NAME);
-                data.AddValueByDotName(taemistNode1.Id, 12, UNIQUE_INDEX);
-                data.CreateRelation(taemistNode1.Id, taemistNode.Id, parentRelationType.Id);
-
-                var taemistNode2 = data.CreateNode(securityLevelType.Id);
-                data.AddValueByDotName(taemistNode2.Id, "Дуже таємне", NAME);
-                data.AddValueByDotName(taemistNode2.Id, 13, UNIQUE_INDEX);
-                data.CreateRelation(taemistNode2.Id, taemistNode.Id, parentRelationType.Id);
-
-                var taemistNode3 = data.CreateNode(securityLevelType.Id);
-                data.AddValueByDotName(taemistNode3.Id, "Цілком таємне", NAME);
-                data.AddValueByDotName(taemistNode3.Id, 14, UNIQUE_INDEX);
-                data.CreateRelation(taemistNode3.Id, taemistNode.Id, parentRelationType.Id);
-
                 var regionNode = data.CreateNode(securityLevelType.Id);
                 data.AddValueByDotName(regionNode.Id, "Регіон", NAME);
                 data.AddValueByDotName(regionNode.Id, 2, UNIQUE_INDEX);
@@ -1103,11 +1083,6 @@ namespace Iis.DbLayer.ModifyDataScripts
                 data.AddValueByDotName(moveNode3.Id, "Космічні", NAME);
                 data.AddValueByDotName(moveNode3.Id, 313, UNIQUE_INDEX);
                 data.CreateRelation(moveNode3.Id, moveNode.Id, parentRelationType.Id);
-
-                var putchNode = data.CreateNode(securityLevelType.Id);
-                data.AddValueByDotName(putchNode.Id, "Путч", NAME);
-                data.AddValueByDotName(putchNode.Id, 32, UNIQUE_INDEX);
-                data.CreateRelation(putchNode.Id, categoryNode.Id, parentRelationType.Id);
             });
         }
 

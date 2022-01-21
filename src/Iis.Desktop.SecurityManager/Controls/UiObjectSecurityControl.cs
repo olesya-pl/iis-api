@@ -48,7 +48,7 @@ namespace Iis.Desktop.SecurityManager.Controls
         {
             Guid id;
             if (!Guid.TryParse(_txtId.Text, out id)) return;
-            _currentObjectSecurityDto = await _requestWrapper.GetObjectSecurityDtos(id).ConfigureAwait(false);
+            _currentObjectSecurityDto = await _requestWrapper.GetObjectSecurityDtosAsync(id).ConfigureAwait(false);
             MainPanel.Invoke((Action)(() =>
             {
                 _txtTitle.Text = _currentObjectSecurityDto.Title;
@@ -82,7 +82,7 @@ namespace Iis.Desktop.SecurityManager.Controls
                 Id = _currentObjectSecurityDto.Id,
                 SecurityIndexes = GetCheckedIndexes()
             };
-            await _requestWrapper.SaveObjectSecurityDto(objectSecurityDto).ConfigureAwait(false);
+            await _requestWrapper.SaveObjectSecurityDtoAsync(objectSecurityDto).ConfigureAwait(false);
             await Load();
         }
     }
