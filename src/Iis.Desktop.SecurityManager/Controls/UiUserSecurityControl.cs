@@ -50,7 +50,6 @@ namespace Iis.Desktop.SecurityManager.Controls
             panelLeft.Controls.Add(_grid);
             _grid.CellFormatting += grid_CellFormatting;
             _grid.SelectionChanged += (sender, e) => { SetSecurityLevels(); };
-            //grid.DoubleClick += gridInheritance_DoubleClick;
 
             var container = new UiContainerManager("Right", panelRight, _style);
             container.SetColWidth(500);
@@ -104,7 +103,7 @@ namespace Iis.Desktop.SecurityManager.Controls
                 Username = SelectedUser.Username,
                 SecurityIndexes = GetCheckedIndexes()
             };
-            await _requestWrapper.SaveUserSecurityDto(userSecurityDto).ConfigureAwait(false);
+            await _requestWrapper.SaveUserSecurityDtoAsync(userSecurityDto).ConfigureAwait(false);
             OnSave?.Invoke();
         }
     }

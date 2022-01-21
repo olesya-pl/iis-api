@@ -153,7 +153,7 @@ namespace Iis.Desktop.SecurityManager
             Controls.Remove(panelToHide);
             _userCredentials = userCredentials;
             var requestWrapper = GetRequestWrapper();
-            var plainLevels = await requestWrapper.GetSecurityLevels().ConfigureAwait(false);
+            var plainLevels = await requestWrapper.GetSecurityLevelsAsync().ConfigureAwait(false);
             _securityLevelChecker = new SecurityLevelChecker(plainLevels);
             _uiUserSecurityControl.SetSecurityLevelChecker(_securityLevelChecker);
             _uiObjectSecurityControl.SetSecurityLevelChecker(_securityLevelChecker);
@@ -167,7 +167,7 @@ namespace Iis.Desktop.SecurityManager
 
         private async Task RefreshUsers()
         {
-            _users = await GetRequestWrapper().GetUserSecurityDtos().ConfigureAwait(false);
+            _users = await GetRequestWrapper().GetUserSecurityDtosAsync().ConfigureAwait(false);
 
             Invoke((Action)(() =>
             {

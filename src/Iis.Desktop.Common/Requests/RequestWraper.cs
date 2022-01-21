@@ -95,7 +95,7 @@ namespace Iis.Desktop.Common.Requests
             return await SendRequestAsync(() => httpClient.PostAsync(uri, new StringContent(json, Encoding.UTF8, "application/json")), uri);
         }
 
-        public async Task<IReadOnlyList<SecurityLevelPlain>> GetSecurityLevels()
+        public async Task<IReadOnlyList<SecurityLevelPlain>> GetSecurityLevelsAsync()
         {
             var uri = new Uri(ApiRouteList.GetSecurityLevels, UriKind.Relative);
 
@@ -110,7 +110,7 @@ namespace Iis.Desktop.Common.Requests
             return result;
         }
 
-        public async Task<IReadOnlyList<UserSecurityDto>> GetUserSecurityDtos()
+        public async Task<IReadOnlyList<UserSecurityDto>> GetUserSecurityDtosAsync()
         {
             var uri = new Uri(ApiRouteList.GetUserSecurityDtos, UriKind.Relative);
 
@@ -125,7 +125,7 @@ namespace Iis.Desktop.Common.Requests
             return result;
         }
 
-        public async Task SaveUserSecurityDto(UserSecurityDto userSecurityDto)
+        public async Task SaveUserSecurityDtoAsync(UserSecurityDto userSecurityDto)
         {
             var uri = new Uri(ApiRouteList.SaveUserSecurityDto, UriKind.Relative);
 
@@ -137,7 +137,7 @@ namespace Iis.Desktop.Common.Requests
                 .ConfigureAwait(false);
         }
 
-        public async Task<ObjectSecurityDto> GetObjectSecurityDtos(Guid id)
+        public async Task<ObjectSecurityDto> GetObjectSecurityDtosAsync(Guid id)
         {
             var uri = new Uri(ApiRouteList.GetObjectSecurityDtos, UriKind.Relative);
 
@@ -152,7 +152,7 @@ namespace Iis.Desktop.Common.Requests
             return result;
         }
 
-        public async Task SaveObjectSecurityDto(ObjectSecurityDto objectSecurityDto)
+        public async Task SaveObjectSecurityDtoAsync(ObjectSecurityDto objectSecurityDto)
         {
             var uri = new Uri(ApiRouteList.SaveObjectSecurityDto, UriKind.Relative);
 
