@@ -1,6 +1,7 @@
 using System;
 using System.Threading.Tasks;
 using Iis.Api;
+using Iis.Api.Metrics;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
@@ -26,6 +27,8 @@ namespace IIS.Core
                     NeedToStart = host.RunModifyDataScripts();
 
                     await host.SeedExternalUsersAsync();
+
+                    host.InitAppMetrics();
 
                     await host.RunAsync();
                 }
