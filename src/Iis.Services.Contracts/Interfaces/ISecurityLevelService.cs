@@ -11,5 +11,7 @@ namespace Iis.Services.Contracts.Interfaces
         IReadOnlyList<SecurityLevelPlain> GetSecurityLevelsPlain();
         Task<ObjectSecurityDto> GetObjectSecurityDtosAsync(Guid id);
         Task SaveObjectSecurityDtoAsync(ObjectSecurityDto objectSecurityDto);
+        void SaveSecurityLevel(SecurityLevelPlain levelPlain);
+        void RemoveSecurityLevel(Guid id);
     }
 }

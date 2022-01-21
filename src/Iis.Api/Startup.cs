@@ -212,6 +212,7 @@ namespace IIS.Core
             services.AddTransient<IOntologySchemaService, OntologySchemaService>();
             services.AddTransient<IConnectionStringService, ConnectionStringService>();
             services.AddTransient<IAccessLevelService, AccessLevelService>();
+            services.AddTransient<ISecurityLevelService, SecurityLevelService>();
             services.AddTransient<AccessObjectService>();
             services.AddTransient<IFeatureProcessorFactory, FeatureProcessorFactory>();
             services.AddTransient<NodeMapper>();

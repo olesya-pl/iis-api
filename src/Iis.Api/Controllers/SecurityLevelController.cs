@@ -42,5 +42,13 @@ namespace Iis.Api.Controllers
         [HttpPost("saveObjectSecurityDto")]
         public Task SaveObjectSecurityDtoAsync(ObjectSecurityDto objectSecurityDto) =>
             _securityLevelService.SaveObjectSecurityDtoAsync(objectSecurityDto);
+
+        [HttpPost("saveSecurityLevel")]
+        public async Task SaveSecurityLevel(SecurityLevelPlain levelPlain) =>
+            _securityLevelService.SaveSecurityLevel(levelPlain);
+
+        [HttpPost("removeSecurityLevel")]
+        public void RemoveSecurityLevel(SecurityLevelPlain levelPlain) =>
+            _securityLevelService.RemoveSecurityLevel(levelPlain.Id);
     }
 }

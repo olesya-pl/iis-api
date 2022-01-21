@@ -11,46 +11,20 @@ namespace Iis.Security.SecurityLevels
     public class SecurityLevelChecker : ISecurityLevelChecker
     {
         private SecurityLevel _rootLevel;
+        private IOntologyNodesData _ontologyData;
 
         public SecurityLevelChecker() { }
 
         public SecurityLevelChecker(IOntologyNodesData ontologyData)
         {
-            const string NAME = "name";
-            const string UNIQUE_INDEX = "uniqueIndex";
-            const string PARENT = "parent";
-
-            var levelsNodes = ontologyData.GetEntitiesByTypeName(EntityTypeNames.SecurityLevel.ToString());
-            var rowLevels = levelsNodes.Select(_ => 
-                new
-                {
-                    SecurityLevel = new SecurityLevel
-                    {
-                        Id = _.Id,
-                        Name = _.GetSingleDirectProperty(NAME)?.Value,
-                        UniqueIndex = int.Parse(_.GetSingleDirectProperty(UNIQUE_INDEX)?.Value),
-                    },
-                    ParentIndexStr = _.GetSingleDirectProperty(PARENT)?.GetSingleDirectProperty(UNIQUE_INDEX)?.Value
-                }
-            ).ToDictionary(_ => _.SecurityLevel.UniqueIndex);
-
-            foreach (var rowLevel in rowLevels.Values)
-            {
-                if (!string.IsNullOrEmpty(rowLevel.ParentIndexStr))
-                {
-                    var parentLevel = rowLevels[int.Parse(rowLevel.ParentIndexStr)].SecurityLevel;
-                    rowLevel.SecurityLevel._parent = parentLevel;
-                    parentLevel._children.Add(rowLevel.SecurityLevel);
-                }
-            }
-            _rootLevel = rowLevels.Values.First().SecurityLevel.Root;
+            _ontologyData = ontologyData;
+            Initialize();
         }
 
         internal SecurityLevelChecker(SecurityLevel rootLevel)
         {
             _rootLevel = rootLevel;
         }
-
 
         public SecurityLevelChecker(IReadOnlyList<SecurityLevelPlain> plainLevels)
         {
@@ -76,6 +50,9 @@ namespace Iis.Security.SecurityLevels
 
         public ISecurityLevel RootLevel => _rootLevel;
 
+        public void Reload() => Initialize();
+        public ISecurityLevel GetSecurityLevel(Guid id) => _rootLevel.GetAllItems().Single(_ => _.Id == id);
+        public ISecurityLevel GetSecurityLevel(int uniqueIndex) => _rootLevel.GetAllItems().Single(_ => _.UniqueIndex == uniqueIndex);
         public IReadOnlyList<ISecurityLevel> GetSecurityLevels(IReadOnlyList<Guid> securityLevelIds) =>
             _rootLevel.GetAllItems().Where(_ => securityLevelIds.Contains(_.Id)).ToList();
         public IReadOnlyList<ISecurityLevel> GetSecurityLevels(IReadOnlyList<int> securityLevelIndexes) =>
@@ -122,5 +99,34 @@ namespace Iis.Security.SecurityLevels
 
         private IReadOnlyList<SecurityLevel> GetAllAccessibleLevels(IReadOnlyList<SecurityLevel> baseItems) =>
             _rootLevel.GetAllItems().Where(_ => AccessGranted(baseItems, _)).ToList();
+
+        private void Initialize()
+        {
+            var levelsNodes = _ontologyData.GetEntitiesByTypeName(EntityTypeNames.SecurityLevel.ToString());
+            var rowLevels = levelsNodes.Select(_ =>
+                new
+                {
+                    SecurityLevel = new SecurityLevel
+                    {
+                        Id = _.Id,
+                        Name = _.GetSingleDirectProperty(OntologyNames.NameField)?.Value,
+                        UniqueIndex = int.Parse(_.GetSingleDirectProperty(OntologyNames.UniqueIndexField)?.Value),
+                    },
+                    ParentIndexStr = _.GetSingleDirectProperty(OntologyNames.ParentField)
+                        ?.GetSingleDirectProperty(OntologyNames.UniqueIndexField)?.Value
+                }
+            ).ToDictionary(_ => _.SecurityLevel.UniqueIndex);
+
+            foreach (var rowLevel in rowLevels.Values)
+            {
+                if (!string.IsNullOrEmpty(rowLevel.ParentIndexStr))
+                {
+                    var parentLevel = rowLevels[int.Parse(rowLevel.ParentIndexStr)].SecurityLevel;
+                    rowLevel.SecurityLevel._parent = parentLevel;
+                    parentLevel._children.Add(rowLevel.SecurityLevel);
+                }
+            }
+            _rootLevel = rowLevels.Values.First().SecurityLevel.Root;
+        }
     }
 }
