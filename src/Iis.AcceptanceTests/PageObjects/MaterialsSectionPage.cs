@@ -217,5 +217,26 @@ namespace AcceptanceTests.PageObjects
 
         [FindsBy(How = How.XPath, Using = "//div[@class='p-datatable-scrollable-body']//div[@class='player']//div[@class='player__controls-panel']//*[@class='player__timer-total']")]
         public IWebElement PlayerControlsPanelWithTotalTime;
+
+        [FindsBy(How = How.CssSelector, Using = ".action-button--important")]
+        [CacheLookup]
+        public IWebElement SessionPriorityTranslate;
+
+        [FindsBy(How = How.CssSelector, Using = ".action-button--translation")]
+        [CacheLookup]
+        public IWebElement SessionPriorityImportant;
+
+        [FindsBy(How = How.CssSelector, Using = ".action-button--immediateReport")]
+        [CacheLookup]
+        public IWebElement SessionPriorityImmediateRepor;
+
+        [FindsBy(How = How.XPath, Using = "//*[@class='el-notification right']")]
+        public IWebElement Notification;
+
+        [FindsBy(How = How.CssSelector, Using = ".action-button--next-page span")]
+        public IWebElement NextMaterialButton;
+
+        [FindsBy(How = How.CssSelector, Using = ".action-button--next-page span")]
+        public IWebElement newContext;
     }
 }

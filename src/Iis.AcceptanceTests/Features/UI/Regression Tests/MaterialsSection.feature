@@ -7,6 +7,7 @@ Feature: Materials - regression
 	- IIS-7445 - Change a material`s AccessLevel
 	- IIS-6470 - Sorting materials by source
 	- IIS-8238 - Hotkeys for audio rewind
+	- IIS-8257 - Possibility save  material by hotkeys
 	- IIS-8441 - Display the length of the audio track
 
 Background:
@@ -196,3 +197,27 @@ Scenario: IIS-8441 - Display the length of the audio track
 	When I clicked on the first material in the Materials list
 	Then I must see the length of the audio track
 	When I close the material card
+
+	@regression @UI @Materials
+Scenario: IIS-8257 - Possibility save  material by hotkeys
+        Given I upload a new docx material via API
+		| Field                 | Value                                      |
+		| FileName              | тестовий матеріал                          |
+		| SourceReliabilityText | Здебільшого надійне                        |
+		| ReliabilityText       | Достовірна                                 |
+		| Content               | таємний контент                           |
+		| AccessLevel           | 0                                          |
+		| LoadedBy              | автотест                                   |
+		| MetaData              | {"type":"document","source":"contour.doc"} |
+	When I navigated to Materials page
+	And I clicked search button in the Materials section
+	And I searched таємн data in the materials
+	And I clicked on the first search result in the Materials section
+	Then I cliced on the text field
+	Then I wrote on the text field  Якийсь текст
+	When I send keys Ctrl and [ from the keyboard
+	Then I must see notification about saving material
+	When I pressed the Next material button
+	When I pressed the Previous material button
+	Then I must see saved new content with text  Якийсь текст in the text field
+	When I clean up uploaded material via API
