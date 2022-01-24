@@ -17,15 +17,24 @@ namespace Iis.Services
         private readonly OntologyContext _context;
         private readonly IOntologyNodesData _ontologyData;
         private readonly ISecurityLevelChecker _securityLevelChecker;
+        private readonly INodeSaveService _nodeSaveService;
 
         public SecurityLevelService(
             IOntologyNodesData ontologyData,
             ISecurityLevelChecker securityLevelChecker,
-            OntologyContext context)
+            OntologyContext context,
+            INodeSaveService nodeSaveService)
         {
             _ontologyData = ontologyData;
             _securityLevelChecker = securityLevelChecker;
+            _context = context;
+            _nodeSaveService = nodeSaveService;
         }
+
+        private INodeTypeLinked SecurityLevelType => _ontologyData.Schema.GetEntityTypeByName(EntityTypeNames.SecurityLevel.ToString());
+        private IRelationType NameType => SecurityLevelType.GetRelationByName(OntologyNames.NameField);
+        private IRelationType UniqueIndexType => SecurityLevelType.GetRelationByName(OntologyNames.UniqueIndexField);
+        private IRelationType ParentType => SecurityLevelType.GetRelationByName(OntologyNames.ParentField);
 
         public IReadOnlyList<SecurityLevelPlain> GetSecurityLevelsPlain()
             => _securityLevelChecker.GetSecurityLevelsPlain();
@@ -69,36 +78,36 @@ namespace Iis.Services
                     _ontologyData.CreateRelation(objectSecurityDto.Id, id, securityLevelType.Id);
                 }
             });
+            await _nodeSaveService.PutNodeAsync(node.Id);
         }
 
         public void SaveSecurityLevel(SecurityLevelPlain levelPlain)
         {
-            var securityLevelType = _ontologyData.Schema.GetEntityTypeByName(EntityTypeNames.SecurityLevel.ToString());
-            var nameType = securityLevelType.GetRelationByName(OntologyNames.NameField);
-            var uniqueIndexType = securityLevelType.GetRelationByName(OntologyNames.UniqueIndexField);
-            var parentType = securityLevelType.GetRelationByName(OntologyNames.ParentField);
-
             _ontologyData.WriteLock(() =>
             {
-                var node = _ontologyData.GetNode(levelPlain.Id) ?? _ontologyData.CreateNode(securityLevelType.Id);
+                var node = _ontologyData.GetNode(levelPlain.Id) ?? _ontologyData.CreateNode(SecurityLevelType.Id);
                 var nameRelation = node.GetSingleDirectRelation(OntologyNames.NameField);
                 var oldName = nameRelation?.TargetNode.Value;
 
                 if (nameRelation != null && levelPlain.Name != oldName)
                 {
-                    _ontologyData.SetNodeIsArchived(nameRelation.Id);
-                    _ontologyData.CreateRelationWithAttribute(node.Id, nameType.Id, levelPlain.Name);
+                    _ontologyData.RemoveNodeAndRelations(nameRelation.Id);
                 }
 
-                if (node.GetSingleDirectRelation(OntologyNames.UniqueIndexField) == null)
+                if (levelPlain.Name != oldName)
                 {
-                    _ontologyData.CreateRelationWithAttribute(node.Id, uniqueIndexType.Id, levelPlain.UniqueIndex.ToString());
+                    _ontologyData.CreateRelationWithAttribute(node.Id, NameType.Id, levelPlain.Name);
+                }
+
+                if (levelPlain.IsNew)
+                {
+                    _ontologyData.CreateRelationWithAttribute(node.Id, UniqueIndexType.Id, GetNextUniqueIndex().ToString());
                 }
 
                 if (node.GetSingleDirectRelation(OntologyNames.ParentField) == null && levelPlain.ParentUniqueIndex != null)
                 {
                     var parentLevel = _securityLevelChecker.GetSecurityLevel((int)levelPlain.ParentUniqueIndex);
-                    _ontologyData.CreateRelation(node.Id, parentLevel.Id, parentType.Id);
+                    _ontologyData.CreateRelation(node.Id, parentLevel.Id, ParentType.Id);
                 }
             });
             _securityLevelChecker.Reload();
@@ -106,7 +115,22 @@ namespace Iis.Services
 
         public void RemoveSecurityLevel(Guid id)
         {
-            _ontologyData.WriteLock(() => { _ontologyData.RemoveNode(id); });
+            _ontologyData.WriteLock(() =>
+            {
+                _ontologyData.RemoveNodeAndRelations(id);
+                _securityLevelChecker.Reload();
+            });
+        }
+
+        private int GetNextUniqueIndex()
+        {
+            var values =
+               (from n in _context.Nodes
+                join a in _context.Attributes on n.Id equals a.Id
+                where n.NodeTypeId == UniqueIndexType.TargetTypeId
+                select a.Value).ToList();
+
+            return values.Count == 0 ? 0 : values.Max(_ => int.Parse(_)) + 1;
         }
     }
 }

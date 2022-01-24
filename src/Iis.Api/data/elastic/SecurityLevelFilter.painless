@@ -1,6 +1,6 @@
-if (doc['__securityLevels.keyword'].size() == 0) return true;
+if (doc['__securityLevels'].size() == 0) return true;
 String userAccess = ';{{_user.metadata.securityLevels}};';
-String docAccess = doc['__securityLevels.keyword'][0];
+String docAccess = doc['__securityLevels'][0];
 docAccess = docAccess + ';';
  
 while (docAccess != '') {

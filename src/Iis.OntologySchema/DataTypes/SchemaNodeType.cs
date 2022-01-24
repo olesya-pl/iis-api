@@ -235,7 +235,8 @@ namespace Iis.OntologySchema.DataTypes
         public bool IsEnum => Name == EntityTypeNames.Enum.ToString() || IsInheritedFrom(EntityTypeNames.Enum.ToString());
         public bool IsWiki => Name == EntityTypeNames.Wiki.ToString() || IsInheritedFrom(EntityTypeNames.Wiki.ToString());
         public bool IsObject => Name == EntityTypeNames.Object.ToString() || IsInheritedFrom(EntityTypeNames.Object.ToString());
-        public bool IsSeparateObject => IsObject || IsObjectSign || IsEnum || IsEvent;
+        public bool IsSecurityLevel => Name == EntityTypeNames.SecurityLevel.ToString();
+        public bool IsSeparateObject => IsObject || IsObjectSign || IsEnum || IsEvent || IsSecurityLevel;
         public bool IsLinkFromEventToObjectOfStudy =>
             RelationType.SourceType.IsEvent && RelationType.TargetType.IsObjectOfStudy;
 
