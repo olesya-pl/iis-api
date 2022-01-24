@@ -20,6 +20,11 @@ namespace Iis.Desktop.SecurityManager.Controls
         private Button _btnSave;
         private ISecurityLevelChecker _securityLevelChecker;
         
+        public UiUserSecurityControl(RequestWraper requestWrapper)
+        {
+            _requestWrapper = requestWrapper;
+        }
+
         private UserSecurityDto SelectedUser
         {
             get
@@ -28,10 +33,7 @@ namespace Iis.Desktop.SecurityManager.Controls
                 return (UserSecurityDto)selectedRow?.DataBoundItem;
             }
         }
-        public UiUserSecurityControl(RequestWraper requestWrapper)
-        {
-            _requestWrapper = requestWrapper;
-        }
+
         public void SetSecurityLevelChecker(ISecurityLevelChecker securityLevelChecker)
         {
             _securityLevelChecker = securityLevelChecker;

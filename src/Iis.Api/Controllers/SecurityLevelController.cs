@@ -33,8 +33,8 @@ namespace Iis.Api.Controllers
             => _userService.GetUserSecurityDtosAsync();
 
         [HttpPost("saveUserSecurityDto")]
-        public async Task SaveUserSecurityDtoAsync(UserSecurityDto userSecurityDto)
-            => await _userService.SaveUserSecurityAsync(userSecurityDto);
+        public Task SaveUserSecurityDtoAsync(UserSecurityDto userSecurityDto)
+            => _userService.SaveUserSecurityAsync(userSecurityDto);
 
         [HttpGet("getObjectSecurityDtos/{id}")]
         public Task<ObjectSecurityDto> GetObjectSecurityDtosAsync(Guid id) =>
@@ -45,7 +45,7 @@ namespace Iis.Api.Controllers
             _securityLevelService.SaveObjectSecurityDtoAsync(objectSecurityDto);
 
         [HttpPost("saveSecurityLevel")]
-        public async Task SaveSecurityLevel(SecurityLevelPlain levelPlain) =>
+        public void SaveSecurityLevel(SecurityLevelPlain levelPlain) =>
             _securityLevelService.SaveSecurityLevel(levelPlain);
 
         [HttpPost("removeSecurityLevel")]
