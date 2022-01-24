@@ -10,6 +10,7 @@ namespace Iis.Interfaces.SecurityLevels
         public string Name { get; set; }
         public int UniqueIndex { get; set; }
         public int? ParentUniqueIndex { get; set; }
+        public bool IsNew => UniqueIndex == -1;
         
         public SecurityLevelPlain() { }
 

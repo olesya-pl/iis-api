@@ -60,7 +60,7 @@ namespace Iis.OntologyData
 
             return new Mapper(configuration);
         }
-            
+
         public T ReadLock<T>(Func<T> func) => Locker.ReadLock(func);
 
         public T WriteLock<T>(Func<T> func) => Locker.WriteLock(func);

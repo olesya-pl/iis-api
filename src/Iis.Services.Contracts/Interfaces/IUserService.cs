@@ -28,6 +28,6 @@ namespace Iis.Services.Contracts.Interfaces
         Task<string> GetUserMatrixInfoAsync();
         Task<string> CreateMatrixUsersAsync(List<string> userNames = null);
         Task<IReadOnlyList<UserSecurityDto>> GetUserSecurityDtosAsync();
-        Task SaveUserSecurityAsync(UserSecurityDto userSecurityDto);
+        Task SaveUserSecurityAsync(UserSecurityDto userSecurityDto, CancellationToken cancellationToken = default);
     }
 }

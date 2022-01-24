@@ -88,9 +88,8 @@ namespace Iis.Services
 
             await _context.SaveChangesAsync();
 
-            var elasticUser = _mapper.Map<ElasticUserDto>(userEntity);
-
-            await Task.WhenAll(_userElasticService.SaveUserAsync(elasticUser, CancellationToken.None),
+            await Task.WhenAll(
+                PutUserToElasticSearchAsync(userEntity, CancellationToken.None),
                 _matrixService.CreateUserAsync(userEntity.Username, userEntity.Id.ToString("N")));
 
             return userEntity.Id;
@@ -167,10 +166,7 @@ namespace Iis.Services
 
             await _context.SaveChangesAsync(cancellationToken);
 
-            var elasticUser = _mapper.Map<ElasticUserDto>(userEntity);
-            var securityLevels = _securityLevelChecker.GetSecurityLevels(userEntity.SecurityLevels.Select(_ => _.Id).ToList());
-            elasticUser.Metadata.SecurityLevels = _securityLevelChecker.GetStringCode(true, securityLevels.Select(_ => _.UniqueIndex).ToList());
-            await _userElasticService.SaveUserAsync(elasticUser, cancellationToken);
+            await PutUserToElasticSearchAsync(userEntity, cancellationToken);
 
             return userEntity.Id;
         }
@@ -482,7 +478,7 @@ namespace Iis.Services
             }).ToList();
         }
 
-        public async Task SaveUserSecurityAsync(UserSecurityDto userSecurityDto)
+        public async Task SaveUserSecurityAsync(UserSecurityDto userSecurityDto, CancellationToken cancellationToken = default)
         {
             var userEntity = await RunWithoutCommitAsync(_ => _.UserRepository.GetByIdAsync(userSecurityDto.Id));
             var currentIndexes = userEntity.SecurityLevels.Select(_ => _.SecurityLevelIndex).ToList();
@@ -498,7 +494,8 @@ namespace Iis.Services
                 UserId = userSecurityDto.Id,
                 SecurityLevelIndex = _
             }));
-            _context.SaveChanges();
+            await _context.SaveChangesAsync(cancellationToken);
+            await PutUserToElasticSearchAsync(userEntity.Id, cancellationToken);
         }
 
         private RoleEntity GetDefaultRole(IEnumerable<RoleEntity> roles)
@@ -540,8 +537,15 @@ namespace Iis.Services
 
         private async Task PutUserToElasticSearchAsync(Guid id, CancellationToken cancellationToken)
         {
-            var user = await RunWithoutCommitAsync(uowfactory => uowfactory.UserRepository.GetByIdAsync(id, cancellationToken));
-            var elasticUser = _mapper.Map<ElasticUserDto>(user);
+            var userEntity = await RunWithoutCommitAsync(uowfactory => uowfactory.UserRepository.GetByIdAsync(id, cancellationToken));
+            await PutUserToElasticSearchAsync(userEntity, cancellationToken);
+        }
+
+        private async Task PutUserToElasticSearchAsync(UserEntity userEntity, CancellationToken cancellationToken)
+        {
+            var elasticUser = _mapper.Map<ElasticUserDto>(userEntity);
+            var securityLevels = _securityLevelChecker.GetSecurityLevels(userEntity.SecurityLevels.Select(_ => _.Id).ToList());
+            elasticUser.Metadata.SecurityLevels = _securityLevelChecker.GetStringCode(true, securityLevels.Select(_ => _.UniqueIndex).ToList());
 
             await _userElasticService.SaveUserAsync(elasticUser, cancellationToken);
         }
