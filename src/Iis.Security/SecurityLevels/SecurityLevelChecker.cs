@@ -51,7 +51,6 @@ namespace Iis.Security.SecurityLevels
             _rootLevel = rootLevel;
         }
 
-
         public SecurityLevelChecker(IReadOnlyList<SecurityLevelPlain> plainLevels)
         {
             var levelsDict = plainLevels.Select(_ => new SecurityLevel
@@ -84,7 +83,17 @@ namespace Iis.Security.SecurityLevels
             GetSecurityLevels(securityLevelIds).Select(_ => _.UniqueIndex).ToList();
         public IReadOnlyList<SecurityLevelPlain> GetSecurityLevelsPlain() =>
             _rootLevel.GetAllItems().Select(_ => new SecurityLevelPlain(_)).ToList();
-            
+        public ISecurityLevel CreateChildLevel(int parentIndex)
+        {
+            var parent = GetSecurityLevel(parentIndex);
+            return new SecurityLevel
+            {
+                Id = Guid.NewGuid(),
+                Name = string.Empty,
+                UniqueIndex = -1,
+                _parent = parent
+            };
+        }
         public bool AccessGranted(IReadOnlyList<int> userIndexes, IReadOnlyList<int> objectIndexes)
         {
             return true;
@@ -93,6 +102,7 @@ namespace Iis.Security.SecurityLevels
         /// See details here: https://confluence.infozahyst.com/pages/viewpage.action?pageId=192484154 
         public string GetStringCode(bool includeAll, params int[] uniqueIndexes) => GetStringCode(includeAll, uniqueIndexes.ToList());
         public string GetStringCode(bool includeAll, IReadOnlyList<int> uniqueIndexes) => GetStringCode(includeAll, _rootLevel.GetAllItems(uniqueIndexes));
+
         internal string GetStringCode(bool includeAll, IReadOnlyList<SecurityLevel> baseLevels)
         {
             var sb = new StringBuilder();
@@ -108,6 +118,8 @@ namespace Iis.Security.SecurityLevels
             }
             return sb.ToString();
         }
+        internal SecurityLevel GetSecurityLevel(int uniqueIndex) =>
+            _rootLevel.GetAllItems().Where(_ => _.UniqueIndex == uniqueIndex).Single();
 
         private bool AccessGranted(IReadOnlyList<SecurityLevel> userLevels, IReadOnlyList<SecurityLevel> objectLevels)
         {

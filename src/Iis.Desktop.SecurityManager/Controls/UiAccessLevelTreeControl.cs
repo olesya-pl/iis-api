@@ -10,19 +10,24 @@ namespace Iis.Desktop.SecurityManager.Controls
     public class UiAccessLevelTreeControl: UiBaseControl
     {
         private TreeView _treeView;
+        private ISecurityLevelChecker _securityLevelChecker;
 
         public event Action<TreeNode> OnNodeSelect;
-        public void SetUiValues(ISecurityLevel rootLevel)
+        public event Action<TreeNode> OnNodeRemove;
+        public void SetUiValues(ISecurityLevelChecker securityLevelChecker)
         {
+            _securityLevelChecker = securityLevelChecker;
             _uiControlsCreator.FillTreeView(
                 _treeView,
-                new[] { rootLevel },
+                new[] { _securityLevelChecker.RootLevel },
                 _ => _.Name,
                 _ => _.Children,
                 null);
 
             _treeView.ExpandAll();
         }
+
+        private ISecurityLevel SelectedLevel => (ISecurityLevel)_treeView.SelectedNode?.Tag;
 
         protected override void CreateControls()
         {
@@ -39,22 +44,20 @@ namespace Iis.Desktop.SecurityManager.Controls
 
         private void CreateLevel()
         {
-            var selectedNode = _treeView.SelectedNode;
-            if (selectedNode == null) return;
-            var node = new TreeNode();
-            selectedNode.Nodes.Add(node);
+            if (SelectedLevel == null) return;
+            var newLevel = _securityLevelChecker.CreateChildLevel(SelectedLevel.UniqueIndex);
+            var node = new TreeNode { Text = "< новий рівень >", Tag = newLevel };
+            _treeView.SelectedNode.Nodes.Add(node);
+            _treeView.SelectedNode = node;
             OnNodeSelect?.Invoke(node);
         }
 
         private void RemoveLevel()
         {
-            if (MessageBox.Show("Дійсно видалити?", "Підтвердження", MessageBoxButtons.YesNo) == DialogResult.No) return;
-
-            var selectedNode = _treeView.SelectedNode;
-            
-            if (selectedNode == null) return;
-            var parent = selectedNode.Parent;
-            parent.Nodes.Remove(selectedNode);
+            if (MessageBox.Show("Дійсно видалити?", "Підтвердження", MessageBoxButtons.YesNo) == DialogResult.Yes)
+            {
+                OnNodeRemove?.Invoke(_treeView.SelectedNode);
+            }
         }
 
         private void TreeView_AfterSelect(object sender, TreeViewEventArgs e)

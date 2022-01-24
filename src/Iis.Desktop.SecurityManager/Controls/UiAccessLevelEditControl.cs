@@ -17,12 +17,14 @@ namespace Iis.Desktop.SecurityManager.Controls
         private TreeNode treeNode;
         private ISecurityLevel CurrentLevel => (ISecurityLevel)treeNode.Tag;
 
+        public Action<SecurityLevelPlain> OnSave;
+
         public void SetUiValues(TreeNode node)
         {
             treeNode = node;
             txtId.Text = CurrentLevel.Id.ToString("N");
             txtName.Text = CurrentLevel.Name;
-            txtUniqueIndex.Text = CurrentLevel.UniqueIndex.ToString();
+            txtUniqueIndex.Text = CurrentLevel.IsNew ? string.Empty : CurrentLevel.UniqueIndex.ToString();
             txtParent.Text = CurrentLevel.Parent?.Name;
         }
 
@@ -33,12 +35,10 @@ namespace Iis.Desktop.SecurityManager.Controls
             _container.Add(txtUniqueIndex = new TextBox { Enabled = false }, "Унікальний індекс");
             _container.Add(txtParent = new TextBox { Enabled = false }, "Належить до");
             _container.Add(btnSave = _uiControlsCreator.GetButton("Зберегти"));
-            btnSave.Click += (sender, e) => { Save(); };
+            btnSave.Click += (sender, e) => { OnSave?.Invoke(GetSecurityLevelPlain()); };
         }
 
-        private void Save()
-        {
-            treeNode.Text = txtName.Text;
-        }
+        private SecurityLevelPlain GetSecurityLevelPlain()
+            => new SecurityLevelPlain(CurrentLevel) { Name = txtName.Text };
     }
 }

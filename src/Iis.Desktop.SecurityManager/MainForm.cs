@@ -115,11 +115,12 @@ namespace Iis.Desktop.SecurityManager
 
             _uiAccessLevelTreeControl = new UiAccessLevelTreeControl();
             _uiAccessLevelTreeControl.Initialize("AccessLevelTree", panelLeft, _style);
+            _uiAccessLevelTreeControl.OnNodeSelect += node => _uiAccessLevelEditControl.SetUiValues(node);
+            _uiAccessLevelTreeControl.OnNodeRemove += node => OnRemoveSecurityLevel(node);
 
             _uiAccessLevelEditControl = new UiAccessLevelEditControl();
             _uiAccessLevelEditControl.Initialize("AccessLevelEdit", panelRight, _style);
-
-            _uiAccessLevelTreeControl.OnNodeSelect += node => { _uiAccessLevelEditControl.SetUiValues(node); };
+            _uiAccessLevelEditControl.OnSave += securityLevelPlain => OnSaveSecurityLevel(securityLevelPlain);
         }
 
         private void CreateUsersTab(TabControl tabControl)
@@ -130,7 +131,7 @@ namespace Iis.Desktop.SecurityManager
 
             _uiUserSecurityControl = new UiUserSecurityControl(GetRequestWrapper());
             _uiUserSecurityControl.Initialize("UserSecurityControl", pnlUser, _style);
-            _uiUserSecurityControl.OnSave += async () => { await RefreshUsers(); };
+            _uiUserSecurityControl.OnSave += async () => { await RefreshUsersAsync(); };
         }
 
         private void CreateObjectsTab(TabControl tabControl)
@@ -153,20 +154,25 @@ namespace Iis.Desktop.SecurityManager
             panelMain.Visible = true;
             Controls.Remove(panelToHide);
             _userCredentials = userCredentials;
+            await RefreshAsync().ConfigureAwait(false);
+        }
+
+        private async Task RefreshAsync()
+        {
             var requestWrapper = GetRequestWrapper();
             var plainLevels = await requestWrapper.GetSecurityLevelsAsync().ConfigureAwait(false);
             _securityLevelChecker = new SecurityLevelChecker(plainLevels);
             _uiUserSecurityControl.SetSecurityLevelChecker(_securityLevelChecker);
             _uiObjectSecurityControl.SetSecurityLevelChecker(_securityLevelChecker);
-            await RefreshUsers();
+            await RefreshUsersAsync().ConfigureAwait(false);
 
             Invoke((Action)(() =>
             {
-                _uiAccessLevelTreeControl.SetUiValues(_securityLevelChecker.RootLevel);
+                _uiAccessLevelTreeControl.SetUiValues(_securityLevelChecker);
             }));
         }
 
-        private async Task RefreshUsers()
+        private async Task RefreshUsersAsync()
         {
             _users = await GetRequestWrapper().GetUserSecurityDtosAsync().ConfigureAwait(false);
 
@@ -176,10 +182,25 @@ namespace Iis.Desktop.SecurityManager
             }));
         }
 
+        private async Task OnSaveSecurityLevel(SecurityLevelPlain securityLevelPlain)
+        {
+            var requestWrapper = GetRequestWrapper();
+            await requestWrapper.SaveSecurityLevel(securityLevelPlain).ConfigureAwait(false);
+            await RefreshAsync().ConfigureAwait(false);
+        }
+
+        private async Task OnRemoveSecurityLevel(TreeNode node)
+        {
+            var level = node.Tag as ISecurityLevel;
+
+            var requestWrapper = GetRequestWrapper();
+            await requestWrapper.RemoveSecurityLevel(new SecurityLevelPlain(level)).ConfigureAwait(false);
+            await RefreshAsync().ConfigureAwait(false);
+        }
+
         #endregion
 
         private RequestWraper GetRequestWrapper() =>
             new RequestWraper(_currentConfig.ApiUri, _userCredentials, _requestSettings, _logger);
-
     }
 }

@@ -37,6 +37,7 @@ namespace Iis.Security.SecurityLevels
         public int? ParentUniqueIndex => _parent?.UniqueIndex;
         public ISecurityLevel Parent => _parent;
         public IReadOnlyList<ISecurityLevel> Children => _children;
+        public bool IsNew => UniqueIndex == -1;
 
         public override string ToString() => $"{UniqueIndex} : {Name}";
 
