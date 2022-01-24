@@ -7,6 +7,7 @@ Feature: Materials - regression
 	- IIS-7445 - Change a material`s AccessLevel
 	- IIS-6470 - Sorting materials by source
 	- IIS-8238 - Hotkeys for audio rewind
+	- IIS-6793 - Search materials related by object
 
 Background:
 	Given I sign in with the user olya and password 123 in the Contour

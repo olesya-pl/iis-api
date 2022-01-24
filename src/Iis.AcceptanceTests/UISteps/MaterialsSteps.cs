@@ -34,6 +34,7 @@ namespace AcceptanceTests.UISteps
         [When(@"I navigated to Materials page")]
         public void IWantNavigateToMaterialsPage()
         {
+            driver.WaitFor(2);
             navigationSection.MaterialsLink.Click();
             driver.WaitFor(2);
         }
