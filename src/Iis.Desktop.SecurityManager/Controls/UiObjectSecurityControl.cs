@@ -36,7 +36,7 @@ namespace Iis.Desktop.SecurityManager.Controls
             _container.Add(_btnSave = _uiControlsCreator.GetButton("Зберегти"));
             _btnSave.Click += async (sender, e) => { await SaveAsync(); };
             _container.Add(_txtId = new TextBox(), "Id");
-            _txtId.TextChanged += async (sender, e) => { await Load(); };
+            _txtId.TextChanged += async (sender, e) => { await LoadAsync(); };
             _container.Add(_txtTitle = new TextBox { ReadOnly = true }, "Title");
 
             _treeView = _uiControlsCreator.GetTreeView();
@@ -44,7 +44,7 @@ namespace Iis.Desktop.SecurityManager.Controls
             _container.Add(_treeView, null, true);
         }
 
-        private async Task Load()
+        private async Task LoadAsync()
         {
             Guid id;
             if (!Guid.TryParse(_txtId.Text, out id)) return;
@@ -83,7 +83,7 @@ namespace Iis.Desktop.SecurityManager.Controls
                 SecurityIndexes = GetCheckedIndexes()
             };
             await _requestWrapper.SaveObjectSecurityDtoAsync(objectSecurityDto).ConfigureAwait(false);
-            await Load();
+            await LoadAsync();
         }
     }
 }
