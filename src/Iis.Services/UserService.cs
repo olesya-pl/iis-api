@@ -549,8 +549,8 @@ namespace Iis.Services
         private ElasticUserDto GetElasticUser(UserEntity userEntity)
         {
             var elasticUser = _mapper.Map<ElasticUserDto>(userEntity);
-            var securityLevelIds = userEntity.SecurityLevels?.Select(_ => _.Id).ToList() ?? new List<Guid>();
-            var securityLevels = _securityLevelChecker.GetSecurityLevels(securityLevelIds);
+            var securityLevelIndexes = userEntity.SecurityLevels.Select(_ => _.SecurityLevelIndex).ToList();
+            var securityLevels = _securityLevelChecker.GetSecurityLevels(securityLevelIndexes);
             elasticUser.Metadata.SecurityLevels = _securityLevelChecker.GetStringCode(true, securityLevels.Select(_ => _.UniqueIndex).ToList());
             return elasticUser;
         }
