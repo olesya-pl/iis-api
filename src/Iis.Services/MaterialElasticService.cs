@@ -36,10 +36,16 @@ using IIS.Repository.Factories;
 using Iis.Domain.Materials;
 using Iis.Domain;
 using Iis.Elastic.Entities;
+using Iis.Services.Mappers.Materials;
+using RabbitMQ.Client;
+using Iis.RabbitMq.Channels;
+using Iis.Messages.Materials;
+using Iis.Messages;
+using Iis.RabbitMq.Helpers;
 
 namespace Iis.Services
 {
-    public class MaterialElasticService<TUnitOfWork> : BaseService<TUnitOfWork>, IMaterialElasticService
+    public class MaterialElasticService<TUnitOfWork> : BaseService<TUnitOfWork>, IMaterialElasticService, IDisposable
          where TUnitOfWork : IIISUnitOfWork
     {
         private const int MaxDegreeOfParallelism = 8;
@@ -76,6 +82,8 @@ namespace Iis.Services
         private readonly IMapper _mapper;
         private readonly IOntologyNodesData _ontologyData;
         private readonly ILogger<MaterialElasticService<TUnitOfWork>> _logger;
+        private readonly IConnection _connection;
+        private readonly PublishMessageChannel<MaterialProcessingCriteriasEventMessage> _materialCriteriasChannel;
 
         public MaterialElasticService(
             IElasticManager elasticManager,
@@ -86,7 +94,8 @@ namespace Iis.Services
             IMapper mapper,
             IOntologyNodesData ontologyData,
             IUnitOfWorkFactory<TUnitOfWork> unitOfWorkFactory,
-            ILogger<MaterialElasticService<TUnitOfWork>> logger)
+            ILogger<MaterialElasticService<TUnitOfWork>> logger,
+            IConnectionFactory connectionFactory)
             : base(unitOfWorkFactory)
         {
             _elasticManager = elasticManager;
@@ -97,9 +106,17 @@ namespace Iis.Services
             _mapper = mapper;
             _ontologyData = ontologyData;
             _logger = logger;
+            _connection = connectionFactory.CreateAndWaitConnection();
+            _materialCriteriasChannel = new PublishMessageChannel<MaterialProcessingCriteriasEventMessage>(_connection, new ChannelConfig { ExchangeName = MaterialRabbitConsts.DefaultExchangeName, RoutingKeys = new[] { MaterialRabbitConsts.MaterialCriteriasQueueName } });
         }
 
         private static Expression<Func<ChangeHistoryEntity, bool>> ChangeHistoryTotalCountPredicate => _ => (_.Type == ChangeHistoryEntityType.Material || _.Type == ChangeHistoryEntityType.Node) && _.PropertyName == ChangeHistoryDocument.MaterialLinkPropertyName;
+
+        public void Dispose()
+        {
+            _connection.Dispose();
+            _materialCriteriasChannel.Dispose();
+        }
 
         public bool ShouldReturnNoEntities(string queryExpression)
         {
@@ -555,6 +572,8 @@ namespace Iis.Services
                 .Select(p => MapEntityToDocument(p))
                 .ToDictionary(_ => _.Id);
             string json = materialDocuments.ConvertToJson();
+            var processingCriteriasEvent = materialDocuments.Values.ToProcessingCriteriasEvent();
+            _materialCriteriasChannel.Send(processingCriteriasEvent);
 
             return await _elasticManager.PutDocumentsAsync(_elasticState.MaterialIndexes.FirstOrDefault(), json, waitForIndexing, cancellationToken);
         }

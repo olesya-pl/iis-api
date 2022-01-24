@@ -28,6 +28,7 @@
     <ProjectReference Include="..\Iis.DataModel\Iis.DataModel.csproj" />
     <ProjectReference Include="..\Iis.Events\Iis.Events.csproj" />
     <ProjectReference Include="..\Iis.Interfaces\Iis.Interfaces.csproj" />
+    <ProjectReference Include="..\Iis.Messages\Iis.Messages.csproj" />
     <ProjectReference Include="..\Iis.Services.Contracts\Iis.Services.Contracts.csproj" />
     <ProjectReference Include="..\IIS.Repository\IIS.Repository.csproj" />
     <ProjectReference Include="..\Iis.DbLayer\Iis.DbLayer.csproj" />
