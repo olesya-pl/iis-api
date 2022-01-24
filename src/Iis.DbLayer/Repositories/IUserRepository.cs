@@ -13,7 +13,7 @@ namespace Iis.DbLayer.Repositories
     {
         UserEntity GetByUserNameAndHash(string userName, string passwordHash);
         Task<UserEntity> GetByUserNameAsync(string userName, CancellationToken cancellationToken = default);
-        Task<UserEntity> GetByIdAsync(Guid userId, CancellationToken ct);
+        Task<UserEntity> GetByIdAsync(Guid userId, CancellationToken ct = default);
         Task<List<UserEntity>> GetAllUsersAsync(CancellationToken ct);
         Task<UserEntity[]> GetOperatorsAsync(CancellationToken ct = default);
         Task<UserEntity[]> GetUsersAsync(Expression<Func<UserEntity, bool>> predicate, CancellationToken ct = default);

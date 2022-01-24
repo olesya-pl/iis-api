@@ -1,25 +1,33 @@
-if (doc['__securityLevels.keyword'].size() == 0) return true;
-String userAccess = ';{{_user.metadata.securityLevels}};';
-String docAccess = doc['__securityLevels.keyword'][0];
-docAccess = docAccess + ';';
+if (doc['__securityLevels'].size() == 0) return true; 
+String userAccess = '{{_user.metadata.accessLevels}}'; 
+String docAccess = doc['__securityLevels'][0];
  
-while (docAccess != '') {
-    String docSingleAccess = docAccess.substring(0, docAccess.indexOf(';'));
-    String groupId = docSingleAccess.substring(0, docSingleAccess.indexOf(':'));
-    String docAccessIds = docSingleAccess.substring(docSingleAccess.indexOf(':') + 1) + ',';
-    int n = userAccess.indexOf(';' + groupId + ':');
-    if (n == -1) return false;
-    int semicolon = userAccess.indexOf(':', n + 1);
-    int next = userAccess.indexOf(';', n+1);
-    String userAccessIds = ',' + userAccess.substring(semicolon + 1, next - 1) + ',';
-    boolean found = false;
-    while (!found && docAccessIds != '') {
-        int k = docAccessIds.indexOf(',');
-        String accessId = ',' + docAccessIds.substring(0, k) + ',';
-        if (userAccessIds.indexOf(accessId) > -1) found = true;
-        if (!found) docAccessIds = docAccessIds.substring(k + 1);
-    }
-    if (!found) return false;
-    docAccess = docAccess.substring(docAccess.indexOf(';') + 1);
-}
-return true;
+while (docAccess != '') { 
+	int docAccessIndex = docAccess.indexOf(';'); 
+	String docSingleAccess = docAccessIndex > 0 ? docAccess.substring(0, docAccessIndex) : docAccess; 
+	String groupId = docSingleAccess.substring(0, docSingleAccess.indexOf(':')); 
+	String docAccessIds = docSingleAccess.substring(docSingleAccess.indexOf(':') + 1); 
+	int n = userAccess.indexOf(groupId + ':'); 
+	if (n == -1)
+	{ 
+		int groupStartIndex = docAccess.indexOf(';'); 
+		if(groupStartIndex == -1) break; 
+		docAccess = docAccess.substring(groupStartIndex + 1); 
+		continue; 
+	} 
+	int semicolon = userAccess.indexOf(':', n + 1); 
+	int next = userAccess.indexOf(';', n + 1); 
+	String userAccessIds = next < 0 ? userAccess.substring(semicolon + 1) : userAccess.substring(semicolon + 1, next - 1); 
+	while (docAccessIds != '') 
+	{ 
+		int k = docAccessIds.indexOf(','); 
+		String accessId = k > 0 ? docAccessIds.substring(0, k) : docAccessIds; 
+		if (userAccessIds.indexOf(accessId) > -1) return true; 
+		if (k < 0) break; 
+		docAccessIds = docAccessIds.substring(k + 1); 
+	} 
+	int groupStartIndex = docAccess.indexOf(';'); 
+	if(groupStartIndex == -1) break; 
+	docAccess = docAccess.substring(groupStartIndex + 1); 
+} 
+return false;

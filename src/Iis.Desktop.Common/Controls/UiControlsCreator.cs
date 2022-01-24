@@ -162,14 +162,17 @@ namespace Iis.Desktop.Common.Controls
 
         public Panel GetFillPanel(Control parent, bool visible = true)
         {
+            int width = parent is TabPage ? parent.Parent.Width : parent.Width;
+            int height = parent is TabPage ? parent.Parent.Height : parent.Height;
+
             var marginVer = 20;
             var panel = new Panel
             {
                 Parent = parent,
                 Top = marginVer,
                 Left = 0,
-                Width = parent.Width,
-                Height = parent.Height - marginVer,
+                Width = width,
+                Height = height - marginVer,
                 Dock = DockStyle.None,
                 BackColor = _style.BackgroundColor,
                 Anchor = AnchorStyles.Left | AnchorStyles.Right | AnchorStyles.Top | AnchorStyles.Bottom,
@@ -237,13 +240,17 @@ namespace Iis.Desktop.Common.Controls
             return panel;
         }
 
-        public TreeView GetTreeView()
-        {
-            return new TreeView
+        public TreeView GetTreeView() =>
+            new TreeView
             {
                 BackColor = _style.BackgroundColor
             };
-        }
+
+        public ListView GetListView() =>
+            new ListView
+            {
+                BackColor = _style.BackgroundColor
+            };
 
         public void PutToCenterOfParent(Control control)
         {
@@ -256,6 +263,59 @@ namespace Iis.Desktop.Common.Controls
             if (control.Height < parent.Height)
             {
                 control.Top = (parent.Height - control.Height) / 2;
+            }
+        }
+
+        public IReadOnlyList<TreeNode> GetAllNodes(TreeNodeCollection nodes)
+        {
+            var result = new List<TreeNode>();
+            foreach (TreeNode node in nodes)
+            {
+                result.Add(node);
+                result.AddRange(GetAllNodes(node.Nodes));
+            }
+            return result;
+        }
+
+        public void FillTreeView<T>(
+            TreeView treeView,
+            IReadOnlyList<T> rootItems,
+            Func<T, string> getTitle,
+            Func<T, IReadOnlyList<T>> getChildren,
+            Func<T, bool> getChecked)
+        {
+            treeView.Nodes.Clear();
+            foreach (var rootItem in rootItems)
+            {
+                var node = new TreeNode(getTitle(rootItem));
+                node.Tag = rootItem;
+                FillTreeNodeChildren(node, rootItem, getTitle, getChildren, getChecked);
+                treeView.Nodes.Add(node);
+                if (getChecked?.Invoke(rootItem) == true)
+                {
+                    node.Checked = true;
+                }
+            }
+        }
+
+        private void FillTreeNodeChildren<T>(
+            TreeNode node,
+            T item,
+            Func<T, string> getTitle,
+            Func<T, IReadOnlyList<T>> getChildren,
+            Func<T, bool> getChecked)
+        {
+            var children = getChildren(item);
+            foreach (var child in children)
+            {
+                var childNode = new TreeNode(getTitle(child));
+                childNode.Tag = child;
+                FillTreeNodeChildren(childNode, child, getTitle, getChildren, getChecked);
+                if (getChecked?.Invoke(child) == true)
+                {
+                    childNode.Checked = true;
+                }
+                node.Nodes.Add(childNode);
             }
         }
     }

@@ -28,7 +28,7 @@ namespace Iis.DbLayer.Repositories
                 .SingleOrDefaultAsync(_ => _.Username == userName && !_.IsBlocked, cancellationToken);
         }
 
-        public Task<UserEntity> GetByIdAsync(Guid userId, CancellationToken ct)
+        public Task<UserEntity> GetByIdAsync(Guid userId, CancellationToken ct = default)
         {
             return GetUsersQuery()
                 .FirstOrDefaultAsync(e => e.Id == userId, ct);
@@ -36,7 +36,7 @@ namespace Iis.DbLayer.Repositories
 
         public Task<List<UserEntity>> GetAllUsersAsync(CancellationToken ct)
         {
-            return Context.Users
+            return GetUsersQuery()
                 .AsNoTracking()
                 .ToListAsync(ct);
         }

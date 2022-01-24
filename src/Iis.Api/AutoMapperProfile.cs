@@ -40,6 +40,7 @@ using Iis.DbLayer.Repositories;
 using Iis.Interfaces.Ontology;
 using Iis.Api.GraphQL.RadioElectronicSituation;
 using Iis.Elastic.Entities;
+using Iis.Interfaces.SecurityLevels;
 
 namespace Iis.Api
 {
@@ -305,7 +306,8 @@ namespace Iis.Api
 
             //mapping: UserEntity -> Roles.User
             CreateMap<UserEntity, Iis.Domain.Users.User>()
-                .ForMember(dest => dest.Roles, opts => opts.MapFrom(src => src.UserRoles.Select(ur => ur.Role)));
+                .ForMember(dest => dest.Roles, opts => opts.MapFrom(src => src.UserRoles.Select(ur => ur.Role)))
+                .ForMember(dest => dest.SecurityLevels, opts => opts.Ignore());
 
             //mapping: Roles.User -> UserEntity
             CreateMap<Iis.Domain.Users.User, UserEntity>()

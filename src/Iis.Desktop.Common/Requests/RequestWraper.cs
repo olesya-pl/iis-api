@@ -8,6 +8,7 @@ using Serilog;
 using Iis.Services.Contracts.Params;
 using Newtonsoft.Json;
 using Iis.Desktop.Common.Login;
+using Iis.Interfaces.SecurityLevels;
 
 namespace Iis.Desktop.Common.Requests
 {
@@ -92,6 +93,99 @@ namespace Iis.Desktop.Common.Requests
             var json = JsonConvert.SerializeObject(param);
 
             return await SendRequestAsync(() => httpClient.PostAsync(uri, new StringContent(json, Encoding.UTF8, "application/json")), uri);
+        }
+
+        public async Task<IReadOnlyList<SecurityLevelPlain>> GetSecurityLevelsAsync()
+        {
+            var uri = new Uri(ApiRouteList.GetSecurityLevels, UriKind.Relative);
+
+            using var httpClient = GetClient(_baseApiApiAddress, _requestSettings);
+
+            var response = await SendRequestAsync(() => httpClient.GetAsync(uri), uri).ConfigureAwait(false);
+
+            var result = response.IsSuccess ?
+                JsonConvert.DeserializeObject<List<SecurityLevelPlain>>(response.Message) :
+                new List<SecurityLevelPlain>();
+
+            return result;
+        }
+
+        public async Task<IReadOnlyList<UserSecurityDto>> GetUserSecurityDtosAsync()
+        {
+            var uri = new Uri(ApiRouteList.GetUserSecurityDtos, UriKind.Relative);
+
+            using var httpClient = GetClient(_baseApiApiAddress, _requestSettings);
+
+            var response = await SendRequestAsync(() => httpClient.GetAsync(uri), uri).ConfigureAwait(false);
+
+            var result = response.IsSuccess ?
+                JsonConvert.DeserializeObject<List<UserSecurityDto>>(response.Message) :
+                new List<UserSecurityDto>();
+
+            return result;
+        }
+
+        public async Task SaveUserSecurityDtoAsync(UserSecurityDto userSecurityDto)
+        {
+            var uri = new Uri(ApiRouteList.SaveUserSecurityDto, UriKind.Relative);
+
+            using var httpClient = GetClient(_baseApiApiAddress, _requestSettings);
+
+            var json = JsonConvert.SerializeObject(userSecurityDto);
+
+            var response = await SendRequestAsync(() => httpClient.PostAsync(uri, new StringContent(json, Encoding.UTF8, "application/json")), uri)
+                .ConfigureAwait(false);
+        }
+
+        public async Task<ObjectSecurityDto> GetObjectSecurityDtosAsync(Guid id)
+        {
+            var uri = new Uri(ApiRouteList.GetObjectSecurityDtos, UriKind.Relative);
+
+            using var httpClient = GetClient(_baseApiApiAddress, _requestSettings);
+
+            var response = await SendRequestAsync(() => httpClient.GetAsync($"{uri}/{id}"), uri).ConfigureAwait(false);
+
+            var result = response.IsSuccess ?
+                JsonConvert.DeserializeObject<ObjectSecurityDto>(response.Message) :
+                new ObjectSecurityDto { Title = String.Empty, SecurityIndexes = new List<int>() };
+
+            return result;
+        }
+
+        public async Task SaveObjectSecurityDtoAsync(ObjectSecurityDto objectSecurityDto)
+        {
+            var uri = new Uri(ApiRouteList.SaveObjectSecurityDto, UriKind.Relative);
+
+            using var httpClient = GetClient(_baseApiApiAddress, _requestSettings);
+
+            var json = JsonConvert.SerializeObject(objectSecurityDto);
+
+            var response = await SendRequestAsync(() => httpClient.PostAsync(uri, new StringContent(json, Encoding.UTF8, "application/json")), uri)
+                .ConfigureAwait(false);
+        }
+
+        public async Task SaveSecurityLevel(SecurityLevelPlain securityLevelPlain)
+        {
+            var uri = new Uri(ApiRouteList.SaveSecurityLevel, UriKind.Relative);
+
+            using var httpClient = GetClient(_baseApiApiAddress, _requestSettings);
+
+            var json = JsonConvert.SerializeObject(securityLevelPlain);
+
+            var response = await SendRequestAsync(() => httpClient.PostAsync(uri, new StringContent(json, Encoding.UTF8, "application/json")), uri)
+                .ConfigureAwait(false);
+        }
+
+        public async Task RemoveSecurityLevel(SecurityLevelPlain securityLevelPlain)
+        {
+            var uri = new Uri(ApiRouteList.RemoveSecurityLevel, UriKind.Relative);
+
+            using var httpClient = GetClient(_baseApiApiAddress, _requestSettings);
+
+            var json = JsonConvert.SerializeObject(securityLevelPlain);
+
+            var response = await SendRequestAsync(() => httpClient.PostAsync(uri, new StringContent(json, Encoding.UTF8, "application/json")), uri)
+                .ConfigureAwait(false);
         }
 
         private async Task<RequestResult> SendRequestAsync(Func<Task<HttpResponseMessage>> func, Uri uri)

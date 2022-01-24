@@ -88,9 +88,8 @@ namespace Iis.Services
 
             await _context.SaveChangesAsync();
 
-            var elasticUser = _mapper.Map<ElasticUserDto>(userEntity);
-
-            await Task.WhenAll(_userElasticService.SaveUserAsync(elasticUser, CancellationToken.None),
+            await Task.WhenAll(
+                PutUserToElasticSearchAsync(userEntity, CancellationToken.None),
                 _matrixService.CreateUserAsync(userEntity.Username, userEntity.Id.ToString("N")));
 
             return userEntity.Id;
@@ -167,10 +166,7 @@ namespace Iis.Services
 
             await _context.SaveChangesAsync(cancellationToken);
 
-            var elasticUser = _mapper.Map<ElasticUserDto>(userEntity);
-            var securityLevels = _securityLevelChecker.GetSecurityLevels(userEntity.SecurityLevels.Select(_ => _.Id).ToList());
-            elasticUser.Metadata.SecurityLevels = _securityLevelChecker.GetStringCode(true, securityLevels.Select(_ => _.UniqueIndex).ToList());
-            await _userElasticService.SaveUserAsync(elasticUser, cancellationToken);
+            await PutUserToElasticSearchAsync(userEntity, cancellationToken);
 
             return userEntity.Id;
         }
@@ -318,7 +314,7 @@ namespace Iis.Services
         {
             var users = await RunWithoutCommitAsync(uowfactory => uowfactory.UserRepository.GetAllUsersAsync(cancellationToken));
 
-            var elasticUsers = _mapper.Map<List<ElasticUserDto>>(users);
+            var elasticUsers = users.Select(GetElasticUser).ToList();
 
             await _userElasticService.SaveAllUsersAsync(elasticUsers, cancellationToken);
         }
@@ -471,6 +467,37 @@ namespace Iis.Services
             return sb.ToString();
         }
 
+        public async Task<IReadOnlyList<UserSecurityDto>> GetUserSecurityDtosAsync()
+        {
+            var userEntityList = await RunWithoutCommitAsync(_ => _.UserRepository.GetUsersAsync(_ => true));
+            return userEntityList.Select(_ => new UserSecurityDto
+            {
+                Id = _.Id,
+                Username = _.Username,
+                SecurityIndexes = _.SecurityLevels.Select(sl => sl.SecurityLevelIndex).ToList()
+            }).ToList();
+        }
+
+        public async Task SaveUserSecurityAsync(UserSecurityDto userSecurityDto, CancellationToken cancellationToken = default)
+        {
+            var userEntity = await RunWithoutCommitAsync(_ => _.UserRepository.GetByIdAsync(userSecurityDto.Id));
+            var currentIndexes = userEntity.SecurityLevels.Select(_ => _.SecurityLevelIndex).ToList();
+
+            var indexesToDelete = currentIndexes.Where(_ => !userSecurityDto.SecurityIndexes.Contains(_));
+            _context.RemoveRange(userEntity.SecurityLevels.Where(_ => indexesToDelete.Contains(_.SecurityLevelIndex)));
+
+            var indexesToAdd = userSecurityDto.SecurityIndexes.Where(_ => !currentIndexes.Contains(_));
+
+            _context.AddRange(indexesToAdd.Select(_ => new UserSecurityLevelEntity
+            {
+                Id = Guid.NewGuid(),
+                UserId = userSecurityDto.Id,
+                SecurityLevelIndex = _
+            }));
+            await _context.SaveChangesAsync(cancellationToken);
+            await PutUserToElasticSearchAsync(userEntity.Id, cancellationToken);
+        }
+
         private RoleEntity GetDefaultRole(IEnumerable<RoleEntity> roles)
         {
             var defaultRole = roles.SingleOrDefault(_ => _.Name == DefaultRoleName);
@@ -510,10 +537,22 @@ namespace Iis.Services
 
         private async Task PutUserToElasticSearchAsync(Guid id, CancellationToken cancellationToken)
         {
-            var user = await RunWithoutCommitAsync(uowfactory => uowfactory.UserRepository.GetByIdAsync(id, cancellationToken));
-            var elasticUser = _mapper.Map<ElasticUserDto>(user);
+            var userEntity = await RunWithoutCommitAsync(uowfactory => uowfactory.UserRepository.GetByIdAsync(id, cancellationToken));
+            await PutUserToElasticSearchAsync(userEntity, cancellationToken);
+        }
 
-            await _userElasticService.SaveUserAsync(elasticUser, cancellationToken);
+        private async Task PutUserToElasticSearchAsync(UserEntity userEntity, CancellationToken cancellationToken)
+        {
+            await _userElasticService.SaveUserAsync(GetElasticUser(userEntity), cancellationToken);
+        }
+
+        private ElasticUserDto GetElasticUser(UserEntity userEntity)
+        {
+            var elasticUser = _mapper.Map<ElasticUserDto>(userEntity);
+            var securityLevelIndexes = userEntity.SecurityLevels.Select(_ => _.SecurityLevelIndex).ToList();
+            var securityLevels = _securityLevelChecker.GetSecurityLevels(securityLevelIndexes);
+            elasticUser.Metadata.SecurityLevels = _securityLevelChecker.GetStringCode(true, securityLevels.Select(_ => _.UniqueIndex).ToList());
+            return elasticUser;
         }
 
         private void OnExternalUserNotFound(UserEntity userEntity)

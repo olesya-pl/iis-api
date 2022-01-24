@@ -12,5 +12,12 @@
         public const string ApplicationRestart = "admin/RestartApplication";
         public const string OntologyReloadData = "admin/ReloadOntologyData";
         public const string AccessLevelChange = "admin/ChangeAccessLevels";
+        public const string GetSecurityLevels = "securityLevel/getSecurityLevels";
+        public const string GetUserSecurityDtos = "securityLevel/getUserSecurityDtos";
+        public const string SaveUserSecurityDto = "securityLevel/saveUserSecurityDto";
+        public const string GetObjectSecurityDtos = "securityLevel/getObjectSecurityDtos";
+        public const string SaveObjectSecurityDto = "securityLevel/saveObjectSecurityDto";
+        public const string SaveSecurityLevel = "securityLevel/saveSecurityLevel";
+        public const string RemoveSecurityLevel = "securityLevel/removeSecurityLevel";
     }
 }

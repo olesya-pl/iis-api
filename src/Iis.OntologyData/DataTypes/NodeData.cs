@@ -305,6 +305,10 @@ namespace Iis.OntologyData.DataTypes
             .Where(_ => _.Node.NodeType.Name == OntologyNames.SecurityLevelField)
             .Select(_ => int.Parse(_.TargetNode.GetSingleDirectProperty(OntologyNames.UniqueIndexField).Value))
             .ToList();
+        public IReadOnlyList<IRelation> GetSecurityLevelRelations() =>
+            _outgoingRelations
+            .Where(_ => _.Node.NodeType.Name == OntologyNames.SecurityLevelField)
+            .ToList();
         private object ResolveSingleFormula(string formula)
         {
             var replaced = ReplaceVariables(formula);
