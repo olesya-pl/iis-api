@@ -240,9 +240,14 @@ namespace AcceptanceTests.PageObjects
 
         [FindsBy(How = How.CssSelector, Using = "ul[role='menubar'] > li:nth-of-type(2)")]
         public IWebElement MaterialsTab;
-    
 
-    [FindsBy(How = How.XPath, Using = "//div[@class='infinity-table object-materials-table']//div[@class='p-datatable-scrollable-view']//tr[1]//td[@class='object-materials-table__title']")]
-    public IWebElement AttachedMaterialTitle;
+        [FindsBy(How = How.XPath, Using = "//div[@class='infinity-table object-materials-table']//div[@class='p-datatable-scrollable-view']//tr[1]//td[@class='object-materials-table__title']")]
+        public IWebElement AttachedMaterialTitle;
+
+        [FindsBy(How = How.CssSelector, Using = ".objects-page .el-menu--horizontal .comments")]
+        public IWebElement CommentsTab;
+
+       [FindsBy(How = How.XPath, Using = "//*[@type='ObjectOfStudy']//*[@class='comments']//*[@class='message-editor el-textarea']")]
+        public IWebElement TextAreaForComments;
     }
 }

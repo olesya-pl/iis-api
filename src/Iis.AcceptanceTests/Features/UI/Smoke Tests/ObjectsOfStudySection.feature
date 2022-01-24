@@ -4,6 +4,7 @@ Feature: ObjectsOfStudySection - smoke
     - IIS-6210 - Ensure that search by using ! symbol gives 0 search results
     - IIS-6207 - Open a small object of study card
     - IIS-6208 - Open a big object of study card
+    - IIS-8567 - Posibility open comment tab in the big object of study card
 
     Background:
         Given I sign in with the user olya and password 123 in the Contour
@@ -61,5 +62,9 @@ Feature: ObjectsOfStudySection - smoke
             | BigCardAffiliation |
             | BigCardImportance  |
 
-
-
+    @smoke @sanity @UI @ObjectOfStudySmallCardUI
+    Scenario: IIS-8567 - Posibility open comment tab in the big object of study card
+        When I clicked on first object of study
+        And I clicked on enlarge small card button
+        And I clicked on the comments tab in the big card window
+        Then I must see text area for comments

@@ -3,6 +3,7 @@ Feature: MaterialsSectionUI - Sanity
     - IIS-6375 - Material processing, priority and importance setup
     - IIS-6374 - ML results display for DOCX material
     - IIS-5837- Connect a material with an object of study from material
+    - IIS-6196 - Possibility save text into audio file text area
     - IIS-6363 - Search a material by keyword from the material
     - IIS-8102 - Go to Events page from the material
     - IIS-8105 - Go to Report page from the material
@@ -127,6 +128,17 @@ Feature: MaterialsSectionUI - Sanity
 	Then I must see first report in the report list
     When I clean up uploaded material via API
 
-
+     @sanity @UI @MaterialsSanityUI
+    Scenario: IIS-6196 - Possibility save text into audio file text area
+    Given I upload a new mp3 material via API
+	When I navigated to Materials page
+	Then I clicked on the type`s filter audio
+    When I clicked on the first search result in the Materials section
+	Then I cliced on the text field
+	Then I wrote on the text field  Якийсь текст
+    When I pressed the Next material button
+	When I pressed the Previous material button
+	Then I must see saved new content with text  Якийсь текст in the text field
+    When I clean up uploaded material via API
 
 

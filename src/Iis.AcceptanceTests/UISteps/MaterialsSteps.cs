@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using AcceptanceTests.Helpers;
 using AcceptanceTests.PageObjects;
 using OpenQA.Selenium;
+using OpenQA.Selenium.Interactions;
 using TechTalk.SpecFlow;
 using TechTalk.SpecFlow.Assist;
 using Xunit;
@@ -165,7 +166,7 @@ namespace AcceptanceTests.UISteps
         public void WhenIPressProcessedButton()
         {
             materialsSectionPage.ProcessedButton.Click();
-            driver.WaitFor(15);
+            driver.WaitFor(5);
         }
 
         [When(@"I pressed Back button")]
@@ -179,7 +180,7 @@ namespace AcceptanceTests.UISteps
         public void WhenIPressedThePreviousButton()
         {
             materialsSectionPage.PreviousMaterialButton.Click();
-            driver.WaitFor(2);
+            driver.WaitFor(3);
         }
 
         [When(@"I clicked on the first search result in the Materials section")]
@@ -346,6 +347,20 @@ namespace AcceptanceTests.UISteps
             materialsSectionPage.MaterialTypeIcon.Click();
             driver.WaitFor(2);
         }
+        
+        [When(@"I send keys Ctrl and \[ from the keyboard")]
+        public void WhenISendKeysCtrlAndFromTheKeyboard()
+        {
+            materialsSectionPage.TextField.SendKeys(Keys.Control + "[");
+            driver.WaitFor(2);
+        }
+        
+        [When(@"I pressed the Next material button")]
+        public void WhenIPressedTheNextButton()
+        {
+            materialsSectionPage.NextMaterialButton.Click();
+            driver.WaitFor(3);
+        }
 
         #endregion When
 
@@ -373,7 +388,6 @@ namespace AcceptanceTests.UISteps
         [Then(@"I must see events search in the materials card")]
         public void IMustSeeEventsSearchInTheMaterialsCard()
         {
-
             Assert.True(materialsSectionPage.EventsSearch.Displayed);
         }
 
@@ -571,6 +585,27 @@ namespace AcceptanceTests.UISteps
         public void ThenIMustSeePlayerControlsPanelWithTotalTime()
         {
             Assert.True(materialsSectionPage.PlayerControlsPanelWithTotalTime.Displayed);
+        }
+
+        [Then(@"I wrote on the text field (.*)")]
+        public void ThenIWroteOnTheTextField(string input)
+        {
+            materialsSectionPage.TextField.SendKeys(input);
+            driver.WaitFor(5);
+        }
+
+        [Then(@"I must see notification about saving material")]
+        public void ThenIMustSeeNotificationAboutSavingMaterial()
+        {
+            Assert.True(materialsSectionPage.Notification.Displayed);
+        }
+
+        [Then(@"I must see saved new content with text (.*) in the text field")]
+        public void ThenIMustSeeSavedNewContentWithTextInTheTextField(string expectedContent)
+        {
+            driver.WaitFor(2);
+            var actualContent = materialsSectionPage.TextField.Text;
+            Assert.Contains(expectedContent, actualContent);
         }
         #endregion
     }

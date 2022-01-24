@@ -8,5 +8,6 @@ namespace Iis.Interfaces.Metrics
 
         IGauge GetMaterialsCountMetric(string source);
         void SetMetrics(MaterialMetrics materialMetrics);
+        void SetDefaultValues();
     }
 }
