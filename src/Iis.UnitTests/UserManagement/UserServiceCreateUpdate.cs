@@ -9,6 +9,7 @@ using Iis.DataModel;
 using Iis.DataModel.Roles;
 using Iis.Services.Contracts.Interfaces;
 using Iis.Domain.Users;
+using Iis.Interfaces.SecurityLevels;
 
 namespace Iis.UnitTests.UserManagement
 {
