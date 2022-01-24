@@ -29,7 +29,7 @@ namespace AcceptanceTests.UISteps
             loginPageObjects.LoginField.SendKeys(login);
             loginPageObjects.PasswordField.SendKeys(password);
             loginPageObjects.LoginButton.Click();
-            driver.WaitFor(15);
+            driver.WaitFor(20);
         }
 
         [When(@"I pressed Sign out button")]
