@@ -62,5 +62,11 @@ namespace Iis.Services.Contracts.Elastic
             public const string Path = "Assignees.Id";
             public const string AliasForSingleItem = "Призначено мені";
         }
+
+        public static class SecurityLevels
+        {
+            public const string Alias = "Рівні доступу";
+            public const string Path = "__securityLevels";
+        }
     }
 }

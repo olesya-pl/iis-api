@@ -214,6 +214,7 @@ namespace Iis.Api.Controllers
                 KeywordProperty.Create(nameof(MaterialDocument.Channel), false),
                 KeywordProperty.Create(MaterialAliases.Assignees.Path, false),
                 AliasProperty.Create(MaterialAliases.Assignees.Alias, MaterialAliases.Assignees.Path),
+                KeywordProperty.Create(MaterialAliases.SecurityLevels.Path, true),
             });
             await _elasticManager.CreateIndexesAsync(
                 new[] { materialIndex },
