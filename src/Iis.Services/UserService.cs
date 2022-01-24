@@ -314,7 +314,7 @@ namespace Iis.Services
         {
             var users = await RunWithoutCommitAsync(uowfactory => uowfactory.UserRepository.GetAllUsersAsync(cancellationToken));
 
-            var elasticUsers = _mapper.Map<List<ElasticUserDto>>(users);
+            var elasticUsers = users.Select(GetElasticUser).ToList();
 
             await _userElasticService.SaveAllUsersAsync(elasticUsers, cancellationToken);
         }
@@ -543,11 +543,16 @@ namespace Iis.Services
 
         private async Task PutUserToElasticSearchAsync(UserEntity userEntity, CancellationToken cancellationToken)
         {
-            var elasticUser = _mapper.Map<ElasticUserDto>(userEntity);
-            var securityLevels = _securityLevelChecker.GetSecurityLevels(userEntity.SecurityLevels.Select(_ => _.Id).ToList());
-            elasticUser.Metadata.SecurityLevels = _securityLevelChecker.GetStringCode(true, securityLevels.Select(_ => _.UniqueIndex).ToList());
+            await _userElasticService.SaveUserAsync(GetElasticUser(userEntity), cancellationToken);
+        }
 
-            await _userElasticService.SaveUserAsync(elasticUser, cancellationToken);
+        private ElasticUserDto GetElasticUser(UserEntity userEntity)
+        {
+            var elasticUser = _mapper.Map<ElasticUserDto>(userEntity);
+            var securityLevelIds = userEntity.SecurityLevels?.Select(_ => _.Id).ToList() ?? new List<Guid>();
+            var securityLevels = _securityLevelChecker.GetSecurityLevels(securityLevelIds);
+            elasticUser.Metadata.SecurityLevels = _securityLevelChecker.GetStringCode(true, securityLevels.Select(_ => _.UniqueIndex).ToList());
+            return elasticUser;
         }
 
         private void OnExternalUserNotFound(UserEntity userEntity)

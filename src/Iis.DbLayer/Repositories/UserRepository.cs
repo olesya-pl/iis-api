@@ -36,7 +36,7 @@ namespace Iis.DbLayer.Repositories
 
         public Task<List<UserEntity>> GetAllUsersAsync(CancellationToken ct)
         {
-            return Context.Users
+            return GetUsersQuery()
                 .AsNoTracking()
                 .ToListAsync(ct);
         }

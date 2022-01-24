@@ -63,7 +63,7 @@ namespace Iis.Security.SecurityLevels
             _rootLevel.GetAllItems().Select(_ => new SecurityLevelPlain(_)).ToList();
         public ISecurityLevel CreateChildLevel(int parentIndex)
         {
-            var parent = GetSecurityLevel(parentIndex);
+            var parent = GetSecurityLevelConcrete(parentIndex);
             return new SecurityLevel
             {
                 Id = Guid.NewGuid(),
@@ -96,7 +96,7 @@ namespace Iis.Security.SecurityLevels
             }
             return sb.ToString();
         }
-        internal SecurityLevel GetSecurityLevel(int uniqueIndex) =>
+        internal SecurityLevel GetSecurityLevelConcrete(int uniqueIndex) =>
             _rootLevel.GetAllItems().Where(_ => _.UniqueIndex == uniqueIndex).Single();
 
         private bool AccessGranted(IReadOnlyList<SecurityLevel> userLevels, IReadOnlyList<SecurityLevel> objectLevels)
