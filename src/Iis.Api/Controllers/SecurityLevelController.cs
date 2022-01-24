@@ -14,8 +14,9 @@ namespace Iis.Api.Controllers
     [ApiController]
     public class SecurityLevelController : ControllerBase
     {
-        private readonly IUserService _userService;
         private readonly ISecurityLevelService _securityLevelService;
+        private readonly IUserService _userService;
+
         public SecurityLevelController(
             ISecurityLevelService securityLevelService,
             IUserService userService)
@@ -28,8 +29,8 @@ namespace Iis.Api.Controllers
         public IReadOnlyList<SecurityLevelPlain> GetSecurityLevels() => _securityLevelService.GetSecurityLevelsPlain();
 
         [HttpGet("getUserSecurityDtos")]
-        public async Task<IReadOnlyList<UserSecurityDto>> GetUserSecurityDtosAsync()
-            => await _userService.GetUserSecurityDtosAsync();
+        public Task<IReadOnlyList<UserSecurityDto>> GetUserSecurityDtosAsync()
+            => _userService.GetUserSecurityDtosAsync();
 
         [HttpPost("saveUserSecurityDto")]
         public async Task SaveUserSecurityDtoAsync(UserSecurityDto userSecurityDto)

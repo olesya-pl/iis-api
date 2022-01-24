@@ -28,7 +28,9 @@
 
 
 	<ItemGroup>
-	  <Content Include="data\elastic\SecurityLevelFilter.painless" />
+	  <Content Include="data\elastic\SecurityLevelFilter.painless">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </Content>
 	</ItemGroup>
 
   <ItemGroup>
