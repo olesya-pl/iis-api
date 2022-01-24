@@ -59,7 +59,15 @@ namespace AcceptanceTests.PageObjects
 
         [FindsBy(How = How.CssSelector, Using = ".sidebar__nav li.objects")]
         public IWebElement ObjectsTabSearch;
+        
+        [FindsBy(How = How.CssSelector, Using = ".materials-table__dor .toggle-more")]
+        public IWebElement RelatedObjectToTheMaterial;
+        
+        [FindsBy(How = How.XPath, Using = "//div[contains(text(),'Бонд ')]/ancestor::tr")]
+        public IWebElement Autosuggest;
 
+        [FindsBy(How = How.CssSelector, Using = "div:nth-of-type(1) > .general-container > div:nth-of-type(1) > .el-form-item__content > .el-select.el-tooltip")]
+        [CacheLookup]
         public MaterialPage MaterialPage => new MaterialPage(driver);
 
         [FindsBy(How = How.CssSelector, Using = "div:nth-of-type(2) > .el-form-item__content > .el-select.el-tooltip")]

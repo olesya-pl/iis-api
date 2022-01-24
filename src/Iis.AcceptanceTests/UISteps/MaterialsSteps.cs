@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AcceptanceTests.Helpers;
@@ -7,6 +8,7 @@ using OpenQA.Selenium;
 using TechTalk.SpecFlow;
 using TechTalk.SpecFlow.Assist;
 using Xunit;
+using Xunit.Sdk;
 
 
 namespace AcceptanceTests.UISteps
@@ -84,6 +86,14 @@ namespace AcceptanceTests.UISteps
             driver.WaitFor(2);
             materialsSectionPage.SearchField.SendKeys(Keys.Enter);
             driver.WaitFor(5);
+        }
+        
+        [When(@"I searched (.*) data from cherry pick in the materials")]
+        public void ISearchedFromCherryPickInTheMaterials(string input)
+        {
+            materialsSectionPage.SearchField.SendKeys(input);
+            driver.WaitFor(1);
+            materialsSectionPage.Autosuggest.Click();
         }
 
         [When(@"I searched for uploaded material in the materials")]
@@ -410,6 +420,15 @@ namespace AcceptanceTests.UISteps
             string actualValue = materialsSectionPage.MaterialsSearchResultCounter.Text;
             string expectedValue = context.GetResponse<string>("counterValue");
             Assert.Equal(actualValue, expectedValue);
+        }
+
+        [Then(@"I must see (.*) as the related object to the material")]
+        public void IMustSeeAsTheRelatedObjectToTheMaterial(string keyword)
+       
+        {
+            driver.WaitFor(1);
+            var actualValue = materialsSectionPage.RelatedObjectToTheMaterial.Text;
+            Assert.True(materialsSectionPage.RelatedObjectToTheMaterial.Displayed);
         }
 
         [Then(@"I must see that importance value must be set to (.*) value")]

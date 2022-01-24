@@ -184,3 +184,11 @@ Scenario: IIS-8238 - Hotkeys for audio rewind
 	When I clicked Ctrl and left arrow on the keyboard
 	Then I see that position of timeline changed
 	And I clicked Ctrl and right arrow on the keyboard
+	
+@regression @UI @Material @upload
+Scenario: IIS-6793 - Search materials related by object
+	When I navigated to Materials page
+	When I clicked search button in the Materials section
+	And I searched Бонд  data from cherry pick in the materials
+	Then I must see Бонд   as the related object to the material
+	
