@@ -287,8 +287,6 @@ namespace Iis.Elastic
             mappingConfiguration.Properties.Add(DateProperty.Create(ElasticConfigConstants.CreatedAtField, ElasticConfiguration.DefaultDateFormats));
             mappingConfiguration.Properties.Add(DateProperty.Create(ElasticConfigConstants.UpdatedAtField, ElasticConfiguration.DefaultDateFormats));
             mappingConfiguration.Properties.Add(KeywordProperty.Create(ElasticConfigConstants.SecurityLevelsField, true));
-            mappingConfiguration.Properties.Add(SearchAsYouTypeProperty.Create(ElasticConfigConstants.TitleField));
-            mappingConfiguration.Properties.Add(SearchAsYouTypeProperty.Create(ElasticConfigConstants.ComputedTitleField));
 
             var indexUrl = GetRealIndexName(attributesList.EntityTypeName);
             var jObject = mappingConfiguration.ToJObject();

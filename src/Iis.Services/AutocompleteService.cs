@@ -56,7 +56,7 @@ namespace Iis.Services
 
             if(!_elasticService.TypesAreSupported(typeNameList)) return EmptyAutoCompleteList;
 
-            var autocompleteQuery = new SearchAsYouTypeQueryBuilder(query, SearchableFields)
+            var autocompleteQuery = new DisjunctionQueryBuilder(query, SearchableFields)
                 .WithPagination(0, size)
                 .BuildSearchQuery()
                 .ToString();

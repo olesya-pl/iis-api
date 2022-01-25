@@ -8,8 +8,6 @@ namespace Iis.Interfaces.Elastic
         public const string CreatedAtField = "CreatedAt";
         public const string UpdatedAtField = "UpdatedAt";
         public const string NodeTypeTitleAlias = "Тип_ОР";
-        public const string SecurityLevelsField = "__securityLevels";
-        public const string TitleField = "title";
-        public const string ComputedTitleField = "__title";
+        public const string SecurityLevelsField = "__securityLevels";        
     }
 }
