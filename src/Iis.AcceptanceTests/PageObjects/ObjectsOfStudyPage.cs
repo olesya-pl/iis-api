@@ -25,8 +25,8 @@ namespace AcceptanceTests.PageObjects
         [CacheLookup]
         public IWebElement SearchField;
 
-        [FindsBy(How = How.XPath, Using = "(//div[@class='base-page objects-page']//tr[1]//div[@class='object-summary']//div[@class='text-ellipsis title'])")]
-        public IWebElement FirstSearchResultTitle;
+        public IWebElement FirstSearchResultTitle(string objectOfStudyTitle) =>
+            driver.FindElement(By.XPath($"//div[@class='base-page objects-page']//div[@class='object-summary']//*[text()=' {objectOfStudyTitle} ']"));
 
         [FindsBy(How = How.CssSelector, Using = ".objects-table .p-datatable-tbody tr:nth-child(1) .object-summary")]
         public IWebElement FirstSearchResultRow;
