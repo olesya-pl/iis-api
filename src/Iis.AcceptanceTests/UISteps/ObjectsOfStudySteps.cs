@@ -413,20 +413,31 @@ namespace AcceptanceTests.UISteps
             driver.WaitFor(2);
         }
 
+        [When(@"I clicked on the aggregation type object of study on (.*)")]
+        public void WhenIClickedOnTheAggregationType(string type)
+        {
+            var aggregationfilter = driver.FindElement(By.XPath($"//div[1][@class ='el-tree-node is-focusable']//*[@class='el-tree-node__expand-icon el-icon-caret-right']"));
+            aggregationfilter.Click();
+            driver.WaitFor(2);
+            var objectType = driver.FindElement(By.XPath($"//div[@class='aggregation']//div[@class='aggregation-group']//div[contains(text(),'{type}')]"));
+            objectType.Click();
+            driver.WaitFor(2);
+        }
+
         #endregion
 
         #region Then
         [Then(@"I must see object of study (.*) as first search result")]
         public void IMustSeeObjectOfStudyInTheSearchResults(string objectOfStudyTitle)
         {
-            var actualTitle = objectsOfStudyPage.FirstSearchResultTitle.Text;
-            Assert.Equal(objectOfStudyTitle, actualTitle);
+            var actualTitle = objectsOfStudyPage.FirstSearchResultTitle(objectOfStudyTitle);
+            Assert.True(actualTitle.Displayed);
         }
 
         [Then(@"I must not see object of study (.*) as first search result")]
         public void IMustNotSeeObjectOfStudyAsFirstResult(string objectOfStudyTitle)
         {
-            var actualTitle = objectsOfStudyPage.FirstSearchResultTitle.Text;
+            var actualTitle = objectsOfStudyPage.FirstSearchResultTitle(objectOfStudyTitle).Text;
             Assert.NotEqual(objectOfStudyTitle, actualTitle);
         }
 
