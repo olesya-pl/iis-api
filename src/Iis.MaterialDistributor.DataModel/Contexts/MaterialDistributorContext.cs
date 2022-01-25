@@ -11,7 +11,7 @@ namespace Iis.MaterialDistributor.DataModel.Contexts
         {
         }
 
-        public virtual DbSet<PermanentCriteriaEntity> PermanentCriterias { get; set; }
+        public virtual DbSet<PermanentCoefficientEntity> PermanentCoefficients { get; set; }
         public virtual DbSet<VariableCoefficientEntity> VariableCoefficients { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

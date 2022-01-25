@@ -16,6 +16,7 @@ namespace Iis.MaterialDistributor.DependencyInjection
             services.AddSingleton<DistributionConfig>(config);
 
             services.AddHostedService<DistributionWorker>();
+            services.AddHostedService<MaterialCoefficientsConsumer>();
 
             return services;
         }

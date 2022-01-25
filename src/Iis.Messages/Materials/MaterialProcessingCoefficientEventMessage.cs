@@ -2,7 +2,7 @@
 
 namespace Iis.Messages.Materials
 {
-    public class MaterialProcessingCriteriasEventMessage
+    public class MaterialProcessingCoefficientEventMessage
     {
         public Material[] Materials { get; set; }
     }

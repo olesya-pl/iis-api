@@ -7,11 +7,11 @@ using Newtonsoft.Json;
 
 namespace Iis.Services.Mappers.Materials
 {
-    internal static class MaterialCriteriasMessageMapper
+    internal static class MaterialCoefficientsMessageMapper
     {
-        public static MaterialProcessingCriteriasEventMessage ToProcessingCriteriasEvent(this IEnumerable<MaterialDocument> materials)
+        public static MaterialProcessingCoefficientEventMessage ToProcessingCoefficientEvent(this IEnumerable<MaterialDocument> materials)
         {
-            return new MaterialProcessingCriteriasEventMessage
+            return new MaterialProcessingCoefficientEventMessage
             {
                 Materials = materials.Select(_ => _.Map()).ToArray()
             };
