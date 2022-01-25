@@ -10,6 +10,7 @@ using Iis.RabbitMq.Channels;
 using Iis.Messages.Materials;
 using Iis.Services.Contracts.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using Material = Iis.Domain.Materials.Material;
 
 namespace Iis.MaterialLoader.Services
 {
