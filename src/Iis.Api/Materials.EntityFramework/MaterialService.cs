@@ -23,6 +23,7 @@ using Iis.Services.Contracts.Materials.Distribution;
 using Iis.Utility;
 using Microsoft.Extensions.Logging;
 using MaterialLoadData = Iis.Domain.Materials.MaterialLoadData;
+using Material = Iis.Domain.Materials.Material;
 
 namespace IIS.Core.Materials.EntityFramework
 {
@@ -69,7 +70,7 @@ namespace IIS.Core.Materials.EntityFramework
             _materialElasticService = materialElasticService;
         }
 
-        public async Task SaveAsync(Material material, Guid? changeRequestId = null)
+        public async Task SaveAsync(Iis.Domain.Materials.Material material, Guid? changeRequestId = null)
         {
             await MakeFilePermanent(material);
             await ValidateMaterialParent(material);
