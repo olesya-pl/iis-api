@@ -19,11 +19,6 @@ namespace Iis.Desktop.SecurityManager.Controls
         private TreeNode treeNode;
         private ISecurityLevelChecker _securityLevelChecker;
 
-        public UiAccessLevelEditControl()
-        {
-            
-        }
-
         private ISecurityLevel CurrentLevel => (ISecurityLevel)treeNode.Tag;
         private string CurrentName => txtName.Text.Trim();
 
@@ -47,13 +42,13 @@ namespace Iis.Desktop.SecurityManager.Controls
             _container.Add(txtUniqueIndex = new TextBox { Enabled = false }, "Унікальний індекс");
             _container.Add(txtParent = new TextBox { Enabled = false }, "Належить до");
             _container.Add(btnSave = _uiControlsCreator.GetButton("Зберегти"));
-            btnSave.Click += btnSave_Click;
+            btnSave.Click += BtnSaveClick;
         }
 
         private SecurityLevelPlain GetSecurityLevelPlain()
             => new SecurityLevelPlain(CurrentLevel) { Name = CurrentName };
 
-        private void btnSave_Click(object sender, EventArgs e)
+        private void BtnSaveClick(object sender, EventArgs e)
         {
             if (string.IsNullOrEmpty(txtName.Text.Trim()))
             {
