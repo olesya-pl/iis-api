@@ -30,6 +30,17 @@ namespace Iis.Domain.TreeResult
             }
             return this;
         }
+        public TreeResultList Init<T>(
+            IEnumerable<T> items,
+            Func<T, string> labelFunc,
+            Func<T, string> valueFunc,
+            Func<T, IReadOnlyList<T>> optionsFunc)
+        {
+            Items = items
+                .Select(_ => new TreeResult().Init(_, labelFunc, valueFunc, optionsFunc))
+                .ToList();
+            return this;
+        }
         public string GetJson()
         {
             var jItems = new JArray();

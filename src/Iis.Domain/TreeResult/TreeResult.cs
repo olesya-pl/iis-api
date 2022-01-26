@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace Iis.Domain.TreeResult
@@ -14,7 +15,6 @@ namespace Iis.Domain.TreeResult
         public JObject GetJsonObject()
         {
             var result = new JObject();
-            
             result["label"] = Label;
 
             if (!string.IsNullOrEmpty(Value))
@@ -31,6 +31,19 @@ namespace Iis.Domain.TreeResult
             }
 
             return result;
+        }
+        public TreeResult Init<T>(
+            T item,
+            Func<T, string> labelFunc,
+            Func<T, string> valueFunc,
+            Func<T, IReadOnlyList<T>> optionsFunc)
+        {
+            Label = labelFunc(item);
+            Value = valueFunc(item);
+            Options = optionsFunc(item)
+                .Select(_ => new TreeResult().Init(_, labelFunc, valueFunc, optionsFunc))
+                .ToList();
+            return this;
         }
     }
 }
