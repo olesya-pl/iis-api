@@ -9,6 +9,11 @@
     <AnalysisMode>AllEnabledByDefault</AnalysisMode>
     <AnalysisLevel>latest</AnalysisLevel>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Migrations\20220124104424_AddVariableCoefficientEntity.cs" />
+    <Compile Remove="Migrations\20220124104424_AddVariableCoefficientEntity.Designer.cs" />
+  </ItemGroup>
   
   <ItemGroup>
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.1.4" />

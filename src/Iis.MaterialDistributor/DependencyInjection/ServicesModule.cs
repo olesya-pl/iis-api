@@ -9,6 +9,9 @@ namespace Iis.MaterialDistributor.DependencyInjection
         public static IServiceCollection RegisterServices(this IServiceCollection services)
         {
             services.AddTransient<IMaterialService, MaterialService>();
+            services.AddTransient<IVariableCoefficientService, VariableCoefficientService>();
+            services.AddTransient<IVariableCoefficientRuleEvaluator, VariableCoefficientRuleEvaluator>();
+
             return services;
         }
     }

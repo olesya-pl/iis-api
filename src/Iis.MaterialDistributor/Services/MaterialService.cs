@@ -22,7 +22,7 @@ namespace Iis.MaterialDistributor.Services
             "CreatedDate"
         };
 
-        private IMaterialElasticRepository _elasticRepository;
+        private readonly IMaterialElasticRepository _elasticRepository;
 
         public MaterialService(
             IMaterialElasticRepository elasticRepository)
@@ -30,9 +30,9 @@ namespace Iis.MaterialDistributor.Services
             _elasticRepository = elasticRepository;
         }
 
-        public async Task<IReadOnlyCollection<MaterialDocument>> GetMaterialCollectionAsync(int hourOffset, CancellationToken cancellationToken)
+        public async Task<IReadOnlyCollection<MaterialDocument>> GetMaterialCollectionAsync(int offsetHours, CancellationToken cancellationToken)
         {
-            var searchParam = new SearchParams(GetSuggestion(hourOffset), _defaultPagination, _resultFieldCollection);
+            var searchParam = new SearchParams(GetSuggestion(offsetHours), _defaultPagination, _resultFieldCollection);
 
             var result = await _elasticRepository.BeginSearchByScrollAsync(searchParam, cancellationToken);
 
@@ -59,9 +59,12 @@ namespace Iis.MaterialDistributor.Services
 
         private static string GetSuggestion(int hourOffset)
         {
-            //var timeStamp = new DateTime(2021, 12, 13, 18, 02, 13);
-            //var escapeSymbolsPattern = new HashSet<char> { ':', '/' };
-            //var dateRangeExpression = $"{timeStamp.ToString("yyyy-MM-ddTHH:mm:ssZ")}||-{hourOffset}h/h".EscapeSymbols(escapeSymbolsPattern);
+            /*
+            // temporally. for dev purposes only
+            var timeStamp = new DateTime(2021, 12, 13, 18, 02, 13);
+            var escapeSymbolsPattern = new HashSet<char> { ':', '/' };
+            var dateRangeExpression = $"{timeStamp.ToString("yyyy-MM-ddTHH:mm:ssZ")}||-{hourOffset}h/h".EscapeSymbols(escapeSymbolsPattern);
+            */
 
             var dateRangeExpression = $"now-{hourOffset}h\\/h";
 

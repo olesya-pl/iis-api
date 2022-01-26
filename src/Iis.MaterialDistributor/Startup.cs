@@ -27,7 +27,7 @@ namespace Iis.MaterialDistributor
             services.RegisterElasticManager(Configuration);
             services.RegisterRepositories();
             services.RegisterServices();
-            services.RegisterHostedServices();
+            services.RegisterHostedServices(Configuration);
             services.AddPersistance();
         }
 
