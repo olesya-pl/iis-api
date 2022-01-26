@@ -33,7 +33,7 @@ namespace Iis.UnitTests.Materials
             _serviceProvider.Dispose();
         }
 
-        [Theory, RecursiveAutoData]
+        //[Theory, RecursiveAutoData]
         public async Task PutDocumentToElasticSearch_PutsProcessedMaterialsCount(MaterialEntity materialEntity,
             List<MLResponseEntity> responses)
         {
