@@ -12,7 +12,5 @@ namespace Iis.Elastic.ElasticMappingProperties
         {
             return CreateWithNestedProperty(propertyName, (propName) => new ByteProperty { Name = propName }, (propName) => Create(propName));
         }
-
-        protected override void PopulatePropertyIntoJObject(JObject result) { }
     }
 }

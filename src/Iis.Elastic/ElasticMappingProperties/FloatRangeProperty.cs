@@ -1,6 +1,4 @@
-﻿using Newtonsoft.Json.Linq;
-
-namespace Iis.Elastic.ElasticMappingProperties
+﻿namespace Iis.Elastic.ElasticMappingProperties
 {
     public class FloatRangeProperty : ElasticMappingProperty
     {
@@ -15,7 +13,5 @@ namespace Iis.Elastic.ElasticMappingProperties
         }
 
         public override ElasticMappingPropertyType Type => ElasticMappingPropertyType.FloatRange;
-
-        protected override void PopulatePropertyIntoJObject(JObject result) { }
     }
 }

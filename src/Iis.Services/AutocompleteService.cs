@@ -1,30 +1,35 @@
-﻿using Iis.Interfaces.Elastic;
-using Iis.Interfaces.Ontology.Schema;
-using Iis.Elastic.SearchQueryExtensions;
-using Iis.Services.Contracts.Dtos;
-using Iis.Services.Contracts.Interfaces;
-using Newtonsoft.Json.Linq;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Iis.Domain.Users;
+using Iis.Elastic.SearchQueryExtensions;
+using Iis.Interfaces.Elastic;
+using Iis.Interfaces.Ontology.Schema;
+using Iis.Services.Contracts.Dtos;
+using Iis.Services.Contracts.Interfaces;
+using Newtonsoft.Json.Linq;
 
 namespace Iis.Services
 {
     public class AutocompleteService : IAutocompleteService
     {
-        private readonly IOntologySchema _ontologySchema;
-        private readonly IElasticService _elasticService;
         private static readonly IReadOnlyCollection<AutocompleteEntityDto> EmptyAutoCompleteList = Array.Empty<AutocompleteEntityDto>();
         private static readonly List<string> KeyWords = new List<string>();
         private static readonly string[] SearchableFields = { "__title", "commonInfo.RealNameShort", "title" };
+        private readonly IOntologySchema _ontologySchema;
+        private readonly IElasticService _elasticService;
+        private readonly IElasticManager _elasticManager;
 
-        public AutocompleteService(IOntologySchema ontologySchema, IElasticService elasticService)
+        public AutocompleteService(
+            IOntologySchema ontologySchema,
+            IElasticService elasticService,
+            IElasticManager elasticManager)
         {
             _ontologySchema = ontologySchema;
             _elasticService = elasticService;
+            _elasticManager = elasticManager;
         }
 
         public IReadOnlyCollection<string> GetTips(string query, int count)
@@ -43,22 +48,25 @@ namespace Iis.Services
                 .ToArray();
         }
 
-        public async Task<IReadOnlyCollection<AutocompleteEntityDto>> GetEntitiesAsync(string query, string[] types, int size, User user, CancellationToken ct = default)
+        public async Task<IReadOnlyCollection<AutocompleteEntityDto>> GetEntitiesAsync(string query, string[] types, int size, User user, CancellationToken cancellationToken = default)
         {
-            if(SearchQueryExtension.IsMatchAll(query)) return EmptyAutoCompleteList;
-
-            if (!query.Contains('*')) query = $"*{query}*";
+            if (SearchQueryExtension.IsMatchAll(query)) return EmptyAutoCompleteList;
 
             var typeNameList = _ontologySchema.GetEntityTypesByName(types, includeChildren: true)
                                 .Select(e => e.Name)
                                 .Distinct()
                                 .ToArray();
 
-            if(!_elasticService.TypesAreSupported(typeNameList)) return EmptyAutoCompleteList;
+            if (!_elasticService.TypesAreSupported(typeNameList)) return EmptyAutoCompleteList;
 
-            var response = await _elasticService.SearchByFieldsAsync(query, SearchableFields, typeNameList, size, user.Id, ct);
+            var autocompleteQuery = new DisjunctionQueryBuilder(query, SearchableFields)
+                .WithPagination(0, size)
+                .BuildSearchQuery()
+                .ToString();
 
-            return response.Select(x => new AutocompleteEntityDto
+            var response = await _elasticManager.SearchAsync(autocompleteQuery, typeNameList, cancellationToken);
+
+            return response.Items.Select(x => new AutocompleteEntityDto
             {
                 Id = x.Identifier,
                 Title = GetFirstNotNullField(x.SearchResult),
@@ -67,7 +75,7 @@ namespace Iis.Services
             }).ToArray();
         }
 
-        private string GetFirstNotNullField(JObject jObject) 
+        private static string GetFirstNotNullField(JObject jObject)
         {
             string result = null;
             foreach (var item in SearchableFields)
@@ -88,7 +96,6 @@ namespace Iis.Services
                             return result;
                     }
                 }
-
                 catch (InvalidCastException)
                 {
                     continue;
@@ -105,7 +112,7 @@ namespace Iis.Services
                 var aliases = _ontologySchema.Aliases.Items.Select(x => x.Value).ToList();
                 var fields = _ontologySchema.GetFullHierarchyNodes()
                     .Where(x => IsEligibleNodeType(x.Value))
-                    .Select(x => x.Key.Substring(x.Key.IndexOf('.') + 1))
+                    .Select(x => x.Key.Substring(x.Key.IndexOf('.', StringComparison.OrdinalIgnoreCase) + 1))
                     .Distinct()
                     .ToList();
 
