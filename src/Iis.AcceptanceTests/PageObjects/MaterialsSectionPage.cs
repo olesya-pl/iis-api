@@ -236,7 +236,7 @@ namespace AcceptanceTests.PageObjects
         [FindsBy(How = How.CssSelector, Using = ".action-button--next-page span")]
         public IWebElement NextMaterialButton;
 
-        [FindsBy(How = How.CssSelector, Using = ".action-button--next-page span")]
-        public IWebElement newContext;
+        [FindsBy(How = How.XPath, Using = "//*[@class='material-viewer__editor']//*[@class='ProseMirror-trailingBreak']")]
+        public IWebElement ClearTextField;
     }
 }
