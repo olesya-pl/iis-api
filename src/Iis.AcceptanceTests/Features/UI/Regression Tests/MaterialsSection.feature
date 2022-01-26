@@ -9,6 +9,7 @@ Feature: Materials - regression
 	- IIS-8238 - Hotkeys for audio rewind
 	- IIS-8257 - Possibility save  material by hotkeys
 	- IIS-8441 - Display the length of the audio track
+	- IIS-6633 - Search materials by status processing
 
 Background:
 	Given I sign in with the user olya and password 123 in the Contour
@@ -221,3 +222,11 @@ Scenario: IIS-8257 - Possibility save  material by hotkeys
 	When I pressed the Previous material button
 	Then I must see saved new content with text  Якийсь текст in the text field
 	When I clean up uploaded material via API
+
+	@regression @UI @Materials
+Scenario: IIS-6633 - Search materials by status processing
+	When I navigated to Materials page
+	And I clicked search button in the Materials section
+	And I searched ProcessedStatus.Title:Оброблено data in the materials
+	Then I must see Оброблено in the marerial table
+	
