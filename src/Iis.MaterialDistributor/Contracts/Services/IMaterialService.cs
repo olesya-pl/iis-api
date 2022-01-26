@@ -6,6 +6,6 @@ namespace Iis.MaterialDistributor.Contracts.Services
 {
     public interface IMaterialService
     {
-        Task<IReadOnlyCollection<MaterialDocument>> GetMaterialCollectionAsync(int hourOffset, CancellationToken cancellationToken);
+        Task<IReadOnlyCollection<MaterialDocument>> GetMaterialCollectionAsync(int offsetHours, CancellationToken cancellationToken);
     }
 }

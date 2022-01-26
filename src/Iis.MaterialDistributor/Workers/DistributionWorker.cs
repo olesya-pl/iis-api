@@ -1,8 +1,10 @@
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using MediatR;
+using Iis.MaterialDistributor.Configurations;
 using Iis.MaterialDistributor.Contracts.Events;
 
 namespace Iis.MaterialDistributor.Workers
@@ -11,26 +13,25 @@ namespace Iis.MaterialDistributor.Workers
     {
         private readonly ILogger _logger;
         private readonly IMediator _mediator;
+        private readonly DistributionConfig _configuration;
 
         public DistributionWorker(
             ILogger<DistributionWorker> logger,
-            IMediator mediator)
+            IMediator mediator,
+            DistributionConfig configuration)
         {
             _logger = logger;
             _mediator = mediator;
+            _configuration = configuration;
         }
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            await _mediator.Publish(new ReadAllMaterialsEvent { HourOffset = 2 }, stoppingToken);
-
-            /*
             while (!stoppingToken.IsCancellationRequested)
             {
-                _logger.LogInformation("Ping");
+                await _mediator.Publish(new ReadAllMaterialsEvent(), stoppingToken);
 
-                await Task.Delay(System.TimeSpan.FromSeconds(5), stoppingToken);
+                await Task.Delay(_configuration.RefreshMaterialInterval, stoppingToken);
             }
-            */
         }
     }
 }

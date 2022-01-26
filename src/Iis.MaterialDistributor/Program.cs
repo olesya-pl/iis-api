@@ -19,6 +19,7 @@ namespace Iis.MaterialDistributor
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
             Host.CreateDefaultBuilder(args)
+                .UseDefaultServiceProvider(_ => _.ValidateScopes = false)
                 .UseSerilog((context, config) => config.ReadFrom.Configuration(context.Configuration))
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
