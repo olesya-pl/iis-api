@@ -10,6 +10,7 @@ namespace Iis.Domain.TreeResult
     public class TreeResultList
     {
         public List<TreeResult> Items { get; private set; }
+
         public TreeResultList Init<T>(
             IEnumerable<T> items,
             Func<T, string> labelFunc,
@@ -30,6 +31,7 @@ namespace Iis.Domain.TreeResult
             }
             return this;
         }
+
         public TreeResultList Init<T>(
             IEnumerable<T> items,
             Func<T, string> labelFunc,
@@ -41,6 +43,7 @@ namespace Iis.Domain.TreeResult
                 .ToList();
             return this;
         }
+
         public string GetJson()
         {
             var jItems = new JArray();
