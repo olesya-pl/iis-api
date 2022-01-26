@@ -130,15 +130,19 @@ Feature: MaterialsSectionUI - Sanity
 
      @sanity @UI @MaterialsSanityUI
     Scenario: IIS-6196 - Possibility save text into audio file text area
-    Given I upload a new mp3 material via API
-	When I navigated to Materials page
-	Then I clicked on the type`s filter audio
+    When I navigated to Materials page
+    Then I clicked on the type`s filter audio
+    When I clicked search button in the Materials section
+    And I searched neizvesten-peregovory-po-racii.mp3 data in the materials
     When I clicked on the first search result in the Materials section
-	Then I cliced on the text field
-	Then I wrote on the text field  Якийсь текст
+    Then I clicked on the text field
+    Then I wrote on the text field  Якийсь текст
     When I pressed the Next material button
-	When I pressed the Previous material button
-	Then I must see saved new content with text  Якийсь текст in the text field
-    When I clean up uploaded material via API
+    When I pressed the Previous material button
+    Then I must see saved new content with text Якийсь текст in the text field
+    When I clean up material's text field
+    When I pressed the Next material button
+    When I pressed the Previous material button
+    Then I must see clear text field
 
 

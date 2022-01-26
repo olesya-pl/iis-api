@@ -362,6 +362,17 @@ namespace AcceptanceTests.UISteps
             driver.WaitFor(3);
         }
 
+        [When(@"I clean up material's text field")]
+        public void WhenICleanUpMaterialSTextField()
+        {
+            materialsSectionPage.TextField.Click();
+            Actions keyAction = new Actions(driver);
+            keyAction.KeyDown(Keys.Control).SendKeys("A").KeyUp(Keys.Control).Perform();
+            driver.WaitFor(3);
+            keyAction.SendKeys(Keys.Delete).Perform();
+            driver.WaitFor(2);
+        }
+
         #endregion When
 
         #region Then
@@ -561,7 +572,7 @@ namespace AcceptanceTests.UISteps
             Assert.True(materialsSectionPage.PositionOfTimeline.Displayed);
         }
 
-        [Then(@"I cliced on the text field")]
+        [Then(@"I clicked on the text field")]
         public void ThenIClickedOnTheTextField()
         {
             materialsSectionPage.TextField.Click();
@@ -606,6 +617,13 @@ namespace AcceptanceTests.UISteps
             driver.WaitFor(2);
             var actualContent = materialsSectionPage.TextField.Text;
             Assert.Contains(expectedContent, actualContent);
+        }
+
+        [Then(@"I must see clear text field")]
+        public void ThenIMustSeeClearTextField()
+        {
+            driver.WaitFor(3);
+            Assert.True(materialsSectionPage.ClearTextField.Enabled);
         }
         #endregion
     }
