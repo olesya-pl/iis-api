@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using Iis.Desktop.Common.Controls;
@@ -26,6 +27,16 @@ namespace Iis.Desktop.SecurityManager.Controls
 
             _treeView.ExpandAll();
         }
+        public void SelectNode(Guid id)
+        {
+            var treeNode = GetAllNodes()
+                .SingleOrDefault(_ => (_.Tag as ISecurityLevel).Id == id);
+
+            MainPanel.Invoke((Action)(() =>
+            {
+                _treeView.SelectedNode = treeNode;
+            }));
+        }
 
         private ISecurityLevel SelectedLevel => (ISecurityLevel)_treeView.SelectedNode?.Tag;
 
@@ -51,7 +62,6 @@ namespace Iis.Desktop.SecurityManager.Controls
             _treeView.SelectedNode = node;
             OnNodeSelect?.Invoke(node);
         }
-
         private void RemoveLevel()
         {
             if (MessageBox.Show("Дійсно видалити?", "Підтвердження", MessageBoxButtons.YesNo) == DialogResult.Yes)
@@ -59,10 +69,25 @@ namespace Iis.Desktop.SecurityManager.Controls
                 OnNodeRemove?.Invoke(_treeView.SelectedNode);
             }
         }
-
         private void TreeView_AfterSelect(object sender, TreeViewEventArgs e)
         {
             OnNodeSelect?.Invoke(e.Node);
+        }
+        private IEnumerable<TreeNode> GetAllNodes() =>
+            _treeView.Nodes
+                .Cast<TreeNode>()
+                .SelectMany(GetNodeBranch);
+        private IEnumerable<TreeNode> GetNodeBranch(TreeNode node)
+        {
+            yield return node;
+
+            foreach (TreeNode child in node.Nodes)
+            {
+                foreach (var childChild in GetNodeBranch(child))
+                {
+                    yield return childChild;
+                }
+            }
         }
     }
 }

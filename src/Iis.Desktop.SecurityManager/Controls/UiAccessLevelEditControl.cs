@@ -9,16 +9,28 @@ namespace Iis.Desktop.SecurityManager.Controls
 {
     public class UiAccessLevelEditControl : UiBaseControl
     {
+        public Action<SecurityLevelPlain> OnSave; 
+
         private TextBox txtId;
         private TextBox txtName;
         private TextBox txtUniqueIndex;
         private TextBox txtParent;
         private Button btnSave;
         private TreeNode treeNode;
+        private ISecurityLevelChecker _securityLevelChecker;
+
+        public UiAccessLevelEditControl()
+        {
+            
+        }
+
         private ISecurityLevel CurrentLevel => (ISecurityLevel)treeNode.Tag;
+        private string CurrentName => txtName.Text.Trim();
 
-        public Action<SecurityLevelPlain> OnSave;
-
+        public void SetSecurityLevelChecker(ISecurityLevelChecker securityLevelChecker)
+        {
+            _securityLevelChecker = securityLevelChecker;
+        }
         public void SetUiValues(TreeNode node)
         {
             treeNode = node;
@@ -35,10 +47,32 @@ namespace Iis.Desktop.SecurityManager.Controls
             _container.Add(txtUniqueIndex = new TextBox { Enabled = false }, "Унікальний індекс");
             _container.Add(txtParent = new TextBox { Enabled = false }, "Належить до");
             _container.Add(btnSave = _uiControlsCreator.GetButton("Зберегти"));
-            btnSave.Click += (sender, e) => { OnSave?.Invoke(GetSecurityLevelPlain()); };
+            btnSave.Click += btnSave_Click;
         }
 
         private SecurityLevelPlain GetSecurityLevelPlain()
-            => new SecurityLevelPlain(CurrentLevel) { Name = txtName.Text };
+            => new SecurityLevelPlain(CurrentLevel) { Name = CurrentName };
+
+        private void btnSave_Click(object sender, EventArgs e)
+        {
+            if (string.IsNullOrEmpty(txtName.Text.Trim()))
+            {
+                MessageBox.Show("Назва не може бути пустою");
+            }
+            else if (!NameIsUnique())
+            {
+                MessageBox.Show("Назва має бути унікальною");
+            }
+            else
+            {
+                OnSave?.Invoke(GetSecurityLevelPlain());
+            }
+        }
+
+        private bool NameIsUnique()
+        {
+            var levelWithTheSameName = _securityLevelChecker.GetSecurityLevelByName(CurrentName);
+            return levelWithTheSameName == null || levelWithTheSameName.Id == CurrentLevel.Id;
+        }
     }
 }
