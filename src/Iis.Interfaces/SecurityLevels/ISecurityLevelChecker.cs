@@ -14,6 +14,7 @@ namespace Iis.Interfaces.SecurityLevels
         IReadOnlyList<ISecurityLevel> GetSecurityLevels(IReadOnlyList<int> securityLevelIndexes);
         IReadOnlyList<int> GetSecurityLevelIndexes(IReadOnlyList<Guid> securityLevelIds);
         IReadOnlyList<SecurityLevelPlain> GetSecurityLevelsPlain();
+        ISecurityLevel GetSecurityLevelByName(string name);
         ISecurityLevel CreateChildLevel(int parentIndex);
         bool AccessGranted(IReadOnlyList<int> userIndexes, IReadOnlyList<int> objectIndexes);
         string GetStringCode(bool includeAll, IReadOnlyList<int> indexes); 

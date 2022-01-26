@@ -19,7 +19,8 @@ namespace Iis.Desktop.SecurityManager.Controls
         private TreeView _treeView;
         private Button _btnSave;
         private ISecurityLevelChecker _securityLevelChecker;
-        
+        private IReadOnlyList<UserSecurityDto> _allUsers;
+
         public UiUserSecurityControl(RequestWraper requestWrapper)
         {
             _requestWrapper = requestWrapper;
@@ -40,7 +41,8 @@ namespace Iis.Desktop.SecurityManager.Controls
         }
         public void SetUiValues(IReadOnlyList<UserSecurityDto> users)
         {
-            _grid.DataSource = users;
+            _allUsers = users.OrderBy(_ => _.Username).ToList();
+            _grid.DataSource = _allUsers;
         }
         protected override void CreateControls()
         {
@@ -48,7 +50,8 @@ namespace Iis.Desktop.SecurityManager.Controls
             var (panelLeft, panelRight) = _uiControlsCreator.GetLeftRightPanels(MainPanel, panelLeftWidth);
             _grid = _uiControlsCreator.GetDataGridView("Users", null, new List<string> { "Username" });
             _grid.Columns[0].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
-            _grid.Dock = DockStyle.Fill;
+            _grid.Width = panelLeft.Width;
+            _grid.Height = panelLeft.Height;
             panelLeft.Controls.Add(_grid);
             _grid.CellFormatting += grid_CellFormatting;
             _grid.SelectionChanged += (sender, e) => { SetSecurityLevels(); };

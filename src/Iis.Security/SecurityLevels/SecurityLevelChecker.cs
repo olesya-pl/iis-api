@@ -61,6 +61,8 @@ namespace Iis.Security.SecurityLevels
             GetSecurityLevels(securityLevelIds).Select(_ => _.UniqueIndex).ToList();
         public IReadOnlyList<SecurityLevelPlain> GetSecurityLevelsPlain() =>
             _rootLevel.GetAllItems().Select(_ => new SecurityLevelPlain(_)).ToList();
+        public ISecurityLevel GetSecurityLevelByName(string name) =>
+            _rootLevel.GetAllItems().FirstOrDefault(_ => name.Equals(_.Name, StringComparison.OrdinalIgnoreCase));
         public ISecurityLevel CreateChildLevel(int parentIndex)
         {
             var parent = GetSecurityLevelConcrete(parentIndex);

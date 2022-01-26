@@ -30,8 +30,9 @@ namespace Iis.Desktop.SecurityManager
         private IConfiguration _configuration;
         private IReadOnlyDictionary<string, EnvConfig> _environmentProperties;
         private IDesktopStyle _style;
-        private const string VERSION = "0.75";
-        private const string DEFAULT_CONFIG = "local";
+        private const string VERSION = "0.91";
+        private const string DEFAULT_ENVIRONMENT_KEY = "defaultEnvironment";
+        private string _selectedEnvironment;
         private ILogger _logger;
         private UiControlsCreator _uiControlsCreator;
         private Panel panelMain;
@@ -67,6 +68,7 @@ namespace Iis.Desktop.SecurityManager
 
             _environmentProperties = _configuration.GetSection(EnvConfig.SectionName)
                                         .Get<IReadOnlyDictionary<string, EnvConfig>>();
+            _selectedEnvironment = _configuration[DEFAULT_ENVIRONMENT_KEY];
 
             panelMain = _uiControlsCreator.GetFillPanel(this);
 
@@ -74,7 +76,8 @@ namespace Iis.Desktop.SecurityManager
             panelMain.Controls.Add(tabControl);
             tabControl.Dock = DockStyle.Fill;
 
-            _currentConfig = _environmentProperties[DEFAULT_CONFIG];
+
+            _currentConfig = _environmentProperties[_selectedEnvironment];
             _requestSettings = new RequestSettings { ReIndexTimeOutInMins = 25 };
 
             CreateSecurityAttributesTab(tabControl);
@@ -142,7 +145,6 @@ namespace Iis.Desktop.SecurityManager
 
             _uiObjectSecurityControl = new UiObjectSecurityControl(GetRequestWrapper());
             _uiObjectSecurityControl.Initialize("ObjectSecurityControl", pnlObject, _style);
-            //_uiObjectSecurityControl.OnSave += async () => { await RefreshUsers(); };
         }
 
         #endregion
@@ -164,6 +166,7 @@ namespace Iis.Desktop.SecurityManager
             _securityLevelChecker = new SecurityLevelChecker(plainLevels);
             _uiUserSecurityControl.SetSecurityLevelChecker(_securityLevelChecker);
             _uiObjectSecurityControl.SetSecurityLevelChecker(_securityLevelChecker);
+            _uiAccessLevelEditControl.SetSecurityLevelChecker(_securityLevelChecker);
             await RefreshUsersAsync().ConfigureAwait(false);
 
             Invoke((Action)(() =>
@@ -187,6 +190,7 @@ namespace Iis.Desktop.SecurityManager
             var requestWrapper = GetRequestWrapper();
             await requestWrapper.SaveSecurityLevel(securityLevelPlain).ConfigureAwait(false);
             await RefreshAsync().ConfigureAwait(false);
+            _uiAccessLevelTreeControl.SelectNode(securityLevelPlain.Id);
         }
 
         private async Task OnRemoveSecurityLevel(TreeNode node)
