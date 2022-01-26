@@ -12,8 +12,8 @@ namespace Iis.Api.Controllers
     [ApiController]
     public class OntologyController: Controller
     {
-        IOntologyService _ontologyService;
-        ISecurityLevelChecker _securityLevelChecker;
+        private readonly IOntologyService _ontologyService;
+        private readonly ISecurityLevelChecker _securityLevelChecker;
 
         public OntologyController(
             IOntologyService ontologyService, 

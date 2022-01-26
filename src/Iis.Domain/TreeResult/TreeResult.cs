@@ -11,7 +11,9 @@ namespace Iis.Domain.TreeResult
         public string Label { get; set; }
         public string Value { get; set; }
         public List<TreeResult> Options { get; set; } = new List<TreeResult>();
+
         public override string ToString() => Label;
+
         public JObject GetJsonObject()
         {
             var result = new JObject();
@@ -32,6 +34,7 @@ namespace Iis.Domain.TreeResult
 
             return result;
         }
+
         public TreeResult Init<T>(
             T item,
             Func<T, string> labelFunc,
