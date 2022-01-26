@@ -13,6 +13,7 @@ namespace Iis.Elastic
         IntegerRange,
         FloatRange,
         Byte,
-        GeoPoint
+        GeoPoint,
+        SearchAsYouType
     }
 }

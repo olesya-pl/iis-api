@@ -38,7 +38,7 @@ namespace Iis.Elastic
             return NestedProperty.Create(propertyNameList.First(), nestedPropertyFunc(newPropertyName));
         }
 
-        protected abstract void PopulatePropertyIntoJObject(JObject result);
+        protected virtual void PopulatePropertyIntoJObject(JObject result) { }
 
         private bool IsDenseVectorContainer()
         {

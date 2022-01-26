@@ -1,5 +1,3 @@
-using Newtonsoft.Json.Linq;
-
 namespace Iis.Elastic.ElasticMappingProperties
 {
     public class GeoPointProperty : ElasticMappingProperty
@@ -12,7 +10,5 @@ namespace Iis.Elastic.ElasticMappingProperties
         {
             return CreateWithNestedProperty(propertyName, (propName) => new GeoPointProperty { Name = propName }, (propName) => Create(propName));
         }
-
-        protected override void PopulatePropertyIntoJObject(JObject result) { }
     }
 }
