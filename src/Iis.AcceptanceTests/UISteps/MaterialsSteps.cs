@@ -82,9 +82,7 @@ namespace AcceptanceTests.UISteps
         public void IEnteredDataInTheSearchField(string input)
         {
             materialsSectionPage.SearchField.SendKeys(input);
-            driver.WaitFor(2);
             materialsSectionPage.SearchField.SendKeys(Keys.Enter);
-            driver.WaitFor(5);
         }
 
         [When(@"I searched for uploaded material in the materials")]
@@ -541,6 +539,14 @@ namespace AcceptanceTests.UISteps
         {
             Assert.True(materialsSectionPage.SortedMaterialsBySource(sourceName));
         }
+
+
+        [Then(@"I must see (.*) in the marerial table")]
+        public void ThenIMustSeeProcessedStatusMarerialTable(string sourceName)
+        {
+            Assert.True(materialsSectionPage.ProcessedStatusHightlight.Displayed);
+        }
+
 
         [Then(@"I must see materials sorted by source sorting: null")]
         public void ThenIMustSeeMaterialsSortedBySourceSortingNull()

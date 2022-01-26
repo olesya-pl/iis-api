@@ -24,6 +24,10 @@ namespace AcceptanceTests.PageObjects
         [FindsBy(How = How.CssSelector, Using = ".el-button--default")]
         public IWebElement SearchButton;
 
+        [FindsBy(How = How.XPath, Using = ".//*[text()='Оброблено']")]   //".material-status .is-processed")]
+        public IWebElement ProcessedStatusHightlight;
+
+
         [FindsBy(How = How.CssSelector, Using = ".el-input.entity-search__input > .el-input__inner")]
         public IWebElement SearchField;
 
