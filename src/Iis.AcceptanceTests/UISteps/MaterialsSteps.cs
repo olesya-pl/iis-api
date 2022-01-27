@@ -371,6 +371,14 @@ namespace AcceptanceTests.UISteps
             driver.WaitFor(2);
         }
 
+        [When(@"I clicked on the button get similar materials")]
+        public void WhenIClickedOnTheButtonGetSimilarMaterials()
+        {
+            materialsSectionPage.GetSimilarMaterials.Click();
+            driver.WaitFor(3);
+        }
+
+
         #endregion When
 
         #region Then
@@ -631,6 +639,13 @@ namespace AcceptanceTests.UISteps
             driver.WaitFor(3);
             Assert.True(materialsSectionPage.ClearTextField.Enabled);
         }
+
+        [Then(@"I must see list of similar materials")]
+        public void ThenIMustSeeListOfSimilarMaterials()
+        {
+            Assert.True(materialsSectionPage.SimilarMaterials.Displayed);
+        }
+
         #endregion
     }
 }

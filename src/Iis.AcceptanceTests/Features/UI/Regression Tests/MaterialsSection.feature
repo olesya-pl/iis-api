@@ -4,6 +4,7 @@ Feature: Materials - regression
     - IIS-6045 - Change material reliability by clicking on the Processed button
     - IIS-6052 - Ability to lose the connection between a material and an event from a material
     - IIS-6051 - Ability to connect the material to an event from a material
+	- IIS-6095 -Possibility getting similar materials
 	- IIS-7445 - Change a material`s AccessLevel
 	- IIS-6470 - Sorting materials by source
 	- IIS-8238 - Hotkeys for audio rewind
@@ -230,3 +231,22 @@ Scenario: IIS-6633 - Search materials by status processing
 	And I searched ProcessedStatus.Title:Оброблено data in the materials
 	Then I must see Оброблено in the marerial table
 	
+	@regression @UI @Materials
+Scenario: IIS-6095 -Possibility getting similar materials
+        Given I upload a new docx material via API
+		| Field                 | Value                                      |
+		| FileName              | тестовий матеріал                          |
+		| SourceReliabilityText | Здебільшого надійне                        |
+		| ReliabilityText       | Достовірна                                 |
+		| Content               | таємний контент                           |
+		| AccessLevel           | 0                                          |
+		| LoadedBy              | автотест                                   |
+		| MetaData              | {"type":"document","source":"contour.doc"} |
+	When I navigated to Materials page
+	Then I clicked on the type`s filter  contour.doc
+	When I clicked search button in the Materials section
+	And I searched таємний контент data in the materials
+	And I clicked on the first material in the Materials list
+	When I clicked on the button get similar materials
+	Then I must see list of similar materials
+	When I clean up uploaded material via API

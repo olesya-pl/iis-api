@@ -242,5 +242,11 @@ namespace AcceptanceTests.PageObjects
 
         [FindsBy(How = How.XPath, Using = "//*[@class='material-viewer__editor']//*[@class='ProseMirror-trailingBreak']")]
         public IWebElement ClearTextField;
+
+        [FindsBy(How = How.CssSelector, Using = ".action-button--similar-search")]
+        public IWebElement GetSimilarMaterials;
+
+        [FindsBy(How = How.XPath, Using = "//div[@class='base-page__header-body']//span[@class='el-tag el-tag--danger el-tag--light']")]
+        public IWebElement SimilarMaterials;
     }
 }
