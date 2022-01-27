@@ -996,6 +996,16 @@ object Tests_PrepareTestEnv : BuildType({
             dockerImage = "docker.contour.net:5000/levant:0.3.0-beta1"
         }
         script {
+            name = "Nomad run material distributor"
+            scriptContent = """
+                #!/bin/sh
+                levant deploy -force -ignore-no-changes iis-dev/%NOMAD_ENV%/iis_material_distributor.hcl
+            """.trimIndent()
+            dockerImagePlatform = ScriptBuildStep.ImagePlatform.Linux
+            dockerPull = true
+            dockerImage = "docker.contour.net:5000/levant:0.3.0-beta1"
+        }
+        script {
             name = "Nomad run ui"
             scriptContent = """
                 #!/bin/sh
@@ -1038,6 +1048,11 @@ object Tests_PrepareTestEnv : BuildType({
             pattern = "${MaterialLoader_BuildDocker.depParamRefs["DOCKER_IMAGE_NAME"]}:latest"
             replacement = "${MaterialLoader_BuildDocker.depParamRefs["DOCKER_IMAGE_NAME"]}:${MaterialLoader_BuildDocker.depParamRefs["gitHashShort"]}"
         }
+        replaceContent {
+            fileRules = "+:iis-dev/%NOMAD_ENV%/iis_material_distributor.hcl"
+            pattern = "${MaterialDistributor_BuildDocker.depParamRefs["DOCKER_IMAGE_NAME"]}:latest"
+            replacement = "${MaterialDistributor_BuildDocker.depParamRefs["DOCKER_IMAGE_NAME"]}:${MaterialDistributor_BuildDocker.depParamRefs["gitHashShort"]}"
+        }
     }
 
     dependencies {
@@ -1046,6 +1061,10 @@ object Tests_PrepareTestEnv : BuildType({
             onDependencyCancel = FailureAction.CANCEL
         }
         snapshot(MaterialLoader_BuildDocker) {
+            onDependencyFailure = FailureAction.CANCEL
+            onDependencyCancel = FailureAction.CANCEL
+        }
+        snapshot(MaterialDistributor_BuildDocker) {
             onDependencyFailure = FailureAction.CANCEL
             onDependencyCancel = FailureAction.CANCEL
         }
