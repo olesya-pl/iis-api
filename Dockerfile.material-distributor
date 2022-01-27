@@ -1,0 +1,17 @@
+FROM mcr.microsoft.com/dotnet/core/sdk:3.1 as build
+ARG BUILD_VERSION=local
+
+
+ENV IIS_SOURCE_REVISION_ID=${BUILD_VERSION}
+WORKDIR /opt/material-distributor
+COPY . /opt/material-distributor/
+
+RUN dotnet publish src/Iis.MaterialDistributor/Iis.MaterialDistributor.csproj -c Release -o publish/material-distributor
+
+FROM mcr.microsoft.com/dotnet/core/aspnet:3.1
+WORKDIR /opt/material-distributor
+COPY --from=build /opt/material-distributor/publish/material-distributor/ /opt/material-distributor/
+RUN rm -f /opt/material-distributor/appsettings.json && ln -s /local/appsettings.json /opt/material-distributor/appsettings.json
+
+EXPOSE 5223
+CMD ["dotnet", "Iis.MaterialDistributor.dll"]

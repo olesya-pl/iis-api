@@ -46,6 +46,7 @@ project {
     subProject(Api)
     subProject(Tests)
     subProject(MaterialLoader)
+    subProject(MaterialDistributor)
 }
 
 
