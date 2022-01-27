@@ -12,6 +12,7 @@ using Iis.Api.GraphQL.Entities;
 using HotChocolate.Resolvers;
 using IIS.Services.Contracts.Interfaces;
 using Iis.Services.Contracts.Elastic;
+using Iis.Services.Contracts.Dtos;
 using Newtonsoft.Json.Linq;
 using IIS.Services.Contracts.Materials;
 using Iis.Domain.Materials;
@@ -51,7 +52,7 @@ namespace IIS.Core.GraphQL.Materials
             }
 
             var relationsState = ParseRelationsState(filter.RelationsState);
-            MaterialsDto materialsResult = searchByRelation != null && searchByRelation.HasConditions && cherryPickedItems.Count == 0?
+            MaterialsDto materialsResult = searchByRelation != null && searchByRelation.HasConditions && cherryPickedItems.Count == 0 ?
                 await materialProvider.GetMaterialsCommonForEntitiesAsync(
                     tokenPayload.UserId,
                     searchByRelation.NodeIdentityList,
@@ -77,17 +78,6 @@ namespace IIS.Core.GraphQL.Materials
             return (materials, materialsResult.Aggregations, materialsResult.Count);
         }
 
-        private static void MapHighlights(List<Material> materials, Dictionary<Guid, SearchResultItem> materialsResult)
-        {
-            foreach (var material in materials)
-            {
-                if (materialsResult.ContainsKey(material.Id))
-                {
-                    material.Highlight = materialsResult[material.Id].Highlight;
-                }
-            }
-        }
-
         public async Task<Material> GetMaterial(
             IResolverContext ctx,
             [Service] IMaterialProvider materialProvider,
@@ -100,17 +90,38 @@ namespace IIS.Core.GraphQL.Materials
 
             var locationDtoList = await materialProvider.GetLocationHistoriesAsync(materialId);
 
-            res.CoordinateList = locationDtoList.Select(e => 
-                new GeoCoordinate
-                {
-                    Label = "material",
-                    Lat = e.Lat,
-                    Long = e.Long,
-                    PropertyName = "material.location"
-                }
-            ).ToArray();
+            res.CoordinateList = MapLocationsToGeoCoordinates(locationDtoList);
 
             return res;
+        }
+
+        public async Task<Material> GetNextAssignedMaterial(
+            IResolverContext context,
+            [Service] IMaterialProvider materialProvider,
+            [Service] IMapper mapper)
+        {
+            var tokenPayload = context.GetToken();
+            var sorting = new SortingParams("createdDate", "desc");
+            var pagination = new PaginationParams(1, 100);
+
+            var materialsResult = await materialProvider.GetMaterialsAsync(
+                tokenPayload.UserId,
+                string.Empty,
+                null,
+                Array.Empty<Property>(),
+                Array.Empty<string>(),
+                new DateRange(),
+                pagination,
+                sorting);
+
+            var index = new Random().Next(0, 100);
+            var material = materialsResult.Materials.ElementAt(index);
+            var result = mapper.Map<Material>(material);
+            var locationDtoList = await materialProvider.GetLocationHistoriesAsync(result.Id);
+
+            result.CoordinateList = MapLocationsToGeoCoordinates(locationDtoList);
+
+            return result;
         }
 
         public Task<IEnumerable<MaterialSignFull>> GetImportanceSigns([Service] IMaterialProvider materialProvider, [Service] IMapper mapper)
@@ -261,14 +272,37 @@ namespace IIS.Core.GraphQL.Materials
 
                 if (highlight.ContainsKey(MaterialAliases.Assignees.Alias))
                 {
-                    var value = highlight.GetValue(MaterialAliases.Assignees.Alias).ToString()
+                    var value = highlight.GetValue(MaterialAliases.Assignees.Alias, StringComparison.OrdinalIgnoreCase).ToString()
                         .Replace(userId.ToString(), MaterialAliases.Assignees.AliasForSingleItem, StringComparison.OrdinalIgnoreCase);
                     highlight[MaterialAliases.Assignees.Alias] = JToken.Parse(value);
                 }
             }
         }
 
-        private RelationsState? ParseRelationsState(string relationsState) => !string.IsNullOrWhiteSpace(relationsState)
+        private static IReadOnlyCollection<GeoCoordinate> MapLocationsToGeoCoordinates(IReadOnlyCollection<LocationHistoryDto> locationHistories)
+        {
+            return locationHistories.Select(e =>
+                new GeoCoordinate
+                {
+                    Label = "material",
+                    Lat = e.Lat,
+                    Long = e.Long,
+                    PropertyName = "material.location"
+                }).ToArray();
+        }
+
+        private static void MapHighlights(List<Material> materials, Dictionary<Guid, SearchResultItem> materialsResult)
+        {
+            foreach (var material in materials)
+            {
+                if (materialsResult.ContainsKey(material.Id))
+                {
+                    material.Highlight = materialsResult[material.Id].Highlight;
+                }
+            }
+        }
+
+        private static RelationsState? ParseRelationsState(string relationsState) => !string.IsNullOrWhiteSpace(relationsState)
                 && Enum.TryParse<RelationsState>(relationsState.Trim(), true, out var value)
                 ? value
                 : default(RelationsState?);
