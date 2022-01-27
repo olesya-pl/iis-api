@@ -370,6 +370,13 @@ namespace AcceptanceTests.UISteps
             keyAction.SendKeys(Keys.Delete).Perform();
             driver.WaitFor(2);
         }
+ 
+        [When(@"I clicked on the editor button for bold")]
+        public void WhenIClickedOnTheButton()
+        {
+              materialsSectionPage.BoltButton.Click();
+               driver.WaitFor(2);
+        }
 
         #endregion When
 
@@ -631,6 +638,22 @@ namespace AcceptanceTests.UISteps
             driver.WaitFor(3);
             Assert.True(materialsSectionPage.ClearTextField.Enabled);
         }
+
+        [Then(@"I highlight the text")]
+        public void ThenIHighlightTheText()
+        {
+            Actions keyAction = new Actions(driver);
+            keyAction.KeyDown(Keys.Control).SendKeys("A").KeyUp(Keys.Control).Perform();
+            driver.WaitFor(2);
+        }
+
+        [Then(@"I must i see my text highlighted in bold")]
+        public void ThenIMustISeeMyTextHighlightedInBold()
+        {
+            driver.WaitFor(2);
+            Assert.True(materialsSectionPage.BoldContent.Enabled);
+        }
+
         #endregion
     }
 }
