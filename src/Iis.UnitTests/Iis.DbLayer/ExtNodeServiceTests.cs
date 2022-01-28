@@ -204,7 +204,7 @@ namespace Iis.UnitTests.Iis.DbLayer
         private ExtNodeService GetExtNodeService()
         {
             var securityLevelChecker = new Mock<ISecurityLevelChecker>();
-            securityLevelChecker.Setup(_ => _.GetStringCode(It.IsAny<bool>(), It.IsAny<IReadOnlyList<int>>())).Returns(string.Empty);
+            securityLevelChecker.Setup(_ => _.GetObjectElasticCode(It.IsAny<IReadOnlyList<int>>())).Returns(string.Empty);
             return new ExtNodeService(securityLevelChecker.Object);
         }
     }

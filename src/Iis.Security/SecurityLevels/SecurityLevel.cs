@@ -12,7 +12,6 @@ namespace Iis.Security.SecurityLevels
     internal class SecurityLevel: ISecurityLevel
     {
         internal SecurityLevel _parent;
-
         internal List<SecurityLevel> _children = new List<SecurityLevel>();
 
         public SecurityLevel() { }
@@ -40,6 +39,7 @@ namespace Iis.Security.SecurityLevels
         public bool IsNew => UniqueIndex == -1;
 
         public override string ToString() => $"{UniqueIndex} : {Name}";
+        public bool IsGroup => _parent?.IsRoot == true;
 
         internal bool IsRoot => _parent == null;
         internal SecurityLevel Root => IsRoot ? this : _parent.Root;
@@ -62,5 +62,16 @@ namespace Iis.Security.SecurityLevels
             level._parent != null && (level._parent == this || IsParentOf(level._parent));
         internal bool IsChildOf(SecurityLevel level) => level.IsParentOf(this);
         internal bool IsBrotherOf(SecurityLevel level) => level != this && _parent == level._parent;
+        internal int GetDepth()
+        {
+            int depth = 1;
+            var level = _parent;
+            while (level != null)
+            {
+                depth++;
+                level = level._parent;
+            }
+            return depth;
+        }
     }
 }

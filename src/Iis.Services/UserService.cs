@@ -553,7 +553,7 @@ namespace Iis.Services
             {
                 var securityLevelIndexes = userEntity.SecurityLevels.Select(_ => _.SecurityLevelIndex).ToList();
                 var securityLevels = _securityLevelChecker.GetSecurityLevels(securityLevelIndexes);
-                elasticUser.Metadata.SecurityLevels = _securityLevelChecker.GetStringCode(true, securityLevels.Select(_ => _.UniqueIndex).ToList());
+                elasticUser.Metadata.SecurityLevels = _securityLevelChecker.GetUserElasticCode(securityLevels.Select(_ => _.UniqueIndex).ToList());
             }
             return elasticUser;
         }
