@@ -18,7 +18,7 @@ namespace AcceptanceTests.PageObjects
             PageFactory.InitElements(driver, this);
         }
 
-        [FindsBy(How = How.XPath, Using = "//div[@class='infinity-table materials-table']//tbody[@class='p-datatable-tbody']/tr")]
+        [FindsBy(How = How.XPath, Using = "//div[@class='infinity-table materials-table']//tbody[@class='p-datatable-tbody']/tr[1]")]
         public IWebElement FirstMaterialInTheMaterialsList;
 
         [FindsBy(How = How.CssSelector, Using = ".el-button--default")]
@@ -242,5 +242,11 @@ namespace AcceptanceTests.PageObjects
 
         [FindsBy(How = How.XPath, Using = "//*[@class='material-viewer__editor']//*[@class='ProseMirror-trailingBreak']")]
         public IWebElement ClearTextField;
+
+        [FindsBy(How = How.XPath, Using = "//button[@aria-label='Жирний']")]
+        public IWebElement BoltButton;
+
+        [FindsBy(How = How.XPath, Using = "//descendant::strong[contains(text(), '')]")]
+        public IWebElement BoldContent;
     }
 }

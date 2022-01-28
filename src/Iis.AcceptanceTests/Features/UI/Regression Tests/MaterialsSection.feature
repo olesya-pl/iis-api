@@ -4,6 +4,7 @@ Feature: Materials - regression
     - IIS-6045 - Change material reliability by clicking on the Processed button
     - IIS-6052 - Ability to lose the connection between a material and an event from a material
     - IIS-6051 - Ability to connect the material to an event from a material
+	- IIS-6203 - Possibility To make text in bold
 	- IIS-7445 - Change a material`s AccessLevel
 	- IIS-6470 - Sorting materials by source
 	- IIS-8238 - Hotkeys for audio rewind
@@ -214,7 +215,7 @@ Scenario: IIS-8257 - Possibility save  material by hotkeys
 	And I clicked search button in the Materials section
 	And I searched таємн data in the materials
 	And I clicked on the first search result in the Materials section
-	Then I cliced on the text field
+	Then I clicked on the text field
 	Then I wrote on the text field  Якийсь текст
 	When I send keys Ctrl and [ from the keyboard
 	Then I must see notification about saving material
@@ -229,4 +230,26 @@ Scenario: IIS-6633 - Search materials by status processing
 	And I clicked search button in the Materials section
 	And I searched ProcessedStatus.Title:Оброблено data in the materials
 	Then I must see Оброблено in the marerial table
-	
+
+	@regression @UI @Materials
+Scenario: IIS-6203 - Possibility To make text in bold
+        Given I upload a new docx material via API
+		| Field                 | Value                                      |
+		| FileName              | тестовий матеріал                          |
+		| SourceReliabilityText | Здебільшого надійне                        |
+		| ReliabilityText       | Достовірна                                 |
+		| Content               | таємний контент                           |
+		| AccessLevel           | 0                                          |
+		| LoadedBy              | автотест                                   |
+		| MetaData              | {"type":"document","source":"contour.doc"} |
+	When I navigated to Materials page
+	And I clicked search button in the Materials section
+	And I searched таємн data in the materials
+	And I clicked on the first material in the Materials list
+	Then I clicked on the text field
+	And I highlight the text
+	When I clicked on the editor button for bold
+	When I pressed the Next material button
+	When I pressed the Previous material button
+	Then I must i see my text highlighted in bold
+	When I clean up uploaded material via API
