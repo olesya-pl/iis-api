@@ -88,14 +88,6 @@ namespace AcceptanceTests.UISteps
             materialsSectionPage.SearchField.SendKeys(Keys.Enter);
             driver.WaitFor(5);
         }
-        
-        [When(@"I searched (.*) data from cherry pick in the materials")]
-        public void ISearchedFromCherryPickInTheMaterials(string input)
-        {
-            materialsSectionPage.SearchField.SendKeys(input);
-            driver.WaitFor(1);
-            materialsSectionPage.Autosuggest.Click();
-        }
 
         [When(@"I searched for uploaded material in the materials")]
         public void WhenISearchedForUploadedMaterialInTheMaterials()
@@ -423,15 +415,6 @@ namespace AcceptanceTests.UISteps
             Assert.Equal(actualValue, expectedValue);
         }
 
-        [Then(@"I must see (.*) as the related object to the material")]
-        public void IMustSeeAsTheRelatedObjectToTheMaterial(string keyword)
-       
-        {
-            driver.WaitFor(1);
-            var actualValue = materialsSectionPage.RelatedObjectToTheMaterial.Text;
-            Assert.True(materialsSectionPage.RelatedObjectToTheMaterial.Displayed);
-        }
-
         [Then(@"I must see that importance value must be set to (.*) value")]
         public void ThemIMustSeeThatImportanceValueMustBeSetToValue(string expectedValue)
         {
@@ -518,6 +501,18 @@ namespace AcceptanceTests.UISteps
             var actualMaterialName = materialsSectionPage.MaterialTitle.Text;
             Assert.Contains(expectedMaterialName, actualMaterialName);
         }
+        
+        [Then(@"I must see the (.*) related object to material")]
+        public void IMustSeeTheRelatedObjectToMaterial(string expectedObjectName)
+        {
+            var actualObjectName = materialsSectionPage.RelatedObject.Text;
+            Assert.Contains(expectedObjectName, actualObjectName);
+        }
+        
+        
+        
+        
+        
 
         [Then(@"I must see (.*) value in the accessLevel field")]
         public void ThenIMustSeeValueInTheAccessLevelField(string accessLevel)

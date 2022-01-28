@@ -190,6 +190,5 @@ Scenario: IIS-8238 - Hotkeys for audio rewind
 Scenario: IIS-6793 - Search materials related by object
 	When I navigated to Materials page
 	When I clicked search button in the Materials section
-	And I searched Бонд  data from cherry pick in the materials
-	Then I must see Бонд   as the related object to the material
-	
+	When I searched Бонд data in the materials
+	Then  I must see the Бонд related object to material

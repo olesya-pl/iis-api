@@ -3,6 +3,7 @@ using OpenQA.Selenium.Interactions;
 using SeleniumExtras.PageObjects;
 using System.Collections.Generic;
 using System.Linq;
+using TechTalk.SpecFlow.BindingSkeletons;
 
 namespace AcceptanceTests.PageObjects
 {
@@ -59,12 +60,6 @@ namespace AcceptanceTests.PageObjects
 
         [FindsBy(How = How.CssSelector, Using = ".sidebar__nav li.objects")]
         public IWebElement ObjectsTabSearch;
-        
-        [FindsBy(How = How.CssSelector, Using = ".materials-table__dor .toggle-more")]
-        public IWebElement RelatedObjectToTheMaterial;
-        
-        [FindsBy(How = How.XPath, Using = "//div[contains(text(),'Бонд ')]/ancestor::tr")]
-        public IWebElement Autosuggest;
 
         [FindsBy(How = How.CssSelector, Using = "div:nth-of-type(1) > .general-container > div:nth-of-type(1) > .el-form-item__content > .el-select.el-tooltip")]
         [CacheLookup]
@@ -134,6 +129,10 @@ namespace AcceptanceTests.PageObjects
 
         [FindsBy(How = How.XPath, Using = "//td[@class='materials-table__title']//div")]
         public IWebElement MaterialTitle;
+
+        [FindsBy(How = How.CssSelector, Using = ".materials-table__dor .toggle-more")]
+        public IWebElement RelatedObject;
+        
 
         [FindsBy(How = How.XPath, Using = "//button[contains(@class, 'search__clear-button')]")]
         public IWebElement ClearSearchFieldButton;
