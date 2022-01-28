@@ -17,6 +17,7 @@ using Iis.Interfaces.Ontology.Schema;
 using Iis.Services.Contracts.Interfaces;
 using IIS.Services.Materials;
 using Iis.Services;
+using Iis.Interfaces.SecurityLevels;
 
 namespace Iis.UnitTests.Materials
 {
@@ -58,7 +59,8 @@ namespace Iis.UnitTests.Materials
                     new Mock<IMapper>().Object,
                     new Mock<IOntologySchema>().Object,
                     new Mock<IOntologyService>().Object,
-                    new NodeToJObjectMapper()));
+                    new NodeToJObjectMapper(),
+                    new Mock<ISecurityLevelChecker>().Object));
         }
         public void Dispose()
         {
