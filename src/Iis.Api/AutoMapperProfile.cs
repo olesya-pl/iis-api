@@ -85,7 +85,6 @@ namespace Iis.Api
                 .ForMember(dest => dest.UpdatedAt, opts => opts.MapFrom(src => src.UpdatedAt.ToString(Iso8601DateFormatWithFraction)))
                 .ForMember(dest => dest.RegistrationDate, opts => opts.MapFrom(src => src.RegistrationDate.ToString(Iso8601DateFormatWithFraction)))
                 .ForMember(dest => dest.AccessLevel, opts => opts.MapFrom(src => src.AccessLevel))
-                //.ForMember(dest => dest.SecurityLevels, opts => opts.MapFrom(src => new Materi))
                 .AfterMap((src, dest, context) => { context.Mapper.Map(src.LoadData, dest); });
 
             CreateMap<Iis.Domain.Materials.MaterialFeature, MaterialFeatureEntity>();
