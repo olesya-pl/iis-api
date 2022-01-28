@@ -77,6 +77,7 @@ namespace Iis.DataModel
         public DbSet<ModifyDataLogEntity> ModifyDataLogs { get; set; }
         public DbSet<MaterialChannelMappingEntity> MaterialChannelMappings { get; set; }
         public DbSet<UserSecurityLevelEntity> UserSecurityLevels { get; set; }
+        public DbSet<MaterialSecurityLevelEntity> MaterialSecurityLevels { get; set; }
 
         public static OntologyContext GetContext(string connectionString)
         {

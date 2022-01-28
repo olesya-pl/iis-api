@@ -73,6 +73,8 @@ namespace Iis.Api
                 .Include<Iis.Domain.Materials.RelatedObjectOfStudy, IIS.Core.GraphQL.Materials.RelatedObjectOfStudy>();
             CreateMap<Iis.Domain.Materials.RelatedObjectOfStudy, IIS.Core.GraphQL.Materials.RelatedObjectOfStudy>();
 
+            CreateMap<ISecurityLevel, IIS.Core.GraphQL.Materials.MaterialSecurityLevel>();
+
             CreateMap<Iis.Domain.Materials.Material, IIS.Core.GraphQL.Materials.Material>()
                 .ForMember(dest => dest.Data, opts => opts.MapFrom(src => src.Data.ToObject<IEnumerable<IIS.Core.GraphQL.Materials.Data>>()))
                 .ForMember(dest => dest.FileId, opts => opts.MapFrom(src => src.File == null ? (Guid?)null : src.File.Id))
@@ -83,6 +85,7 @@ namespace Iis.Api
                 .ForMember(dest => dest.UpdatedAt, opts => opts.MapFrom(src => src.UpdatedAt.ToString(Iso8601DateFormatWithFraction)))
                 .ForMember(dest => dest.RegistrationDate, opts => opts.MapFrom(src => src.RegistrationDate.ToString(Iso8601DateFormatWithFraction)))
                 .ForMember(dest => dest.AccessLevel, opts => opts.MapFrom(src => src.AccessLevel))
+                //.ForMember(dest => dest.SecurityLevels, opts => opts.MapFrom(src => new Materi))
                 .AfterMap((src, dest, context) => { context.Mapper.Map(src.LoadData, dest); });
 
             CreateMap<Iis.Domain.Materials.MaterialFeature, MaterialFeatureEntity>();
@@ -268,7 +271,9 @@ namespace Iis.Api
                     context.Mapper.Map<Elastic.Entities.MaterialSign>(MaterialEntity.SessionPriority)))
                 .ForMember(dest => dest.LoadData, opts =>
                     opts.MapFrom(src => JsonConvert.DeserializeObject<Elastic.Entities.MaterialLoadData>(src.LoadData)))
-                .ForMember(dest => dest.Assignees, src => src.MapFrom(_ => _.MaterialAssignees));
+                .ForMember(dest => dest.Assignees, src => src.MapFrom(_ => _.MaterialAssignees))
+                .ForMember(dest => dest.SecurityLevels, opts => opts.Ignore())
+                .ForMember(dest => dest.SecurityLevelsCode, opts => opts.Ignore());
 
             CreateMap<MaterialAssigneeEntity, Elastic.Entities.Assignee>()
                 .ConstructUsing((entity, context) => context.Mapper.Map<Elastic.Entities.Assignee>(entity.Assignee));
@@ -287,7 +292,8 @@ namespace Iis.Api
                 .ForMember(dest => dest.RegistrationDate, opts => opts.MapFrom(src => src.RegistrationDate.AsDateTime(DateTimeExtensions.Iso8601DateFormat, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind)))
                 .ForMember(dest => dest.Children, opts => opts.Ignore())
                 .ForMember(dest => dest.Assignees, opts => opts.MapFrom(src => src.Assignees))
-                .ForMember(dest => dest.Editor, opts => opts.MapFrom(src => src.Editor));
+                .ForMember(dest => dest.Editor, opts => opts.MapFrom(src => src.Editor))
+                .ForMember(dest => dest.SecurityLevels, opts => opts.Ignore());
 
 
             //mapping: GraphQl.UserInput -> Roles.User

@@ -123,6 +123,11 @@ namespace Iis.DbLayer.Repositories.Helpers
             return MapNodeCollection(collection, (node) => node.NodeType.IsEvent, GetTitleFunc);
         }
 
+        public static IReadOnlyCollection<RelatedObject> MapSecurityLevels(IDictionary<Guid, NodeDataObject> collection)
+        {
+            return MapNodeCollection(collection, (node) => node.NodeType.IsEvent, GetTitleFunc);
+        }
+
         private static MaterialFeatureEntity GetAnyFeature(IEnumerable<MaterialFeatureEntity> collection) => collection.FirstOrDefault();
 
         private static MaterialFeatureEntity GetCallerOrReceiverFeature(IEnumerable<MaterialFeatureEntity> collection) => collection.FirstOrDefault(_ => CallerOrReveiver.Contains(_.NodeLinkType)) ?? collection.FirstOrDefault();

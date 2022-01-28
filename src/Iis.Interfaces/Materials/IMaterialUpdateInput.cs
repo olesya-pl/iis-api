@@ -19,5 +19,6 @@ namespace Iis.Interfaces.Materials
         IEnumerable<string> Tags { get; set; }
         string Title { get; set; }
         string Content { get; set; }
+        IReadOnlyList<Guid> SecurityLevels { get; set; }
     }
 }

@@ -100,7 +100,7 @@ namespace IIS.Core.GraphQL.Materials
 
             var locationDtoList = await materialProvider.GetLocationHistoriesAsync(materialId);
 
-            res.CoordinateList = locationDtoList.Select(e => 
+            res.CoordinateList = locationDtoList.Select(e =>
                 new GeoCoordinate
                 {
                     Label = "material",
