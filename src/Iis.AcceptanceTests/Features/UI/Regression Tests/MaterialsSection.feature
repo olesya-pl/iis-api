@@ -11,6 +11,7 @@ Feature: Materials - regression
 	- IIS-8257 - Possibility save  material by hotkeys
 	- IIS-8441 - Display the length of the audio track
 	- IIS-6633 - Search materials by status processing
+	- IIS-6632 - Possibility searching materials by importance
 
 Background:
 	Given I sign in with the user olya and password 123 in the Contour
@@ -253,3 +254,16 @@ Scenario: IIS-6203 - Possibility To make text in bold
 	When I pressed the Previous material button
 	Then I must i see my text highlighted in bold
 	When I clean up uploaded material via API
+
+	@regression @UI @Materials
+Scenario: IIS-6632 - Possibility searching materials by importance
+	When I navigated to Materials page
+	And I clicked search button in the Materials section
+	When I searched by field name SessionPriority.Title: and request Важливий in the materials
+	Then I must see list of the materials with SessionPriority.Title:Важливий
+	When I clicked on the clear search button
+	When I searched by field name SessionPriority.Title: and request Переклад in the materials
+	Then I must see list of the materials with SessionPriority.Title:Переклад
+	When I clicked on the clear search button
+	When I searched by field name SessionPriority.Title: and request Негайна* in the materials
+	Then I must see list of the materials with SessionPriority.Title:Негайна доповідь

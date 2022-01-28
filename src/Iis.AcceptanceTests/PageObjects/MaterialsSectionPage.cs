@@ -248,5 +248,11 @@ namespace AcceptanceTests.PageObjects
 
         [FindsBy(How = How.XPath, Using = "//descendant::strong[contains(text(), '')]")]
         public IWebElement BoldContent;
+        public IWebElement PriorityTitle(string SessionPriorityTitle) =>
+            driver.FindElement(By.XPath($"//tr[1]//td[@class='materials-table__title']//descendant::em[contains(text(), '{SessionPriorityTitle}')]"));
+
+        public IWebElement FieldName(string fieldName) =>
+            driver.FindElement(By.XPath($"//tr[1]//td[@class='materials-table__title']//descendant::b[contains(text(), '{fieldName}')]"));
+        
     }
 }
