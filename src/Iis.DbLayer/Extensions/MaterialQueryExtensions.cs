@@ -51,6 +51,13 @@ namespace Iis.DbLayer.Extensions
                 .Include(m => m.File);
         }
 
+        public static IQueryable<MaterialEntity> WithSecurityLevels(
+            this IQueryable<MaterialEntity> materialQuery)
+        {
+            return materialQuery
+                .Include(m => m.SecurityLevels);
+        }
+
         public static IQueryable<MaterialEntity> OnlyParent(
             this IQueryable<MaterialEntity> materialQuery)
         {
@@ -92,6 +99,7 @@ namespace Iis.DbLayer.Extensions
             MaterialIncludeEnum.WithChildren => query.WithChildren(),
             MaterialIncludeEnum.WithFiles => query.WithFiles(),
             MaterialIncludeEnum.OnlyParent => query.OnlyParent(),
+            MaterialIncludeEnum.WithSecurityLevels => query.WithSecurityLevels(),
             _ => query
         };
 

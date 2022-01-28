@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using Iis.Domain.Users;
 using Iis.Interfaces.Common;
+using Iis.Interfaces.SecurityLevels;
 using Newtonsoft.Json.Linq;
 
 namespace Iis.Domain.Materials
@@ -57,5 +58,6 @@ namespace Iis.Domain.Materials
         public IReadOnlyCollection<RelatedObject> RelatedEventCollection { get; set; } = Array.Empty<RelatedObject>();
         public IReadOnlyCollection<RelatedObject> RelatedSignCollection { get; set; } = Array.Empty<RelatedObject>();
         public int ObjectsOfStudyCount { get; set; }
+        public IReadOnlyCollection<ISecurityLevel> SecurityLevels { get; set; }
     }
 }

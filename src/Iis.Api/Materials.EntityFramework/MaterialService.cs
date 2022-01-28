@@ -13,6 +13,7 @@ using Iis.Domain.Materials;
 using Iis.Domain.Users;
 using Iis.Interfaces.Common;
 using Iis.Interfaces.Materials;
+using Iis.Interfaces.SecurityLevels;
 using Iis.Messages.Materials;
 using IIS.Repository;
 using IIS.Repository.Factories;
@@ -42,6 +43,7 @@ namespace IIS.Core.Materials.EntityFramework
         private readonly ICommonData _commonData;
         private readonly ILogger<MaterialService<TUnitOfWork>> _logger;
         private readonly IMaterialElasticService _materialElasticService;
+        private readonly ISecurityLevelChecker _securityLevelChecker;
 
         public MaterialService(
             IFileService fileService,
@@ -55,7 +57,8 @@ namespace IIS.Core.Materials.EntityFramework
             IUnitOfWorkFactory<TUnitOfWork> unitOfWorkFactory,
             ICommonData commonData,
             ILogger<MaterialService<TUnitOfWork>> logger,
-            IMaterialElasticService materialElasticService) : base(unitOfWorkFactory)
+            IMaterialElasticService materialElasticService,
+            ISecurityLevelChecker securityLevelChecker) : base(unitOfWorkFactory)
         {
             _fileService = fileService;
             _mapper = mapper;
@@ -68,6 +71,7 @@ namespace IIS.Core.Materials.EntityFramework
             _commonData = commonData;
             _logger = logger;
             _materialElasticService = materialElasticService;
+            _securityLevelChecker = securityLevelChecker;
         }
 
         public async Task SaveAsync(Iis.Domain.Materials.Material material, Guid? changeRequestId = null)
@@ -107,7 +111,7 @@ namespace IIS.Core.Materials.EntityFramework
 
         public async Task<Material> UpdateMaterialAsync(IMaterialUpdateInput input, User user)
         {
-            var includes = MaterialIncludeEnum.WithChildren.AsArray();
+            var includes = new[] { MaterialIncludeEnum.WithChildren, MaterialIncludeEnum.WithSecurityLevels };
             var material = await RunWithoutCommitAsync(_ => _.MaterialRepository.GetByIdAsync(input.Id, includes));
             if (!material.CanBeEdited(user.Id))
                 return await _materialProvider.GetMaterialAsync(input.Id, user);
@@ -214,6 +218,22 @@ namespace IIS.Core.Materials.EntityFramework
                             changesList);
                         material.SessionPriorityId = p;
                     });
+
+                    if (input.SecurityLevels != null)
+                    {
+                        var securityLevels = _securityLevelChecker.GetSecurityLevels(input.SecurityLevels);
+                        var levelsToDelete = material.SecurityLevels
+                            .Where(m => !securityLevels.Any(sl => sl.UniqueIndex == m.SecurityLevelIndex)).ToList();
+
+                        var levelsToAdd = securityLevels.Select(sl =>
+                                new MaterialSecurityLevelEntity
+                                {
+                                    Id = Guid.NewGuid(),
+                                    MaterialId = material.Id,
+                                    SecurityLevelIndex = sl.UniqueIndex
+                                }).ToList();
+                        _.MaterialRepository.ChangeSecurityLevels(levelsToDelete, levelsToAdd);
+                    }
 
                     if (input.Content != null && !string.Equals(material.Content, input.Content, StringComparison.Ordinal))
                     {

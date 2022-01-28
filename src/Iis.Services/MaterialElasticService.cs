@@ -42,6 +42,7 @@ using Iis.RabbitMq.Channels;
 using Iis.Messages.Materials;
 using Iis.Messages;
 using Iis.RabbitMq.Helpers;
+using Iis.Interfaces.SecurityLevels;
 
 namespace Iis.Services
 {
@@ -56,7 +57,8 @@ namespace Iis.Services
         private static readonly MaterialIncludeEnum[] IncludeAll = new[]
         {
             MaterialIncludeEnum.WithChildren,
-            MaterialIncludeEnum.WithFeatures
+            MaterialIncludeEnum.WithFeatures,
+            MaterialIncludeEnum.WithSecurityLevels
         };
         private static readonly IReadOnlyCollection<AggregationField> AggregationsFieldList = new List<AggregationField>
         {
@@ -84,6 +86,7 @@ namespace Iis.Services
         private readonly ILogger<MaterialElasticService<TUnitOfWork>> _logger;
         private readonly IConnection _connection;
         private readonly PublishMessageChannel<MaterialProcessingCriteriasEventMessage> _materialCriteriasChannel;
+        private readonly ISecurityLevelChecker _securityLevelChecker;
 
         public MaterialElasticService(
             IElasticManager elasticManager,
@@ -95,7 +98,8 @@ namespace Iis.Services
             IOntologyNodesData ontologyData,
             IUnitOfWorkFactory<TUnitOfWork> unitOfWorkFactory,
             ILogger<MaterialElasticService<TUnitOfWork>> logger,
-            IConnectionFactory connectionFactory)
+            IConnectionFactory connectionFactory,
+            ISecurityLevelChecker securityLevelChecker)
             : base(unitOfWorkFactory)
         {
             _elasticManager = elasticManager;
@@ -108,6 +112,7 @@ namespace Iis.Services
             _logger = logger;
             _connection = connectionFactory.CreateAndWaitConnection();
             _materialCriteriasChannel = new PublishMessageChannel<MaterialProcessingCriteriasEventMessage>(_connection, new ChannelConfig { ExchangeName = MaterialRabbitConsts.DefaultExchangeName, RoutingKeys = new[] { MaterialRabbitConsts.MaterialCriteriasQueueName } });
+            _securityLevelChecker = securityLevelChecker;
         }
 
         private static Expression<Func<ChangeHistoryEntity, bool>> ChangeHistoryTotalCountPredicate => _ => (_.Type == ChangeHistoryEntityType.Material || _.Type == ChangeHistoryEntityType.Node) && _.PropertyName == ChangeHistoryDocument.MaterialLinkPropertyName;
@@ -842,6 +847,11 @@ namespace Iis.Services
             materialDocument.RelatedSignCollection = MaterialDocumentHelper.MapSingCollection(nodeDictionary);
 
             materialDocument.ObjectsOfStudyCount = materialDocument.RelatedObjectCollection.Count;
+
+            var securityIndexes = material.SecurityLevels.Select(_ => _.SecurityLevelIndex).ToList();
+            var securityLevels = _securityLevelChecker.GetSecurityLevels(securityIndexes);
+            materialDocument.SecurityLevels = securityLevels.Select(_ => _.Id).ToList();
+            materialDocument.SecurityLevelsCode = _securityLevelChecker.GetStringCode(false, securityIndexes);
 
             return materialDocument;
         }

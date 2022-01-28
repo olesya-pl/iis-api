@@ -6,7 +6,8 @@ namespace Iis.DbLayer.MaterialEnum
         WithFeatures,
         OnlyParent,
         WithNodes,
-        WithFiles
+        WithFiles,
+        WithSecurityLevels
     }
 
 }

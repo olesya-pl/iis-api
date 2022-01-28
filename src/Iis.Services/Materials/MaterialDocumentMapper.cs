@@ -9,6 +9,7 @@ using Iis.Domain.Users;
 using Iis.Elastic.Entities;
 using Iis.Interfaces.Common;
 using Iis.Interfaces.Ontology.Schema;
+using Iis.Interfaces.SecurityLevels;
 using Iis.Services;
 using Newtonsoft.Json.Linq;
 
@@ -20,17 +21,20 @@ namespace IIS.Services.Materials
         private readonly IOntologyService _ontologyService;
         private readonly IOntologySchema _ontologySchema;
         private readonly NodeToJObjectMapper _nodeToJObjectMapper;
+        private readonly ISecurityLevelChecker _securityLevelChecker;
 
         public MaterialDocumentMapper(
             IMapper mapper,
             IOntologySchema ontologySchema,
             IOntologyService ontologyService,
-            NodeToJObjectMapper nodeToJObjectMapper)
+            NodeToJObjectMapper nodeToJObjectMapper,
+            ISecurityLevelChecker securityLevelChecker)
         {
             _mapper = mapper;
             _ontologyService = ontologyService;
             _ontologySchema = ontologySchema;
             _nodeToJObjectMapper = nodeToJObjectMapper;
+            _securityLevelChecker = securityLevelChecker;
         }
 
         public Material Map(MaterialDocument document)
@@ -57,6 +61,7 @@ namespace IIS.Services.Materials
             var (ObjectsOfStudy, ObjectsOfStudyCount) = GetObjectOfStudyListForMaterial(nodeCollection);
 
             material.ObjectsOfStudy = ObjectsOfStudy;
+            material.SecurityLevels = _securityLevelChecker.GetSecurityLevels(document.SecurityLevels);
 
             return material;
         }

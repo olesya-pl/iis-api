@@ -50,6 +50,9 @@ namespace Iis.Elastic.Entities
         public string RegistrationDate { get; set; }
         public string ProcessedAt { get; set; }
         public SecurityAttributes SecurityAttributes { get; set; } = new SecurityAttributes();
+        public IReadOnlyList<Guid> SecurityLevels { get; set; }
+        [JsonProperty("__securityLevels")]
+        public string SecurityLevelsCode { get; set; }
 
         private static readonly JsonSerializerSettings _materialDocSerializeSettings = new JsonSerializerSettings
         {

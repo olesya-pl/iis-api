@@ -71,5 +71,6 @@ namespace Iis.DbLayer.Repositories
         Task SaveDistributionResult(DistributionResult distributionResult);
         void RemoveMaterialAndRelatedData(Guid materialId);
         Task<IReadOnlyList<ResCallerReceiverDto>> GetCallInfoAsync(IReadOnlyList<Guid> nodeIds, CancellationToken cancellationToken = default);
+        void ChangeSecurityLevels(IReadOnlyList<MaterialSecurityLevelEntity> itemsToDelete, IReadOnlyList<MaterialSecurityLevelEntity> itemsToAdd);
     }
 }

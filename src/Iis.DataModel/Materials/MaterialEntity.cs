@@ -142,6 +142,7 @@ namespace Iis.DataModel.Materials
         public int MlHandlersCount { get; set; }
 
         public DateTime? RegistrationDate { get; set; }
+        public List<MaterialSecurityLevelEntity> SecurityLevels { get; set; }
     }
 
     public class MaterialAccessEntity : BaseEntity

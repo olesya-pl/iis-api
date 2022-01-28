@@ -347,6 +347,12 @@ namespace Iis.DbLayer.Repositories
             return result;
         }
 
+        public void ChangeSecurityLevels(IReadOnlyList<MaterialSecurityLevelEntity> itemsToDelete, IReadOnlyList<MaterialSecurityLevelEntity> itemsToAdd)
+        {
+            Context.MaterialSecurityLevels.RemoveRange(itemsToDelete);
+            Context.MaterialSecurityLevels.AddRange(itemsToAdd);
+        }
+
         private Task<PaginatedCollection<MaterialEntity>> GetAllWithPredicateAsync(
             int limit,
             int offset,

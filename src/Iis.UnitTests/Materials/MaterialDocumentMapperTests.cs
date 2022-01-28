@@ -5,6 +5,7 @@ using Iis.Domain;
 using Iis.Domain.Materials;
 using Iis.Elastic.Entities;
 using Iis.Interfaces.Ontology.Schema;
+using Iis.Interfaces.SecurityLevels;
 using Iis.Services;
 using IIS.Services.Materials;
 using Moq;
@@ -22,7 +23,8 @@ namespace Iis.UnitTests.Materials
                     mapper.Object,
                     new Mock<IOntologySchema>().Object,
                     ontologyServiceMock.Object,
-                    new NodeToJObjectMapper());
+                    new NodeToJObjectMapper(),
+                    new Mock<ISecurityLevelChecker>().Object);
         }
 
         [Theory]

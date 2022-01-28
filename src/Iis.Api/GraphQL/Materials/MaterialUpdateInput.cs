@@ -20,5 +20,6 @@ namespace IIS.Core.GraphQL.Materials
         public IEnumerable<string> Objects { get; set; }
         public IEnumerable<string> Tags { get; set; }
         public IEnumerable<string> States { get; set; }
+        public IReadOnlyList<Guid> SecurityLevels { get; set; }
     }
 }
