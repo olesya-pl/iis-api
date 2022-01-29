@@ -11,7 +11,7 @@ namespace Iis.MaterialDistributor.PermanentCoefficients
     {
         private const int DefaultCoefficientValue = 0;
 
-        private static readonly IReadOnlyDictionary<string, PermanentCoefficientRule> Rules = new Dictionary<string, PermanentCoefficientRule>
+        private readonly IReadOnlyDictionary<string, PermanentCoefficientRule> _rules = new Dictionary<string, PermanentCoefficientRule>
         {
             { PermanentCoefficientEntity.RelatedToObjectOfStudy, new RelatedToObjectOfStudyRule() },
             { PermanentCoefficientEntity.HasPhoneNumber, new HasPhoneNumberRule() },
@@ -30,15 +30,9 @@ namespace Iis.MaterialDistributor.PermanentCoefficients
                 .ToArray();
         }
 
-        private static MaterialPermanentCoefficient Evaluate(IReadOnlyDictionary<string, int> coefficients, MaterialInfo materialInfo)
+        private MaterialPermanentCoefficient Evaluate(IReadOnlyDictionary<string, int> coefficients, MaterialInfo materialInfo)
         {
-            var materialCoefficient = Rules.Sum(_ =>
-            {
-                if (_.Value.IsSatisfied(materialInfo))
-                    return coefficients.GetValueOrDefault(_.Key, DefaultCoefficientValue);
-
-                return 0;
-            });
+            var materialCoefficient = _rules.Sum(_ => _.Value.IsSatisfied(materialInfo) ? coefficients.GetValueOrDefault(_.Key, DefaultCoefficientValue) : 0);
 
             return new MaterialPermanentCoefficient
             {
