@@ -51,7 +51,9 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
             var securityLevelChecker = ctx.Service<ISecurityLevelChecker>();
 
             if (!securityLevelChecker.AccessGranted(tokenPayload.User.SecurityLevelsIndexes, node.OriginalNode.GetSecurityLevelIndexes()))
+            {
                 throw new Exception($"{FrontEndErrorCodes.NotFound}:{ObjectNotFound}");
+            }
 
             if (!userService.IsAccessLevelAllowedForUser(tokenPayload.User.AccessLevel, node.OriginalNode.GetAccessLevelIndex()))
                 throw new Exception($"{FrontEndErrorCodes.NotFound}:{ObjectNotFound}");

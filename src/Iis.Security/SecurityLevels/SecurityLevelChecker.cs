@@ -86,7 +86,6 @@ namespace Iis.Security.SecurityLevels
         public bool AccessGranted(IReadOnlyList<int> userIndexes, IReadOnlyList<int> objectIndexes)
         {
             var userLevels = GetSecurityLevels(userIndexes);
-            var userFullLevels = GetAllAccessibleLevels(userLevels);
             var objectLevels = GetSecurityLevels(objectIndexes);
             return AccessGranted(userLevels, objectLevels);
         }
@@ -150,7 +149,6 @@ namespace Iis.Security.SecurityLevels
                     .Any(al => al.ParentUniqueIndex == rl.ParentUniqueIndex))
                 .ToList();
             return accessibleByBrother.Count == restLevels.Count;
-
         }
         
         private bool AccessGranted(IReadOnlyList<ISecurityLevel> userLevels, ISecurityLevel objectLevel) =>
