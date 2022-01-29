@@ -15,6 +15,8 @@ namespace Iis.Api.Modules
         private const string FeatureHandlerSectionName = "featureHandler";
         private const string ElasticSaverSectionName = "elasticSaver";
         private const string MaterialConsumerSectionName = "materialConsumer";
+        private const string MaterialCoefficientsConsumerSectionName = "materialCoefficientsConsumer";
+
         public static IServiceCollection RegisterMaterialEventServices(this IServiceCollection services, IConfiguration configuration)
         {
             var meConfig = configuration.GetSection(EventSectionName)
@@ -28,6 +30,8 @@ namespace Iis.Api.Modules
             var materialConsumerConfig = configuration.GetSection(MaterialConsumerSectionName)
                                                     .Get<MaterialConsumerConfiguration>();
 
+            services.Configure<MaterialCoefficientsConsumerConfiguration>(configuration.GetSection(MaterialCoefficientsConsumerSectionName));
+
             return services
                         .AddSingleton<MaterialEventConfiguration>(serviceProvider => meConfig)
                         .AddSingleton<MaterialConsumerConfiguration>(materialConsumerConfig)
@@ -38,7 +42,8 @@ namespace Iis.Api.Modules
                         .AddHostedService<MaterialOperatorDistributor>()
                         .AddHostedService<MaterialElasticConsumer>()
                         .AddHostedService<FeatureHandler>()
-                        .AddHostedService<MaterialConsumer>();
+                        .AddHostedService<MaterialConsumer>()
+                        .AddHostedService<MaterialCoefficientsConsumer>();
         }
     }
 }

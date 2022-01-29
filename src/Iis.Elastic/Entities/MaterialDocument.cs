@@ -49,6 +49,7 @@ namespace Iis.Elastic.Entities
         public SubscriberDto Receiver { get; set; }
         public string RegistrationDate { get; set; }
         public string ProcessedAt { get; set; }
+        public int? PermanentCoefficient { get; set; }
         public SecurityAttributes SecurityAttributes { get; set; } = new SecurityAttributes();
         public IReadOnlyList<Guid> SecurityLevels { get; set; }
         [JsonProperty("__securityLevels")]
