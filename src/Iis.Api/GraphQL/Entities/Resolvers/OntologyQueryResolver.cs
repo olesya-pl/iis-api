@@ -18,6 +18,7 @@ using Node = Iis.Domain.Node;
 using Relation = Iis.Domain.Relation;
 using Iis.Interfaces.Constants;
 using Iis.Domain.Users;
+using Iis.Interfaces.SecurityLevels;
 
 namespace IIS.Core.GraphQL.Entities.Resolvers
 {
@@ -47,6 +48,12 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
             var tokenPayload = ctx.GetToken();
 
             var node = await ctx.DataLoader<NodeDataLoader>().LoadAsync(Tuple.Create<Guid, INodeTypeLinked>(id, null), default);
+            var securityLevelChecker = ctx.Service<ISecurityLevelChecker>();
+
+            if (!securityLevelChecker.AccessGranted(tokenPayload.User.SecurityLevelsIndexes, node.OriginalNode.GetSecurityLevelIndexes()))
+            {
+                throw new Exception($"{FrontEndErrorCodes.NotFound}:{ObjectNotFound}");
+            }
 
             if (!userService.IsAccessLevelAllowedForUser(tokenPayload.User.AccessLevel, node.OriginalNode.GetAccessLevelIndex()))
                 throw new Exception($"{FrontEndErrorCodes.NotFound}:{ObjectNotFound}");

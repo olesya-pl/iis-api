@@ -17,7 +17,8 @@ namespace Iis.Interfaces.SecurityLevels
         ISecurityLevel GetSecurityLevelByName(string name);
         ISecurityLevel CreateChildLevel(int parentIndex);
         bool AccessGranted(IReadOnlyList<int> userIndexes, IReadOnlyList<int> objectIndexes);
-        string GetStringCode(bool includeAll, IReadOnlyList<int> indexes);
+        string GetObjectElasticCode(IReadOnlyList<int> indexes);
+        string GetUserElasticCode(IReadOnlyList<int> indexes);
         bool IsNameUnique(Guid id, string name);
     }
 }
