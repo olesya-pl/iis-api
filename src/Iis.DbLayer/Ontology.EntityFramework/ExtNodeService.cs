@@ -158,7 +158,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                 CreatedAt = node.CreatedAt,
                 UpdatedAt = node.UpdatedAt,
                 AccessLevel = node.NodeType.IsObject ? node.GetAccessLevelIndex() : (int?)null,
-                SecurityLevels = _securityLevelChecker.GetStringCode(false, node.GetSecurityLevelIndexes())
+                SecurityLevels = _securityLevelChecker.GetObjectElasticCode(node.GetSecurityLevelIndexes())
             };
         }
 

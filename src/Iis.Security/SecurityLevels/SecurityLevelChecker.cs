@@ -51,18 +51,26 @@ namespace Iis.Security.SecurityLevels
         public ISecurityLevel RootLevel => _rootLevel;
 
         public void Reload() => Initialize();
+
         public ISecurityLevel GetSecurityLevel(Guid id) => _rootLevel.GetAllItems().Single(_ => _.Id == id);
+
         public ISecurityLevel GetSecurityLevel(int uniqueIndex) => _rootLevel.GetAllItems().Single(_ => _.UniqueIndex == uniqueIndex);
+
         public IReadOnlyList<ISecurityLevel> GetSecurityLevels(IReadOnlyList<Guid> securityLevelIds) =>
             _rootLevel.GetAllItems().Where(_ => securityLevelIds.Contains(_.Id)).ToList();
+
         public IReadOnlyList<ISecurityLevel> GetSecurityLevels(IReadOnlyList<int> securityLevelIndexes) =>
             _rootLevel.GetAllItems().Where(_ => securityLevelIndexes.Contains(_.UniqueIndex)).ToList();
+
         public IReadOnlyList<int> GetSecurityLevelIndexes(IReadOnlyList<Guid> securityLevelIds) =>
             GetSecurityLevels(securityLevelIds).Select(_ => _.UniqueIndex).ToList();
+
         public IReadOnlyList<SecurityLevelPlain> GetSecurityLevelsPlain() =>
             _rootLevel.GetAllItems().Select(_ => new SecurityLevelPlain(_)).ToList();
+
         public ISecurityLevel GetSecurityLevelByName(string name) =>
             _rootLevel.GetAllItems().FirstOrDefault(_ => name.Equals(_.Name, StringComparison.OrdinalIgnoreCase));
+
         public ISecurityLevel CreateChildLevel(int parentIndex)
         {
             var parent = GetSecurityLevelConcrete(parentIndex);
@@ -74,20 +82,48 @@ namespace Iis.Security.SecurityLevels
                 _parent = parent
             };
         }
+
         public bool AccessGranted(IReadOnlyList<int> userIndexes, IReadOnlyList<int> objectIndexes)
         {
-            return true;
+            var userLevels = GetSecurityLevels(userIndexes);
+            var objectLevels = GetSecurityLevels(objectIndexes);
+            return AccessGranted(userLevels, objectLevels);
         }
+
         /// This is security code for elastic painless script.
         /// See details here: https://confluence.infozahyst.com/pages/viewpage.action?pageId=192484154 
-        public string GetStringCode(bool includeAll, params int[] uniqueIndexes) => GetStringCode(includeAll, uniqueIndexes.ToList());
-        public string GetStringCode(bool includeAll, IReadOnlyList<int> uniqueIndexes) => GetStringCode(includeAll, _rootLevel.GetAllItems(uniqueIndexes));
+        public string GetObjectElasticCode(params int[] uniqueIndexes) => GetObjectElasticCode(uniqueIndexes.ToList());
 
-        internal string GetStringCode(bool includeAll, IReadOnlyList<SecurityLevel> baseLevels)
+        public string GetObjectElasticCode(IReadOnlyList<int> uniqueIndexes) => GetObjectElasticCode(_rootLevel.GetAllItems(uniqueIndexes));
+
+        public string GetUserElasticCode(params int[] uniqueIndexes) => GetUserElasticCode(uniqueIndexes.ToList());
+
+        public string GetUserElasticCode(IReadOnlyList<int> uniqueIndexes) => GetUserElasticCode(_rootLevel.GetAllItems(uniqueIndexes));
+        
+        internal string GetObjectElasticCode(IReadOnlyList<SecurityLevel> levels)
         {
             var sb = new StringBuilder();
-            var levels = includeAll ? GetAllAccessibleLevels(baseLevels) : baseLevels;
             
+            var grouped = levels
+                .Where(_ => !_.IsRoot)
+                .GroupBy(_ => _._parent?.UniqueIndex);
+
+            foreach (var group in grouped.OrderBy(_ => _.Key))
+            {
+                sb.Append(
+                    group.First().IsGroup ?
+                        string.Join(';', group.Select(l => $"{group.Key}:{l.UniqueIndex}")) + ";" :
+                        $"{group.Key}:{string.Join(',', group.Select(_ => _.UniqueIndex.ToString()))};"
+                );
+            }
+            return sb.ToString();
+        }
+
+        internal string GetUserElasticCode(IReadOnlyList<SecurityLevel> baseLevels)
+        {
+            var sb = new StringBuilder();
+            var levels = GetAllAccessibleLevels(baseLevels);
+
             var grouped = levels
                 .Where(_ => !_.IsRoot)
                 .GroupBy(_ => _._parent?.UniqueIndex);
@@ -98,23 +134,35 @@ namespace Iis.Security.SecurityLevels
             }
             return sb.ToString();
         }
+        
         internal SecurityLevel GetSecurityLevelConcrete(int uniqueIndex) =>
             _rootLevel.GetAllItems().Where(_ => _.UniqueIndex == uniqueIndex).Single();
 
-        private bool AccessGranted(IReadOnlyList<SecurityLevel> userLevels, IReadOnlyList<SecurityLevel> objectLevels)
+        
+        private bool AccessGranted(IReadOnlyList<ISecurityLevel> userLevels, IReadOnlyList<ISecurityLevel> objectLevels)
         {
-            return true;
+            var accessibleLevels = objectLevels.Where(_ => AccessGranted(userLevels, _)).ToList();
+            if (accessibleLevels.Count == objectLevels.Count) return true;
+            var restLevels = objectLevels.Where(_ => !accessibleLevels.Contains(_)).ToList();
+            var accessibleByBrother = restLevels
+                .Where(rl => !rl.IsGroup && accessibleLevels
+                    .Any(al => al.ParentUniqueIndex == rl.ParentUniqueIndex))
+                .ToList();
+            return accessibleByBrother.Count == restLevels.Count;
         }
-        private bool AccessGranted(IReadOnlyList<SecurityLevel> userLevels, SecurityLevel objectLevel) =>
+        
+        private bool AccessGranted(IReadOnlyList<ISecurityLevel> userLevels, ISecurityLevel objectLevel) =>
             userLevels.Any(userLevel => AccessGranted(userLevel, objectLevel));
-        private bool AccessGranted(SecurityLevel userLevel, SecurityLevel objectLevel) =>
+        
+        private bool AccessGranted(ISecurityLevel userLevel, ISecurityLevel objectLevel) =>
             userLevel == objectLevel ||
             userLevel.IsParentOf(objectLevel) ||
             userLevel.IsChildOf(objectLevel);
 
-        private IReadOnlyList<SecurityLevel> GetAllAccessibleLevels(IReadOnlyList<SecurityLevel> baseItems) =>
+        
+        private IReadOnlyList<SecurityLevel> GetAllAccessibleLevels(IReadOnlyList<ISecurityLevel> baseItems) =>
             _rootLevel.GetAllItems().Where(_ => AccessGranted(baseItems, _)).ToList();
-
+        
         private void Initialize()
         {
             var levelsNodes = _ontologyData.GetEntitiesByTypeName(EntityTypeNames.SecurityLevel.ToString());
