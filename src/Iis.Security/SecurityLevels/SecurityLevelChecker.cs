@@ -85,7 +85,10 @@ namespace Iis.Security.SecurityLevels
 
         public bool AccessGranted(IReadOnlyList<int> userIndexes, IReadOnlyList<int> objectIndexes)
         {
-            return true;
+            var userLevels = GetSecurityLevels(userIndexes);
+            var userFullLevels = GetAllAccessibleLevels(userLevels);
+            var objectLevels = GetSecurityLevels(objectIndexes);
+            return AccessGranted(userLevels, objectLevels);
         }
 
         /// This is security code for elastic painless script.
@@ -137,21 +140,29 @@ namespace Iis.Security.SecurityLevels
             _rootLevel.GetAllItems().Where(_ => _.UniqueIndex == uniqueIndex).Single();
 
         
-        private bool AccessGranted(IReadOnlyList<SecurityLevel> userLevels, IReadOnlyList<SecurityLevel> objectLevels)
+        private bool AccessGranted(IReadOnlyList<ISecurityLevel> userLevels, IReadOnlyList<ISecurityLevel> objectLevels)
         {
-            return true;
+            var accessibleLevels = objectLevels.Where(_ => AccessGranted(userLevels, _)).ToList();
+            if (accessibleLevels.Count == objectLevels.Count) return true;
+            var restLevels = objectLevels.Where(_ => !accessibleLevels.Contains(_)).ToList();
+            var accessibleByBrother = restLevels
+                .Where(rl => !rl.IsGroup && accessibleLevels
+                    .Any(al => al.ParentUniqueIndex == rl.ParentUniqueIndex))
+                .ToList();
+            return accessibleByBrother.Count == restLevels.Count;
+
         }
         
-        private bool AccessGranted(IReadOnlyList<SecurityLevel> userLevels, SecurityLevel objectLevel) =>
+        private bool AccessGranted(IReadOnlyList<ISecurityLevel> userLevels, ISecurityLevel objectLevel) =>
             userLevels.Any(userLevel => AccessGranted(userLevel, objectLevel));
         
-        private bool AccessGranted(SecurityLevel userLevel, SecurityLevel objectLevel) =>
+        private bool AccessGranted(ISecurityLevel userLevel, ISecurityLevel objectLevel) =>
             userLevel == objectLevel ||
             userLevel.IsParentOf(objectLevel) ||
             userLevel.IsChildOf(objectLevel);
 
         
-        private IReadOnlyList<SecurityLevel> GetAllAccessibleLevels(IReadOnlyList<SecurityLevel> baseItems) =>
+        private IReadOnlyList<SecurityLevel> GetAllAccessibleLevels(IReadOnlyList<ISecurityLevel> baseItems) =>
             _rootLevel.GetAllItems().Where(_ => AccessGranted(baseItems, _)).ToList();
         
         private void Initialize()

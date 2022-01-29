@@ -660,6 +660,8 @@ namespace Iis.Services
                 user.AccessGrantedItems.Merge(accessGrantedList);
             }
 
+            user.SecurityLevels = _securityLevelChecker.GetSecurityLevels(entity.SecurityLevels.Select(_ => _.SecurityLevelIndex).ToList());
+
             user.IsAdmin = roleEntityList.Any(re => re.IsAdmin);
 
             return user;

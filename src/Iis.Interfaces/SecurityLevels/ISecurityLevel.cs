@@ -13,5 +13,10 @@ namespace Iis.Interfaces.SecurityLevels
         public ISecurityLevel Parent { get; }
         public IReadOnlyList<ISecurityLevel> Children { get; }
         public bool IsNew { get; }
+        public bool IsGroup { get; }
+
+        bool IsParentOf(ISecurityLevel level);
+        bool IsChildOf(ISecurityLevel level);
+        bool IsBrotherOf(ISecurityLevel level);
     }
 }
