@@ -50,17 +50,27 @@ namespace Iis.Desktop.SecurityManager.Controls
 
         private void BtnSaveClick(object sender, EventArgs e)
         {
-            if (string.IsNullOrEmpty(txtName.Text.Trim()))
+            try
             {
-                MessageBox.Show("Назва не може бути пустою");
+                btnSave.Enabled = false;
+                var id = Guid.Parse(txtId.Text);
+                var name = txtName.Text.Trim();
+                if (string.IsNullOrEmpty(name))
+                {
+                    MessageBox.Show("Назва не може бути пустою");
+                }
+                else if (!_securityLevelChecker.IsNameUnique(id, name))
+                {
+                    MessageBox.Show("Назва має бути унікальною");
+                }
+                else
+                {
+                    OnSave?.Invoke(GetSecurityLevelPlain());
+                }
             }
-            else if (!NameIsUnique())
+            finally
             {
-                MessageBox.Show("Назва має бути унікальною");
-            }
-            else
-            {
-                OnSave?.Invoke(GetSecurityLevelPlain());
+                btnSave.Enabled = true;
             }
         }
 

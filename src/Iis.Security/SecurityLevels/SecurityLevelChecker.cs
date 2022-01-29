@@ -82,6 +82,11 @@ namespace Iis.Security.SecurityLevels
         /// See details here: https://confluence.infozahyst.com/pages/viewpage.action?pageId=192484154 
         public string GetStringCode(bool includeAll, params int[] uniqueIndexes) => GetStringCode(includeAll, uniqueIndexes.ToList());
         public string GetStringCode(bool includeAll, IReadOnlyList<int> uniqueIndexes) => GetStringCode(includeAll, _rootLevel.GetAllItems(uniqueIndexes));
+        public bool IsNameUnique(Guid id, string name)
+        {
+            var levelWithTheSameName = GetSecurityLevelByName(name);
+            return levelWithTheSameName == null || levelWithTheSameName.Id == id;
+        }
 
         internal string GetStringCode(bool includeAll, IReadOnlyList<SecurityLevel> baseLevels)
         {

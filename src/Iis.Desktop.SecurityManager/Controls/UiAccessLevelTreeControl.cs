@@ -30,7 +30,7 @@ namespace Iis.Desktop.SecurityManager.Controls
         public void SelectNode(Guid id)
         {
             var treeNode = GetAllNodes()
-                .SingleOrDefault(_ => (_.Tag as ISecurityLevel).Id == id);
+                .SingleOrDefault(_ => ((ISecurityLevel)_?.Tag)?.Id == id);
 
             MainPanel.Invoke((Action)(() =>
             {
