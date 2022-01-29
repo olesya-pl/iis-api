@@ -19,5 +19,6 @@ namespace Iis.Interfaces.SecurityLevels
         bool AccessGranted(IReadOnlyList<int> userIndexes, IReadOnlyList<int> objectIndexes);
         string GetObjectElasticCode(IReadOnlyList<int> indexes);
         string GetUserElasticCode(IReadOnlyList<int> indexes);
+        bool IsNameUnique(Guid id, string name);
     }
 }
