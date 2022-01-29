@@ -851,7 +851,7 @@ namespace Iis.Services
             var securityIndexes = material.SecurityLevels.Select(_ => _.SecurityLevelIndex).ToList();
             var securityLevels = _securityLevelChecker.GetSecurityLevels(securityIndexes);
             materialDocument.SecurityLevels = securityLevels.Select(_ => _.Id).ToList();
-            materialDocument.SecurityLevelsCode = _securityLevelChecker.GetStringCode(false, securityIndexes);
+            materialDocument.SecurityLevelsCode = _securityLevelChecker.GetObjectElasticCode(securityIndexes);
 
             return materialDocument;
         }
