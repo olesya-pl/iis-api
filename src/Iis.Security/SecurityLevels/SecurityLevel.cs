@@ -39,16 +39,20 @@ namespace Iis.Security.SecurityLevels
         public bool IsNew => UniqueIndex == -1;
 
         public override string ToString() => $"{UniqueIndex} : {Name}";
+
         public bool IsGroup => _parent?.IsRoot == true;
 
         public bool IsParentOf(ISecurityLevel level) =>
             level.Parent != null && (level.Parent == this || IsParentOf(level.Parent));
 
         public bool IsChildOf(ISecurityLevel level) => level.IsParentOf(this);
+
         public bool IsBrotherOf(ISecurityLevel level) => level != this && Parent == level.Parent;
 
         internal bool IsRoot => _parent == null;
+
         internal SecurityLevel Root => IsRoot ? this : _parent.Root;
+
         internal IReadOnlyList<SecurityLevel> GetItems(IReadOnlyList<int> indexes = null)
         {
             var result = new List<SecurityLevel>();
@@ -60,10 +64,14 @@ namespace Iis.Security.SecurityLevels
             _children.ForEach(_ => result.AddRange(_.GetItems(indexes)));
             return result;
         }
+
         internal IReadOnlyList<SecurityLevel> GetAllItems(IReadOnlyList<int> indexes = null) => 
             IsRoot ? GetItems(indexes) : Root.GetItems(indexes);
+
         internal SecurityLevel GetItem(int uniqueIndex) => GetAllItems().SingleOrDefault(_ => _.UniqueIndex == uniqueIndex);
+        
         internal SecurityLevel GetItem(Guid id) => GetAllItems().SingleOrDefault(_ => _.Id == id);
+        
         internal int GetDepth()
         {
             int depth = 1;
