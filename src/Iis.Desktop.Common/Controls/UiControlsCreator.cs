@@ -162,25 +162,29 @@ namespace Iis.Desktop.Common.Controls
 
         public Panel GetFillPanel(Control parent, bool visible = true)
         {
-            int width = parent is TabPage ? parent.Parent.Width : parent.Width;
-            int height = parent is TabPage ? parent.Parent.Height : parent.Height;
-
-            var marginVer = 20;
-            var panel = new Panel
-            {
-                Parent = parent,
-                Top = marginVer,
-                Left = 0,
-                Width = width,
-                Height = height - marginVer,
-                Dock = DockStyle.None,
-                BackColor = _style.BackgroundColor,
-                Anchor = AnchorStyles.Left | AnchorStyles.Right | AnchorStyles.Top | AnchorStyles.Bottom,
-                Visible = visible
-            };
-            parent.Controls.Add(panel);
+            var panel = GetPanel(parent);
+            SetFullSize(panel, parent.DisplayRectangle.Size);
+            panel.Visible = visible;
             return panel;
         }
+
+        public void SetFullSize(Control control, Size size)
+        {
+            var marginVer = _style.MarginVer;
+            control.Top = marginVer;
+            control.Left = 0;
+            control.Width = size.Width;
+            control.Height = size.Height - marginVer;
+            control.Dock = DockStyle.None;
+            control.Anchor = AnchorStyles.Left | AnchorStyles.Right | AnchorStyles.Top | AnchorStyles.Bottom;
+        }
+
+        public void SetFullSize(Control control)
+        {
+            if (control.Parent == null) return;
+            SetFullSize(control, control.Parent.DisplayRectangle.Size);
+        }
+
         public ComboBox GetEnumComboBox(Type enumType)
         {
             var comboBox = new ComboBox
@@ -295,6 +299,11 @@ namespace Iis.Desktop.Common.Controls
                 {
                     node.Checked = true;
                 }
+            }
+            treeView.ExpandAll();
+            if (treeView.Nodes.Count > 0)
+            {
+                treeView.Nodes[0].EnsureVisible();
             }
         }
 

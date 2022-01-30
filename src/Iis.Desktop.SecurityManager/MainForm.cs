@@ -30,7 +30,7 @@ namespace Iis.Desktop.SecurityManager
         private IConfiguration _configuration;
         private IReadOnlyDictionary<string, EnvConfig> _environmentProperties;
         private IDesktopStyle _style;
-        private const string VERSION = "0.92";
+        private const string VERSION = "0.93";
         private const string DEFAULT_ENVIRONMENT_KEY = "defaultEnvironment";
         private string _selectedEnvironment;
         private ILogger _logger;
@@ -74,8 +74,7 @@ namespace Iis.Desktop.SecurityManager
 
             tabControl = new TabControl();
             panelMain.Controls.Add(tabControl);
-            tabControl.Dock = DockStyle.Fill;
-
+            _uiControlsCreator.SetFullSize(tabControl, panelMain.Size);
 
             _currentConfig = _environmentProperties[_selectedEnvironment];
             _requestSettings = new RequestSettings { ReIndexTimeOutInMins = 25 };
@@ -111,7 +110,8 @@ namespace Iis.Desktop.SecurityManager
         {
             var pageAttributes = new TabPage("Атрибути доступу");
             tabControl.TabPages.Add(pageAttributes);
-            var pnlAttributes = _uiControlsCreator.GetFillPanel(pageAttributes);
+            var pnlAttributes = _uiControlsCreator.GetPanel(pageAttributes);
+            _uiControlsCreator.SetFullSize(pnlAttributes, tabControl.DisplayRectangle.Size);
 
             int panelLeftWidth = pnlAttributes.Width / 3;
             (panelLeft, panelRight) = _uiControlsCreator.GetLeftRightPanels(pnlAttributes, panelLeftWidth);
@@ -130,14 +130,15 @@ namespace Iis.Desktop.SecurityManager
         {
             var pageUser = new TabPage("Користувачи");
             tabControl.TabPages.Add(pageUser);
-            var pnlUser = _uiControlsCreator.GetFillPanel(pageUser);
+            var pnlUser = _uiControlsCreator.GetPanel(pageUser);
+            _uiControlsCreator.SetFullSize(pnlUser, tabControl.DisplayRectangle.Size);
 
             _uiUserSecurityControl = new UiUserSecurityControl(GetRequestWrapper());
             _uiUserSecurityControl.Initialize("UserSecurityControl", pnlUser, _style);
-            _uiUserSecurityControl.OnSave += async () => 
+            _uiUserSecurityControl.OnSave += async () =>
             {
                 await RefreshUsersAsync();
-                RefreshUsersGrid(); 
+                RefreshUsersGrid();
             };
         }
 

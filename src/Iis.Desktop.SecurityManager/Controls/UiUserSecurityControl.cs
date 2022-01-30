@@ -50,19 +50,19 @@ namespace Iis.Desktop.SecurityManager.Controls
             var (panelLeft, panelRight) = _uiControlsCreator.GetLeftRightPanels(MainPanel, panelLeftWidth);
             _grid = _uiControlsCreator.GetDataGridView("Users", null, new List<string> { "Username" });
             _grid.Columns[0].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
-            _grid.Width = panelLeft.Width;
-            _grid.Height = panelLeft.Height;
             panelLeft.Controls.Add(_grid);
+            _uiControlsCreator.SetFullSize(_grid);
             _grid.CellFormatting += grid_CellFormatting;
             _grid.SelectionChanged += (sender, e) => { SetSecurityLevels(); };
 
             var container = new UiContainerManager("Right", panelRight, _style);
-            container.SetColWidth(500);
+            container.SetFullWidthColumn();
             container.Add(_btnSave = _uiControlsCreator.GetButton("Зберегти"));
             _btnSave.Click += async (sender, e) => { await SaveAsync(); };
 
             _treeView = _uiControlsCreator.GetTreeView();
             _treeView.CheckBoxes = true;
+            _uiControlsCreator.SetFullSize(_treeView);
             container.Add(_treeView, null, true);
         }
 
@@ -89,8 +89,6 @@ namespace Iis.Desktop.SecurityManager.Controls
                 _ => _.Name,
                 _ => _.Children,
                 _ => SelectedUser?.SecurityIndexes.Contains(_.UniqueIndex) ?? false);
-
-            _treeView.ExpandAll();
         }
 
         private IReadOnlyList<int> GetCheckedIndexes() =>

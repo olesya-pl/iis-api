@@ -26,6 +26,7 @@ namespace Iis.Desktop.SecurityManager.Controls
                 null);
 
             _treeView.ExpandAll();
+            _treeView.Nodes[0].EnsureVisible();
         }
         public void SelectNode(Guid id)
         {
@@ -44,6 +45,7 @@ namespace Iis.Desktop.SecurityManager.Controls
         {
             _container.Add(_treeView = _uiControlsCreator.GetTreeView());
             _treeView.Dock = DockStyle.Fill;
+            _treeView.Scrollable = true;
             _treeView.AfterSelect += TreeView_AfterSelect;
             var menu = new ContextMenuStrip();
             menu.Items.Add("Створити рівень");

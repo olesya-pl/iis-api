@@ -47,11 +47,6 @@ namespace Iis.Desktop.Common.Controls
 
         public Label Add(Control control, string labelText = null, bool stretchToDown = false)
         {
-            Log.Logger.Verbose($"{Name} add...");
-            Log.Logger.Verbose($"... control type = {control.GetType()}");
-            Log.Logger.Verbose($"... labelText = {labelText}");
-            Log.Logger.Verbose($"... stretchToDown = {stretchToDown}");
-
             Label label = null;
             if (!string.IsNullOrEmpty(labelText))
             {
@@ -75,6 +70,7 @@ namespace Iis.Desktop.Common.Controls
                 control.Height = _bottom > control.Top ?
                     _bottom - control.Top :
                     _rect.Height - control.Top;
+                control.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left;
             }
 
             if (AutoWidth)
@@ -88,9 +84,6 @@ namespace Iis.Desktop.Common.Controls
 
             Top = control.Bottom + _style.MarginVer;
             AddToRoot(control);
-            Log.Logger.Verbose($"<= Top = {Top}");
-            Log.Logger.Verbose($"<= Bottom = {_bottom}");
-            Log.Logger.Verbose($"<= Left = {_left}");
             return label;
         }
 
