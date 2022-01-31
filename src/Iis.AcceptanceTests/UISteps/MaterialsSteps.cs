@@ -52,6 +52,13 @@ namespace AcceptanceTests.UISteps
             materialsSectionPage.RelationsTab.Click();
             driver.WaitFor(1);
         }
+        
+        [When(@"I must see that importance must be (.*) value")]
+        public void ThemIMustSeeThatImportanceMustBe(string expectedValue)
+        {
+            var actualValue = materialsSectionPage.MaterialPage.ImportanceDropDown.Text;
+            Assert.Equal(expectedValue, actualValue);
+        }
 
         [When(@"I clicked on the relation tab in the material card")]
         public void IClickedOnTheObjectsTabInTheMaterialCard()
