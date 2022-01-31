@@ -12,6 +12,7 @@ Feature: Materials - regression
 	- IIS-8441 - Display the length of the audio track
 	- IIS-6633 - Search materials by status processing
 	- IIS-6632 - Possibility searching materials by importance
+	- IIS-8240 - Possibility to change the priority for materials using hotkeys
 
 Background:
 	Given I sign in with the user olya and password 123 in the Contour
@@ -267,3 +268,33 @@ Scenario: IIS-6632 - Possibility searching materials by importance
 	When I clicked on the clear search button
 	When I searched by field name SessionPriority.Title: and request Негайна* in the materials
 	Then I must see list of the materials with SessionPriority.Title:Негайна доповідь
+
+	@regression @UI @Materials
+Scenario: IIS-8240 - Possibility to change the priority for materials using hotkeys
+		 Given I upload a new docx material via API
+		| Field                 | Value                                        |
+		| FileName              | тестовий матеріал                            |
+		| SourceReliabilityText | Здебільшого надійне                          |
+		| ReliabilityText       | Достовірна                                   |
+		| Content               | таємний контент                              |
+		| AccessLevel           | 0                                            |
+		| LoadedBy              | автотест                                     |
+		| MetaData              | {"type":"document","source":"contour.doc"} |
+		| From                  | contour.doc                                |
+	When I navigated to Materials page
+	And I clicked search button in the Materials section
+	And I searched таємн data in the materials
+	And I clicked on the first material in the Materials list
+	When I press hotkeys Ctrl+Alt+2
+	When I pressed the Next material button
+	When I pressed the Previous material button
+	Then I must see that the session priority value must be set to Important
+	When I press hotkeys Ctrl+Alt+3
+	When I pressed the Next material button
+	When I pressed the Previous material button
+	Then I must see that the session priority value must be set to Immediate Report
+	When I press hotkeys Ctrl+Alt+4
+	When I pressed the Next material button
+	When I pressed the Previous material button
+	Then I must see that the session priority value must be set to Translation
+	When I clean up uploaded material via API
