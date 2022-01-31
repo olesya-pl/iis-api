@@ -12,6 +12,7 @@ Feature: Materials - regression
 	- IIS-8441 - Display the length of the audio track
 	- IIS-6633 - Search materials by status processing
 	- IIS-5962 - Change importance of mterials
+	- IIS-5964 - Change reliability of materials 
 
 Background:
 	Given I sign in with the user olya and password 123 in the Contour
@@ -256,21 +257,52 @@ Scenario: IIS-6203 - Possibility To make text in bold
 	When I clean up uploaded material via API
 	
 	@regression @UI @Materials
-Scenario: IIS-5962 - Change importance of mterials
-		When I navigated to Materials page
-		And I clicked on the first material in the Materials list
-		And I set importance Перша категорія value
-		And I pressed the Next material button
-		And I set importance Друга категорія value
-		And I pressed the Next material button
-		And I set importance Третя категорія value
-		And I pressed the Next material button
-		And I close the material card
-		And I clicked on the first material in the Materials list
-		And I must see that importance must be Перша категорія value
-		And I pressed the Next material button
-		And I must see that importance must be Друга категорія value
-		And I pressed the Next material button
-		And I must see that importance must be Третя категорія value
+Scenario: IIS-5962 - Change importance of materials
+	When I navigated to Materials page
+	And I clicked on the first material in the Materials list
+	And I set importance Перша категорія value
+	And I pressed the Next material button
+	And I set importance Друга категорія value
+	And I pressed the Next material button
+	And I set importance Третя категорія value
+	And I pressed the Next material button
+	And I close the material card
+	And I clicked on the first material in the Materials list
+	And I must see that importance must be Перша категорія value
+	And I pressed the Next material button
+	And I must see that importance must be Друга категорія value
+	And I pressed the Next material button
+	And I must see that importance must be Третя категорія value
 
+	@regression @UI @Materials
+Scenario: IIS-5964 - Change reliability of materials
+	When I navigated to Materials page
+	And I clicked on the first material in the Materials list
+	And I set reliability Достовірна value
+	And I pressed the Next material button
+	And I set reliability Ймовірна value
+	And I pressed the Next material button	
+	And I set reliability Сумнівна value
+	And I pressed the Next material button	
+	And I set reliability Недостовірна value
+	And I pressed the Next material button	
+	And I set reliability Невизначеної достовірності value
+	And I pressed the Next material button	
+	And I set reliability Дезінформація value
+	And I pressed the Next material button	
+	And I close the material card
+	And I clicked on the first material in the Materials list
+	And I must see that reliability  must be Достовірна value
+	And I pressed the Next material button
+	And I must see that reliability  must be Ймовірна value
+	And I pressed the Next material button
+	And I must see that reliability  must be Сумнівна value
+	And I pressed the Next material button
+	And I must see that reliability  must be Недостовірна value
+	And I pressed the Next material button
+	And I must see that reliability  must be Невизначеної достовірності value
+	And I pressed the Next material button
+	And I must see that reliability  must be Дезінформація value
+		
+	
 		

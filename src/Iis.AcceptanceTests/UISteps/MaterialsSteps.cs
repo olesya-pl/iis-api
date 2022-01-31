@@ -59,6 +59,13 @@ namespace AcceptanceTests.UISteps
             var actualValue = materialsSectionPage.MaterialPage.ImportanceDropDown.Text;
             Assert.Equal(expectedValue, actualValue);
         }
+        
+        [When(@"I must see that reliability  must be (.*) value")]
+        public void ThemIMustSeeThatRelevanceValueMustBeValue(string expectedValue)
+        {
+            var actualValue = materialsSectionPage.MaterialPage.ReliabilityDropDown.Text;
+            Assert.Equal(expectedValue, actualValue);
+        }
 
         [When(@"I clicked on the relation tab in the material card")]
         public void IClickedOnTheObjectsTabInTheMaterialCard()
