@@ -93,6 +93,11 @@ namespace Iis.Security.SecurityLevels
         /// This is security code for elastic painless script.
         /// See details here: https://confluence.infozahyst.com/pages/viewpage.action?pageId=192484154 
         public string GetObjectElasticCode(params int[] uniqueIndexes) => GetObjectElasticCode(uniqueIndexes.ToList());
+        public bool IsNameUnique(Guid id, string name)
+        {
+            var levelWithTheSameName = GetSecurityLevelByName(name);
+            return levelWithTheSameName == null || levelWithTheSameName.Id == id;
+        }
 
         public string GetObjectElasticCode(IReadOnlyList<int> uniqueIndexes) => GetObjectElasticCode(_rootLevel.GetAllItems(uniqueIndexes));
 
