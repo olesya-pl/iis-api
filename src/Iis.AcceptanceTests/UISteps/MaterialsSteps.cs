@@ -378,6 +378,37 @@ namespace AcceptanceTests.UISteps
                driver.WaitFor(2);
         }
 
+        [When(@"I press hotkeys Ctrl\+Alt\+3")]
+        public void WhenIPressHotkeysCtrlAlt3()
+        {
+            driver.WaitFor(3);
+            navigationSection.ObjectOfStudyLink.SendKeys(Keys.Alt + Keys.Control + "3");
+            driver.WaitFor(5);
+        }
+
+        [When(@"I press hotkeys Ctrl\+Alt\+2")]
+        public void WhenIPressHotkeysCtrlAlt2()
+        {
+            driver.WaitFor(3);
+            navigationSection.ObjectOfStudyLink.SendKeys(Keys.Alt + Keys.Control + "2");
+            driver.WaitFor(5);
+        }
+
+        [When(@"I press hotkeys Ctrl\+Alt\+4")]
+        public void WhenIPressHotkeysCtrlAlt4()
+        {
+            driver.WaitFor(3);
+            navigationSection.ObjectOfStudyLink.SendKeys(Keys.Alt + Keys.Control + "4");
+            driver.WaitFor(5);
+        }
+
+        [When(@"I searched by field name (.*) and request (.*) in the materials")]
+        public void WhenISearchedByFieldName_AndRequest_InTheMaterials(string input1, string input2)
+        {
+            materialsSectionPage.SearchField.SendKeys(input1);
+            materialsSectionPage.SearchField.SendKeys(input2);
+            materialsSectionPage.SearchField.SendKeys(Keys.Enter);
+        }
         #endregion When
 
         #region Then
@@ -660,18 +691,6 @@ namespace AcceptanceTests.UISteps
             Assert.True(materialsSectionPage.FieldName(fieldName).Displayed);
             Assert.True(materialsSectionPage.PriorityTitle(title).Displayed);
         }
-
-
-        [When(@"I searched by field name (.*) and request (.*) in the materials")]
-        public void WhenISearchedByFieldName_AndRequest_InTheMaterials(string input1, string input2)
-        {
-            materialsSectionPage.SearchField.SendKeys(input1);
-            materialsSectionPage.SearchField.SendKeys(input2);
-            materialsSectionPage.SearchField.SendKeys(Keys.Enter);
-        }
-
-
-
         #endregion
     }
 }

@@ -253,6 +253,5 @@ namespace AcceptanceTests.PageObjects
 
         public IWebElement FieldName(string fieldName) =>
             driver.FindElement(By.XPath($"//tr[1]//td[@class='materials-table__title']//descendant::b[contains(text(), '{fieldName}')]"));
-        
     }
 }
