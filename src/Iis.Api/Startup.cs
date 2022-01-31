@@ -323,7 +323,7 @@ namespace IIS.Core
             services.RegisterCoordinatesMessageHandler(Configuration);
 
             var eusConfiguration = Configuration.GetSection("externalUserService").Get<ExternalUserServiceConfiguration>();
-            services.AddTransient<IExternalUserService>(_ => (new ExternalUserServiceFactory()).GetInstance(eusConfiguration));
+            services.AddTransient<IExternalUserService>(_ => new ExternalUserServiceFactory().GetInstance(eusConfiguration));
 
             var matrixConfiguration = Configuration.GetSection("matrix").Get<MatrixServiceConfiguration>();
             services.AddSingleton(matrixConfiguration);
@@ -378,7 +378,7 @@ namespace IIS.Core
                 {
                     if (graphQLAccessItem == null || graphQLAccessItem.Kind == AccessKind.FreeForAll)
                     {
-                        break;   
+                        break;
                     }
                     if (!validatedToken.User.IsGranted(graphQLAccessItem.Kind, graphQLAccessItem.Operation, AccessCategory.Entity))
                     {
@@ -397,7 +397,6 @@ namespace IIS.Core
                 app.UseDeveloperExceptionPage();
             }
 
-            app.UpdateMartialStatus();
             app.ReloadElasticFieldsConfiguration();
 
             if (!Configuration.GetValue<bool>("disableCORS", false))
