@@ -654,6 +654,24 @@ namespace AcceptanceTests.UISteps
             Assert.True(materialsSectionPage.BoldContent.Enabled);
         }
 
+        [Then(@"I must see list of the materials with (.*)\:(.*)")]
+        public void WhenIMustSeeListOfTheMaterialsWithSessionPriority_TitleВажливий(string fieldName, string title)
+        {
+            Assert.True(materialsSectionPage.FieldName(fieldName).Displayed);
+            Assert.True(materialsSectionPage.PriorityTitle(title).Displayed);
+        }
+
+
+        [When(@"I searched by field name (.*) and request (.*) in the materials")]
+        public void WhenISearchedByFieldName_AndRequest_InTheMaterials(string input1, string input2)
+        {
+            materialsSectionPage.SearchField.SendKeys(input1);
+            materialsSectionPage.SearchField.SendKeys(input2);
+            materialsSectionPage.SearchField.SendKeys(Keys.Enter);
+        }
+
+
+
         #endregion
     }
 }
