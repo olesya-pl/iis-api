@@ -13,6 +13,7 @@ Feature: Materials - regression
 	- IIS-6633 - Search materials by status processing
 	- IIS-6632 - Possibility searching materials by importance
 	- IIS-8240 - Possibility to change the priority for materials using hotkeys
+	- IIS-6197 - Possibility  change priority for audio materials
 
 Background:
 	Given I sign in with the user olya and password 123 in the Contour
@@ -186,7 +187,7 @@ Scenario: IIS-8238 - Hotkeys for audio rewind
 	And I searched neizvesten-peregovory-po-racii.mp3 data in the materials
 	And I clicked on the first material in the Materials list
 	And I clicked pause button
-	Then I cliced on the text field
+	Then I clicked on the text field
 	When I clicked Ctrl and left arrow on the keyboard
 	Then I see that position of timeline changed
 	And I clicked Ctrl and right arrow on the keyboard
@@ -298,3 +299,23 @@ Scenario: IIS-8240 - Possibility to change the priority for materials using hotk
 	When I pressed the Previous material button
 	Then I must see that the session priority value must be set to Translation
 	When I clean up uploaded material via API
+
+	@regression @UI @Material @upload
+Scenario: IIS-6197 - Possibility  change priority for audio materials
+	When I navigated to Materials page
+	Then I clicked on the type`s filter audio
+	When I clicked search button in the Materials section
+	And I searched neizvesten-peregovory-po-racii.mp3 data in the materials
+	When I clicked on the first material in the Materials list
+	And I set the session priority to Important
+	When I pressed the Next material button
+	When I pressed the Previous material button
+	Then I must see that the session priority value must be set to Important
+	When I set the session priority to Immediate Report
+	When I pressed the Next material button
+	When I pressed the Previous material button
+	Then I must see that the session priority value must be set to Immediate Report
+	When I set the session priority to Translation
+	When I pressed the Next material button
+	When I pressed the Previous material button
+	Then I must see that the session priority value must be set to Translation
