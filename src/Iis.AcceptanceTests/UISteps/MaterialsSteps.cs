@@ -42,7 +42,7 @@ namespace AcceptanceTests.UISteps
         {
             driver.WaitFor(2);
             materialsSectionPage.FirstMaterialInTheMaterialsList.Click();
-            driver.WaitFor(2);
+            driver.WaitFor(3);
         }
 
         [When(@"I clicked on the relations tab in the material card")]
