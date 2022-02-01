@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Iis.Domain.Elastic;
+using Iis.DbLayer.Elastic;
 using Iis.Elastic;
 using Iis.Elastic.Entities;
 using Iis.Elastic.SearchQueryExtensions;
@@ -29,7 +29,7 @@ namespace IIS.Core.Ontology.EntityFramework
         private readonly IGroupedAggregationNameGenerator _groupedAggregationNameGenerator;
         private readonly IIisElasticField[] _historicalSearchFields =
         {
-            new IisElasticField { Name = $"{ElasticSerializer.HistoricalPropertyName}.{nameof(ChangeHistoryDocument.OldValue) }" },
+            new IisElasticField { Name = $"{ElasticSerializer.HistoricalPropertyName}.{nameof(ChangeHistoryDocument.OldValue)}" },
             new IisElasticField { Name = $"{ElasticSerializer.HistoricalPropertyName}.{nameof(ChangeHistoryDocument.NewValue)}" }
         };
 
@@ -82,8 +82,9 @@ namespace IIS.Core.Ontology.EntityFramework
             {
                 Count = searchResult.Count,
                 Items = searchResult.Items
-                    .ToDictionary(k => new Guid(k.Identifier),
-                    v => new SearchResultItem { Highlight = v.Higlight, SearchResult = v.SearchResult })
+                    .ToDictionary(
+                        key => new Guid(key.Identifier),
+                        value => new SearchResultItem { Highlight = value.Higlight, SearchResult = value.SearchResult })
             };
         }
 
@@ -225,8 +226,9 @@ namespace IIS.Core.Ontology.EntityFramework
             {
                 Count = searchResult.Count,
                 Items = searchResult.Items
-                    .ToDictionary(k => new Guid(k.Identifier),
-                    v => new SearchResultItem { Highlight = v.Higlight, SearchResult = v.SearchResult })
+                    .ToDictionary(
+                        k => new Guid(k.Identifier),
+                        v => new SearchResultItem { Highlight = v.Higlight, SearchResult = v.SearchResult })
             };
         }
 
@@ -244,6 +246,27 @@ namespace IIS.Core.Ontology.EntityFramework
                 || (!_elasticState.WikiIndexes.Contains(type.Name) && !_elasticState.OntologyIndexes.Contains(type.Name));
         }
 
+        private static JObject PrepareMultiSearchQuery(ElasticMultiSearchParams multiSearchParams)
+        {
+            return new MultiSearchParamsQueryBuilder(multiSearchParams.SearchParams)
+                .WithLeniency(multiSearchParams.IsLenient)
+                .WithPagination(multiSearchParams.From, multiSearchParams.Size)
+                .WithResultFields(multiSearchParams.ResultFields)
+                .BuildSearchQuery();
+        }
+
+        private static Dictionary<string, AggregationItem> ExtractSubAggregations(Dictionary<string, AggregationItem> aggregations)
+        {
+            if (aggregations == null)
+            {
+                return SearchResultsExtension.EmptyAggregation;
+            }
+
+            return aggregations.ToDictionary(x => x.Key, pair => pair.Value.SubAggs ?? pair.Value);
+        }
+
+        private static string AsAggregateName(IIisElasticField field) => $"{field.Name}{SearchQueryExtension.AggregateSuffix}";
+
         private (JObject Query, ISearchParamsContext SearchContext) PrepareMultiSearchQuery(
             IEnumerable<string> typeNames,
             ElasticFilter filter,
@@ -255,29 +278,10 @@ namespace IIS.Core.Ontology.EntityFramework
             return (query, searchParamsContext);
         }
 
-        private JObject PrepareMultiSearchQuery(IElasticMultiSearchParams multiSearchParams)
-        {
-            return new MultiSearchParamsQueryBuilder(multiSearchParams.SearchParams)
-                .WithLeniency(multiSearchParams.IsLenient)
-                .WithPagination(multiSearchParams.From, multiSearchParams.Size)
-                .WithResultFields(multiSearchParams.ResultFields)
-                .BuildSearchQuery();
-        }
-
-        private Dictionary<string, AggregationItem> ExtractSubAggregations(Dictionary<string, AggregationItem> aggregations)
-        {
-            if (aggregations == null)
-            {
-                return SearchResultsExtension.EmptyAggregation;
-            }
-
-            return aggregations.ToDictionary(x => x.Key, pair => pair.Value.SubAggs ?? pair.Value);
-        }
-
         private bool OntologyIndexIsSupported(string indexName)
         {
-            return _elasticState.ObjectIndexes.Any(index => index.Equals(indexName))
-                || _elasticState.EventIndexes.Any(index => index.Equals(indexName));
+            return _elasticState.ObjectIndexes.Any(index => index.Equals(indexName, StringComparison.Ordinal))
+                || _elasticState.EventIndexes.Any(index => index.Equals(indexName, StringComparison.Ordinal));
         }
 
         private bool OntologyIndexesAreSupported(IEnumerable<string> indexNames)
@@ -375,7 +379,7 @@ namespace IIS.Core.Ontology.EntityFramework
             ElasticFilter filter,
             ISearchParamsContext context)
         {
-            var batchCount = aggregationFields.Count() / MaxAggregationsCount + 1;
+            var batchCount = aggregationFields.Count / MaxAggregationsCount + 1;
 
             for (var batchIndex = 0; batchIndex < batchCount; batchIndex++)
             {
@@ -392,7 +396,5 @@ namespace IIS.Core.Ontology.EntityFramework
         private IReadOnlyList<IIisElasticField> GetSearchFields(IEnumerable<string> typeNames) => _elasticConfiguration
                 .GetOntologyIncludedFields(typeNames.Where(_ => _elasticState.ObjectIndexes.Contains(_)))
                 .ToList();
-
-        private string AsAggregateName(IIisElasticField field) => $"{field.Name}{SearchQueryExtension.AggregateSuffix}";
     }
 }

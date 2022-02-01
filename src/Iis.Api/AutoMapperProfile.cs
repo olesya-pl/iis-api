@@ -173,7 +173,7 @@ namespace Iis.Api
             CreateMap<IIS.Core.GraphQL.NodeMaterialRelation.DeleteNodeMaterialRelationInput, Iis.Services.NodeMaterialRelation>();
 
             CreateMap<IIisElasticField, ElasticFieldEntity>();
-            CreateMap<IIisElasticField, Iis.Domain.Elastic.IisElasticField>();
+            CreateMap<IIisElasticField, Iis.Interfaces.Elastic.IisElasticField>();
             CreateMap<IIisElasticField, IIS.Core.GraphQL.ElasticConfig.ElasticField>();
             CreateMap<ElasticFieldEntity, IIS.Core.GraphQL.ElasticConfig.ElasticField>()
                 .ForMember(dest => dest.IsAggregated, opts => opts.MapFrom(src => false));

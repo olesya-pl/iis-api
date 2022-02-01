@@ -39,7 +39,7 @@ namespace Iis.Services
         public async Task ClearNonPredefinedUsers(CancellationToken cancellationToken)
         {
             var users = 
-                await _elasticManager.GetExactPayloadAsyncDictionary<Dictionary<string, ElasticUserDto>>($"{ElasticConstants.UsersIndexName}", cancellationToken);
+                await _elasticManager.GetExactPayloadAsyncDictionaryAsync<Dictionary<string, ElasticUserDto>>($"{ElasticConstants.UsersIndexName}", cancellationToken);
             var nonPredefinedUsers = users.Where(p => !p.Value.Metadata.Reserved.HasValue || p.Value.Metadata.Reserved == false).Select(p => p.Key);
             var tasks = new List<Task>();
 

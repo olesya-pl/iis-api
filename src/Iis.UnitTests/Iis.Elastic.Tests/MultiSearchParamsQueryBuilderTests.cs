@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using FluentAssertions;
-using Iis.Domain.Elastic;
+using Iis.DbLayer.Elastic;
 using Iis.Elastic.SearchQueryExtensions;
 using Iis.Interfaces.Elastic;
 using Newtonsoft.Json.Linq;
@@ -14,7 +14,8 @@ namespace Iis.UnitTests.Iis.Elastic.Tests
         public void ExactIds_QueryString()
         {
             var sut = new MultiSearchParamsQueryBuilder(new List<SearchParameter> {
-                new SearchParameter("__coordinates:* AND тестовий підрозділ 452", new List<IIisElasticField> {
+                new SearchParameter("__coordinates:* AND тестовий підрозділ 452", new List<IIisElasticField>
+                {
                     new IisElasticField
                     {
                         Name = "purpose"
@@ -24,7 +25,8 @@ namespace Iis.UnitTests.Iis.Elastic.Tests
                         Name = "destination"
                     }
                 }, true),
-                new SearchParameter("1911159e0fb345fb9c8ac941ef674b5c 1a28d7a1dc1b476aa1fc10799ecf1a33", new List<IIisElasticField> {
+                new SearchParameter("1911159e0fb345fb9c8ac941ef674b5c 1a28d7a1dc1b476aa1fc10799ecf1a33", new List<IIisElasticField>
+                {
                     new IisElasticField
                     {
                         Name = "Id",
@@ -32,10 +34,7 @@ namespace Iis.UnitTests.Iis.Elastic.Tests
                     }
                 })
             })
-                .WithPagination(0, 50)
-                .WithLeniency(true)
-                .WithResultFields(new[] { "*" })
-                .BuildSearchQuery();
+                .WithPagination(0, 50).WithLeniency(true).WithResultFields(new[] { "*" }).BuildSearchQuery();
 
             var expected = JObject.Parse(@"{
   ""_source"": [
@@ -73,8 +72,10 @@ namespace Iis.UnitTests.Iis.Elastic.Tests
         [Fact]
         public void ExactIds_QueryString_CountQuery()
         {
-            var sut = new MultiSearchParamsQueryBuilder(new List<SearchParameter> {
-                new SearchParameter("__coordinates:* AND тестовий підрозділ 452", new List<IIisElasticField> {
+            var sut = new MultiSearchParamsQueryBuilder(new List<SearchParameter>
+            {
+                new SearchParameter("__coordinates:* AND тестовий підрозділ 452", new List<IIisElasticField>
+                {
                     new IisElasticField
                     {
                         Name = "purpose"
@@ -84,7 +85,8 @@ namespace Iis.UnitTests.Iis.Elastic.Tests
                         Name = "destination"
                     }
                 }, true),
-                new SearchParameter("1911159e0fb345fb9c8ac941ef674b5c 1a28d7a1dc1b476aa1fc10799ecf1a33", new List<IIisElasticField> {
+                new SearchParameter("1911159e0fb345fb9c8ac941ef674b5c 1a28d7a1dc1b476aa1fc10799ecf1a33", new List<IIisElasticField>
+                {
                     new IisElasticField
                     {
                         Name = "Id",
@@ -92,8 +94,7 @@ namespace Iis.UnitTests.Iis.Elastic.Tests
                     }
                 })
             })
-                .WithLeniency(true)
-                .BuildCountQuery();
+                .WithLeniency(true).BuildCountQuery();
             var expected = JObject.Parse(@"{
   ""query"": {
     ""bool"": {
@@ -125,8 +126,10 @@ namespace Iis.UnitTests.Iis.Elastic.Tests
         [Fact]
         public void ExactIds_QueryString_Highlights_Aggregations()
         {
-            var sut = new MultiSearchParamsQueryBuilder(new List<SearchParameter> {
-                new SearchParameter("__coordinates:* AND тестовий підрозділ 452", new List<IIisElasticField> {
+            var sut = new MultiSearchParamsQueryBuilder(new List<SearchParameter>
+            {
+                new SearchParameter("__coordinates:* AND тестовий підрозділ 452", new List<IIisElasticField>
+                {
                     new IisElasticField
                     {
                         Name = "purpose"
@@ -136,7 +139,8 @@ namespace Iis.UnitTests.Iis.Elastic.Tests
                         Name = "destination"
                     }
                 }, true),
-                new SearchParameter("1911159e0fb345fb9c8ac941ef674b5c 1a28d7a1dc1b476aa1fc10799ecf1a33", new List<IIisElasticField> {
+                new SearchParameter("1911159e0fb345fb9c8ac941ef674b5c 1a28d7a1dc1b476aa1fc10799ecf1a33", new List<IIisElasticField>
+                {
                     new IisElasticField
                     {
                         Name = "Id",
@@ -209,6 +213,5 @@ namespace Iis.UnitTests.Iis.Elastic.Tests
 }");
             sut.Should().BeEquivalentTo(expected);
         }
-
     }
 }

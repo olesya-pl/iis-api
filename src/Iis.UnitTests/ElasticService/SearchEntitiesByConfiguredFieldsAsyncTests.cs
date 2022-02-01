@@ -26,7 +26,7 @@ namespace Iis.UnitTests.Iis.Elastic.Tests
                 .Returns(new List<IIisElasticField>());
 
             elasticServiceMock.Setup(e => e.WithUserId(userId)).Returns(elasticServiceMock.Object);
-                
+
             var ontologySchemaMock = new Mock<IOntologySchema>();
             var nodeRepositoryMock = new Mock<INodeSaveService>();
 
@@ -41,9 +41,9 @@ namespace Iis.UnitTests.Iis.Elastic.Tests
                 .ReturnsAsync(resultMock.Object);
 
             elasticServiceMock
-                .Setup(e => e.SearchAsync(It.IsAny<IIisElasticSearchParams>(), It.IsAny<CancellationToken>()))
+                .Setup(e => e.SearchAsync(It.IsAny<IisElasticSearchParams>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync(resultMock.Object);
-            
+
             var sut = new ElasticService(
                 elasticServiceMock.Object,
                 elasticConfigurationMock.Object,
@@ -51,12 +51,15 @@ namespace Iis.UnitTests.Iis.Elastic.Tests
                 new ElasticState(ontologySchemaMock.Object),
                 aggregationNameGeneratorMock.Object);
 
-            var res = await sut.SearchEntitiesByConfiguredFieldsAsync(new[] { indexName }, new ElasticFilter
-            {
-                Suggestion = "!",
-                Offset = from,
-                Limit = limit                
-            }, userId);
+            var res = await sut.SearchEntitiesByConfiguredFieldsAsync(
+                new[] { indexName },
+                new ElasticFilter
+                {
+                    Suggestion = "!",
+                    Offset = from,
+                    Limit = limit
+                },
+                userId);
 
             Assert.Equal(0, res.Count);
         }
