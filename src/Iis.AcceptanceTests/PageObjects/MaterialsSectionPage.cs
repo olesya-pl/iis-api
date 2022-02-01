@@ -266,5 +266,17 @@ namespace AcceptanceTests.PageObjects
 
         [FindsBy(How = How.XPath, Using = "//div/table/thead/tr/th[@class='materials-table__importance p-sortable-column'][@aria-sort='none']")]
         public IWebElement SortedByImportantSortingNull;
+
+        [FindsBy(How = How.CssSelector, Using = ".p-datatable-thead .materials-table__createdDate")]
+        public IWebElement CreatedDateSortable;
+
+        [FindsBy(How = How.XPath, Using = "//*[@aria-sort='ascending'][@class='materials-table__createdDate p-sortable-column p-highlight']")]
+        public IWebElement CreatedDateASC;
+
+        [FindsBy(How = How.XPath, Using = "//*[@aria-sort='descending'][@class='materials-table__createdDate p-sortable-column p-highlight']")]
+        public IWebElement CreatedDateDesc;
+
+        [FindsBy(How = How.XPath, Using = "//*[@aria-sort='none'][@class='materials-table__createdDate p-sortable-column']")]
+        public IWebElement CreatedDateNULL;
     }
 }
