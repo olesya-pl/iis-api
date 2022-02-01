@@ -30,7 +30,7 @@ namespace Iis.Api.Controllers
 
             var contentResult = new ContentResult
             {
-                Content = treeItems.GetJson(),
+                Content = treeItems.GetJson("label", "value", "options"),
                 ContentType = "application/json"
             };
 
@@ -41,14 +41,14 @@ namespace Iis.Api.Controllers
         public Task<IActionResult> GetSecurityLevels()
         {
             var treeItems = new TreeResultList().Init(
-                new[] { _securityLevelChecker.RootLevel },
+                _securityLevelChecker.RootLevel.Children,
                 _ => _.Name,
                 _ => _.Id.ToString("N"),
                 _ => _.Children);
 
             var contentResult = new ContentResult
             {
-                Content = treeItems.GetJson(),
+                Content = treeItems.GetJson("name", "id", "options"),
                 ContentType = "application/json"
             };
 

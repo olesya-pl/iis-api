@@ -44,12 +44,12 @@ namespace Iis.Domain.TreeResult
             return this;
         }
 
-        public string GetJson()
+        public string GetJson(string labelName, string valueName, string optionsName)
         {
             var jItems = new JArray();
             foreach (var item in Items)
             {
-                jItems.Add(item.GetJsonObject());
+                jItems.Add(item.GetJsonObject(labelName, valueName, optionsName));
             }
             return JsonConvert.SerializeObject(jItems);
         }

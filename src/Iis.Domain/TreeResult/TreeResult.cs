@@ -14,22 +14,22 @@ namespace Iis.Domain.TreeResult
 
         public override string ToString() => Label;
 
-        public JObject GetJsonObject()
+        public JObject GetJsonObject(string labelName, string valueName, string optionsName)
         {
             var result = new JObject();
-            result["label"] = Label;
+            result[labelName] = Label;
 
             if (!string.IsNullOrEmpty(Value))
-                result["value"] = Value;
+                result[valueName] = Value;
 
             if (Options.Count > 0)
             {
                 var jOptions = new JArray();
                 foreach (var option in Options)
                 {
-                    jOptions.Add(option.GetJsonObject());
+                    jOptions.Add(option.GetJsonObject(labelName, valueName, optionsName));
                 }
-                result["options"] = jOptions;
+                result[optionsName] = jOptions;
             }
 
             return result;
