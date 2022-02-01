@@ -64,8 +64,6 @@ namespace Iis.Desktop.SecurityManager.Controls
                 _ => _.Name,
                 _ => _.Children,
                 _ => _currentObjectSecurityDto?.SecurityIndexes.Contains(_.UniqueIndex) ?? false);
-
-            _treeView.ExpandAll();
         }
 
         private IReadOnlyList<int> GetCheckedIndexes() =>
