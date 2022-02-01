@@ -1,4 +1,7 @@
-﻿using Iis.Domain.Elastic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using Iis.Domain.Users;
 using Iis.Elastic.SearchQueryExtensions;
 using Iis.Interfaces.Elastic;
@@ -7,18 +10,14 @@ using Iis.Services.Contracts.Interfaces;
 using Iis.Services.Contracts.Params;
 using MoreLinq;
 using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Iis.Services
 {
     public class ReportElasticService : IReportElasticService
     {
+        private const int ElasticBulkSize = 10000;
         private readonly IElasticManager _elasticManager;
         private readonly string _elasticIndex;
-        private const int ElasticBulkSize = 10000;
 
         public ReportElasticService(IElasticManager elasticManager, IElasticState elasticState)
         {
@@ -37,7 +36,7 @@ namespace Iis.Services
             return _elasticManager.DeleteDocumentAsync(_elasticIndex, id.ToString("N"));
         }
 
-        public async Task<(int Count, List<ReportDto> Items)> SearchAsync(ReportSearchParams search, User user) 
+        public async Task<(int Count, List<ReportDto> Items)> SearchAsync(ReportSearchParams search, User user)
         {
             var searchParams = new IisElasticSearchParams
             {
@@ -48,7 +47,7 @@ namespace Iis.Services
                 IsExact = SearchQueryExtension.IsExactQuery(search.Suggestion)
             };
 
-            if (!string.IsNullOrEmpty(search.SortColumn) && !string.IsNullOrEmpty(search.SortOrder)) 
+            if (!string.IsNullOrEmpty(search.SortColumn) && !string.IsNullOrEmpty(search.SortOrder))
             {
                 searchParams.SortColumn = GetValidSortColumnName(search.SortColumn);
                 searchParams.SortOrder = search.SortOrder;
@@ -70,24 +69,12 @@ namespace Iis.Services
             return await _elasticManager.CountAsync(searchParams);
         }
 
-        public async Task<ReportDto> GetAsync(Guid id) 
+        public async Task<ReportDto> GetAsync(Guid id)
         {
             var document = await _elasticManager.GetDocumentByIdAsync(new string[] { _elasticIndex }, id.ToString("N"));
             var jsonReport = document.Items.FirstOrDefault()?.SearchResult;
-            
+
             return jsonReport?.ToObject<ReportDto>();
-        }
-
-        private string GetValidSortColumnName(string sortColumn) 
-        {
-            var property = typeof(ReportDto)
-                .GetProperties()
-                .SingleOrDefault(x => string.Equals(x.Name, sortColumn, StringComparison.OrdinalIgnoreCase));
-
-            if (property == null)
-                throw new ArgumentException($"{sortColumn} is not valid property for sorting");
-
-            return property.PropertyType == typeof(string) ? $"{property.Name}.keyword" : property.Name;
         }
 
         public async Task<List<ElasticBulkResponse>> PutAsync(IEnumerable<ReportDto> reports)
@@ -96,12 +83,26 @@ namespace Iis.Services
             foreach (var reportBatch in reports.Batch(ElasticBulkSize))
             {
                 var jsonReports = reportBatch
-                 .Aggregate("", (acc, r) => acc += $"{{ \"index\":{{ \"_id\": \"{r.Id:N}\" }} }}\n{JsonConvert.SerializeObject(r)}\n");
-                
+                 .Aggregate(string.Empty, (acc, r) => acc += $"{{ \"index\":{{ \"_id\": \"{r.Id:N}\" }} }}\n{JsonConvert.SerializeObject(r)}\n");
+
                 responses.AddRange(await _elasticManager.PutDocumentsAsync(_elasticIndex, jsonReports));
             }
 
             return responses;
+        }
+
+        private static string GetValidSortColumnName(string sortColumn)
+        {
+            var property = typeof(ReportDto)
+                .GetProperties()
+                .SingleOrDefault(x => string.Equals(x.Name, sortColumn, StringComparison.OrdinalIgnoreCase));
+
+            if (property == null)
+            {
+                throw new ArgumentException($"{sortColumn} is not valid property for sorting");
+            }
+
+            return property.PropertyType == typeof(string) ? $"{property.Name}.keyword" : property.Name;
         }
     }
 }

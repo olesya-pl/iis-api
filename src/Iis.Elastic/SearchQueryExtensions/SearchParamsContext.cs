@@ -1,12 +1,12 @@
-﻿using Iis.Interfaces.Elastic;
-using System;
+﻿using System;
 using System.Linq;
+using Iis.Interfaces.Elastic;
 
 namespace Iis.Elastic.SearchQueryExtensions
 {
     public interface ISearchParamsContext
     {
-        IElasticMultiSearchParams ElasticMultiSearchParams { get; }
+        ElasticMultiSearchParams ElasticMultiSearchParams { get; }
         SearchParameter BaseSearchParameter { get; }
         public bool IsBaseQueryExact => SearchQueryExtension.IsExactQuery(BaseSearchParameter.Query);
         public bool IsBaseQueryMatchAll => SearchQueryExtension.IsMatchAll(BaseSearchParameter.Query);
@@ -16,7 +16,7 @@ namespace Iis.Elastic.SearchQueryExtensions
     {
         private const int BaseParametersCount = 1;
 
-        private SearchParamsContext(IElasticMultiSearchParams elasticMultiSearchParams)
+        private SearchParamsContext(ElasticMultiSearchParams elasticMultiSearchParams)
         {
             if (elasticMultiSearchParams is null)
             {
@@ -31,10 +31,10 @@ namespace Iis.Elastic.SearchQueryExtensions
             BaseSearchParameter = elasticMultiSearchParams.SearchParams.First();
         }
 
-        public IElasticMultiSearchParams ElasticMultiSearchParams { get; private set; }
+        public ElasticMultiSearchParams ElasticMultiSearchParams { get; private set; }
         public SearchParameter BaseSearchParameter { get; private set; }
 
-        public static ISearchParamsContext CreateFrom(IElasticMultiSearchParams multiElasticSearchParams)
+        public static ISearchParamsContext CreateFrom(ElasticMultiSearchParams multiElasticSearchParams)
         {
             return new SearchParamsContext(multiElasticSearchParams);
         }

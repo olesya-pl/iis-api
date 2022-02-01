@@ -1,21 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using Elasticsearch.Net;
+using Iis.Elastic.ElasticMappingProperties;
+using Iis.Elastic.SearchQueryExtensions;
+using Iis.Elastic.SearchResult;
 using Iis.Interfaces.Elastic;
 using Iis.Interfaces.Ontology.Schema;
 using Iis.Utility;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json.Linq;
-using Iis.Elastic.SearchResult;
-using Iis.Elastic.ElasticMappingProperties;
-using Iis.Elastic.SearchQueryExtensions;
 using Newtonsoft.Json;
-using System.IO;
-using System.Text.RegularExpressions;
+using Newtonsoft.Json.Linq;
 
 namespace Iis.Elastic
 {
@@ -41,15 +41,6 @@ namespace Iis.Elastic
             _logger = logger;
         }
 
-        private void CreateLowlevelClient(string login, string password)
-        {
-            var connectionPool = new StaticConnectionPool(new[] { new Uri(_configuration.Uri) });
-            var config = new ConnectionConfiguration(connectionPool)
-                .BasicAuthentication(login, password)
-                .DisablePing();
-            _lowLevelClient = new ElasticLowLevelClient(config);
-        }
-
         public Task<bool> PutDocumentAsync(string indexName, string documentId, string jsonDocument, CancellationToken cancellationToken = default)
         {
             return PutDocumentAsync(indexName, documentId, jsonDocument, false, cancellationToken);
@@ -62,10 +53,15 @@ namespace Iis.Elastic
 
             PostData postData = jsonDocument;
 
-            var response = await _lowLevelClient.IndexAsync<StringResponse>(GetRealIndexName(indexName), documentId, postData, new IndexRequestParameters
-            {
-                Refresh = waitForIndexing ? Refresh.WaitFor : Refresh.False
-            });
+            var response = await _lowLevelClient.IndexAsync<StringResponse>(
+                GetRealIndexName(indexName),
+                documentId,
+                postData,
+                new IndexRequestParameters
+                {
+                    Refresh = waitForIndexing ? Refresh.WaitFor : Refresh.False
+                },
+                cancellationToken);
 
             return response.Success;
         }
@@ -76,66 +72,16 @@ namespace Iis.Elastic
                 return null;
 
             var indexUrl = $"{GetRealIndexName(indexName)}/_bulk";
-            var response = await PostAsync(indexUrl, documents, new IndexRequestParameters
-            {
-                Refresh = waitForIndexing ? Refresh.WaitFor : Refresh.False
-            }, ct);
+            var response = await PostAsync(
+                indexUrl,
+                documents,
+                new IndexRequestParameters
+                {
+                    Refresh = waitForIndexing ? Refresh.WaitFor : Refresh.False
+                },
+                ct);
 
             return ParseBulkBodyResponse(response.Body);
-        }
-
-        private List<ElasticBulkResponse> ParseBulkBodyResponse(string body)
-        {
-
-            var jBody = JObject.Parse(body);
-            var statusItems = jBody["items"];
-            var result = new List<ElasticBulkResponse>(statusItems.Count());
-            foreach (JObject item in statusItems)
-            {
-                if (IsErrorStatusCode(item["index"]["status"].Value<int>()))
-                {
-                    result.Add(new ElasticBulkResponse
-                    {
-                        Id = item["index"]["_id"].Value<string>(),
-                        IsSuccess = false,
-                        ErrorReason = item["index"]["error"]["reason"].Value<string>(),
-                        ErrorType = item["index"]["error"]["type"].Value<string>(),
-                    });
-                }
-                else
-                {
-                    result.Add(new ElasticBulkResponse
-                    {
-                        Id = item["index"]["_id"].Value<string>(),
-                        IsSuccess = true,
-                        SuccessOperation = item["index"]["result"].Value<string>()
-                    });
-                }
-            }
-
-            return result;
-        }
-
-        private ElasticResponse ParseResponse(StringResponse response)
-        {
-            var result = new ElasticResponse
-            {
-                IsSuccess = response.Success
-            };
-
-            if (!result.IsSuccess)
-            {
-                var jBody = JObject.Parse(response.Body);
-                result.ErrorType = jBody["error"]["type"].Value<string>();
-                result.ErrorReason = jBody["error"]["reason"].Value<string>();
-            }
-
-            return result;
-        }
-
-        private bool IsErrorStatusCode(int statusCode)
-        {
-            return statusCode / 100 == 4;
         }
 
         public async Task<bool> DeleteDocumentAsync(string indexName, string documentId, CancellationToken ct = default)
@@ -145,14 +91,14 @@ namespace Iis.Elastic
             return searchResponse.Success;
         }
 
-        public Task<IElasticSearchResult> SearchAsync(IIisElasticSearchParams searchParams, CancellationToken cancellationToken = default)
+        public Task<IElasticSearchResult> SearchAsync(IisElasticSearchParams searchParams, CancellationToken cancellationToken = default)
         {
             var jsonString = GetSearchJson(searchParams);
 
             return SearchAsync(jsonString, searchParams.BaseIndexNames, cancellationToken);
         }
 
-        public Task<int> CountAsync(IIisElasticSearchParams searchParams, CancellationToken cancellationToken = default)
+        public Task<int> CountAsync(IisElasticSearchParams searchParams, CancellationToken cancellationToken = default)
         {
             var jsonString = GetCountJson(searchParams);
 
@@ -177,7 +123,7 @@ namespace Iis.Elastic
             var path = !baseIndexNameList.Any() ? "_search" : $"{GetRealIndexNames(baseIndexNameList)}/_search";
             var queryString = new Dictionary<string, object>()
             {
-                {"scroll",  $"{(int)scrollLifetime.TotalSeconds}s"}
+                { "scroll",  $"{(int)scrollLifetime.TotalSeconds}s" }
             };
             var response = await GetAsync(path, queryData, queryString, cancellationToken);
 
@@ -188,7 +134,7 @@ namespace Iis.Elastic
         {
             var path = "_search/scroll";
             var postData = $@"{{
-                ""scroll"" : ""{ scrollDuration.TotalSeconds }s"",
+                ""scroll"" : ""{scrollDuration.TotalSeconds}s"",
                 ""scroll_id"" : ""{scrollId}""
             }}";
             var response = await PostAsync(path, postData, cancellationToken: cancellationToken);
@@ -239,7 +185,9 @@ namespace Iis.Elastic
                         }
                     },
                     _source = "*"
-                }), null, token);
+                }),
+                null,
+                token);
 
             if (!searchResponse.Success)
             {
@@ -247,6 +195,40 @@ namespace Iis.Elastic
             }
 
             return _resultExtractor.GetFromResponse(searchResponse);
+        }
+
+        public async Task<bool> PutExactPayloadAsync(string path, string data, CancellationToken cancellationToken)
+        {
+            var result = await PutAsync(path, data, cancellationToken);
+            return result.Success;
+        }
+
+        public async Task<bool> DeleteExactPayloadAsync(string path, CancellationToken cancellationToken)
+        {
+            var result = await DeleteAsync(path, cancellationToken);
+            return result.Success;
+        }
+
+        public async Task<T> GetExactPayloadAsyncDictionaryAsync<T>(string path, CancellationToken cancellationToken)
+        {
+            var result = await GetAsync(path, null, null, cancellationToken);
+            var jsonSerializerSettings = new JsonSerializerSettings
+            {
+                MissingMemberHandling = MissingMemberHandling.Ignore
+            };
+            return JsonConvert.DeserializeObject<T>(result.Body, jsonSerializerSettings);
+        }
+
+        public IElasticManager WithUserId(Guid userId)
+        {
+            CreateLowlevelClient(userId.ToString("N"), ElasticConstants.DefaultPassword);
+            return this;
+        }
+
+        public IElasticManager WithDefaultUser()
+        {
+            CreateLowlevelClient(_configuration.DefaultLogin, _configuration.DefaultPassword);
+            return this;
         }
 
         public async Task CreateIndexesAsync(IEnumerable<string> indexNames, JObject mappingConfiguration = null, CancellationToken token = default)
@@ -296,6 +278,45 @@ namespace Iis.Elastic
             return response.Success;
         }
 
+        public async Task<ElasticResponse> AddMappingPropertyToIndexAsync(string indexName, JObject mappingConfiguration, CancellationToken cancellationToken = default)
+        {
+            if (!await IndexExistsAsync(indexName, cancellationToken))
+            {
+                throw new ArgumentException($"{indexName} does not exist", nameof(indexName));
+            }
+
+            var response = await DoRequestAsync(HttpMethod.PUT, $"{GetRealIndexName(indexName)}/_mapping", mappingConfiguration.ToString(), null, cancellationToken);
+
+            return ParseResponse(response);
+        }
+
+        public async Task<bool> CreateSecurityMappingAsync(
+            List<(
+                IReadOnlyCollection<string> indexNames,
+                string accessLevelFieldName)> parameters,
+            CancellationToken cancellationToken)
+        {
+            var sectionBaseText = File.ReadAllText(@"data\elastic\RoleIndexSection.json");
+            var scriptBaseText = File.ReadAllText(@"data\elastic\SecurityLevelFilter.painless");
+            var scriptText = Regex.Replace(scriptBaseText, @"\s+", " ");
+            var sectionText = sectionBaseText.Replace("{SCRIPT}", scriptText, StringComparison.Ordinal);
+            var settings = new StringBuilder("{\"indices\": [");
+            for (int i = 0; i < parameters.Count; i++)
+            {
+                var param = parameters[i];
+                if (i > 0) settings.Append(',');
+
+                var stringifiedIndexes = string.Join(',', param.indexNames.Select(p => $"\"{GetRealIndexName(p)}\""));
+                settings.AppendLine();
+                var indexSection = sectionText.Replace("{NAMES}", stringifiedIndexes, StringComparison.Ordinal);
+                settings.AppendLine(indexSection);
+            }
+            settings.AppendLine("]}");
+
+            var response = await PutAsync($"_xpack/security/role/{ElasticConstants.SecurityPolicyName}", settings.ToString(), cancellationToken);
+            return response.Success;
+        }
+
         public void ApplyRussianAnalyzerAsync(JObject createRequest)
         {
             var analyzerSettings = @"{
@@ -326,9 +347,7 @@ namespace Iis.Elastic
         {
             var mappingValue = new JObject(
                 new JProperty("total_fields", new JObject(
-                    new JProperty("limit", _configuration.TotalFieldsLimit)
-                ))
-            );
+                    new JProperty("limit", _configuration.TotalFieldsLimit))));
 
             var settigns = request["settings"];
 
@@ -337,16 +356,18 @@ namespace Iis.Elastic
 
         private async Task<bool> IndexExistsAsync(string indexName, CancellationToken token)
         {
-            var searchResponse = await _lowLevelClient.SearchAsync<StringResponse>(GetRealIndexName(indexName), PostData.Serializable(new
-            {
-                size = 1,
-                query = new
+            var searchResponse = await _lowLevelClient.SearchAsync<StringResponse>(
+                GetRealIndexName(indexName),
+                PostData.Serializable(new
                 {
-                    match_all = new object()
-                },
-                stored_fields = Array.Empty<object>()
-            }),
-            ctx: token);
+                    size = 1,
+                    query = new
+                    {
+                        match_all = new object()
+                    },
+                    stored_fields = Array.Empty<object>()
+                }),
+                ctx: token);
 
             return searchResponse.Success || searchResponse.HttpStatusCode != 404;
         }
@@ -361,43 +382,6 @@ namespace Iis.Elastic
             return response.Success;
         }
 
-        public async Task<ElasticResponse> AddMappingPropertyToIndexAsync(string indexName, JObject mappingConfiguration, CancellationToken ct = default)
-        {
-            if (!await IndexExistsAsync(indexName, ct))
-                throw new ArgumentException($"{indexName} does not exist", nameof(indexName));
-
-            var response = await DoRequestAsync(HttpMethod.PUT, $"{GetRealIndexName(indexName)}/_mapping", mappingConfiguration.ToString(), null, ct);
-
-            return ParseResponse(response);
-        }
-
-        public async Task<bool> CreateSecurityMappingAsync(
-            List<(
-                IReadOnlyCollection<string> indexNames, 
-                string accessLevelFieldName)> parameters,
-            CancellationToken cancellationToken)
-        {
-            var sectionBaseText = File.ReadAllText(@"data\elastic\RoleIndexSection.json");
-            var scriptBaseText = File.ReadAllText(@"data\elastic\SecurityLevelFilter.painless");
-            var scriptText = Regex.Replace(scriptBaseText, @"\s+", " ");
-            var sectionText = sectionBaseText.Replace("{SCRIPT}", scriptText, StringComparison.Ordinal);
-            var settings = new StringBuilder("{\"indices\": [");
-            for (int i = 0; i < parameters.Count; i++)
-            {
-                var param = parameters[i];
-                if (i > 0) settings.Append(",");
-
-                var stringifiedIndexes = string.Join(',', param.indexNames.Select(p => $"\"{GetRealIndexName(p)}\""));
-                settings.AppendLine();
-                var indexSection = sectionText.Replace("{NAMES}", stringifiedIndexes, StringComparison.Ordinal);
-                settings.AppendLine(indexSection);
-            }
-            settings.AppendLine("]}");
-
-            var response = await PutAsync($"_xpack/security/role/{ElasticConstants.SecurityPolicyName}", settings.ToString(), cancellationToken);
-            return response.Success;
-        }
-
         private void ApplyMappingConfiguration(JObject request, JObject mappingConfiguration)
         {
             if (mappingConfiguration == null)
@@ -407,7 +391,7 @@ namespace Iis.Elastic
             request.Merge(mappingConfiguration);
         }
 
-        private string GetSearchJson(IIisElasticSearchParams searchParams)
+        private string GetSearchJson(IisElasticSearchParams searchParams)
         {
             var json = new JObject();
             json["_source"] = new JArray(searchParams.ResultFields);
@@ -440,7 +424,60 @@ namespace Iis.Elastic
             return json.ToString();
         }
 
-        private string GetCountJson(IIisElasticSearchParams searchParams)
+        private List<ElasticBulkResponse> ParseBulkBodyResponse(string body)
+        {
+            var jBody = JObject.Parse(body);
+            var statusItems = jBody["items"];
+            var result = new List<ElasticBulkResponse>(statusItems.Count());
+            foreach (JObject item in statusItems)
+            {
+                if (IsErrorStatusCode(item["index"]["status"].Value<int>()))
+                {
+                    result.Add(new ElasticBulkResponse
+                    {
+                        Id = item["index"]["_id"].Value<string>(),
+                        IsSuccess = false,
+                        ErrorReason = item["index"]["error"]["reason"].Value<string>(),
+                        ErrorType = item["index"]["error"]["type"].Value<string>(),
+                    });
+                }
+                else
+                {
+                    result.Add(new ElasticBulkResponse
+                    {
+                        Id = item["index"]["_id"].Value<string>(),
+                        IsSuccess = true,
+                        SuccessOperation = item["index"]["result"].Value<string>()
+                    });
+                }
+            }
+
+            return result;
+        }
+
+        private ElasticResponse ParseResponse(StringResponse response)
+        {
+            var result = new ElasticResponse
+            {
+                IsSuccess = response.Success
+            };
+
+            if (!result.IsSuccess)
+            {
+                var jBody = JObject.Parse(response.Body);
+                result.ErrorType = jBody["error"]["type"].Value<string>();
+                result.ErrorReason = jBody["error"]["reason"].Value<string>();
+            }
+
+            return result;
+        }
+
+        private bool IsErrorStatusCode(int statusCode)
+        {
+            return statusCode != 200;
+        }
+
+        private string GetCountJson(IisElasticSearchParams searchParams)
         {
             var json = new JObject();
             json["query"] = new JObject();
@@ -468,7 +505,7 @@ namespace Iis.Elastic
             return result;
         }
 
-        private void PopulateExactQuery(IIisElasticSearchParams searchParams, JObject json)
+        private void PopulateExactQuery(IisElasticSearchParams searchParams, JObject json)
         {
             var queryString = new JObject();
             queryString["query"] = searchParams.Query;
@@ -476,7 +513,7 @@ namespace Iis.Elastic
             json["query"]["query_string"] = queryString;
         }
 
-        private void PopulateFieldsIntoQuery(IIisElasticSearchParams searchParams, JObject json)
+        private void PopulateFieldsIntoQuery(IisElasticSearchParams searchParams, JObject json)
         {
             json["query"]["bool"] = new JObject();
             var columns = new JArray();
@@ -498,7 +535,7 @@ namespace Iis.Elastic
             }
         }
 
-        private void PrepareFallbackQuery(IIisElasticSearchParams searchParams, JObject json)
+        private void PrepareFallbackQuery(IisElasticSearchParams searchParams, JObject json)
         {
             var queryString = new JObject();
             queryString["query"] = searchParams.Query
@@ -538,40 +575,6 @@ namespace Iis.Elastic
             }
         }
 
-        public async Task<bool> PutExactPayloadAsync(string path, string data, CancellationToken cancellationToken)
-        {
-            var result = await PutAsync(path, data, cancellationToken);
-            return result.Success;
-        }
-
-        public async Task<bool> DeleteExactPayloadAsync(string path, CancellationToken cancellationToken)
-        {
-            var result = await DeleteAsync(path, cancellationToken);
-            return result.Success;
-        }
-
-        public async Task<T> GetExactPayloadAsyncDictionary<T>(string path, CancellationToken cancellationToken)
-        {
-            var result = await GetAsync(path, null, null, cancellationToken);
-            var jsonSerializerSettings = new JsonSerializerSettings
-            {
-                MissingMemberHandling = MissingMemberHandling.Ignore
-            };
-            return JsonConvert.DeserializeObject<T>(result.Body, jsonSerializerSettings);
-        }
-
-        public IElasticManager WithUserId(Guid userId)
-        {
-            CreateLowlevelClient(userId.ToString("N"), ElasticConstants.DefaultPassword);
-            return this;
-        }
-
-        public IElasticManager WithDefaultUser()
-        {
-            CreateLowlevelClient(_configuration.DefaultLogin, _configuration.DefaultPassword);
-            return this;
-        }
-
         private async Task<StringResponse> PutAsync(string path, string data, CancellationToken cancellationToken)
         {
             return await DoRequestAsync(HttpMethod.PUT, path, data, null, cancellationToken);
@@ -585,7 +588,7 @@ namespace Iis.Elastic
         private async Task<StringResponse> GetAsync(string path, string data, Dictionary<string, object> queryString, CancellationToken cancellationToken)
         {
             IRequestParameters parameters = null;
-            if (queryString != null) 
+            if (queryString != null)
             {
                 parameters = new GetRequestParameters()
                 {
@@ -598,6 +601,15 @@ namespace Iis.Elastic
         private async Task<StringResponse> PostAsync(string path, string data, IRequestParameters requestParameters = null, CancellationToken cancellationToken = default)
         {
             return await DoRequestAsync(HttpMethod.POST, path, data, requestParameters, cancellationToken);
-        }        
+        }
+
+        private void CreateLowlevelClient(string login, string password)
+        {
+            var connectionPool = new StaticConnectionPool(new[] { new Uri(_configuration.Uri) });
+            var config = new ConnectionConfiguration(connectionPool)
+                .BasicAuthentication(login, password)
+                .DisablePing();
+            _lowLevelClient = new ElasticLowLevelClient(config);
+        }
     }
 }

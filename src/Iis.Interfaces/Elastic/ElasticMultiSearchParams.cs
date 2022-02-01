@@ -1,9 +1,8 @@
-﻿using Iis.Interfaces.Elastic;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
-namespace Iis.Domain.Elastic
+namespace Iis.Interfaces.Elastic
 {
-    public class ElasticMultiSearchParams : IElasticMultiSearchParams
+    public class ElasticMultiSearchParams
     {
         public List<string> BaseIndexNames { get; set; } = new List<string>();
         public List<string> ResultFields { get; set; } = new List<string> { "*" };

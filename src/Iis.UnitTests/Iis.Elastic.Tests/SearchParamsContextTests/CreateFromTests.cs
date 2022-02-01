@@ -1,13 +1,13 @@
-﻿using AutoFixture;
-using FluentAssertions;
-using Iis.Elastic.SearchQueryExtensions;
-using Iis.Interfaces.Elastic;
-using Moq;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Xunit;
+using AutoFixture;
+using FluentAssertions;
+using Iis.Elastic;
+using Iis.Elastic.SearchQueryExtensions;
+using Iis.Interfaces.Elastic;
 using Iis.UnitTests.Iis.Elastic.Tests.Helpers;
+using Xunit;
 
 namespace Iis.UnitTests.Iis.Elastic.Tests.SearchParamsContextTests
 {
@@ -24,11 +24,10 @@ namespace Iis.UnitTests.Iis.Elastic.Tests.SearchParamsContextTests
         [Theory]
         [AutoMoqData]
         public void CreateFrom_WhenSearchParamsAreEmpty_ShouldThrowArgumentException(
-            Mock<IElasticMultiSearchParams> searchParamsMock)
+            ElasticMultiSearchParams searchParamsMock)
         {
-            searchParamsMock.SetupProperty(_ => _.SearchParams, new List<SearchParameter>());
-
-            Func<ISearchParamsContext> func = () => SearchParamsContext.CreateFrom(searchParamsMock.Object);
+            searchParamsMock.SearchParams = new List<SearchParameter>();
+            Func<ISearchParamsContext> func = () => SearchParamsContext.CreateFrom(searchParamsMock);
 
             func.Should().Throw<ArgumentException>();
         }
@@ -37,7 +36,7 @@ namespace Iis.UnitTests.Iis.Elastic.Tests.SearchParamsContextTests
         public void CreateFrom_ShouldCreateContext()
         {
             var fixture = ElasticMultiSearchParamsFixture.CreateFixture();
-            var searchParams = fixture.Create<IElasticMultiSearchParams>();
+            var searchParams = fixture.Create<ElasticMultiSearchParams>();
             var expectedBaseSearchParameter = searchParams.SearchParams.First();
 
             var context = SearchParamsContext.CreateFrom(searchParams);
