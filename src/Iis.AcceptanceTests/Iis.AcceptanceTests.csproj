@@ -29,6 +29,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <SpecFlowObsoleteCodeBehindFiles Remove="Features\UI\Regression Tests\MaterialsSection - Copy.feature.cs" />
     <SpecFlowObsoleteCodeBehindFiles Remove="Features\UI\Smoke Tests\AdministrationSectionUI - Copy.feature.cs" />
   </ItemGroup>
 
@@ -59,6 +60,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Update="Features\UI\Regression Tests\MaterialCardHotkeys.feature.cs">
+      <DependentUpon>MaterialCardHotkeys.feature</DependentUpon>
+    </Compile>
+    <Compile Update="Features\UI\Regression Tests\MaterialCard.feature.cs">
+      <DependentUpon>MaterialCard.feature</DependentUpon>
+    </Compile>
     <Compile Update="Features\UI\Smoke Tests\REO.feature.cs">
       <DependentUpon>REO.feature</DependentUpon>
     </Compile>
@@ -78,6 +85,14 @@
   </ItemGroup>
 
   <ItemGroup>
+    <SpecFlowFeatureFiles Update="Features\UI\Regression Tests\MaterialCardHotkeys.feature">
+      <Visible>$(UsingMicrosoftNETSdk)</Visible>
+      <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
+    </SpecFlowFeatureFiles>
+    <SpecFlowFeatureFiles Update="Features\UI\Regression Tests\MaterialCard.feature">
+      <Visible>$(UsingMicrosoftNETSdk)</Visible>
+      <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
+    </SpecFlowFeatureFiles>
     <SpecFlowFeatureFiles Update="Features\UI\Smoke Tests\REO.feature">
       <Visible>$(UsingMicrosoftNETSdk)</Visible>
       <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
