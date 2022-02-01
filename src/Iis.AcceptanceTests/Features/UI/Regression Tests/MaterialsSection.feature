@@ -1,12 +1,14 @@
 Feature: Materials - regression
-    - IIS-6109 - Indicate a phone number pattern of a cell voice material
-    - IIS-6048 - Change a material priority by clicking on the Processed button
-    - IIS-6045 - Change material reliability by clicking on the Processed button
-    - IIS-6052 - Ability to lose the connection between a material and an event from a material
-    - IIS-6051 - Ability to connect the material to an event from a material
+	- IIS-6045 - Change material reliability by clicking on the Processed button
+	- IIS-6048 - Change a material priority by clicking on the Processed button
+	- IIS-6051 - Ability to connect the material to an event from a material
+	- IIS-6052 - Ability to lose the connection between a material and an event from a material
+	- IIS-6109 - Indicate a phone number pattern of a cell voice material
 	- IIS-6203 - Possibility To make text in bold
-	- IIS-7445 - Change a material`s AccessLevel
 	- IIS-6470 - Sorting materials by source
+	- IIS-6473 - Sorting materials by importance
+	- IIS-6633 - Search materials by status processing
+	- IIS-7445 - Change a material`s AccessLevel
 	- IIS-8238 - Hotkeys for audio rewind
 	- IIS-8257 - Possibility save  material by hotkeys
 	- IIS-8441 - Display the length of the audio track
@@ -14,6 +16,7 @@ Feature: Materials - regression
 	- IIS-6632 - Possibility searching materials by importance
 	- IIS-8240 - Possibility to change the priority for materials using hotkeys
 	- IIS-6197 - Possibility  change priority for audio materials
+	- IIS-6473 - Sorting materials by importance
 
 Background:
 	Given I sign in with the user olya and password 123 in the Contour
@@ -319,3 +322,13 @@ Scenario: IIS-6197 - Possibility  change priority for audio materials
 	When I pressed the Next material button
 	When I pressed the Previous material button
 	Then I must see that the session priority value must be set to Translation
+
+	@regression @UI @Materials
+	Scenario: IIS-6473 - Sorting materials by importance
+		When I navigated to Materials page
+		When I clicked arrow for sorting by importance
+		Then I must see more important materials at the top of the table
+		When I clicked arrow for sorting by importance
+		Then I must see less important materials at the top of the table
+		When I clicked arrow for sorting by importance
+		Then I must see materials sorted by importance sorting: null

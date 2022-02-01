@@ -244,14 +244,27 @@ namespace AcceptanceTests.PageObjects
         public IWebElement ClearTextField;
 
         [FindsBy(How = How.XPath, Using = "//button[@aria-label='Жирний']")]
-        public IWebElement BoltButton;
+        public IWebElement BoldButton;
 
         [FindsBy(How = How.XPath, Using = "//descendant::strong[contains(text(), '')]")]
         public IWebElement BoldContent;
+
         public IWebElement PriorityTitle(string SessionPriorityTitle) =>
             driver.FindElement(By.XPath($"//tr[1]//td[@class='materials-table__title']//descendant::em[contains(text(), '{SessionPriorityTitle}')]"));
 
         public IWebElement FieldName(string fieldName) =>
             driver.FindElement(By.XPath($"//tr[1]//td[@class='materials-table__title']//descendant::b[contains(text(), '{fieldName}')]"));
+
+        [FindsBy(How = How.XPath, Using = "//tr[1]//div[@class='material-importance__badge is-danger'] | //tr[1]//div[@class='material-importance__badge'] | //tr[1]//div[@class='material-importance__badge is-success'] | //tr[1]/td[@class='materials-table__importance']")]
+        public IWebElement MoreImportant;
+
+        [FindsBy(How = How.XPath, Using = "//tr[1]/td[@class='materials-table__importance'] | //tr[1]//div[@class='material-importance__badge is-success'] | //tr[1]//div[@class='material-importance__badge'] | //tr[1]//div[@class='material-importance__badge is-danger']")]
+        public IWebElement LessImportant;
+
+        [FindsBy(How = How.CssSelector, Using = ".p-datatable-scrollable-header-table .materials-table__importance .p-sortable-column-icon")]
+        public IWebElement ImportanceSortable;
+
+        [FindsBy(How = How.XPath, Using = "//div/table/thead/tr/th[@class='materials-table__importance p-sortable-column'][@aria-sort='none']")]
+        public IWebElement SortedByImportantSortingNull;
     }
 }
