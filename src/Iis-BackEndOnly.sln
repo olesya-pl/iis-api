@@ -37,8 +37,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Iis.FlightRadar.DataModel",
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Iis.Events", "Iis.Events\Iis.Events.csproj", "{C905D6B5-F408-4F35-A7FC-B3D0B0A62D83}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Iis.EventHandlers", "Iis.EventHandlers\Iis.EventHandlers.csproj", "{7D081911-CBC0-4A0C-9662-C3D23804F692}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Iis.Messages", "Iis.Messages\Iis.Messages.csproj", "{FB3A9232-9235-4CAE-B1AE-1C04A466084E}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Iis.MaterialLoader", "Iis.MaterialLoader\Iis.MaterialLoader.csproj", "{6B74487D-EC74-4E41-A911-0F56C97A8EB6}"
@@ -63,7 +61,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Iis.Metrics", "Iis.Metrics\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Iis.MaterialDistributor.DataModel", "Iis.MaterialDistributor.DataModel\Iis.MaterialDistributor.DataModel.csproj", "{EF7C8427-15D6-4695-AE1B-9DFDB97F119A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Iis.UnitTests.MaterialDistributor", "Iis.UnitTests.MaterialDistributor\Iis.UnitTests.MaterialDistributor.csproj", "{D4B2CE62-E9A9-45B2-8883-EBFB22A33407}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Iis.UnitTests.MaterialDistributor", "Iis.UnitTests.MaterialDistributor\Iis.UnitTests.MaterialDistributor.csproj", "{D4B2CE62-E9A9-45B2-8883-EBFB22A33407}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -139,10 +137,6 @@ Global
 		{C905D6B5-F408-4F35-A7FC-B3D0B0A62D83}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C905D6B5-F408-4F35-A7FC-B3D0B0A62D83}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C905D6B5-F408-4F35-A7FC-B3D0B0A62D83}.Release|Any CPU.Build.0 = Release|Any CPU
-		{7D081911-CBC0-4A0C-9662-C3D23804F692}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{7D081911-CBC0-4A0C-9662-C3D23804F692}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{7D081911-CBC0-4A0C-9662-C3D23804F692}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{7D081911-CBC0-4A0C-9662-C3D23804F692}.Release|Any CPU.Build.0 = Release|Any CPU
 		{FB3A9232-9235-4CAE-B1AE-1C04A466084E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{FB3A9232-9235-4CAE-B1AE-1C04A466084E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FB3A9232-9235-4CAE-B1AE-1C04A466084E}.Release|Any CPU.ActiveCfg = Release|Any CPU

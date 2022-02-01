@@ -1,4 +1,7 @@
-﻿using Iis.DataModel;
+﻿using System;
+using System.IO;
+using System.Linq;
+using Iis.DataModel;
 using Iis.DbLayer.OntologySchema;
 using Iis.Interfaces.Enums;
 using Iis.Interfaces.Ontology.Schema;
@@ -7,11 +10,6 @@ using Iis.OntologySchema.Saver;
 using Iis.Services.Contracts.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
 
 namespace Iis.Services
 {
