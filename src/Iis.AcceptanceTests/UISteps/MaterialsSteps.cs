@@ -374,7 +374,7 @@ namespace AcceptanceTests.UISteps
         [When(@"I clicked on the editor button for bold")]
         public void WhenIClickedOnTheButton()
         {
-              materialsSectionPage.BoltButton.Click();
+              materialsSectionPage.BoldButton.Click();
                driver.WaitFor(2);
         }
 
@@ -409,6 +409,14 @@ namespace AcceptanceTests.UISteps
             materialsSectionPage.SearchField.SendKeys(input2);
             materialsSectionPage.SearchField.SendKeys(Keys.Enter);
         }
+
+        [When(@"I clicked arrow for sorting by importance")]
+        public void WhenIClickedArrowForSortingByImportance()
+        {
+            materialsSectionPage.ImportanceSortable.Click();
+            driver.WaitFor(2);
+        }
+
         #endregion When
 
         #region Then
@@ -690,6 +698,24 @@ namespace AcceptanceTests.UISteps
         {
             Assert.True(materialsSectionPage.FieldName(fieldName).Displayed);
             Assert.True(materialsSectionPage.PriorityTitle(title).Displayed);
+        }
+
+        [Then(@"I must see more important materials at the top of the table")]
+        public void ThenIMustSeeMoreImportantMaterialsAtTheTopOfTheTable()
+        {
+            Assert.True(materialsSectionPage.MoreImportant.Displayed);
+        }
+
+        [Then(@"I must see less important materials at the top of the table")]
+        public void ThenIMustSeeLessImportantMaterialsAtTheTopOfTheTable()
+        {
+            Assert.True(materialsSectionPage.LessImportant.Displayed);
+        }
+
+        [Then(@"I must see materials sorted by importance sorting: null")]
+        public void ThenIMustSeeMaterialsSortedByImportanceSortingNull()
+        {
+            Assert.True(materialsSectionPage.SortedByImportantSortingNull.Displayed);
         }
         #endregion
     }
