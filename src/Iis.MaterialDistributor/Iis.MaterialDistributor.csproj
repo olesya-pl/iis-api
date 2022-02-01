@@ -37,6 +37,7 @@
     <ItemGroup>
         <ProjectReference Include="..\Iis.Elastic\Iis.Elastic.csproj" />
         <ProjectReference Include="..\Iis.MaterialDistributor.DataModel\Iis.MaterialDistributor.DataModel.csproj" />
+        <ProjectReference Include="..\Iis.Messages\Iis.Messages.csproj" />
         <ProjectReference Include="..\Iis.Utility\Iis.Utility.csproj" />
         <ProjectReference Include="..\Iis.RabbitMq\Iis.RabbitMq.csproj" />
     </ItemGroup>

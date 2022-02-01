@@ -1,5 +1,8 @@
-﻿namespace Iis.Messages.Materials
+﻿using System;
+
+namespace Iis.Messages.Materials
 {
+    [Flags]
     public enum Importance
     {
         Critical,

@@ -6,6 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Iis.Elastic;
 using Iis.MaterialDistributor.DependencyInjection;
+using Iis.RabbitMq.DependencyInjection;
 
 namespace Iis.MaterialDistributor
 {
@@ -29,6 +30,8 @@ namespace Iis.MaterialDistributor
             services.RegisterServices();
             services.RegisterHostedServices(Configuration);
             services.AddPersistance();
+            services.RegisterConfigurations(Configuration);
+            services.RegisterMqFactory(Configuration, out _);
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

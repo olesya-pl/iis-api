@@ -3,15 +3,17 @@ using System;
 using Iis.MaterialDistributor.DataModel.Contexts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace Iis.MaterialDistributor.DataModel.Migrations
 {
     [DbContext(typeof(MaterialDistributorContext))]
-    partial class MaterialDistributorContextModelSnapshot : ModelSnapshot
+    [Migration("20220129052631_SeedPermanentCoefficients")]
+    partial class SeedPermanentCoefficients
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

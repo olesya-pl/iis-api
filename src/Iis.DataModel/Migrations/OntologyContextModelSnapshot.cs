@@ -451,6 +451,9 @@ namespace Iis.DataModel.Migrations
                     b.Property<Guid?>("ParentId")
                         .HasColumnType("uuid");
 
+                    b.Property<int?>("PermanentCoefficient")
+                        .HasColumnType("integer");
+
                     b.Property<Guid?>("ProcessedStatusSignId")
                         .IsRequired()
                         .ValueGeneratedOnAdd()

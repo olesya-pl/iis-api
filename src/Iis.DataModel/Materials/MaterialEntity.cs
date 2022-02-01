@@ -140,8 +140,8 @@ namespace Iis.DataModel.Materials
         public virtual List<MaterialAssigneeEntity> MaterialAssignees { get; set; } = new List<MaterialAssigneeEntity>();
         public virtual ICollection<MLResponseEntity> MLResponses { get; set; } = new List<MLResponseEntity>();
         public int MlHandlersCount { get; set; }
-
         public DateTime? RegistrationDate { get; set; }
+        public int? PermanentCoefficient { get; set; }
         public List<MaterialSecurityLevelEntity> SecurityLevels { get; set; }
     }
 

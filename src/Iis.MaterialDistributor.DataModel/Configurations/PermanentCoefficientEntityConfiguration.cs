@@ -7,9 +7,9 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 namespace Iis.MaterialDistributor.DataModel.Configurations
 {
     [DbContext(typeof(MaterialDistributorContext))]
-    internal class PermanentCriteriaEntityConfiguration : IEntityTypeConfiguration<PermanentCriteriaEntity>
+    internal class PermanentCoefficientEntityConfiguration : IEntityTypeConfiguration<PermanentCoefficientEntity>
     {
-        public void Configure(EntityTypeBuilder<PermanentCriteriaEntity> builder)
+        public void Configure(EntityTypeBuilder<PermanentCoefficientEntity> builder)
         {
             builder.Property(_ => _.Name)
                 .HasMaxLength(256)

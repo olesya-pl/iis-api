@@ -85,7 +85,7 @@ namespace Iis.Services
         private readonly IOntologyNodesData _ontologyData;
         private readonly ILogger<MaterialElasticService<TUnitOfWork>> _logger;
         private readonly IConnection _connection;
-        private readonly PublishMessageChannel<MaterialProcessingCriteriasEventMessage> _materialCriteriasChannel;
+        private readonly PublishMessageChannel<MaterialProcessingCoefficientEventMessage> _materialCoefficientChannel;
         private readonly ISecurityLevelChecker _securityLevelChecker;
 
         public MaterialElasticService(
@@ -111,7 +111,7 @@ namespace Iis.Services
             _ontologyData = ontologyData;
             _logger = logger;
             _connection = connectionFactory.CreateAndWaitConnection();
-            _materialCriteriasChannel = new PublishMessageChannel<MaterialProcessingCriteriasEventMessage>(_connection, new ChannelConfig { ExchangeName = MaterialRabbitConsts.DefaultExchangeName, RoutingKeys = new[] { MaterialRabbitConsts.MaterialCriteriasQueueName } });
+            _materialCoefficientChannel = new PublishMessageChannel<MaterialProcessingCoefficientEventMessage>(_connection, new ChannelConfig { ExchangeName = MaterialRabbitConsts.DefaultExchangeName, RoutingKeys = new[] { MaterialRabbitConsts.MaterialCoefficientsQueueName } });
             _securityLevelChecker = securityLevelChecker;
         }
 
@@ -120,7 +120,7 @@ namespace Iis.Services
         public void Dispose()
         {
             _connection.Dispose();
-            _materialCriteriasChannel.Dispose();
+            _materialCoefficientChannel.Dispose();
         }
 
         public bool ShouldReturnNoEntities(string queryExpression)
@@ -577,8 +577,8 @@ namespace Iis.Services
                 .Select(p => MapEntityToDocument(p))
                 .ToDictionary(_ => _.Id);
             string json = materialDocuments.ConvertToJson();
-            var processingCriteriasEvent = materialDocuments.Values.ToProcessingCriteriasEvent();
-            _materialCriteriasChannel.Send(processingCriteriasEvent);
+            var processingCoefficientEvent = materialDocuments.Values.ToProcessingCoefficientEvent();
+            _materialCoefficientChannel.Send(processingCoefficientEvent);
 
             return await _elasticManager.PutDocumentsAsync(_elasticState.MaterialIndexes.FirstOrDefault(), json, waitForIndexing, cancellationToken);
         }

@@ -4,6 +4,6 @@ namespace Iis.Messages
     {
         public const string DefaultExchangeName = "materials";
         public const string QueueName = "material.created";
-        public const string MaterialCriteriasQueueName = "material.criterias";
+        public const string MaterialCoefficientsQueueName = "material.coefficients";
     }
 }
