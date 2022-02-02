@@ -39,8 +39,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Iis.FlightRadar.DataModel",
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Iis.Events", "Iis.Events\Iis.Events.csproj", "{C905D6B5-F408-4F35-A7FC-B3D0B0A62D83}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Iis.EventHandlers", "Iis.EventHandlers\Iis.EventHandlers.csproj", "{7D081911-CBC0-4A0C-9662-C3D23804F692}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Iis.AcceptanceTests", "Iis.AcceptanceTests\Iis.AcceptanceTests.csproj", "{CEEFF138-D9D5-47B4-B8AC-B64C07C02387}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Iis.MaterialLoader", "Iis.MaterialLoader\Iis.MaterialLoader.csproj", "{F2051644-0587-4474-A1F4-A76AD1E3355D}"
@@ -72,7 +70,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Iis.Security", "Iis.Securit
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Iis.MaterialDistributor.DataModel", "Iis.MaterialDistributor.DataModel\Iis.MaterialDistributor.DataModel.csproj", "{8917F778-41A2-43A1-A33D-9B405F92B882}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Iis.UnitTests.MaterialDistributor", "Iis.UnitTests.MaterialDistributor\Iis.UnitTests.MaterialDistributor.csproj", "{EF17F9CA-FD89-46BD-AE43-0521694D0C89}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Iis.UnitTests.MaterialDistributor", "Iis.UnitTests.MaterialDistributor\Iis.UnitTests.MaterialDistributor.csproj", "{EF17F9CA-FD89-46BD-AE43-0521694D0C89}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -152,10 +150,6 @@ Global
 		{C905D6B5-F408-4F35-A7FC-B3D0B0A62D83}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C905D6B5-F408-4F35-A7FC-B3D0B0A62D83}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C905D6B5-F408-4F35-A7FC-B3D0B0A62D83}.Release|Any CPU.Build.0 = Release|Any CPU
-		{7D081911-CBC0-4A0C-9662-C3D23804F692}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{7D081911-CBC0-4A0C-9662-C3D23804F692}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{7D081911-CBC0-4A0C-9662-C3D23804F692}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{7D081911-CBC0-4A0C-9662-C3D23804F692}.Release|Any CPU.Build.0 = Release|Any CPU
 		{CEEFF138-D9D5-47B4-B8AC-B64C07C02387}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{CEEFF138-D9D5-47B4-B8AC-B64C07C02387}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CEEFF138-D9D5-47B4-B8AC-B64C07C02387}.Release|Any CPU.ActiveCfg = Release|Any CPU

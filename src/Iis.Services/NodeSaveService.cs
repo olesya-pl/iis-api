@@ -17,11 +17,12 @@ namespace Iis.Services
 {
     public class NodeSaveService : INodeSaveService
     {
+        private const int BulkSize = 50000;
         private readonly IElasticManager _elasticManager;
         private readonly NodeFlattener<IIISUnitOfWork> _nodeFlattener;
-        private const int BulkSize = 50000;
 
-        public NodeSaveService(IElasticManager elasticManager,
+        public NodeSaveService(
+            IElasticManager elasticManager,
             NodeFlattener<IIISUnitOfWork> nodeFlattener,
             IOntologySchema ontologySchema)
         {
@@ -52,7 +53,8 @@ namespace Iis.Services
             return await _elasticManager.PutDocumentAsync(
                 result.NodeTypeName,
                 result.Id,
-                result.SerializedNode, cancellationToken);
+                result.SerializedNode,
+                cancellationToken);
         }
 
         public async Task<bool> PutNodeAsync(Guid id, IEnumerable<string> fieldsToExclude, CancellationToken cancellationToken = default)
@@ -63,7 +65,8 @@ namespace Iis.Services
             return await _elasticManager.PutDocumentAsync(
                 result.NodeTypeName,
                 result.Id,
-                result.SerializedNode, cancellationToken);
+                result.SerializedNode,
+                cancellationToken);
         }
 
         public async Task<List<ElasticBulkResponse>> PutNodesAsync(IReadOnlyCollection<INode> nodes, CancellationToken ct)
@@ -105,7 +108,7 @@ namespace Iis.Services
 
         private string GenerateBulkData(IEnumerable<FlattenNodeResult> nodes)
         {
-            return nodes.Aggregate("", (acc, p) => acc += $"{{ \"index\":{{ \"_id\": \"{p.Id:N}\" }} }}\n{p.SerializedNode.RemoveNewLineCharacters()}\n");
+            return nodes.Aggregate(string.Empty, (acc, p) => acc += $"{{ \"index\":{{ \"_id\": \"{p.Id:N}\" }} }}\n{p.SerializedNode.RemoveNewLineCharacters()}\n");
         }
 
         private string ExcludeFields(string json, IEnumerable<string> fieldsToExclude)

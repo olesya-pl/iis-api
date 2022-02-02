@@ -11,17 +11,13 @@
   </PropertyGroup>
 	
   <ItemGroup>
-    <PackageReference Include="AutoMapper" Version="9.0.0" />
     <PackageReference Include="GeoJSON.Net" Version="1.2.14" />
-    <PackageReference Include="Microsoft.AspNetCore.Authentication" Version="2.2.0" />
-    <PackageReference Include="Microsoft.Extensions.Http" Version="5.0.0" />
+    <PackageReference Include="Morelinq" Version="3.3.2" />
     <PackageReference Include="Novell.Directory.Ldap.NETStandard" Version="3.2.0" />
     <PackageReference Include="StyleCop.Analyzers" Version="1.1.118">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="System.DirectoryServices.AccountManagement" Version="5.0.0" />
-    <PackageReference Include="System.Reflection.Metadata" Version="5.0.0" />
   </ItemGroup>
 
   <ItemGroup>
@@ -29,6 +25,7 @@
     <ProjectReference Include="..\Iis.Events\Iis.Events.csproj" />
     <ProjectReference Include="..\Iis.Interfaces\Iis.Interfaces.csproj" />
     <ProjectReference Include="..\Iis.Messages\Iis.Messages.csproj" />
+    <ProjectReference Include="..\Iis.OntologySchema.Saver\Iis.OntologySchema.Saver.csproj" />
     <ProjectReference Include="..\Iis.Services.Contracts\Iis.Services.Contracts.csproj" />
     <ProjectReference Include="..\IIS.Repository\IIS.Repository.csproj" />
     <ProjectReference Include="..\Iis.DbLayer\Iis.DbLayer.csproj" />

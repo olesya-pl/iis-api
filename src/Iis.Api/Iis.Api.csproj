@@ -91,7 +91,6 @@
     <ProjectReference Include="..\Iis.DbLayer\Iis.DbLayer.csproj" />
     <ProjectReference Include="..\Iis.Domain\Iis.Domain.csproj" />
     <ProjectReference Include="..\Iis.Elastic\Iis.Elastic.csproj" />
-    <ProjectReference Include="..\Iis.EventHandlers\Iis.EventHandlers.csproj" />
     <ProjectReference Include="..\Iis.EventMaterialAutoAssignment\Iis.EventMaterialAutoAssignment.csproj" />
     <ProjectReference Include="..\Iis.FlightRadar.DataModel\Iis.FlightRadar.DataModel.csproj" />
     <ProjectReference Include="..\Iis.Interfaces\Iis.Interfaces.csproj" />
