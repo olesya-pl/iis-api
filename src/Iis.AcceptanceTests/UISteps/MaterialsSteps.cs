@@ -417,6 +417,13 @@ namespace AcceptanceTests.UISteps
             driver.WaitFor(2);
         }
 
+        [When(@"I clicked arrow for sorting by created date")]
+        public void WhenIClickedArrowForSortingByCreatedDate()
+        {
+            materialsSectionPage.CreatedDateSortable.Click();
+            driver.WaitFor(3);
+        }
+
         #endregion When
 
         #region Then
@@ -717,6 +724,29 @@ namespace AcceptanceTests.UISteps
         {
             Assert.True(materialsSectionPage.SortedByImportantSortingNull.Displayed);
         }
+
+        [Then(@"I must see created date in ascending order")]
+        public void ThenIMustSeeCreatedDateInAscendingOrder()
+        {
+            Assert.True(materialsSectionPage.CreatedDateASC.Displayed);
+            driver.WaitFor(2);
+        }
+
+        [Then(@"I must see created date in descending order")]
+        public void ThenIMustSeeCreatedDateInDescendingOrder()
+        {
+            Assert.True(materialsSectionPage.CreatedDateDesc.Displayed);
+            driver.WaitFor(2);
+        }
+
+
+        [Then(@"I must see materials sorted by created date sorting null")]
+        public void ThenIMustSeeMaterialsSortedByCreatedDateSortingNull()
+        {
+            Assert.True(materialsSectionPage.CreatedDateNULL.Displayed);
+            driver.WaitFor(2);
+        }
+
         #endregion
     }
 }
