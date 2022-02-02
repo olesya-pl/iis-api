@@ -64,7 +64,9 @@ namespace Iis.Services
                 .BuildSearchQuery()
                 .ToString();
 
-            var response = await _elasticManager.SearchAsync(autocompleteQuery, typeNameList, cancellationToken);
+            var response = await _elasticManager
+                .WithUserId(user.Id)
+                .SearchAsync(autocompleteQuery, typeNameList, cancellationToken);
 
             return response.Items.Select(x => new AutocompleteEntityDto
             {
