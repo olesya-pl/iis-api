@@ -474,7 +474,7 @@ namespace Iis.Elastic
 
         private bool IsErrorStatusCode(int statusCode)
         {
-            return statusCode != 200;
+            return (statusCode / 100) != 2;
         }
 
         private string GetCountJson(IisElasticSearchParams searchParams)
