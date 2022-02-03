@@ -416,7 +416,6 @@ namespace IIS.Core
 #endif
             app.UseGraphQL();
             app.UsePlayground();
-            LoadHotChockolateSchema(app);
             app.UseHealthChecks("/api/server-health", new HealthCheckOptions { ResponseWriter = ReportHealthCheck });
 
             app.UseRouting();
@@ -427,15 +426,6 @@ namespace IIS.Core
                 endpoints.MapControllers();
                 endpoints.MapMetrics();
             });
-        }
-
-        private void LoadHotChockolateSchema(IApplicationBuilder app)
-        {
-            using var serviceScope = app.ApplicationServices
-            .GetRequiredService<IServiceScopeFactory>()
-            .CreateScope();
-            var schemaProvider = serviceScope.ServiceProvider.GetRequiredService<ISchemaProvider>();
-            schemaProvider.GetSchema();
         }
 
         private static async Task ReportHealthCheck(HttpContext c, HealthReport r)
