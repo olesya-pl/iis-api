@@ -12,8 +12,9 @@ namespace IIS.Core.GraphQL.Materials
             Dictionary<string, AggregationItem> aggregations,
             int totalCount)> descriptor)
         {
-            descriptor.Name("AggregatedMaterialCollection");
-            descriptor.BindFieldsExplicitly().Include<Resolvers>();
+            descriptor.Field(p => p.totalCount).Name("Count");
+            descriptor.Field(p => p.aggregations).Name("Aggregations").Type(typeof(AnyType));
+            descriptor.Field(p => p.materials).Name("Items").Type(typeof(NonNullType<ListType<NonNullType<ObjectType<Material>>>>));
         }
 
         private class Resolvers

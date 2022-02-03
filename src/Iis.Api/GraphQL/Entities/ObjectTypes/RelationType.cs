@@ -12,7 +12,9 @@ namespace IIS.Core.GraphQL.Entities.ObjectTypes
         protected override void Configure(IObjectTypeDescriptor<Relation> descriptor)
         {
             descriptor.BindFields(BindingBehavior.Explicit);
-            descriptor.Include<Resolvers>();
+            descriptor.Field(p => p.Id).Type(typeof(NonNullType<IdType>));
+            descriptor.Field(p => p.CreatedAt);
+            descriptor.Field(p => p.Type).Type(typeof(EmbeddingRelationTypeType));
         }
 
         private class Resolvers
@@ -42,7 +44,9 @@ namespace IIS.Core.GraphQL.Entities.ObjectTypes
         protected override void Configure(IObjectTypeDescriptor<INodeTypeLinked> descriptor)
         {
             descriptor.BindFields(BindingBehavior.Explicit);
-            descriptor.Include<Resolvers>();
+            descriptor.Field(p => p.Id).Type(typeof(NonNullType<IdType>));
+            descriptor.Field(p => p.Name);
+            descriptor.Field(p => p.Title);
         }
 
         private class Resolvers

@@ -52,8 +52,8 @@
     <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="7.0.0" />
     <PackageReference Include="DocumentFormat.OpenXml" Version="2.10.0" />
     <PackageReference Include="Flee" Version="1.2.2" />
-    <PackageReference Include="HotChocolate" Version="11.0.0-preview.62" />
-    <PackageReference Include="HotChocolate.AspNetCore" Version="11.0.0-preview.62" />
+    <PackageReference Include="HotChocolate" Version="12.6.0" />
+    <PackageReference Include="HotChocolate.AspNetCore" Version="12.6.0" />
     <PackageReference Include="HotChocolate.AspNetCore.Playground" Version="11.0.0-preview.62" />
     <PackageReference Include="LinqKit.Core" Version="1.1.17" />
     <PackageReference Include="MediatR.Extensions.Microsoft.DependencyInjection" Version="8.1.0" />

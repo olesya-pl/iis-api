@@ -15,7 +15,7 @@ namespace Iis.Api.GraphQL.Entities.ObjectTypes
         {
         }
 
-        public override Type ClrType { get; } = typeof(DateTime);
+        public override Type RuntimeType { get; } = typeof(DateTime);
 
         // define which literals this type can be parsed from.
         public override bool IsInstanceOfType(IValueNode literal)
@@ -50,6 +50,11 @@ namespace Iis.Api.GraphQL.Entities.ObjectTypes
             throw new ArgumentException(
                 "The string type can only parse string literals.",
                 nameof(literal));
+        }
+
+        public override IValueNode ParseResult(object resultValue)
+        {
+            throw new NotImplementedException();
         }
 
         // define how a native type is parsed into a literal,

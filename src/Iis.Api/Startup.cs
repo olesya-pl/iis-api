@@ -233,43 +233,8 @@ namespace IIS.Core
 
             var publiclyAccesible = new HashSet<string> { "login", "__schema" };
 
-            QueryExecutionBuilder.New()
-                .Use(next => async context =>
-                {
-                    try
-                    {
-                        await AuthenticateAsync(context, publiclyAccesible);
-                    }
-                    catch (Exception e)
-                    {
-                        if (!(e is AuthenticationException) && !(e is InvalidOperationException) && !(e is AccessViolationException))
-                            throw;
-
-                        var errorHandler = context.Services.GetService<IErrorHandler>();
-                        var error = ErrorBuilder.New()
-                            .SetMessage(e.Message)
-                            .SetException(e)
-                            .Build();
-                        context.Exception = e;
-                        context.Result = QueryResult.CreateError(errorHandler.Handle(error));
-                        return;
-                    }
-
-                    await next(context);
-                })
-                .UseDefaultPipeline()
-                .AddErrorFilter<AppErrorFilter>()
-                .Populate(services);
-
-            services.AddTransient<IErrorHandlerOptionsAccessor>(_ => new QueryExecutionOptions { IncludeExceptionDetails = true });
-            services.AddSingleton(s => s.GetService<GraphQL.ISchemaProvider>().GetSchema())
-                .AddTransient<IBatchQueryExecutor, BatchQueryExecutor>()
-                .AddTransient<IIdSerializer, IdSerializer>()
-                .AddJsonQueryResultSerializer()
-                .AddJsonArrayResponseStreamSerializer()
-                .AddGraphQLSubscriptions();
-            // end of graphql engine registration
-            services.AddDataLoaderRegistry();
+            //services.AddSingleton(s => s.GetService<GraphQL.ISchemaProvider>().GetSchema())
+            //    .AddTransient<IIdSerializer, IdSerializer>();               
 
             /* message queue registration*/
             services.RegisterMqFactory(Configuration, out string mqConnectionString)
@@ -340,56 +305,6 @@ namespace IIS.Core
             services.AddMetrics();
         }
 
-        private async Task AuthenticateAsync(IQueryContext context, HashSet<string> publiclyAccesible)
-        {
-            // TODO: remove this method when hotchocolate will allow to add attribute for authentication
-            var qd = context.Request.Query as QueryDocument;
-            if (qd == null || qd.Document == null)
-            {
-                throw new InvalidOperationException("Cannot find query in document");
-            }
-
-            var odn = qd.Document.Definitions[0] as OperationDefinitionNode;
-            if (odn.SelectionSet?.Selections.Count != 1)
-            {
-                throw new InvalidOperationException("Does not support multiple selections in query");
-            }
-
-            var fieldNode = (FieldNode)odn.SelectionSet.Selections[0];
-
-            if (!publiclyAccesible.Contains(fieldNode.Name.Value))
-            {
-                var httpContext = (HttpContext)context.ContextData["HttpContext"];
-                if (!httpContext.Request.Headers.TryGetValue("Authorization", out var token))
-                {
-                    throw new AuthenticationException("Requires \"Authorization\" header to contain a token");
-                }
-
-                var userService = context.Services.GetService<IUserService>();
-                var graphQLAccessList = context.Services.GetService<GraphQLAccessList>();
-
-                var operationName = context.Request.OperationName ?? fieldNode.Name.Value;
-
-                var graphQLAccessItems = graphQLAccessList.GetAccessItem(operationName, context.Request.VariableValues);
-
-                var validatedToken = await TokenHelper.ValidateTokenAsync(token, Configuration, userService);
-
-                foreach (var graphQLAccessItem in graphQLAccessItems)
-                {
-                    if (graphQLAccessItem == null || graphQLAccessItem.Kind == AccessKind.FreeForAll)
-                    {
-                        break;
-                    }
-                    if (!validatedToken.User.IsGranted(graphQLAccessItem.Kind, graphQLAccessItem.Operation, AccessCategory.Entity))
-                    {
-                        throw new AccessViolationException($"Access denied to {operationName} for user {validatedToken.User.UserName}");
-                    }
-                }
-
-                context.ContextData.Add(TokenPayload.TokenPropertyName, validatedToken);
-            }
-        }
-
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())
@@ -414,7 +329,6 @@ namespace IIS.Core
 #if !DEBUG
             app.UseMiddleware<LoggingMiddleware>();
 #endif
-            app.UseGraphQL();
             app.UsePlayground();
             LoadHotChockolateSchema(app);
             app.UseHealthChecks("/api/server-health", new HealthCheckOptions { ResponseWriter = ReportHealthCheck });
@@ -426,6 +340,7 @@ namespace IIS.Core
             {
                 endpoints.MapControllers();
                 endpoints.MapMetrics();
+                endpoints.MapGraphQL();
             });
         }
 
@@ -435,7 +350,7 @@ namespace IIS.Core
             .GetRequiredService<IServiceScopeFactory>()
             .CreateScope();
             var schemaProvider = serviceScope.ServiceProvider.GetRequiredService<ISchemaProvider>();
-            schemaProvider.GetSchema();
+            //schemaProvider.GetSchema();
         }
 
         private static async Task ReportHealthCheck(HttpContext c, HealthReport r)

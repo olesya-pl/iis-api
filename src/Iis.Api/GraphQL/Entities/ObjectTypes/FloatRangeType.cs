@@ -10,7 +10,7 @@ namespace IIS.Core.GraphQL.Entities.ObjectTypes
         {
         }
 
-        public override Type ClrType { get; } = typeof(string);
+        public override Type RuntimeType { get; } = typeof(string);
 
         // define which literals this type can be parsed from.
         public override bool IsInstanceOfType(IValueNode literal)
@@ -129,6 +129,11 @@ namespace IIS.Core.GraphQL.Entities.ObjectTypes
         : base("FloatRange")
         {
         }
+
+        public override IValueNode ParseResult(object resultValue)
+        {
+            throw new NotImplementedException();
+        }
     }
 
     public class IntegerRangeType : StringBasedScalarType
@@ -136,6 +141,11 @@ namespace IIS.Core.GraphQL.Entities.ObjectTypes
         public IntegerRangeType()
         : base("IntegerRangeType")
         {
+        }
+
+        public override IValueNode ParseResult(object resultValue)
+        {
+            throw new NotImplementedException();
         }
     }
 }

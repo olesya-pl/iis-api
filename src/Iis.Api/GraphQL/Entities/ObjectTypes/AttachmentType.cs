@@ -13,17 +13,22 @@ namespace IIS.Core.GraphQL.Entities.ObjectTypes
     {
         protected override void Configure(IObjectTypeDescriptor<Guid> descriptor)
         {
-            descriptor.Name("Attachment").BindFieldsExplicitly();
-            descriptor.Include<Resolvers>();
-//            descriptor.Field("urlTest").Resolver(ctx =>
-//            {
-//                var httpContext = ctx.CustomProperty<HttpContext>("HttpContext");
-//                var urlHelperFactory = ctx.Service<IUrlHelperFactory>();
-//                var acc = ctx.Service<IActionContextAccessor>();
-//                var helper = urlHelperFactory.GetUrlHelper(acc.ActionContext);
-//                var url = helper.Action("Get", "Files", new {Id = Guid.NewGuid()}, acc.ActionContext.HttpContext.Request.Scheme);
-//                return url;
-//            });
+            descriptor.Name("Attachment");
+            descriptor.Field("FileId").Resolve(ctx => ctx.Parent<Guid>()).Type(typeof(NonNullType<IdType>));
+            descriptor.Field("Title").Resolve(async ctx => {
+                var fileService = ctx.Service<IFileService>();
+                var fileId = ctx.Parent<Guid>();
+                return (await fileService.GetFileAsync(fileId))?.Name ?? "File is not found";
+            }).Type(typeof(NonNullType));
+            descriptor.Field("Type").Resolve(async ctx => {
+                var fileService = ctx.Service<IFileService>();
+                var fileId = ctx.Parent<Guid>();
+                return (await fileService.GetFileAsync(fileId))?.ContentType ?? "File is not found";
+            }).Type(typeof(NonNullType));
+            descriptor.Field("Url").Resolve(ctx => {
+                var fileId = ctx.Parent<Guid>();
+                return FileUrlGetter.GetFileUrl(fileId);
+            }).Type(typeof(NonNullType));
         }
 
         public class Resolvers

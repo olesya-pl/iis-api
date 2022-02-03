@@ -12,7 +12,8 @@ namespace IIS.Core.GraphQL.Materials
         protected override void Configure(IObjectTypeDescriptor<(IEnumerable<Material>materials, int totalCount)> descriptor)
         {
             descriptor.Name("MaterialCollection");
-            descriptor.BindFieldsExplicitly().Include<Resolvers>();
+            descriptor.Field(p => p.totalCount).Name("Count");
+            descriptor.Field(p => p.materials).Name("Items").Type(typeof(NonNullType<ListType<NonNullType<ObjectType<Material>>>>));
         }
 
         private class Resolvers

@@ -61,63 +61,52 @@ namespace IIS.Core.GraphQL
             var builder = SchemaBuilder.New().AddServices(_serviceProvider);
             RegisterTypes(builder);
             TryRegisterOntologyTypes(builder);
-            builder.AddQueryType(d =>
-            {
-                d.Name("QueryType");
-                d.Include<ObjectSignQuery>();
-                d.Include<EntityTypes.Query>();
-                d.Include<Materials.Query>();
-                d.Include<Roles.Query>();
-                d.Include<OntologyFilterableQuery>();
-                d.Include<Users.Query>();
-                d.Include<AnalyticsQuery.Query>();
-                d.Include<AnalyticsIndicator.Query>();
-                d.Include<ExportQuery>();
-                d.Include<ML.Query>();
-                d.Include<ElasticConfig.Query>();
-                d.Include<ChangeHistory.Query>();
-                d.Include<Themes.Query>();
-                d.Include<Autocomplete.Query>();
-                d.Include<Iis.Api.GraphQL.Aliases.Query>();
-                d.Include<Annotations.Query>();
-                d.Include<AssociatedEventsQuery>();
-                d.Include<IncomingEntitiesQuery>();
-                d.Include<RelationsCountQuery>();
-                d.Include<CreateMenuItemsQuery>();
-                d.Include<GraphQuery>();
-                d.Include<ResQuery>();
-                d.Include<NodeMaterialRelationQuery>();
+            builder
+                .AddQueryType<ObjectSignQuery>()
+                .AddQueryType<EntityTypes.Query>()
+                .AddQueryType<Materials.Query>()
+                .AddQueryType<Roles.Query>()
+                .AddQueryType<OntologyFilterableQuery>()
+                .AddQueryType<Users.Query>()
+                .AddQueryType<AnalyticsQuery.Query>()
+                .AddQueryType<AnalyticsIndicator.Query>()
+                .AddQueryType<ExportQuery>()
+                .AddQueryType<ML.Query>()
+                .AddQueryType<ElasticConfig.Query>()
+                .AddQueryType<ChangeHistory.Query>()
+                .AddQueryType<Themes.Query>()
+                .AddQueryType<Autocomplete.Query>()
+                .AddQueryType<Iis.Api.GraphQL.Aliases.Query>()
+                .AddQueryType<Annotations.Query>()
+                .AddQueryType<AssociatedEventsQuery>()
+                .AddQueryType<IncomingEntitiesQuery>()
+                .AddQueryType<RelationsCountQuery>()
+                .AddQueryType<CreateMenuItemsQuery>()
+                .AddQueryType<GraphQuery>()
+                .AddQueryType<NodeMaterialRelationQuery>();
 
+            if (_configuration.GetValue("reportsAvailable", true))
+            {
+                    builder.AddQueryType<Reports.Query>();
+            }               
+            
+            builder
+                .AddMutationType<Materials.Mutation>()
+                .AddMutationType<Users.Mutation>()
+                .AddMutationType<Roles.Mutation>()
+                .AddMutationType<Users.LoginResolver>()
+                .AddMutationType<AnalyticsQuery.Mutation>()
+                .AddMutationType<ML.Mutation>()
+                .AddMutationType<NodeMaterialRelation.Mutation>()
+                .AddMutationType<ElasticConfig.Mutation>()
+                .AddMutationType<Themes.Mutation>()
+                .AddMutationType<Annotations.Mutation>()
+                .AddMutationType<Iis.Api.GraphQL.Aliases.Mutation>();
 
                 if (_configuration.GetValue("reportsAvailable", true))
                 {
-                    d.Include<Reports.Query>();
-                }
-                if (_ontologySchema != null)
-                    ConfigureOntologyQuery(d, _ontologySchema);
-            });
-            builder.AddMutationType(d =>
-            {
-                d.Name("MutationType");
-                d.Include<Materials.Mutation>();
-                d.Include<Users.Mutation>();
-                d.Include<Roles.Mutation>();
-                d.Include<Users.LoginResolver>();
-                d.Include<AnalyticsQuery.Mutation>();
-                d.Include<ML.Mutation>();
-                d.Include<NodeMaterialRelation.Mutation>();
-                d.Include<ElasticConfig.Mutation>();
-                d.Include<Themes.Mutation>();
-                d.Include<Annotations.Mutation>();
-                d.Include<Iis.Api.GraphQL.Aliases.Mutation>();
-
-                if (_configuration.GetValue("reportsAvailable", true))
-                {
-                    d.Include<Reports.Mutation>();
-                }
-                if (_ontologySchema != null)
-                    ConfigureOntologyMutation(d, _ontologySchema);
-            });
+                    builder.AddMutationType<Reports.Mutation>();
+                }                
             try
             {
                 var res = builder.Create();
