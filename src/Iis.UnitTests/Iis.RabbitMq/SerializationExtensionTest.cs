@@ -17,7 +17,7 @@ namespace Iis.UnitTests.Iis.RabbitMq
         [Fact]
         public void ToMessage_NullInstanceReturnsDefaultByteArray()
         {
-            (null as object).ToMessage()
+            (null as object).ToByteArray()
                 .Should()
                 .BeNull();
         }
@@ -44,7 +44,7 @@ namespace Iis.UnitTests.Iis.RabbitMq
             var actual = new MessageType { Name = "user", Type = "userType" };
             var expected = Encoding.UTF8.GetBytes("{\"Name\":\"user\",\"Type\":\"userType\"}");
 
-            actual.ToMessage()
+            actual.ToByteArray()
                 .Should().BeEquivalentTo(expected);
         }
 
@@ -55,7 +55,7 @@ namespace Iis.UnitTests.Iis.RabbitMq
             var expected = Encoding.UTF8.GetBytes("{\"name\":\"user\",\"type\":\"userType\"}");
             var options = new JsonSerializerOptions(JsonSerializerDefaults.Web);
 
-            actual.ToMessage(options)
+            actual.ToByteArray(options)
                 .Should().BeEquivalentTo(expected);
         }
 

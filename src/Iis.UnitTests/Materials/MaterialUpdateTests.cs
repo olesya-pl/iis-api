@@ -1,9 +1,11 @@
 using System;
 using System.Threading.Tasks;
 using System.Collections.Generic;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Microsoft.Extensions.DependencyInjection;
 using AutoMapper;
-
+using RabbitMQ.Client;
 using Xunit;
 using Iis.DataModel;
 using Iis.DataModel.Materials;
@@ -15,7 +17,9 @@ using Iis.Domain;
 using Iis.Interfaces.Ontology.Data;
 using Iis.Interfaces.Ontology.Schema;
 using Iis.Services.Contracts.Interfaces;
+using Iis.Services.Contracts.Configurations;
 using IIS.Services.Materials;
+using IIS.Services.Contracts.Interfaces;
 using Iis.Services;
 using Iis.Interfaces.SecurityLevels;
 
@@ -60,7 +64,10 @@ namespace Iis.UnitTests.Materials
                     new Mock<IOntologySchema>().Object,
                     new Mock<IOntologyService>().Object,
                     new NodeToJObjectMapper(),
-                    new Mock<ISecurityLevelChecker>().Object));
+                    new Mock<ISecurityLevelChecker>().Object),
+                new Mock<IConnection>().Object,
+                new Mock<IOptions<MaterialNextAssignedPublisherConfig>>().Object,
+                new Mock<ILogger<IMaterialProvider>>().Object);
         }
         public void Dispose()
         {

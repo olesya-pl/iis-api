@@ -8,6 +8,7 @@ namespace Iis.RabbitMq.DependencyInjection
     public static class DI
     {
         private const string MessageQueueSectionName = "mq";
+
         public static IServiceCollection RegisterMqFactory(this IServiceCollection services, IConfiguration configuration, out string mqConnectionString)
         {
             var mqConfig = configuration.GetSection(MessageQueueSectionName).Get<MqFactoryConfiguration>();
@@ -29,7 +30,6 @@ namespace Iis.RabbitMq.DependencyInjection
 
             return services
                     .AddTransient<IConnectionFactory>(serviceProvider => connectionFactory);
-
         }
     }
 }
