@@ -335,6 +335,7 @@ namespace AcceptanceTests.UISteps
         [When(@"I clicked pause button")]
         public void WhenIClickedPauseButton()
         {
+            driver.WaitFor(2);
             materialsSectionPage.ClickPauseButton();
             driver.WaitFor(5);
         }
