@@ -1,18 +1,18 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Iis.RabbitMq.Helpers;
-using Iis.RabbitMq.Channels;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using RabbitMQ.Client;
-using Iis.Messages.Materials;
 using Microsoft.Extensions.Options;
-using Iis.MaterialDistributor.Contracts.Configurations;
+using RabbitMQ.Client;
+using AutoMapper;
+using Iis.RabbitMq.Helpers;
+using Iis.RabbitMq.Channels;
+using Iis.Messages.Materials;
+using Iis.MaterialDistributor.Configurations;
 using Iis.MaterialDistributor.Contracts.Services;
 using Iis.MaterialDistributor.Contracts.Repositories;
-using AutoMapper;
 using Iis.MaterialDistributor.Contracts.Services.DataTypes;
 
 namespace Iis.MaterialDistributor.Workers
@@ -20,7 +20,6 @@ namespace Iis.MaterialDistributor.Workers
     public class MaterialCoefficientsConsumer : BackgroundService
     {
         private const int RetryIntervalSeconds = 5;
-
         private readonly ILogger<MaterialCoefficientsConsumer> _logger;
         private readonly IMapper _mapper;
         private readonly IConnectionFactory _connectionFactory;
@@ -47,24 +46,6 @@ namespace Iis.MaterialDistributor.Workers
             _consumerOptions = consumerOptions.Value;
         }
 
-        protected override Task ExecuteAsync(CancellationToken stoppingToken)
-        {
-            _connection = _connectionFactory.CreateAndWaitConnection(RetryIntervalSeconds, _logger, _consumerOptions.HandlerName);
-
-            _publishChannel = new PublishMessageChannel<MaterialCoefficientEvaluatedEventMessage>(
-                _connection,
-                _publisherOptions.SourceChannel);
-
-            _consumeChannel = new ConsumeMessageChannel<MaterialProcessingCoefficientEventMessage>(
-                _connection,
-                _consumerOptions.SourceChannel,
-                _logger);
-
-            _consumeChannel.OnMessageReceived = ProcessMessageAsync;
-
-            return Task.CompletedTask;
-        }
-
         public override void Dispose()
         {
             if (_consumeChannel != null)
@@ -82,6 +63,24 @@ namespace Iis.MaterialDistributor.Workers
             }
 
             base.Dispose();
+        }
+
+        protected override Task ExecuteAsync(CancellationToken stoppingToken)
+        {
+            _connection = _connectionFactory.CreateAndWaitConnection(RetryIntervalSeconds, _logger, _consumerOptions.HandlerName);
+
+            _publishChannel = new PublishMessageChannel<MaterialCoefficientEvaluatedEventMessage>(
+                _connection,
+                _publisherOptions.SourceChannel);
+
+            _consumeChannel = new ConsumeMessageChannel<MaterialProcessingCoefficientEventMessage>(
+                _connection,
+                _consumerOptions.SourceChannel,
+                _logger);
+
+            _consumeChannel.OnMessageReceived = ProcessMessageAsync;
+
+            return Task.CompletedTask;
         }
 
         private async Task ProcessMessageAsync(MaterialProcessingCoefficientEventMessage message)

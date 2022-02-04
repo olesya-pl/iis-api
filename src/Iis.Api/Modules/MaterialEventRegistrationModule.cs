@@ -1,15 +1,20 @@
+using System;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using RabbitMQ.Client;
 using IIS.Core.Materials;
 using IIS.Core.Materials.Handlers.Configurations;
 using Iis.Api.Materials;
 using Iis.Api.Materials.Handlers;
 using Iis.Services.Contracts.Configurations;
+using Iis.RabbitMq.Helpers;
 
 namespace Iis.Api.Modules
 {
     internal static class MaterialEventRegistrationModule
     {
+        private const string ApiConnectionLoggerName = "Iis.Api.Connection";
         private const string EventSectionName = "materialEventPublisher";
         private const string AssignerSectionName = "operatorAssigner";
         private const string FeatureHandlerSectionName = "featureHandler";
@@ -31,6 +36,7 @@ namespace Iis.Api.Modules
                                                     .Get<MaterialConsumerConfiguration>();
 
             services.Configure<MaterialCoefficientsConsumerConfiguration>(configuration.GetSection(MaterialCoefficientsConsumerSectionName));
+            services.Configure<MaterialNextAssignedPublisherConfig>(configuration.GetSection(MaterialNextAssignedPublisherConfig.SectionName));
 
             return services
                         .AddSingleton<MaterialEventConfiguration>(serviceProvider => meConfig)
@@ -38,12 +44,20 @@ namespace Iis.Api.Modules
                         .AddSingleton(assignerConfig)
                         .AddSingleton(featureHandlerConfig)
                         .AddSingleton(elasticSaver)
+                        .AddSingleton<IConnection>(_ => CreateRmqConnection(_))
                         .AddTransient<IMaterialEventProducer, MaterialEventProducer>()
                         .AddHostedService<MaterialOperatorDistributor>()
                         .AddHostedService<MaterialElasticConsumer>()
                         .AddHostedService<FeatureHandler>()
                         .AddHostedService<MaterialConsumer>()
                         .AddHostedService<MaterialCoefficientsConsumer>();
+        }
+
+        private static IConnection CreateRmqConnection(IServiceProvider provider)
+        {
+            var logger = provider.GetRequiredService<ILogger<IConnectionFactory>>();
+            var connectionFactory = provider.GetRequiredService<IConnectionFactory>();
+            return connectionFactory.CreateAndWaitConnection(logger: logger, clientName: ApiConnectionLoggerName);
         }
     }
 }

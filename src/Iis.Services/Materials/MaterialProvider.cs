@@ -4,6 +4,9 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Logging;
+using RabbitMQ.Client;
 using AutoMapper;
 using Iis.DataModel.Materials;
 using Iis.DbLayer.MaterialEnum;
@@ -21,12 +24,15 @@ using Iis.Interfaces.Ontology.Data;
 using Iis.Services.Contracts.Dtos;
 using Iis.Services.Contracts.Dtos.RadioElectronicSituation;
 using Iis.Services.Contracts.Interfaces;
+using Iis.Services.Contracts.Configurations;
 using Iis.Services.Contracts.Materials.Distribution;
 using IIS.Repository;
 using IIS.Repository.Factories;
 using IIS.Services.Contracts.Interfaces;
 using IIS.Services.Contracts.Materials;
+using Iis.RabbitMq.Channels;
 using MaterialSign = Iis.Domain.Materials.MaterialSign;
+using NextAssignedMessage = Iis.Messages.Materials.MaterialNextAssignedMessage;
 
 namespace IIS.Services.Materials
 {
@@ -47,8 +53,12 @@ namespace IIS.Services.Materials
         private readonly IMaterialSignRepository _materialSignRepository;
         private readonly IImageVectorizer _imageVectorizer;
         private readonly MaterialDocumentMapper _materialDocumentMapper;
+        private readonly IConnection _connection;
+        private readonly MaterialNextAssignedPublisherConfig _nextAssignedConfig;
+        private readonly ILogger<IMaterialProvider> _logger;
 
-        public MaterialProvider(IOntologyService ontologyService,
+        public MaterialProvider(
+            IOntologyService ontologyService,
             IOntologyNodesData ontologyData,
             IMaterialElasticService materialElasticService,
             IMLResponseRepository mLResponseRepository,
@@ -56,7 +66,10 @@ namespace IIS.Services.Materials
             IMapper mapper,
             IUnitOfWorkFactory<TUnitOfWork> unitOfWorkFactory,
             IImageVectorizer imageVectorizer,
-            MaterialDocumentMapper materialDocumentMapper) : base(unitOfWorkFactory)
+            MaterialDocumentMapper materialDocumentMapper,
+            IConnection connection,
+            IOptions<MaterialNextAssignedPublisherConfig> nextAssignedConfigOption,
+            ILogger<IMaterialProvider> logger) : base(unitOfWorkFactory)
         {
             _ontologyService = ontologyService;
             _ontologyData = ontologyData;
@@ -66,6 +79,9 @@ namespace IIS.Services.Materials
             _mapper = mapper;
             _imageVectorizer = imageVectorizer;
             _materialDocumentMapper = materialDocumentMapper;
+            _connection = connection;
+            _nextAssignedConfig = nextAssignedConfigOption.Value;
+            _logger = logger;
         }
 
         public async Task<MaterialsDto> GetMaterialsAsync(
@@ -329,6 +345,20 @@ namespace IIS.Services.Materials
                 .ToList();
 
             return MaterialsDto.Create(materials, searchResult.Count, searchResult.Items, searchResult.Aggregations);
+        }
+
+        public async Task<Material> GetNextAssignedMaterialForUserAsync(User user, CancellationToken cancellationToken = default)
+        {
+            using (var rpcChannel = MessageChannels.CreateRPCPublisher<NextAssignedMessage>(_connection, _nextAssignedConfig.TargetChannel, _logger))
+            {
+                var message = new NextAssignedMessage { UserId = user.Id };
+
+                var response = await rpcChannel.SendAsync(message, cancellationToken);
+
+                if (!response.MaterialId.HasValue) return null;
+
+                return await GetMaterialAsync(response.MaterialId.Value, user);
+            };
         }
 
         private IReadOnlyCollection<Guid> GetDescendantsByGivenRelationTypeNameList(IReadOnlyCollection<Guid> entityIdList, IReadOnlyCollection<string> relationTypeNameList)

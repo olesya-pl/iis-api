@@ -59,5 +59,6 @@ namespace IIS.Services.Contracts.Interfaces
             UserDistributionItem user,
             Expression<Func<MaterialEntity, bool>> filter);
         Task<IReadOnlyList<ResCallerReceiverDto>> GetCallInfoAsync(IReadOnlyList<Guid> nodeIds, CancellationToken cancellationToken = default);
+        Task<Material> GetNextAssignedMaterialForUserAsync(User user, CancellationToken cancellationToken = default);
     }
 }
