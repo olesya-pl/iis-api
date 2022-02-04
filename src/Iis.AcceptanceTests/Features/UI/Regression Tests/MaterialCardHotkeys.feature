@@ -11,7 +11,7 @@ Scenario: IIS-8238 - Hotkeys for audio rewind
 	When I navigated to Materials page
 	Then I clicked on the type`s filter audio
 	When I clicked search button in the Materials section
-	And I searched neizvesten-peregovory-po-racii.mp3 data in the materials
+	And I searched "neizvesten-peregovory-po-racii.mp3" data in the materials
 	And I clicked on the first material in the Materials list
 	And I clicked pause button
 	Then I clicked on the text field
@@ -33,7 +33,7 @@ Scenario: IIS-8257 - Possibility save  material by hotkeys
 	When I navigated to Materials page
 	And I clicked search button in the Materials section
 	And I searched таємн data in the materials
-	And I clicked on the first search result in the Materials section
+	And I clicked on the first material in the Materials list
 	Then I clicked on the text field
 	Then I wrote on the text field  Якийсь текст
 	When I send keys Ctrl and [ from the keyboard
