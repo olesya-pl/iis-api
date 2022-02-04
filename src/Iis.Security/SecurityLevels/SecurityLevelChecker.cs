@@ -90,6 +90,19 @@ namespace Iis.Security.SecurityLevels
             return AccessGranted(userLevels, objectLevels);
         }
 
+        public bool AccessGranted(IReadOnlyList<ISecurityLevel> userLevels, IReadOnlyList<ISecurityLevel> objectLevels)
+        {
+            var accessibleLevels = objectLevels.Where(_ => AccessGranted(userLevels, _)).ToList();
+            if (accessibleLevels.Count == objectLevels.Count) return true;
+            var restLevels = objectLevels.Where(_ => !accessibleLevels.Contains(_)).ToList();
+            var accessibleByBrother = restLevels
+                .Where(rl => !rl.IsGroup && accessibleLevels
+                    .Any(al => al.ParentUniqueIndex == rl.ParentUniqueIndex))
+                .ToList();
+            return accessibleByBrother.Count == restLevels.Count;
+        }
+
+
         /// This is security code for elastic painless script.
         /// See details here: https://confluence.infozahyst.com/pages/viewpage.action?pageId=192484154 
         public string GetObjectElasticCode(params int[] uniqueIndexes) => GetObjectElasticCode(uniqueIndexes.ToList());
@@ -143,19 +156,6 @@ namespace Iis.Security.SecurityLevels
         internal SecurityLevel GetSecurityLevelConcrete(int uniqueIndex) =>
             _rootLevel.GetAllItems().Where(_ => _.UniqueIndex == uniqueIndex).Single();
 
-        
-        private bool AccessGranted(IReadOnlyList<ISecurityLevel> userLevels, IReadOnlyList<ISecurityLevel> objectLevels)
-        {
-            var accessibleLevels = objectLevels.Where(_ => AccessGranted(userLevels, _)).ToList();
-            if (accessibleLevels.Count == objectLevels.Count) return true;
-            var restLevels = objectLevels.Where(_ => !accessibleLevels.Contains(_)).ToList();
-            var accessibleByBrother = restLevels
-                .Where(rl => !rl.IsGroup && accessibleLevels
-                    .Any(al => al.ParentUniqueIndex == rl.ParentUniqueIndex))
-                .ToList();
-            return accessibleByBrother.Count == restLevels.Count;
-        }
-        
         private bool AccessGranted(IReadOnlyList<ISecurityLevel> userLevels, ISecurityLevel objectLevel) =>
             userLevels.Any(userLevel => AccessGranted(userLevel, objectLevel));
         

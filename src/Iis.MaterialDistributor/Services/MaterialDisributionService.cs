@@ -8,10 +8,11 @@ using Iis.Utility;
 using Iis.Interfaces.Elastic;
 using Iis.MaterialDistributor.Contracts.Services;
 using Iis.MaterialDistributor.Contracts.Repositories;
+using Iis.MaterialDistributor.DataStorage;
 
 namespace Iis.MaterialDistributor.Services
 {
-    internal class MaterialService : IMaterialService
+    internal class MaterialDisributionService : IMaterialDistributionService
     {
         private static readonly PaginationParams _defaultPagination = new PaginationParams(1, 10000);
         private static readonly string[] _resultFieldCollection =
@@ -19,24 +20,29 @@ namespace Iis.MaterialDistributor.Services
             "Id",
             "Channel",
             "RegistrationDate",
-            "CreatedDate"
+            "CreatedDate",
+            "SecurityLevels"
         };
 
-        private readonly IMaterialElasticRepository _elasticRepository;
+        private readonly IDistributionElasticRepository _elasticRepository;
+        private readonly IVariableCoefficientService _coefficientService;
 
-        public MaterialService(
-            IMaterialElasticRepository elasticRepository)
+        public MaterialDisributionService(
+            IDistributionElasticRepository elasticRepository,
+            IVariableCoefficientService coefficientService)
         {
             _elasticRepository = elasticRepository;
+            _coefficientService = coefficientService;
         }
 
-        public async Task<IReadOnlyCollection<MaterialDocument>> GetMaterialCollectionAsync(int offsetHours, CancellationToken cancellationToken)
+        public async Task<List<MaterialDistributionInfo>> GetMaterialCollectionAsync(int offsetHours, CancellationToken cancellationToken)
         {
+            var users = await _elasticRepository.GetOperatorsAsync(cancellationToken);
             var searchParam = new SearchParams(GetSuggestion(offsetHours), _defaultPagination, _resultFieldCollection);
 
             var result = await _elasticRepository.BeginSearchByScrollAsync(searchParam, cancellationToken);
 
-            var resultCollection = new List<MaterialDocument>(result.Count);
+            var resultCollection = new List<MaterialDistributionInfo>(result.Count);
 
             resultCollection.AddRange(MapSearchResultToMaterialDocumentCollections(result.Items.Values));
 
@@ -50,10 +56,22 @@ namespace Iis.MaterialDistributor.Services
             return resultCollection;
         }
 
-        private static IReadOnlyCollection<MaterialDocument> MapSearchResultToMaterialDocumentCollections(IReadOnlyCollection<SearchResultItem> searchResultItemCollection)
+        public async Task<List<MaterialDistributionInfo>> GetMaterialCollectionAsync(CancellationToken cancellationToken)
+        {
+            var coefficient = await _coefficientService.GetWithMaxOffsetHoursAsync(cancellationToken);
+
+            if (coefficient is null) return new List<MaterialDistributionInfo>();
+
+            return await GetMaterialCollectionAsync(coefficient.OffsetHours, cancellationToken);
+        }
+
+        public Task<IReadOnlyList<UserDistributionInfo>> GetOperatorsAsync(CancellationToken cancellationToken) =>
+            _elasticRepository.GetOperatorsAsync(cancellationToken);
+
+        private static IReadOnlyList<MaterialDistributionInfo> MapSearchResultToMaterialDocumentCollections(IReadOnlyCollection<SearchResultItem> searchResultItemCollection)
         {
             return searchResultItemCollection
-                .Select(_ => JsonSerializer.Deserialize<MaterialDocument>(_.SearchResult.ToString()))
+                .Select(_ => JsonSerializer.Deserialize<MaterialDistributionInfo>(_.SearchResult.ToString()))
                 .ToArray();
         }
 
@@ -68,7 +86,8 @@ namespace Iis.MaterialDistributor.Services
 
             var dateRangeExpression = $"now-{hourOffset}h\\/h";
 
-            return $"(ParentId:NULL)AND((CreatedDate:>{dateRangeExpression})OR(RegistrationDate:>{dateRangeExpression}))";
+            //return $"(ParentId:NULL)AND((CreatedDate:>{dateRangeExpression})OR(RegistrationDate:>{dateRangeExpression}))";
+            return $"(ParentId:NULL)";
         }
     }
 }

@@ -8,9 +8,9 @@ namespace Iis.MaterialDistributor.Contracts.Services
     public interface IVariableCoefficientService
     {
         Task<VariableCoefficient> GetWithMaxOffsetHoursAsync(CancellationToken cancellationToken);
-        Task<IReadOnlyCollection<MaterialDocument>> SetForMaterialsAsync(
+        Task<IReadOnlyCollection<MaterialDistributionInfo>> SetForMaterialsAsync(
             DateTime comparisonTimeStamp,
-            IReadOnlyCollection<MaterialDocument> materialCollection,
+            IReadOnlyCollection<MaterialDistributionInfo> materialCollection,
             CancellationToken cancellationToken);
     }
 }

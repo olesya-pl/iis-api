@@ -178,7 +178,6 @@ namespace IIS.Core
                     var ontologyData = provider.GetRequiredService<IOntologyNodesData>();
                     return new CommonData(ontologyData);
                 });
-                services.AddSingleton<ISecurityLevelChecker, SecurityLevelChecker>();
 
                 services.AddTransient<IFieldToAliasMapper>(provider => provider.GetRequiredService<IOntologySchema>());
                 services.AddTransient<INodeSaveService, NodeSaveService>();

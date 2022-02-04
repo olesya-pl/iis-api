@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Iis.Interfaces.Ontology.Schema;
+using Iis.Services.Contracts.Dtos;
 using Newtonsoft.Json.Linq;
 
 namespace Iis.Interfaces.Elastic
@@ -34,6 +35,7 @@ namespace Iis.Interfaces.Elastic
         Task<T> GetExactPayloadAsyncDictionaryAsync<T>(string path, CancellationToken cancellationToken);
         Task<bool> DeleteExactPayloadAsync(string path, CancellationToken cancellationToken);
         Task<bool> PutExactPayloadAsync(string path, string data, CancellationToken cancellationToken);
+        Task<JObject> GetUsersAsync(CancellationToken cancellationToken = default);
         IElasticManager WithUserId(Guid userId);
         IElasticManager WithDefaultUser();
     }

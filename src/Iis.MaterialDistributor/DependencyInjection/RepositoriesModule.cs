@@ -8,7 +8,7 @@ namespace Iis.MaterialDistributor.DependencyInjection
     {
         public static IServiceCollection RegisterRepositories(this IServiceCollection services)
         {
-            services.AddTransient<IMaterialElasticRepository, MaterialElasticRepository>();
+            services.AddTransient<IDistributionElasticRepository, DistributionElasticRepository>();
             services.AddTransient<IVariableCoefficientRepository, VariableCoefficientRepository>();
             services.AddTransient<IPermanentCoefficientRepository, PermanentCoefficientRepository>();
 
