@@ -4,9 +4,12 @@ using AutoFixture;
 using AutoFixture.AutoMoq;
 using AutoFixture.Xunit2;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
+using RabbitMQ.Client;
 using IIS.Core;
 using Iis.DataModel;
 using Iis.DataModel.Cache;
@@ -17,11 +20,13 @@ using Iis.Domain;
 using Iis.Interfaces.Ontology.Schema;
 using Iis.DbLayer.OntologySchema;
 using Iis.Services.Contracts.Interfaces;
+using Iis.Services.Contracts.Configurations;
 using Iis.Interfaces.Ontology.Data;
 using Iis.Services;
 using AutoFixture.Kernel;
 using Iis.Interfaces.SecurityLevels;
 using Iis.Security.SecurityLevels;
+using IIS.Services.Contracts.Interfaces;
 
 namespace Iis.UnitTests
 {
@@ -94,8 +99,11 @@ namespace Iis.UnitTests
             serviceCollection.AddSingleton(new Mock<IOntologyNodesData>().Object);
             serviceCollection.AddSingleton(new Mock<IElasticConfiguration>().Object);
             serviceCollection.AddSingleton(new Mock<IMaterialEventProducer>().Object);
+            serviceCollection.AddSingleton<IConnection>(new Mock<IConnection>().Object);
+            serviceCollection.AddSingleton<IOptions<MaterialNextAssignedPublisherConfig>>(new Mock<IOptions<MaterialNextAssignedPublisherConfig>>().Object);
             serviceCollection.AddTransient<IFileService>(factory => new Mock<IFileService>().Object);
             serviceCollection.AddTransient<IOntologyService>(factory => new Mock<IOntologyService>().Object);
+            serviceCollection.AddTransient<ILogger<IMaterialProvider>>(_ => new Mock<ILogger<IMaterialProvider>>().Object);
             setup(serviceCollection);
             return serviceCollection.BuildServiceProvider();
         }
@@ -116,6 +124,8 @@ namespace Iis.UnitTests
             serviceCollection.AddSingleton(new Mock<IOntologySchema>().Object);
             serviceCollection.AddSingleton(new Mock<IElasticConfiguration>().Object);
             serviceCollection.AddSingleton(new Mock<IMaterialEventProducer>().Object);
+            serviceCollection.AddSingleton<IConnection>(new Mock<IConnection>().Object);
+            serviceCollection.AddSingleton<IOptions<MaterialNextAssignedPublisherConfig>>(new Mock<IOptions<MaterialNextAssignedPublisherConfig>>().Object);
             serviceCollection.AddTransient<IFileService>(factory => new Mock<IFileService>().Object);
             serviceCollection.AddTransient<IElasticService>(factory => new Mock<IElasticService>().Object);
             serviceCollection.AddTransient(factory => new Mock<IMaterialElasticService>().Object);
@@ -123,6 +133,7 @@ namespace Iis.UnitTests
             serviceCollection.AddTransient<IOntologyNodesData>(factory => new Mock<IOntologyNodesData>().Object);
             serviceCollection.AddTransient<IMatrixService>(factory => new Mock<IMatrixService>().Object);
             serviceCollection.AddTransient<ISecurityLevelChecker>(factory => new Mock<SecurityLevelChecker>().Object);
+            serviceCollection.AddTransient<ILogger<IMaterialProvider>>(_ => new Mock<ILogger<IMaterialProvider>>().Object);
 
             return new Utils
             {
