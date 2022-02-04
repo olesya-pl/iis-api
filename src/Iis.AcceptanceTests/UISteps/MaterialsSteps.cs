@@ -63,6 +63,7 @@ namespace AcceptanceTests.UISteps
         [When(@"I clicked on the ML tab in the material card")]
         public void IClickedOnTheMLTabInTheMaterialCard()
         {
+            driver.WaitFor(3);
             materialsSectionPage.MLTab.Click();
         }
 
