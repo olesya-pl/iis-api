@@ -57,6 +57,12 @@ using IIS.Core.Materials.EntityFramework;
 using IIS.Core.Materials.EntityFramework.FeatureProcessors;
 using IIS.Core.Materials.FeatureProcessors;
 using IIS.Core.Ontology.EntityFramework;
+using IIS.Core.GraphQL.Entities;
+using IIS.Core.GraphQL.Entities.InputTypes;
+using IIS.Core.GraphQL.Entities.ObjectTypes;
+using IIS.Core.GraphQL.Entities.Resolvers;
+using IIS.Core.GraphQL.Export;
+
 using IIS.Repository.Factories;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
@@ -90,6 +96,12 @@ using Prometheus;
 using Iis.Api.Metrics;
 using Iis.Interfaces.SecurityLevels;
 using Iis.Security.SecurityLevels;
+using IIS.Core.GraphQL.Common;
+using IIS.Core.GraphQL.Entities;
+using IIS.Core.GraphQL.Entities.InputTypes;
+using IIS.Core.GraphQL.Entities.ObjectTypes;
+using IIS.Core.GraphQL.Entities.Resolvers;
+using IIS.Core.GraphQL.Export;
 
 namespace IIS.Core
 {
@@ -230,6 +242,27 @@ namespace IIS.Core
             // Here it hits the fan. Removed AddGraphQL() method and stripped it to submethods because of IncludeExceptionDetails.
             // todo: remake graphql engine registration in DI
             //services.AddGraphQL(schema);
+            services.AddGraphQLServer()
+                .AddQueryType<ObjectSignQuery>()
+                .AddQueryType<GraphQL.EntityTypes.Query>()
+                .AddQueryType<GraphQL.Materials.Query>()
+                .AddQueryType<GraphQL.Roles.Query>()
+                .AddQueryType<OntologyFilterableQuery>()
+                .AddQueryType<GraphQL.Users.Query>()
+                .AddQueryType<GraphQL.AnalyticsQuery.Query>()
+                .AddQueryType<GraphQL.AnalyticsIndicator.Query>()
+                .AddQueryType<ExportQuery>()
+                .AddQueryType<GraphQL.ML.Query>()
+                .AddQueryType<GraphQL.ElasticConfig.Query>()
+                .AddQueryType<GraphQL.ChangeHistory.Query>()
+                .AddQueryType<GraphQL.Themes.Query>()
+                .AddQueryType<GraphQL.Autocomplete.Query>()
+                .AddQueryType<Iis.Api.GraphQL.Aliases.Query>()
+                .AddQueryType<GraphQL.Annotations.Query>()
+                .AddQueryType<AssociatedEventsQuery>()
+                .AddQueryType<IncomingEntitiesQuery>()
+                .AddQueryType<RelationsCountQuery>()
+                .AddIdSerializer<IdSerializer>();
 
             var publiclyAccesible = new HashSet<string> { "login", "__schema" };
 
