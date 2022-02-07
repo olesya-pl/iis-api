@@ -5,7 +5,9 @@ namespace Iis.RabbitMq.Helpers
 {
     internal static class SerializationExtension
     {
-        public static byte[] ToMessage<T>(this T value, JsonSerializerOptions options = null)
+        public static JsonSerializerOptions DefaultJsonSerializerOptions => new JsonSerializerOptions(JsonSerializerDefaults.Web);
+
+        public static byte[] ToByteArray<T>(this T value, JsonSerializerOptions options = null)
         {
             if (value is null) return default(byte[]);
 

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -297,8 +298,9 @@ namespace Iis.Elastic
                 string accessLevelFieldName)> parameters,
             CancellationToken cancellationToken)
         {
-            var sectionBaseText = File.ReadAllText(@"data\elastic\RoleIndexSection.json");
-            var scriptBaseText = File.ReadAllText(@"data\elastic\SecurityLevelFilter.painless");
+            var baseDirectory = System.IO.Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
+            var sectionBaseText = File.ReadAllText(Path.Combine(baseDirectory, @"data\elastic\RoleIndexSection.json"));
+            var scriptBaseText = File.ReadAllText(Path.Combine(baseDirectory, @"data\elastic\SecurityLevelFilter.painless"));
             var scriptText = Regex.Replace(scriptBaseText, @"\s+", " ");
             var sectionText = sectionBaseText.Replace("{SCRIPT}", scriptText, StringComparison.Ordinal);
             var settings = new StringBuilder("{\"indices\": [");
@@ -486,7 +488,7 @@ namespace Iis.Elastic
 
         private bool IsErrorStatusCode(int statusCode)
         {
-            return statusCode != 200;
+            return (statusCode / 100) != 2;
         }
 
         private string GetCountJson(IisElasticSearchParams searchParams)

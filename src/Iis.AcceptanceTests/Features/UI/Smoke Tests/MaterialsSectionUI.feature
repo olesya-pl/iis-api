@@ -57,7 +57,7 @@ Feature: MaterialsSectionUI - Smoke
         And Loading icon is not displayed
         And I clicked on the first material in the Materials list
         Then I must see relevance drop down in the materials card
-        When I close the material card
+        When I clean up uploaded material via API
 
     @smoke @UI @MaterialsCardEventsTabUI
     Scenario: IIS-6192 - Open relations tab in the materials card and ensure that events search is present
@@ -78,6 +78,7 @@ Feature: MaterialsSectionUI - Smoke
         And I clicked on the first material in the Materials list
         And I clicked on the relations tab in the material card
         Then I must see events search in the materials card
+        When I clean up uploaded material via API
 
     @smoke @UI @MaterialsCardGeneralTabUI
     Scenario: IIS-6189 - Open general tab in the materials card
@@ -102,7 +103,7 @@ Feature: MaterialsSectionUI - Smoke
             | Originator                |
 
         Then I must I must see at least one user in the originator drop down menu
-        When I close the material card
+        When I clean up uploaded material via API
 
     @smoke @UI @MaterialsCardGeneralTabUI
     Scenario: IIS-6191 - Open relations tab in the materials card and ensure that objects search is present
@@ -123,7 +124,7 @@ Feature: MaterialsSectionUI - Smoke
         And I clicked on the first material in the Materials list
         And I clicked on the relations tab in the material card
         Then I must see objects search in the materials card
-        When I close the material card
+        When I clean up uploaded material via API
 
     @smoke @UI @MaterialsCardGeneralTabUI
     Scenario: IIS-6190 - Open ML tab in the materials card
@@ -144,4 +145,4 @@ Feature: MaterialsSectionUI - Smoke
         And I clicked on the first material in the Materials list
         And I clicked on the ML tab in the material card
         Then I must see Show button in the ML tab
-        When I close the material card
+        When I clean up uploaded material via API

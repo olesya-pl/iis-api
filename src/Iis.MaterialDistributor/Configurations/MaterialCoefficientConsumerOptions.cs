@@ -1,6 +1,6 @@
 ﻿using Iis.RabbitMq.Channels;
 
-namespace Iis.MaterialDistributor.Contracts.Configurations
+namespace Iis.MaterialDistributor.Configurations
 {
     public class MaterialCoefficientConsumerOptions
     {

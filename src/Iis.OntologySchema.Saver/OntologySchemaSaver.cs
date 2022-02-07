@@ -1,21 +1,20 @@
-﻿using AutoMapper;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using AutoMapper;
 using Iis.DataModel;
 using Iis.Interfaces.Enums;
 using Iis.Interfaces.Ontology.Schema;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace Iis.OntologySchema.Saver
 {
     public class OntologySchemaSaver
     {
-        OntologyContext _context;
-        IOntologySchema _schemaTo;
-        IMapper _mapper;
-        List<INodeType> _createdEntityTypes;
+        private readonly OntologyContext _context;
+        private readonly IOntologySchema _schemaTo;
+        private readonly IMapper _mapper;
+        private List<INodeType> _createdEntityTypes;
         public OntologySchemaSaver(OntologyContext context, IOntologySchema schemaTo)
         {
             _context = context;
@@ -40,6 +39,18 @@ namespace Iis.OntologySchema.Saver
             _context.SaveChanges();
         }
 
+        private static IMapper GetMapper()
+        {
+            var configuration = new MapperConfiguration(cfg =>
+            {
+                cfg.CreateMap<INodeType, NodeTypeEntity>();
+                cfg.CreateMap<IRelationType, RelationTypeEntity>();
+                cfg.CreateMap<IAttributeType, AttributeTypeEntity>();
+            });
+
+            return new Mapper(configuration);
+        }
+
         private void AddNodeType(NodeTypeEntity nodeTypeEntity)
         {
             var existingNodeType = _context.NodeTypes.FirstOrDefault(nt => nt.Id == nodeTypeEntity.Id);
@@ -47,7 +58,7 @@ namespace Iis.OntologySchema.Saver
                 _context.NodeTypes.Add(nodeTypeEntity);
             else
                 _context.NodeTypes.Update(nodeTypeEntity);
-            
+
             if (nodeTypeEntity.Kind == Kind.Entity)
                 _createdEntityTypes.Add(nodeTypeEntity);
         }
@@ -62,14 +73,13 @@ namespace Iis.OntologySchema.Saver
                 if (nodeType.Kind == Kind.Relation)
                 {
                     var targetType = nodeType.RelationType.TargetType;
-                    if (targetType.Kind == Kind.Attribute)                     
+                    if (targetType.Kind == Kind.Attribute)
                     {
                         if (!_context.NodeTypes.Local.Any(nt => nt.Id == targetType.Id))
                         {
                             var targetTypeEntity = _mapper.Map<NodeTypeEntity>((INodeType)targetType);
                             AddNodeType(targetTypeEntity);
                             AddAttributeType(targetType.AttributeType);
-                            
                         }
                     }
                     AddRelationType(nodeType.RelationType);
@@ -107,7 +117,7 @@ namespace Iis.OntologySchema.Saver
                 _createdEntityTypes.FirstOrDefault(nt => nt.Name == name);
 
             if (entityType == null)
-                throw new Exception($"Неможливо знайти тип {name}");
+                throw new ArgumentNullException($"Неможливо знайти тип {name}");
 
             return entityType.Id;
         }
@@ -173,7 +183,7 @@ namespace Iis.OntologySchema.Saver
                         var attributeType = _mapper.Map<AttributeTypeEntity>((IAttributeType)item.NodeTypeFrom.RelationType.TargetType.AttributeType);
                         attributeType.Id = item.NodeTypeTo.RelationType.TargetType.Id;
                         _context.AttributeTypes.Update(attributeType);
-                        
+
                         updatedAttributesIds.Add(attributeNodeType.Id);
                     }
                 }
@@ -208,17 +218,6 @@ namespace Iis.OntologySchema.Saver
                 var aliasEntity = _context.Aliases.Single(a => a.DotName == alias.DotName && a.Type == AliasType.Ontology);
                 _context.Aliases.Remove(aliasEntity);
             }
-        }
-        private IMapper GetMapper()
-        {
-            var configuration = new MapperConfiguration(cfg =>
-            {
-                cfg.CreateMap<INodeType, NodeTypeEntity>();
-                cfg.CreateMap<IRelationType, RelationTypeEntity>();
-                cfg.CreateMap<IAttributeType, AttributeTypeEntity>();
-            });
-
-            return new Mapper(configuration);
         }
     }
 }

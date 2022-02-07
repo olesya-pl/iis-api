@@ -8,12 +8,8 @@ using Iis.RabbitMq.Helpers;
 
 namespace Iis.RabbitMq.Channels
 {
-
-    public class ConsumeMessageChannel<T> : IConsumeMessageChannel<T>
+    public sealed class ConsumeMessageChannel<T> : IConsumeMessageChannel<T>
     {
-        private const bool exclusiveQueue = false;
-        private const bool durableQueue = true;
-        private const bool autoDeleteQueue = false;
         private ILogger _logger;
         private IConnection _connection;
         private IModel _channel;
@@ -22,24 +18,26 @@ namespace Iis.RabbitMq.Channels
         private JsonSerializerOptions _options = new JsonSerializerOptions(JsonSerializerDefaults.Web);
         private Func<T, Task> _onMessageReceived;
 
-        public Func<T, Task> OnMessageReceived
-        { 
-            set
-            {
-                if(value is null) return;
-
-                _onMessageReceived = value;
-            }
-        }
-
         public ConsumeMessageChannel(IConnection connection, ChannelConfig config, ILogger logger)
         {
             _logger = logger;
             _connection = connection;
             _config = config;
-            _channel = ConfigureTopology(_connection.CreateModel(), config);
+            _channel = _connection.CreateModel();
+
+            TopologyProvider.ConfugureConsuming(_channel, _config, QueryConfig.DefaultDurable);
 
             ConfigureConsumer(_channel, _config, _options, _logger);
+        }
+
+        public Func<T, Task> OnMessageReceived
+        {
+            set
+            {
+                if (value is null) return;
+
+                _onMessageReceived = value;
+            }
         }
 
         public void Dispose()
@@ -51,36 +49,12 @@ namespace Iis.RabbitMq.Channels
                 _channel = null;
             }
 
-            if(_onMessageReceived != null)
+            if (_onMessageReceived != null)
             {
                 _onMessageReceived = null;
             }
 
             _connection = null;
-        }
-
-        private IModel ConfigureTopology(IModel channel, ChannelConfig config)
-        {
-            if (config is null || channel is null) return channel;
-
-            if (config.IsNotDefaultExchangeUsed())
-            {
-                channel.ExchangeDeclare(config.ExchangeName, config.ExchangeType ?? ExchangeType.Topic);
-            }
-
-            channel.BasicQos(0, config.PrefetchCount, false);
-
-            config.QueueName = channel.QueueDeclare(config.QueueName ?? string.Empty,
-                                                    durable: durableQueue,
-                                                    exclusive: exclusiveQueue,
-                                                    autoDelete: autoDeleteQueue).QueueName;
-
-            foreach (var routingKey in config.RoutingKeys)
-            {
-                channel.QueueBind(config.QueueName, config.ExchangeName, routingKey);
-            }
-
-            return channel;
         }
 
         private void ConfigureConsumer(IModel channel, ChannelConfig config, JsonSerializerOptions options, ILogger logger)

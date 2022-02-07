@@ -17,7 +17,7 @@ namespace Iis.RabbitMq.Helpers
                 }
                 catch (BrokerUnreachableException)
                 {
-                    logger?.LogError($"Attempting to connect again in {retryTimeoutInSeconds} sec.");
+                    logger?.LogError("Attempting to connect again in {RetryTimeout} sec.", retryTimeoutInSeconds);
                     Thread.Sleep(retryTimeoutInSeconds * 1000);
                 }
             }
