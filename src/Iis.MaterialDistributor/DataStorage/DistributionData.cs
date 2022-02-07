@@ -25,17 +25,15 @@ namespace Iis.MaterialDistributor.DataStorage
             _materialDistributionService = materialDistributionService;
         }
 
-        public async Task RefreshMaterialsAsync(CancellationToken cancellationToken)
+        public void RefreshMaterialsAsync(Dictionary<Guid, MaterialDistributionInfo> materials)
         {
-            _materials = (await _materialDistributionService
-                .GetMaterialCollectionAsync(cancellationToken))
-                .ToDictionary(_ => _.Id);
+            _materials = materials;
         }
 
-        public async Task Distribute(CancellationToken cancellationToken)
+        public void Distribute(IReadOnlyList<UserDistributionInfo> users)
         {
             _userQueues.Clear();
-            _users = await _materialDistributionService.GetOperatorsAsync(cancellationToken);
+            _users = users;
             foreach (var user in _users)
             {
                 _userQueues[user.Id] = GetUserQueue(user);

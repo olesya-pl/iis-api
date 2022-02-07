@@ -86,8 +86,7 @@ namespace Iis.MaterialDistributor.Services
 
             var dateRangeExpression = $"now-{hourOffset}h\\/h";
 
-            //return $"(ParentId:NULL)AND((CreatedDate:>{dateRangeExpression})OR(RegistrationDate:>{dateRangeExpression}))";
-            return $"(ParentId:NULL)";
+            return $"(ParentId:NULL)AND((CreatedDate:>{dateRangeExpression})OR(RegistrationDate:>{dateRangeExpression}))";
         }
     }
 }
