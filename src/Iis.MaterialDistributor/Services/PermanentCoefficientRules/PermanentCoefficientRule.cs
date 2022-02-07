@@ -5,15 +5,15 @@ using Iis.MaterialDistributor.Contracts.Services.DataTypes;
 using Iis.Messages.Materials;
 using Newtonsoft.Json.Linq;
 
-namespace Iis.MaterialDistributor.PermanentCoefficients
+namespace Iis.MaterialDistributor.Services
 {
-    public abstract class PermanentCoefficientRule
+    internal abstract class PermanentCoefficientRule
     {
         public abstract bool IsSatisfied(MaterialInfo model);
 
-        protected bool IsJoined(Material model) => model.RelatedObjectCollection?.Length > 0;
+        protected static bool IsJoined(Material model) => model.RelatedObjectCollection?.Length > 0;
 
-        protected bool HasFeature(JObject metadata, string featureName)
+        protected static bool HasFeature(JObject metadata, string featureName)
         {
             if (metadata == null
                 || !metadata.TryGetValue(FeatureFields.FeaturesSection, out var featureSection)) return false;
@@ -29,7 +29,7 @@ namespace Iis.MaterialDistributor.PermanentCoefficients
             return false;
         }
 
-        protected bool HasImportance(Material model, Importance importance)
+        protected static bool HasImportance(Material model, Importance importance)
         {
             return model.RelatedObjectCollection?.Any(_ => _.Importance.HasValue && importance.HasFlag(_.Importance.Value)) ?? false;
         }

@@ -1,8 +1,8 @@
 ﻿using Iis.MaterialDistributor.Contracts.Services.DataTypes;
 
-namespace Iis.MaterialDistributor.PermanentCoefficients
+namespace Iis.MaterialDistributor.Services
 {
-    public class RelatedToObjectOfStudyRule : PermanentCoefficientRule
+    internal class RelatedToObjectOfStudyRule : PermanentCoefficientRule
     {
         public override bool IsSatisfied(MaterialInfo model) => IsJoined(model.Material);
     }
