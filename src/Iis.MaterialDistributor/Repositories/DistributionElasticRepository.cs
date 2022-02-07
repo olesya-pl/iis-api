@@ -51,29 +51,33 @@ namespace Iis.MaterialDistributor.Repositories
 
         public async Task<IReadOnlyList<UserDistributionInfo>> GetOperatorsAsync(CancellationToken cancellationToken)
         {
-            return new List<UserDistributionInfo>
+            var jObject = await _elasticManager
+                .WithDefaultUser()
+                .GetUsersAsync(cancellationToken);
+
+            var result = new List<UserDistributionInfo>();
+            foreach (var token in jObject.Children())
             {
-                new UserDistributionInfo { Id = Guid.NewGuid(), Username = "aaa" },
-                new UserDistributionInfo { Id = Guid.NewGuid(), Username = "bbb" },
-                new UserDistributionInfo { Id = Guid.NewGuid(), Username = "bbb" },
-            };
-            //var elasticResult = await _elasticManager
-            //    .WithDefaultUser()
-            //    .GetUsersAsync(cancellationToken);
-            //return null;
+                var user = GetUserDistributionInfo(token);
+                result.Add(user);
+            }
+            return result;
         }
 
         private TimeSpan GetScrollDuration()
         {
             return TimeSpan.FromMinutes(
-            _elasticConfiguration.ScrollDurationMinutes == ZeroScrollDurationMinutes
-            ? ElasticConstants.DefaultScrollDurationMinutes
-            : _elasticConfiguration.ScrollDurationMinutes);
+                _elasticConfiguration.ScrollDurationMinutes == ZeroScrollDurationMinutes
+                ? ElasticConstants.DefaultScrollDurationMinutes
+                : _elasticConfiguration.ScrollDurationMinutes);
         }
 
-        private UserDistributionInfo GetUserDistributionInfo(JObject jObj)
+        private UserDistributionInfo GetUserDistributionInfo(JToken token)
         {
-            return new UserDistributionInfo();
+            return new UserDistributionInfo
+            {
+                Username = ((JProperty)token).Name
+            };
         }
     }
 }

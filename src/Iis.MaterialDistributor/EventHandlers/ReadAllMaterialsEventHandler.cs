@@ -28,13 +28,6 @@ namespace Iis.MaterialDistributor.MediatR.EventHandlers
         {
             await _distributionData.RefreshMaterialsAsync(cancellationToken);
             await _distributionData.Distribute(cancellationToken);
-            //var coefficient = await _coefficientService.GetWithMaxOffsetHoursAsync(cancellationToken);
-
-            //if (coefficient is null) return;
-
-            //var materialCollection = await _materialService.GetMaterialCollectionAsync(coefficient.OffsetHours, cancellationToken);
-
-            //materialCollection = await _coefficientService.SetForMaterialsAsync(DateTime.UtcNow, materialCollection, cancellationToken);
         }
     }
 }

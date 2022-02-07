@@ -37,6 +37,7 @@ namespace Iis.Services
             ReportIndex = "Reports";
             SignIndexes = new[] { SignTypeName.SatelliteIridiumPhone, SignTypeName.SatellitePhone, SignTypeName.CellPhone};
             ChangeHistoryIndexes = new[] { "ChangeHistory" };
+            SecurityIndexes = new[] { EntityTypeNames.SecurityLevel.ToString() };
             FieldsToExcludeByIndex = new Dictionary<string, IEnumerable<string>>()
             {
                 { "Event", new [] { "associatedWithEvent" } }
@@ -51,6 +52,7 @@ namespace Iis.Services
         public IReadOnlyCollection<string> EventIndexes { get; }
         public IReadOnlyCollection<string> SignIndexes { get; }
         public IReadOnlyCollection<string> ChangeHistoryIndexes { get; }
+        public IReadOnlyCollection<string> SecurityIndexes { get; }
         public Dictionary<string, IEnumerable<string>> FieldsToExcludeByIndex { get; }
     }
 }
