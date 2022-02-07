@@ -1,9 +1,9 @@
 ﻿using Iis.MaterialDistributor.Contracts.Services.DataTypes;
 using Iis.Messages.Materials;
 
-namespace Iis.MaterialDistributor.PermanentCoefficients
+namespace Iis.MaterialDistributor.Services
 {
-    public class RelatedWithHighPriority : PermanentCoefficientRule
+    internal class RelatedWithHighPriority : PermanentCoefficientRule
     {
         public override bool IsSatisfied(MaterialInfo model) => IsJoined(model.Material)
             && HasImportance(model.Material, Importance.Critical | Importance.High | Importance.Medium);
