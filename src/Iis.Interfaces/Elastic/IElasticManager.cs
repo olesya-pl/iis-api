@@ -36,6 +36,7 @@ namespace Iis.Interfaces.Elastic
         Task<bool> DeleteExactPayloadAsync(string path, CancellationToken cancellationToken);
         Task<bool> PutExactPayloadAsync(string path, string data, CancellationToken cancellationToken);
         Task<JObject> GetUsersAsync(CancellationToken cancellationToken = default);
+        Task<IElasticSearchResult> GetSecurityLevelsAsync(CancellationToken cancellationToken = default);
         IElasticManager WithUserId(Guid userId);
         IElasticManager WithDefaultUser();
     }

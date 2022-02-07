@@ -6,7 +6,9 @@ using Iis.MaterialDistributor.DataStorage;
 using Iis.Interfaces.SecurityLevels;
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using Iis.Security.SecurityLevels;
+using Iis.MaterialDistributor.Contracts.Repositories;
 
 namespace Iis.MaterialDistributor.DependencyInjection
 {
@@ -20,10 +22,13 @@ namespace Iis.MaterialDistributor.DependencyInjection
             services.AddTransient<IPermanentCoefficientEvaluator, PermanentCoefficientEvaluator>();
             services.AddTransient<IFinalRatingEvaluator, FinalRatingEvaluator>();
             services.AddSingleton<IDistributionData, DistributionData>();
-            services.AddSingleton<ISecurityLevelChecker>(_ => new SecurityLevelChecker(new List<SecurityLevelPlain>
-                {
-                    new SecurityLevelPlain { Id = Guid.NewGuid(), Name = "Root", UniqueIndex = 1 }
-                }));
+            services.AddSingleton<ISecurityLevelChecker>(provider =>
+            {
+                var repository = provider.GetRequiredService<IDistributionElasticRepository>();
+                var task = repository.GetSecurityLevelsPlainAsync(CancellationToken.None);
+                task.Wait();
+                return new SecurityLevelChecker(task.Result);
+            });
 
             return services;
         }

@@ -357,6 +357,20 @@ namespace Iis.Elastic
             return result;
         }
 
+        public async Task<IElasticSearchResult> GetSecurityLevelsAsync(CancellationToken cancellationToken = default)
+        {
+            
+            var indexName = GetRealIndexName(EntityTypeNames.SecurityLevel.ToString());
+            return await SearchAsync(string.Empty, new [] { EntityTypeNames.SecurityLevel.ToString() }, cancellationToken);
+            //var path = $"{indexName}/_search");
+
+            //var response = await GetAsync(path, string.Empty, null, cancellationToken);
+            //if (!response.Success) return null;
+
+            //var result = _resultExtractor.GetFromResponse(response);
+            //return result;
+        }
+
         private void ApplyIndexMappingSettings(JObject request)
         {
             var mappingValue = new JObject(

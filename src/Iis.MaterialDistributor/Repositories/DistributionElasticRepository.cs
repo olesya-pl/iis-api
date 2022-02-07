@@ -8,6 +8,9 @@ using Iis.MaterialDistributor.Contracts.Repositories;
 using Iis.MaterialDistributor.DataStorage;
 using System.Collections.Generic;
 using Newtonsoft.Json.Linq;
+using Iis.Interfaces.SecurityLevels;
+using Newtonsoft.Json;
+using System.Linq;
 
 namespace Iis.MaterialDistributor.Repositories
 {
@@ -62,6 +65,15 @@ namespace Iis.MaterialDistributor.Repositories
                 result.Add(user);
             }
             return result;
+        }
+
+        public async Task<IReadOnlyList<SecurityLevelPlain>> GetSecurityLevelsPlainAsync(CancellationToken cancellationToken)
+        {
+            var response = await _elasticManager
+                .WithDefaultUser()
+                .GetSecurityLevelsAsync(cancellationToken);
+
+            return response.Items.Select(_ => _.SearchResult.ToObject<SecurityLevelPlain>()).ToList();
         }
 
         private TimeSpan GetScrollDuration()
