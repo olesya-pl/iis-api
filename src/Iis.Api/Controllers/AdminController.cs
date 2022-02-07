@@ -329,8 +329,6 @@ namespace Iis.Api.Controllers
             return Content(log.ToString());
         }
 
-
-
         [HttpGet("GetElasticJson/{id}")]
         public async Task<IActionResult> GetElasticJson(string id, CancellationToken cancellationToken)
         {
