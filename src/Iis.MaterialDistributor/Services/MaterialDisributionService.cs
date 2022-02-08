@@ -37,7 +37,6 @@ namespace Iis.MaterialDistributor.Services
 
         public async Task<List<MaterialDistributionInfo>> GetMaterialCollectionAsync(int offsetHours, CancellationToken cancellationToken)
         {
-            var users = await _elasticRepository.GetOperatorsAsync(cancellationToken);
             var searchParam = new SearchParams(GetSuggestion(offsetHours), _defaultPagination, _resultFieldCollection);
 
             var result = await _elasticRepository.BeginSearchByScrollAsync(searchParam, cancellationToken);

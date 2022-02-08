@@ -11,6 +11,8 @@ namespace Iis.Interfaces.Elastic
     public interface IElasticManager
     {
         Task<bool> PutDocumentAsync(string indexName, string id, string jsonDocument, CancellationToken cancellationToken = default);
+        Task<bool> PutDocumentAsync(string indexName, Guid id, string jsonDocument, CancellationToken cancellationToken = default) =>
+            PutDocumentAsync(indexName, id.ToString("N"), jsonDocument, cancellationToken);
         Task<bool> PutDocumentAsync(string indexName, string documentId, string jsonDocument, bool waitForIndexing, CancellationToken cancellationToken = default);
         Task<bool> DeleteDocumentAsync(string indexName, string documentId, CancellationToken ct = default);
         Task<IElasticSearchResult> SearchAsync(IisElasticSearchParams searchParams, CancellationToken cancellationToken = default);

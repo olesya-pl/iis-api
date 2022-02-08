@@ -8,7 +8,7 @@ namespace Iis.MaterialDistributor.DataStorage
 {
     public interface IDistributionData
     {
-        void RefreshMaterialsAsync(Dictionary<Guid, MaterialDistributionInfo> materials);
+        void RefreshMaterials(Dictionary<Guid, MaterialDistributionInfo> materials);
         void Distribute(IReadOnlyList<UserDistributionInfo> users);
         MaterialDistributionInfo GetMaterialFromQueue(UserDistributionInfo user);
     }

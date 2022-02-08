@@ -25,7 +25,7 @@ namespace Iis.MaterialDistributor.DataStorage
             _materialDistributionService = materialDistributionService;
         }
 
-        public void RefreshMaterialsAsync(Dictionary<Guid, MaterialDistributionInfo> materials)
+        public void RefreshMaterials(Dictionary<Guid, MaterialDistributionInfo> materials)
         {
             _materials = materials;
         }

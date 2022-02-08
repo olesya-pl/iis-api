@@ -307,7 +307,7 @@ namespace Iis.Api.Controllers
         }
 
         [HttpGet("ReInitializeSecurityIndexes")]
-        public async Task<IActionResult> ReInitializeSecurityIndexes(CancellationToken cancellationToken)
+        public async Task<IActionResult> ReInitializeSecurityIndexesAsync(CancellationToken cancellationToken)
         {
             var stopwatch = Stopwatch.StartNew();
 
@@ -322,7 +322,7 @@ namespace Iis.Api.Controllers
             foreach (var level in securityLevelsPlain)
             {
                 var json = JsonConvert.SerializeObject(level);
-                await _elasticManager.PutDocumentAsync(index, level.Id.ToString("N"), json, cancellationToken);
+                await _elasticManager.PutDocumentAsync(index, level.Id, json, cancellationToken);
             }
             log.AppendLine($"Security indexes created. Spend: {stopwatch.ElapsedMilliseconds} ms");
 

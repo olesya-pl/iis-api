@@ -31,7 +31,7 @@ namespace Iis.MaterialDistributor.MediatR.EventHandlers
                 .GetMaterialCollectionAsync(cancellationToken))
                 .ToDictionary(_ => _.Id);
             var users = await _materialDistributionService.GetOperatorsAsync(cancellationToken);
-            _distributionData.RefreshMaterialsAsync(materials);
+            _distributionData.RefreshMaterials(materials);
             _distributionData.Distribute(users);
         }
     }
