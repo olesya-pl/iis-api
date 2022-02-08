@@ -36,7 +36,8 @@ namespace Iis.EventMaterialAutoAssignment
         private readonly IConnection _connection;
         private readonly IModel _incommingChannel;
 
-        public EventMaterialAssigner(ILogger<EventMaterialAssigner> logger,
+        public EventMaterialAssigner(
+            ILogger<EventMaterialAssigner> logger,
             IConnectionFactory connectionFactory,
             EventMaterialAssignerConfiguration configuration,
             IOntologyNodesData ontologyData,
@@ -144,7 +145,8 @@ namespace Iis.EventMaterialAutoAssignment
                                         .FirstOrDefaultAsync(p => p.Id == message.ConfigId);
         }
 
-        private static Dictionary<string, object> GenerateEventProperties(AssignmentConfig config,
+        private static Dictionary<string, object> GenerateEventProperties(
+            AssignmentConfig config,
             Guid? componentId,
             Guid? typeId,
             Guid? importanceId,
@@ -165,7 +167,7 @@ namespace Iis.EventMaterialAutoAssignment
 
         private static async Task AssignEventToMaterial(NodeMaterialRelationService<IIISUnitOfWork> nodeMaterialRelationService, FoundMaterialMessage message, Guid eventId)
         {
-            var nodesSet = (new[] { eventId }).ToHashSet();
+            var nodesSet = new[] { eventId }.ToHashSet();
             var materialsSet = message.MaterialIds.ToHashSet();
             await nodeMaterialRelationService.CreateMultipleRelations(nodesSet, materialsSet, null);
         }
