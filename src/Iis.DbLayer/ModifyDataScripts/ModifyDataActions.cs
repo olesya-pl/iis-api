@@ -274,13 +274,13 @@ namespace Iis.DbLayer.ModifyDataScripts
 
             var materialUploadTabId = new Guid("b51766b93422450ca165d9f9d98a1fb0");
             var materialUploadTab = context.AccessObjects.Find(materialUploadTabId);
-            if (themesTab == null)
+            if (materialUploadTab == null)
             {
                 context.AccessObjects.Add(new AccessObjectEntity
                 {
                     Id = new Guid("b51766b93422450ca165d9f9d98a1fb0"),
                     Title = "Завантаження матеріалів",
-                    Kind = AccessKind.MaterialUpoadTab,
+                    Kind = AccessKind.MaterialUploadTab,
                     Category = AccessCategory.Tab,
                     ReadAllowed = true,
                 });
@@ -290,7 +290,7 @@ namespace Iis.DbLayer.ModifyDataScripts
 
             var wikiTabId = new Guid("cda32d549dd4403a94c391f8ff6d5bca");
             var wikiTab = context.AccessObjects.Find(wikiTabId);
-            if (themesTab == null)
+            if (wikiTab == null)
             {
                 context.AccessObjects.Add(new AccessObjectEntity
                 {
@@ -1258,6 +1258,25 @@ namespace Iis.DbLayer.ModifyDataScripts
         {
             public decimal Lat { get; set; }
             public decimal Lon { get; set; }
+        }
+
+        public void AddAttributesManagerToAccessObjects(OntologyContext context, IOntologyNodesData data)
+        {
+            var attributesManagerTabId = new Guid("5e951b5aa6354756832ce01813a7aa6c");
+            var attributesManagerTab = context.AccessObjects.Find(attributesManagerTabId);
+            if (attributesManagerTab == null)
+            {
+                context.AccessObjects.Add(new AccessObjectEntity
+                {
+                    Id = new Guid("5e951b5aa6354756832ce01813a7aa6c"),
+                    Title = "Менеджер Атрибутивного доступу",
+                    Kind = AccessKind.AttributesManagerTab,
+                    Category = AccessCategory.Tab,
+                    ReadAllowed = true,
+                });
+            }
+
+            context.SaveChanges();
         }
     }
 }

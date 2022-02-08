@@ -13,7 +13,8 @@
         AccessLevelChange = 11,
         Report = 12,
         ThemesTab = 13,
-        MaterialUpoadTab = 14,
-        Wiki = 15
+        MaterialUploadTab = 14,
+        Wiki = 15,
+        AttributesManagerTab = 16
     }
 }
