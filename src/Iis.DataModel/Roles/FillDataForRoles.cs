@@ -107,7 +107,7 @@ namespace Iis.DataModel.Roles
                 {
                     Id = new Guid("b51766b93422450ca165d9f9d98a1fb0"),
                     Title = "Завантаження матеріалів",
-                    Kind = AccessKind.MaterialUpoadTab,
+                    Kind = AccessKind.MaterialUploadTab,
                     Category = AccessCategory.Tab,
                     ReadAllowed = true,
                 },
