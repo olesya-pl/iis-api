@@ -45,15 +45,15 @@ namespace Iis.MaterialDistributor.DataStorage
         {
             lock (_lock)
             {
-                if (_userQueues.ContainsKey(user.Id))
+                if (!_userQueues.TryGetValue(user.Id, out var queue))
                 {
-                    _userQueues[user.Id] = GetUserQueue(user);
+                    queue = GetUserQueue(user);
                 }
 
-                if (_userQueues[user.Id].Count == 0) return null;
+                if (queue.Count == 0) return null;
 
-                var result = _userQueues[user.Id][0];
-                _userQueues[user.Id].RemoveAt(0);
+                var result = queue[0];
+                queue.RemoveAt(0);
                 return result;
             }
         }
