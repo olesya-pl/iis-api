@@ -8,7 +8,7 @@ namespace Iis.MaterialDistributor.Contracts.Services
     {
         private const int DefaultVariableCoefficientValue = 0;
 
-        public int GetVariableCoefficientValue(IReadOnlyCollection<VariableCoefficientRule> ruleCollection, DateTime comparisonTimeStamp, MaterialDocument document)
+        public int GetVariableCoefficientValue(IReadOnlyCollection<VariableCoefficientRule> ruleCollection, DateTime comparisonTimeStamp, MaterialDistributionInfo document)
         {
             if (ruleCollection is null || ruleCollection.Count == 0 || document is null) return DefaultVariableCoefficientValue;
 

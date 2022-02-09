@@ -8,6 +8,7 @@ namespace Iis.Interfaces.SecurityLevels
     {
         ISecurityLevel RootLevel { get; }
         void Reload();
+        void Reload(IReadOnlyList<SecurityLevelPlain> plainLevels);
         ISecurityLevel GetSecurityLevel(Guid id);
         ISecurityLevel GetSecurityLevel(int uniqueIndex);
         IReadOnlyList<ISecurityLevel> GetSecurityLevels(IReadOnlyList<Guid> securityLevelIds);
@@ -17,6 +18,7 @@ namespace Iis.Interfaces.SecurityLevels
         ISecurityLevel GetSecurityLevelByName(string name);
         ISecurityLevel CreateChildLevel(int parentIndex);
         bool AccessGranted(IReadOnlyList<int> userIndexes, IReadOnlyList<int> objectIndexes);
+        bool AccessGranted(IReadOnlyList<ISecurityLevel> userLevels, IReadOnlyList<ISecurityLevel> objectLevels);
         string GetObjectElasticCode(IReadOnlyList<int> indexes);
         string GetUserElasticCode(IReadOnlyList<int> indexes);
         bool IsNameUnique(Guid id, string name);

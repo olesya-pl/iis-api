@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Iis.Interfaces.Ontology.Schema;
+using Iis.Services.Contracts.Dtos;
 using Newtonsoft.Json.Linq;
 
 namespace Iis.Interfaces.Elastic
@@ -10,6 +11,8 @@ namespace Iis.Interfaces.Elastic
     public interface IElasticManager
     {
         Task<bool> PutDocumentAsync(string indexName, string id, string jsonDocument, CancellationToken cancellationToken = default);
+        Task<bool> PutDocumentAsync(string indexName, Guid id, string jsonDocument, CancellationToken cancellationToken = default) =>
+            PutDocumentAsync(indexName, id.ToString("N"), jsonDocument, cancellationToken);
         Task<bool> PutDocumentAsync(string indexName, string documentId, string jsonDocument, bool waitForIndexing, CancellationToken cancellationToken = default);
         Task<bool> DeleteDocumentAsync(string indexName, string documentId, CancellationToken ct = default);
         Task<IElasticSearchResult> SearchAsync(IisElasticSearchParams searchParams, CancellationToken cancellationToken = default);
@@ -34,6 +37,8 @@ namespace Iis.Interfaces.Elastic
         Task<T> GetExactPayloadAsyncDictionaryAsync<T>(string path, CancellationToken cancellationToken);
         Task<bool> DeleteExactPayloadAsync(string path, CancellationToken cancellationToken);
         Task<bool> PutExactPayloadAsync(string path, string data, CancellationToken cancellationToken);
+        Task<JObject> GetUsersAsync(CancellationToken cancellationToken = default);
+        Task<IElasticSearchResult> GetSecurityLevelsAsync(CancellationToken cancellationToken = default);
         IElasticManager WithUserId(Guid userId);
         IElasticManager WithDefaultUser();
     }

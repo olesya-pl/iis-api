@@ -3,32 +3,24 @@ using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 using Iis.MaterialDistributor.Contracts.Events;
-using Iis.MaterialDistributor.Contracts.Services;
+using Iis.MaterialDistributor.Contracts.DataStorage;
 
 namespace Iis.MaterialDistributor.MediatR.EventHandlers
 {
     public class ReadAllMaterialsEventHandler : INotificationHandler<ReadAllMaterialsEvent>
     {
-        private readonly IMaterialService _materialService;
-        private readonly IVariableCoefficientService _coefficientService;
+        private readonly IDistributionDataMediator _distributionDataMediator;
 
         public ReadAllMaterialsEventHandler(
-            IMaterialService materialService,
-            IVariableCoefficientService coefficientService)
+            IDistributionDataMediator distributionDataMediator)
         {
-            _materialService = materialService;
-            _coefficientService = coefficientService;
+            _distributionDataMediator = distributionDataMediator;
         }
 
         public async Task Handle(ReadAllMaterialsEvent notification, CancellationToken cancellationToken)
         {
-            var coefficient = await _coefficientService.GetWithMaxOffsetHoursAsync(cancellationToken);
-
-            if (coefficient is null) return;
-
-            var materialCollection = await _materialService.GetMaterialCollectionAsync(coefficient.OffsetHours, cancellationToken);
-
-            materialCollection = await _coefficientService.SetForMaterialsAsync(DateTime.UtcNow, materialCollection, cancellationToken);
+            await _distributionDataMediator.RefreshMaterialsAsync(cancellationToken);
+            await _distributionDataMediator.DistributeAsync(cancellationToken);
         }
     }
 }

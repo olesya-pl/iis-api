@@ -11,6 +11,8 @@ namespace Iis.MaterialDistributor.DependencyInjection
             services.AddTransient<IMaterialElasticRepository, MaterialElasticRepository>();
             services.AddTransient<IVariableCoefficientRepository, VariableCoefficientRepository>();
             services.AddTransient<IPermanentCoefficientRepository, PermanentCoefficientRepository>();
+            services.AddTransient<IUserElasticRepository, UserElasticRepository>();
+            services.AddTransient<ISecurityLevelElasticRepository, SecurityLevelElasticRepository>();
 
             return services;
         }

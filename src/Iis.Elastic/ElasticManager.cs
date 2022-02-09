@@ -13,6 +13,7 @@ using Iis.Elastic.SearchQueryExtensions;
 using Iis.Elastic.SearchResult;
 using Iis.Interfaces.Elastic;
 using Iis.Interfaces.Ontology.Schema;
+using Iis.Services.Contracts.Dtos;
 using Iis.Utility;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
@@ -344,6 +345,20 @@ namespace Iis.Elastic
 
             createRequest["settings"] = JObject.Parse(analyzerSettings);
         }
+
+        public async Task<JObject> GetUsersAsync(CancellationToken cancellationToken = default)
+        {
+            var path = "_security/user";
+
+            var response = await GetAsync(path, string.Empty, null, cancellationToken);
+            if (!response.Success) return null;
+
+            var result = JObject.Parse(response.Body);
+            return result;
+        }
+
+        public Task<IElasticSearchResult> GetSecurityLevelsAsync(CancellationToken cancellationToken = default) =>
+            SearchAsync(string.Empty, new[] { EntityTypeNames.SecurityLevel.ToString() }, cancellationToken);
 
         private void ApplyIndexMappingSettings(JObject request)
         {

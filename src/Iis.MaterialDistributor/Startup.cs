@@ -32,6 +32,7 @@ namespace Iis.MaterialDistributor
             services.AddPersistance();
             services.RegisterConfigurations(Configuration);
             services.RegisterMqFactory(Configuration, out _);
+            services.RegisterDataStorage();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

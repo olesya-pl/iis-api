@@ -5,6 +5,6 @@ namespace Iis.MaterialDistributor.Contracts.Services
 {
     public interface IVariableCoefficientRuleEvaluator
     {
-        int GetVariableCoefficientValue(IReadOnlyCollection<VariableCoefficientRule> ruleCollection, DateTime comparisonTimeStamp, MaterialDocument document);
+        int GetVariableCoefficientValue(IReadOnlyCollection<VariableCoefficientRule> ruleCollection, DateTime comparisonTimeStamp, MaterialDistributionInfo document);
     }
 }
