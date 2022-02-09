@@ -1,7 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
 using Iis.MaterialDistributor.Contracts.Services;
 using Iis.MaterialDistributor.Services;
-using Iis.MaterialDistributor.PermanentCoefficients;
 
 namespace Iis.MaterialDistributor.DependencyInjection
 {

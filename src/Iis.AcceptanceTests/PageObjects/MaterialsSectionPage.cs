@@ -278,5 +278,11 @@ namespace AcceptanceTests.PageObjects
 
         [FindsBy(How = How.XPath, Using = "//*[@aria-sort='none'][@class='materials-table__createdDate p-sortable-column']")]
         public IWebElement CreatedDateNULL;
+
+        [FindsBy(How = How.XPath, Using = "//*[@class='wavesurfer__control wavesurfer__control--play']//*[@data-icon='pause']")]
+        public IWebElement PlayButton;
+
+        [FindsBy(How = How.XPath, Using = "//*[@class='wavesurfer__control wavesurfer__control--play']//*[@data-icon='play']")]
+        public IWebElement PauseButton;
     }
 }

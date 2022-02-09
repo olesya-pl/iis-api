@@ -1,9 +1,9 @@
 ﻿using Iis.MaterialDistributor.Contracts.Services.DataTypes;
 using Iis.Messages.Materials;
 
-namespace Iis.MaterialDistributor.PermanentCoefficients
+namespace Iis.MaterialDistributor.Services
 {
-    public class RelatedAndIgnoredRule : PermanentCoefficientRule
+    internal class RelatedAndIgnoredRule : PermanentCoefficientRule
     {
         public override bool IsSatisfied(MaterialInfo model) => IsJoined(model.Material)
             && HasImportance(model.Material, Importance.Ignore);

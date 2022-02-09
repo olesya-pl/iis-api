@@ -1,9 +1,9 @@
 ﻿using Iis.Interfaces.Constants;
 using Iis.MaterialDistributor.Contracts.Services.DataTypes;
 
-namespace Iis.MaterialDistributor.PermanentCoefficients
+namespace Iis.MaterialDistributor.Services
 {
-    public class HasTMSIRule : PermanentCoefficientRule
+    internal class HasTMSIRule : PermanentCoefficientRule
     {
         public override bool IsSatisfied(MaterialInfo model) => HasFeature(model.Metadata, FeatureFields.TMSI);
     }

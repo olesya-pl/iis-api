@@ -5,9 +5,9 @@ using Iis.MaterialDistributor.Contracts.Services;
 using Iis.MaterialDistributor.Contracts.Services.DataTypes;
 using Iis.MaterialDistributor.DataModel.Entities;
 
-namespace Iis.MaterialDistributor.PermanentCoefficients
+namespace Iis.MaterialDistributor.Services
 {
-    public class PermanentCoefficientEvaluator : IPermanentCoefficientEvaluator
+    internal class PermanentCoefficientEvaluator : IPermanentCoefficientEvaluator
     {
         private const int DefaultCoefficientValue = 0;
 

@@ -1,9 +1,9 @@
 ﻿using Iis.Interfaces.Constants;
 using Iis.MaterialDistributor.Contracts.Services.DataTypes;
 
-namespace Iis.MaterialDistributor.PermanentCoefficients
+namespace Iis.MaterialDistributor.Services
 {
-    public class HasIridiumOptionsRule : PermanentCoefficientRule
+    internal class HasIridiumOptionsRule : PermanentCoefficientRule
     {
         public override bool IsSatisfied(MaterialInfo model) => HasFeature(model.Metadata, FeatureFields.Mcc)
             && HasFeature(model.Metadata, FeatureFields.Mnc)

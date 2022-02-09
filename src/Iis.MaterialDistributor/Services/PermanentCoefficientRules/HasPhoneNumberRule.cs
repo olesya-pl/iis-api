@@ -1,9 +1,9 @@
 ﻿using Iis.Interfaces.Constants;
 using Iis.MaterialDistributor.Contracts.Services.DataTypes;
 
-namespace Iis.MaterialDistributor.PermanentCoefficients
+namespace Iis.MaterialDistributor.Services
 {
-    public class HasPhoneNumberRule : PermanentCoefficientRule
+    internal class HasPhoneNumberRule : PermanentCoefficientRule
     {
         public override bool IsSatisfied(MaterialInfo model) => HasFeature(model.Metadata, FeatureFields.PhoneNumber);
     }

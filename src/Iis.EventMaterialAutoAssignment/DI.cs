@@ -15,7 +15,7 @@ namespace Iis.EventMaterialAutoAssignment
             var messageHandlerConfig = configuration.GetSection(MessageHandlerSectionName)
                                             .Get<MaterialMessageHandlerConfiguration>();
 
-           return services.AddSingleton(messageHandlerConfig)
+            return services.AddSingleton(messageHandlerConfig)
                 .AddSingleton(assignerConfig)
                 .AddHostedService<MaterialMessageHandler>()
                 .AddHostedService<EventMaterialAssigner>();

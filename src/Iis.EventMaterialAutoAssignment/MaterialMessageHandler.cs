@@ -25,8 +25,8 @@ namespace Iis.EventMaterialAutoAssignment
         private readonly IModel _incommingChannel;
         private readonly IModel _outgoingChannel;
 
-
-        public MaterialMessageHandler(ILogger<MaterialMessageHandler> logger,
+        public MaterialMessageHandler(
+            ILogger<MaterialMessageHandler> logger,
             IConnectionFactory connectionFactory,
             MaterialMessageHandlerConfiguration configuration,
             IServiceScopeFactory serviceScopeFactory)
@@ -88,10 +88,11 @@ namespace Iis.EventMaterialAutoAssignment
                             var serialized = JsonConvert.SerializeObject(message);
                             var body = Encoding.UTF8.GetBytes(serialized);
 
-                            _outgoingChannel.BasicPublish(exchange: _configuration.OutgoingExchangeName,
-                                                routingKey: _configuration.OutgoingRoutingKey,
-                                                basicProperties: null,
-                                                body: body);
+                            _outgoingChannel.BasicPublish(
+                                exchange: _configuration.OutgoingExchangeName,
+                                routingKey: _configuration.OutgoingRoutingKey,
+                                basicProperties: null,
+                                body: body);
                         }
 
                         _incommingChannel.BasicAck(args.DeliveryTag, false);
@@ -107,7 +108,6 @@ namespace Iis.EventMaterialAutoAssignment
             _incommingChannel.BasicConsume(_configuration.IncomingQueueName, false, channelConsumer);
 
             return Task.CompletedTask;
-
         }
     }
 }
