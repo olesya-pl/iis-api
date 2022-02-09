@@ -1,28 +1,28 @@
-﻿using Iis.Domain;
-using Iis.Interfaces.Elastic;
-using Iis.Interfaces.Ontology.Data;
-using Iis.Interfaces.Ontology.Schema;
-using Iis.Utility;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Iis.Services.Contracts.Interfaces;
-using Attribute = Iis.Domain.Attribute;
-using Iis.Interfaces.AccessLevels;
-using Iis.Domain.Users;
-using Newtonsoft.Json.Linq;
+using Iis.Domain;
 using Iis.Domain.TreeResult;
+using Iis.Domain.Users;
+using Iis.Interfaces.AccessLevels;
+using Iis.Interfaces.Elastic;
 using Iis.Interfaces.Ontology;
+using Iis.Interfaces.Ontology.Data;
+using Iis.Interfaces.Ontology.Schema;
+using Iis.Services.Contracts.Interfaces;
+using Iis.Utility;
+using Newtonsoft.Json.Linq;
+using Attribute = Iis.Domain.Attribute;
 
 namespace Iis.DbLayer.Ontology.EntityFramework
 {
     public class OntologyServiceWithCache : IOntologyService
     {
-        readonly IOntologyNodesData _data;
-        readonly IElasticService _elasticService;
-        readonly IElasticState _elasticState;
+        private readonly IOntologyNodesData _data;
+        private readonly IElasticService _elasticService;
+        private readonly IElasticState _elasticState;
         public OntologyServiceWithCache(
             IOntologyNodesData data,
             IElasticService elasticService,
@@ -49,20 +49,6 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             }
 
             return res;
-        }
-
-        private IEnumerable<INode> GetEventsAssociatedWithEntityCore(Guid entityId)
-        {
-            const string propertyName = "associatedWithEvent";
-            var eventType = _data.Schema.GetEntityTypeByName(EntityTypeNames.Event.ToString());
-            var property = eventType.GetRelationTypeByName(propertyName);
-            if (property == null) throw new Exception($"Property does not exist: {EntityTypeNames.Event}.{propertyName}");
-
-            var node = _data.GetNode(entityId);
-            var events = node?.IncomingRelations
-                .Where(r => r.Node.NodeTypeId == property.Id)
-                .Select(r => r.SourceNode) ?? new List<INode>();
-            return events;
         }
 
         public IReadOnlyCollection<IncomingRelation> GetIncomingEntities(Guid entityId)
@@ -142,8 +128,9 @@ namespace Iis.DbLayer.Ontology.EntityFramework
 
             var derivedTypes = _data.Schema
                 .GetNodeTypes(types.Select(t => t.Id), true)
-                .Where(type => !type.IsAbstract 
-                    && _elasticService.TypeIsAvalilable(type,
+                .Where(type => !type.IsAbstract
+                    && _elasticService.TypeIsAvalilable(
+                        type,
                         entitySearchGranted,
                         wikiSearchGranted));
 
@@ -163,39 +150,6 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             }
         }
 
-        private IEnumerable<INode> FilterAccessLevels(IEnumerable<INode> nodes, User user)
-        {
-            var accessLevels = nodes
-                .Where(p => string.Equals(p.NodeType.Name, nameof(AccessLevel), StringComparison.Ordinal))
-                .Where(p => {
-                    var stringValue = p.OutgoingRelations.FirstOrDefault(r => string.Equals(r.TypeName, "numericIndex", StringComparison.Ordinal)).TargetNode.Value;
-                    _ = int.TryParse(stringValue, out var value);
-                    return user.IsAdmin || value <= user.AccessLevel;
-                })
-                .OrderBy(n => {
-                    var p = n.GetSingleProperty("numericIndex");
-                    return p == null ? 0 : int.Parse(p.Value);
-                });
-
-            return accessLevels
-                .Concat(nodes.Where(p => !string.Equals(p.NodeType.Name, nameof(AccessLevel), StringComparison.Ordinal)));
-        }
-
-        private List<INode> GetNodesWithSuggestion(IEnumerable<Guid> derived, ElasticFilter filter)
-        {
-            return GetNodesWithSuggestionCore(derived, filter)
-                .Skip(filter.Offset)
-                .Take(filter.Limit)
-                .ToList();
-        }
-        private IEnumerable<INode> GetNodesWithSuggestionCore(IEnumerable<Guid> derived, ElasticFilter filter)
-        {
-            return _data.GetNodesByTypeIds(derived)
-                .Where(n => string.IsNullOrWhiteSpace(filter.Suggestion) ||
-                    n.OutgoingRelations.Any(
-                        r => r.TargetNode.Value != null &&
-                        r.TargetNode.Value.Contains(filter.Suggestion, StringComparison.OrdinalIgnoreCase)));
-        }
         public async Task<int> GetNodesCountAsync(IEnumerable<INodeTypeLinked> types, ElasticFilter filter, User user, CancellationToken cancellationToken = default)
         {
             var derivedTypes = _data.Schema.GetNodeTypes(types.Select(t => t.Id));
@@ -203,7 +157,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             var isElasticSearch = !string.IsNullOrEmpty(filter.Suggestion) && _elasticService.TypesAreSupported(derivedTypes.Select(nt => nt.Name));
             if (isElasticSearch)
             {
-                return await _elasticService.CountByConfiguredFieldsAsync(derivedTypes.Select(t => t.Name), filter);
+                return await _elasticService.CountByConfiguredFieldsAsync(derivedTypes.Select(t => t.Name), filter, cancellationToken);
             }
             else
             {
@@ -223,7 +177,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                 .Where(n => string.Equals(n.NodeType.Name, valueTypeName, StringComparison.Ordinal) &&
                        n.Value != null && n.Value.Contains(value, StringComparison.OrdinalIgnoreCase) &&
                        n.IncomingRelations.Any(r => r.SourceNode.NodeTypeId == nodeTypeId))
-                .Select(n => (IAttributeBase)(n.Attribute))
+                .Select(n => (IAttributeBase)n.Attribute)
                 .Take(limit)
                 .ToList();
 
@@ -233,9 +187,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
         {
             var node = _data.GetNode(nodeId);
 
-            if(node is null) return null;
-
-            return MapNode(node);
+            return node is null ? null : MapNode(node);
         }
         public IReadOnlyCollection<Node> LoadNodes(IEnumerable<Guid> nodeIds, IEnumerable<INodeTypeLinked> relationTypes)
         {
@@ -263,6 +215,182 @@ namespace Iis.DbLayer.Ontology.EntityFramework
 
                 SaveRelations(source, node);
             });
+        }
+
+        public async Task<SearchEntitiesByConfiguredFieldsResult> FilterNodeAsync(
+            IEnumerable<string> typeNameList,
+            ElasticFilter filter,
+            User user,
+            CancellationToken cancellationToken = default)
+        {
+            if (_elasticService.ShouldReturnNoEntities(filter)) return SearchEntitiesByConfiguredFieldsResult.Empty;
+
+            var entitySearchGranted = _elasticService.ShouldReturnAllEntities(filter) ? user.IsEntityReadGranted() : user.IsEntitySearchGranted();
+            var wikiSearchGranted = _elasticService.ShouldReturnAllEntities(filter) ? user.IsWikiReadGranted() : user.IsWikiSearchGranted();
+
+            var derivedTypeNames = _data.Schema
+                .GetEntityTypesByName(typeNameList, true)
+                .Where(type => _elasticService.TypeIsAvalilable(
+                    type,
+                    entitySearchGranted,
+                    wikiSearchGranted))
+                .Select(nt => nt.Name)
+                .Distinct();
+            var res = await _elasticService.SearchEntitiesByConfiguredFieldsAsync(derivedTypeNames, filter, user.Id, cancellationToken);
+            return RemoveDuplicatesInHighlights(res);
+        }
+
+        public async Task<SearchEntitiesByConfiguredFieldsResult> FilterNodeCoordinatesAsync(
+            IEnumerable<string> typeNameList,
+            ElasticFilter filter,
+            CancellationToken cancellationToken = default)
+        {
+            var derivedTypeNames = _data.Schema
+                .GetEntityTypesByName(typeNameList, true)
+                .Select(nt => nt.Name)
+                .Distinct();
+
+            var isElasticSearch = _elasticService.TypesAreSupported(derivedTypeNames);
+
+            if (isElasticSearch)
+            {
+                return await _elasticService.FilterNodeCoordinatesAsync(derivedTypeNames, filter, cancellationToken);
+            }
+            else
+            {
+                return new SearchEntitiesByConfiguredFieldsResult();
+            }
+        }
+
+        public async Task<SearchEntitiesByConfiguredFieldsResult> SearchEventsAsync(ElasticFilter filter, User user)
+        {
+            if (!string.IsNullOrEmpty(filter.SortColumn) && !string.IsNullOrEmpty(filter.SortOrder))
+            {
+                filter.SortColumn = GetSortColumnForElastic(filter.SortColumn);
+                filter.SortOrder = filter.SortOrder;
+            }
+
+            var response = await _elasticService.SearchByConfiguredFieldsAsync(_elasticState.EventIndexes, filter, user.Id);
+
+            return new SearchEntitiesByConfiguredFieldsResult()
+            {
+                Count = response.Count,
+                Entities = response.Items.Select(x => x.Value.SearchResult).ToList()
+            };
+        }
+
+        public string GetAttributeValueByDotName(Guid id, string dotName)
+        {
+            var node = _data.GetNode(id);
+            return node?.GetSingleProperty(dotName)?.Value;
+        }
+
+        public TreeResultList GetEventTypes(string suggestion)
+        {
+            const string NAME = "name";
+            const string CHILD = "child";
+
+            var eventTypeType = _data.Schema.GetEntityTypeByName("EventType");
+            if (eventTypeType == null) throw new Exception("EventType type is not found");
+
+            var nodes = _data.GetNodesByTypeId(eventTypeType.Id)
+                .Where(n => (string.IsNullOrEmpty(suggestion) ||
+                    n.GetSingleDirectProperty(NAME)?.Value?.Contains(suggestion, StringComparison.OrdinalIgnoreCase) == true)
+                    && !n.OutgoingRelations.Any(r => r.Node.NodeType.Name == CHILD))
+                .OrderBy(n => n.GetSingleDirectProperty(NAME)?.Value);
+
+            var result = new TreeResultList().Init(
+                    nodes,
+                    n => n.GetSingleProperty(NAME)?.Value,
+                    n => n.Id.ToString("N"),
+                    n => n.IncomingRelations
+                        .Where(r => r.Node.NodeType.Name == CHILD)
+                        .Select(r => r.SourceNode)
+                        .SingleOrDefault()
+                        ?.GetSingleDirectProperty(NAME)
+                        ?.Value);
+
+            return result;
+        }
+
+        public IReadOnlyCollection<ObjectFeatureRelation> GetObjectFeatureRelationCollection(IReadOnlyCollection<Guid> nodeIdCollection)
+        {
+            return _data.GetNodes(nodeIdCollection)
+                .SelectMany(n => n.OutgoingRelations.Where(r => r.TargetNode.NodeType.IsObjectSign))
+                .Select(r => new ObjectFeatureRelation(r.SourceNodeId, r.TargetNodeId))
+                .ToArray();
+        }
+
+        public IReadOnlyCollection<Guid> GetSignIds(Guid nodeId)
+        {
+            return _data.GetNode(nodeId)
+                .GetDirectRelations()
+                .Where(_ => _.Node.NodeType.Name == "sign")
+                .Select(_ => _.TargetNodeId)
+                .ToList();
+        }
+
+        private static string GetSortColumnForElastic(string sortColumn)
+        {
+            return sortColumn switch
+            {
+                "name" => "name.keyword",
+                "eventImportance" => "importance.code.keyword",
+                "eventState" => "state.code.keyword",
+                "startAt" => "startsAt",
+                "updatedAt" => "UpdatedAt",
+                _ => null
+            };
+        }
+
+        private static IEnumerable<INode> FilterAccessLevels(IEnumerable<INode> nodes, User user)
+        {
+            var accessLevels = nodes
+                .Where(p => string.Equals(p.NodeType.Name, nameof(AccessLevel), StringComparison.Ordinal))
+                .Where(p =>
+                {
+                    var stringValue = p.OutgoingRelations.FirstOrDefault(r => string.Equals(r.TypeName, "numericIndex", StringComparison.Ordinal)).TargetNode.Value;
+                    _ = int.TryParse(stringValue, out var value);
+                    return user.IsAdmin || value <= user.AccessLevel;
+                })
+                .OrderBy(n =>
+                {
+                    var p = n.GetSingleProperty("numericIndex");
+                    return p == null ? 0 : int.Parse(p.Value);
+                });
+
+            return accessLevels
+                .Concat(nodes.Where(p => !string.Equals(p.NodeType.Name, nameof(AccessLevel), StringComparison.Ordinal)));
+        }
+
+        private IEnumerable<INode> GetEventsAssociatedWithEntityCore(Guid entityId)
+        {
+            const string propertyName = "associatedWithEvent";
+            var eventType = _data.Schema.GetEntityTypeByName(EntityTypeNames.Event.ToString());
+            var property = eventType.GetRelationTypeByName(propertyName);
+            if (property == null) throw new Exception($"Property does not exist: {EntityTypeNames.Event}.{propertyName}");
+
+            var node = _data.GetNode(entityId);
+            var events = node?.IncomingRelations
+                .Where(r => r.Node.NodeTypeId == property.Id)
+                .Select(r => r.SourceNode) ?? new List<INode>();
+            return events;
+        }
+
+        private List<INode> GetNodesWithSuggestion(IEnumerable<Guid> derived, ElasticFilter filter)
+        {
+            return GetNodesWithSuggestionCore(derived, filter)
+                .Skip(filter.Offset)
+                .Take(filter.Limit)
+                .ToList();
+        }
+        private IEnumerable<INode> GetNodesWithSuggestionCore(IEnumerable<Guid> derived, ElasticFilter filter)
+        {
+            return _data.GetNodesByTypeIds(derived)
+                .Where(n => string.IsNullOrWhiteSpace(filter.Suggestion) ||
+                    n.OutgoingRelations.Any(
+                        r => r.TargetNode.Value != null &&
+                        r.TargetNode.Value.Contains(filter.Suggestion, StringComparison.OrdinalIgnoreCase)));
         }
         private void SaveRelations(Node source, INode existing)
         {
@@ -353,7 +481,10 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                 var target = MapNode(node.Relation.TargetNode, mappedNodes);
                 result.AddNode(target);
             }
-            else throw new Exception($"Node mapping does not support ontology type {nodeType.GetType()}.");
+            else
+            {
+                throw new Exception($"Node mapping does not support ontology type {nodeType.GetType()}.");
+            }
 
             foreach (var relation in node.GetDirectRelations())
             {
@@ -382,84 +513,6 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             result.OriginalNode = node;
             return result;
         }
-        public async Task<SearchEntitiesByConfiguredFieldsResult> FilterNodeAsync(
-            IEnumerable<string> typeNameList, 
-            ElasticFilter filter,
-            User user, 
-            CancellationToken cancellationToken = default)
-        {
-            if(_elasticService.ShouldReturnNoEntities(filter)) return SearchEntitiesByConfiguredFieldsResult.Empty;
-
-            var entitySearchGranted = _elasticService.ShouldReturnAllEntities(filter) ? user.IsEntityReadGranted() : user.IsEntitySearchGranted();
-            var wikiSearchGranted = _elasticService.ShouldReturnAllEntities(filter) ? user.IsWikiReadGranted() : user.IsWikiSearchGranted();
-
-            var derivedTypeNames = _data.Schema
-                .GetEntityTypesByName(typeNameList, true)
-                .Where(type => _elasticService.TypeIsAvalilable(type,
-                        entitySearchGranted,
-                        wikiSearchGranted))
-                .Select(nt => nt.Name)
-                .Distinct();
-            var res = await _elasticService.SearchEntitiesByConfiguredFieldsAsync(derivedTypeNames, filter, user.Id);
-            return RemoveDuplicatesInHighlights(res);
-        }
-
-        public async Task<SearchEntitiesByConfiguredFieldsResult> FilterNodeCoordinatesAsync(IEnumerable<string> typeNameList, 
-            ElasticFilter filter, 
-            CancellationToken cancellationToken = default)
-        {
-            var derivedTypeNames = _data.Schema
-                .GetEntityTypesByName(typeNameList, true)
-                .Select(nt => nt.Name)
-                .Distinct();
-
-            var isElasticSearch = _elasticService.TypesAreSupported(derivedTypeNames);
-
-            if (isElasticSearch)
-            {
-                return await _elasticService.FilterNodeCoordinatesAsync(derivedTypeNames, filter, cancellationToken);
-            }
-            else
-            {
-                return new SearchEntitiesByConfiguredFieldsResult();
-            }
-        }
-
-        public async Task<SearchEntitiesByConfiguredFieldsResult> SearchEventsAsync(ElasticFilter filter, User user)
-        {
-            if (!string.IsNullOrEmpty(filter.SortColumn) && !string.IsNullOrEmpty(filter.SortOrder))
-            {
-                filter.SortColumn = GetSortColumnForElastic(filter.SortColumn);
-                filter.SortOrder = filter.SortOrder;
-            }
-
-            var response = await _elasticService.SearchByConfiguredFieldsAsync(_elasticState.EventIndexes, filter, user.Id);
-
-            return new SearchEntitiesByConfiguredFieldsResult()
-            {
-                Count = response.Count,
-                Entities = response.Items.Select(x => x.Value.SearchResult).ToList()
-            };
-        }
-
-        private static string GetSortColumnForElastic(string sortColumn)
-        {
-            return sortColumn switch
-            {
-                "name" => "name.keyword",
-                "eventImportance" => "importance.code.keyword",
-                "eventState" => "state.code.keyword",
-                "startAt" => "startsAt",
-                "updatedAt" => "UpdatedAt",
-                _ => null
-            };
-        }
-
-        public string GetAttributeValueByDotName(Guid id, string dotName)
-        {
-            var node = _data.GetNode(id);
-            return node?.GetSingleProperty(dotName)?.Value;
-        }
 
         private SearchEntitiesByConfiguredFieldsResult RemoveDuplicatesInHighlights(SearchEntitiesByConfiguredFieldsResult res)
         {
@@ -483,7 +536,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
 
                 foreach (var name in names)
                 {
-                    var clearName = name.StartsWith(HISTORICAL) ?
+                    var clearName = name.StartsWith(HISTORICAL, StringComparison.Ordinal) ?
                         name.Substring(HISTORICAL.Length + 1) :
                         name;
 
@@ -494,52 +547,6 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                 }
             }
             return res;
-        }
-
-        public TreeResultList GetEventTypes(string suggestion)
-        {
-            const string NAME = "name";
-            const string CHILD = "child";
-
-            var eventTypeType = _data.Schema.GetEntityTypeByName("EventType");
-            if (eventTypeType == null) throw new Exception("EventType type is not found");
-
-            var nodes = _data.GetNodesByTypeId(eventTypeType.Id)
-                .Where(n => (string.IsNullOrEmpty(suggestion) ||
-                    n.GetSingleDirectProperty(NAME)?.Value?.Contains(suggestion, StringComparison.OrdinalIgnoreCase) == true)
-                    && !n.OutgoingRelations.Any(r => r.Node.NodeType.Name == CHILD))
-                .OrderBy(n => n.GetSingleDirectProperty(NAME)?.Value);
-
-            var result = new TreeResultList().Init(
-                    nodes, 
-                    n => n.GetSingleProperty(NAME)?.Value,
-                    n => n.Id.ToString("N"),
-                    n => n.IncomingRelations
-                        .Where(r => r.Node.NodeType.Name == CHILD)
-                        .Select(r => r.SourceNode)
-                        .SingleOrDefault()
-                        ?.GetSingleDirectProperty(NAME)
-                        ?.Value
-                );
-
-            return result;
-        }
-
-        public IReadOnlyCollection<ObjectFeatureRelation> GetObjectFeatureRelationCollection(IReadOnlyCollection<Guid> nodeIdCollection)
-        {
-            return _data.GetNodes(nodeIdCollection)
-                .SelectMany(n => n.OutgoingRelations.Where(r => r.TargetNode.NodeType.IsObjectSign))
-                .Select(r => new ObjectFeatureRelation(r.SourceNodeId, r.TargetNodeId))
-                .ToArray();
-        }
-
-        public IReadOnlyCollection<Guid> GetSignIds(Guid nodeId)
-        {
-            return _data.GetNode(nodeId)
-                .GetDirectRelations()
-                .Where(_ => _.Node.NodeType.Name == "sign")
-                .Select(_ => _.TargetNodeId)
-                .ToList();
         }
     }
 }
