@@ -5,7 +5,6 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using RabbitMQ.Client;
 using Iis.Messages;
-using Iis.Utility;
 using Iis.RabbitMq.Channels;
 using Iis.RabbitMq.Helpers;
 using Iis.Messages.Materials;
@@ -30,7 +29,6 @@ namespace IIS.Core.Materials
         private readonly IConnection _connection;
         private readonly IModel _channel;
         private readonly ILogger _logger;
-        private readonly IModel _materialEventChannel;
         private readonly IPublishMessageChannel<MaterialProcessingEventMessage> _eventPublishChannel;
         private readonly IPublishMessageChannel<MaterialCreatedMessage> _materialCreatedChannel;
         private readonly IPublishMessageChannel<MaterialProcessingEventMessage> _elasticSaverChannel;
@@ -38,14 +36,14 @@ namespace IIS.Core.Materials
         private readonly MaterialOperatorAssignerConfiguration _assignerConfiguration;
         private readonly MaterialElasticSaverConfiguration _elasticSaverConfiguration;
 
-        public MaterialEventProducer(IConnectionFactory connectionFactory,
-            ILoggerFactory loggerFactory,
+        public MaterialEventProducer(
+            IConnectionFactory connectionFactory,
+            ILogger<MaterialEventProducer> logger,
             MaterialEventConfiguration eventConfiguration,
             MaterialOperatorAssignerConfiguration assignerConfiguration,
             MaterialElasticSaverConfiguration elasticSaverConfiguration)
         {
-            _logger = loggerFactory.CreateLogger<MaterialEventProducer>();
-
+            _logger = logger;
             _connectionFactory = connectionFactory;
             _eventConfiguration = eventConfiguration;
             _assignerConfiguration = assignerConfiguration;
@@ -54,8 +52,6 @@ namespace IIS.Core.Materials
             _connection = _connectionFactory.CreateAndWaitConnection();
 
             _channel = _connection.CreateModel();
-
-            _materialEventChannel = ConfigChannel(_connection.CreateModel(), _eventConfiguration.TargetChannel);
 
             _eventPublishChannel = new PublishMessageChannel<MaterialProcessingEventMessage>(_connection, _eventConfiguration.TargetChannel);
             _materialCreatedChannel = new PublishMessageChannel<MaterialCreatedMessage>(_connection, new ChannelConfig { ExchangeName = MaterialRabbitConsts.DefaultExchangeName, RoutingKeys = new[] { MaterialRabbitConsts.QueueName } });
@@ -105,12 +101,12 @@ namespace IIS.Core.Materials
         public void Dispose()
         {
             _channel.Dispose();
-            _materialEventChannel.Dispose();
             _eventPublishChannel.Dispose();
             _materialCreatedChannel.Dispose();
             _elasticSaverChannel.Dispose();
             _connection.Dispose();
         }
+
         public void SendAvailableForOperatorEvent(Guid materialId)
         {
             _channel.QueueDeclare(
