@@ -3,36 +3,24 @@ using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 using Iis.MaterialDistributor.Contracts.Events;
-using Iis.MaterialDistributor.Contracts.Services;
-using Iis.MaterialDistributor.DataStorage;
-using System.Linq;
+using Iis.MaterialDistributor.Contracts.DataStorage;
 
 namespace Iis.MaterialDistributor.MediatR.EventHandlers
 {
     public class ReadAllMaterialsEventHandler : INotificationHandler<ReadAllMaterialsEvent>
     {
-        private readonly IMaterialDistributionService _materialDistributionService;
-        private readonly IVariableCoefficientService _coefficientService;
-        private readonly IDistributionData _distributionData;
+        private readonly IDistributionDataMediator _distributionDataMediator;
 
         public ReadAllMaterialsEventHandler(
-            IMaterialDistributionService materialDistributionService,
-            IVariableCoefficientService coefficientService,
-            IDistributionData distributionData)
+            IDistributionDataMediator distributionDataMediator)
         {
-            _materialDistributionService = materialDistributionService;
-            _coefficientService = coefficientService;
-            _distributionData = distributionData;
+            _distributionDataMediator = distributionDataMediator;
         }
 
         public async Task Handle(ReadAllMaterialsEvent notification, CancellationToken cancellationToken)
         {
-            var materials = (await _materialDistributionService
-                .GetMaterialCollectionAsync(cancellationToken))
-                .ToDictionary(_ => _.Id);
-            var users = await _materialDistributionService.GetOperatorsAsync(cancellationToken);
-            _distributionData.RefreshMaterials(materials);
-            _distributionData.Distribute(users);
+            await _distributionDataMediator.RefreshMaterialsAsync(cancellationToken);
+            await _distributionDataMediator.DistributeAsync(cancellationToken);
         }
     }
 }

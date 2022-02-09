@@ -1,10 +1,11 @@
 ﻿using Iis.MaterialDistributor.Contracts.Services;
+using Iis.MaterialDistributor.DataStorage;
 using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Iis.MaterialDistributor.DataStorage
+namespace Iis.MaterialDistributor.Contracts.DataStorage
 {
     public interface IDistributionData
     {

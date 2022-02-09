@@ -13,14 +13,14 @@ using Newtonsoft.Json.Linq;
 
 namespace Iis.MaterialDistributor.Repositories
 {
-    internal class DistributionElasticRepository : IDistributionElasticRepository
+    internal class MaterialElasticRepository : IMaterialElasticRepository
     {
         private const int ZeroScrollDurationMinutes = 0;
         private static readonly string[] _materialIndexes = { "Materials" };
         private readonly IElasticManager _elasticManager;
         private readonly ElasticConfiguration _elasticConfiguration;
 
-        public DistributionElasticRepository(
+        public MaterialElasticRepository(
             IElasticManager elasticManager,
             ElasticConfiguration elasticConfiguration)
         {
@@ -51,44 +51,12 @@ namespace Iis.MaterialDistributor.Repositories
             return elasticResult.ToSearchResult();
         }
 
-        public async Task<IReadOnlyList<UserDistributionInfo>> GetOperatorsAsync(CancellationToken cancellationToken)
-        {
-            var jObject = await _elasticManager
-                .WithDefaultUser()
-                .GetUsersAsync(cancellationToken);
-
-            var result = new List<UserDistributionInfo>();
-            foreach (var token in jObject.Children())
-            {
-                var user = GetUserDistributionInfo(token);
-                result.Add(user);
-            }
-            return result;
-        }
-
-        public async Task<IReadOnlyList<SecurityLevelPlain>> GetSecurityLevelsPlainAsync(CancellationToken cancellationToken)
-        {
-            var response = await _elasticManager
-                .WithDefaultUser()
-                .GetSecurityLevelsAsync(cancellationToken);
-
-            return response.Items.Select(_ => _.SearchResult.ToObject<SecurityLevelPlain>()).ToList();
-        }
-
         private TimeSpan GetScrollDuration()
         {
             return TimeSpan.FromMinutes(
                 _elasticConfiguration.ScrollDurationMinutes == ZeroScrollDurationMinutes
                 ? ElasticConstants.DefaultScrollDurationMinutes
                 : _elasticConfiguration.ScrollDurationMinutes);
-        }
-
-        private UserDistributionInfo GetUserDistributionInfo(JToken token)
-        {
-            return new UserDistributionInfo
-            {
-                Username = ((JProperty)token).Name
-            };
         }
     }
 }

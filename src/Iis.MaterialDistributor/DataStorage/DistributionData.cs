@@ -1,4 +1,5 @@
-﻿using Iis.MaterialDistributor.Contracts.Services;
+﻿using Iis.MaterialDistributor.Contracts.DataStorage;
+using Iis.MaterialDistributor.Contracts.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,47 +12,54 @@ namespace Iis.MaterialDistributor.DataStorage
     {
         private const int QueueSize = 200;
         private readonly IFinalRatingEvaluator _finalRatingEvaluator;
-        private readonly IMaterialDistributionService _materialDistributionService;
         private Dictionary<Guid, MaterialDistributionInfo> _materials;
         private IReadOnlyList<UserDistributionInfo> _users;
         private Dictionary<Guid, List<MaterialDistributionInfo>> _userQueues = new Dictionary<Guid, List<MaterialDistributionInfo>>();
-        private object _refreshLock = new object();
+        private object _lock = new object();
 
         public DistributionData(
-            IFinalRatingEvaluator finalRatingEvaluator,
-            IMaterialDistributionService materialDistributionService)
+            IFinalRatingEvaluator finalRatingEvaluator)
         {
             _finalRatingEvaluator = finalRatingEvaluator;
-            _materialDistributionService = materialDistributionService;
         }
 
         public void RefreshMaterials(Dictionary<Guid, MaterialDistributionInfo> materials)
         {
-            _materials = materials;
+            lock (_lock)
+            {
+                _materials = materials;
+                _userQueues.Clear();
+            }
         }
 
         public void Distribute(IReadOnlyList<UserDistributionInfo> users)
         {
-            _userQueues.Clear();
-            _users = users;
-            foreach (var user in _users)
+            lock (_lock)
             {
-                _userQueues[user.Id] = GetUserQueue(user);
+                _userQueues.Clear();
+                _users = users;
+                foreach (var user in _users)
+                {
+                    _userQueues[user.Id] = GetUserQueue(user);
+                }
             }
         }
 
         public MaterialDistributionInfo GetMaterialFromQueue(UserDistributionInfo user)
         {
-            if (_userQueues.GetValueOrDefault(user.Id) == null)
+            lock (_lock)
             {
-                _userQueues[user.Id] = GetUserQueue(user);
+                if (_userQueues.GetValueOrDefault(user.Id) == null)
+                {
+                    _userQueues[user.Id] = GetUserQueue(user);
+                }
+
+                if (_userQueues[user.Id].Count == 0) return null;
+
+                var result = _userQueues[user.Id][0];
+                _userQueues[user.Id].RemoveAt(0);
+                return result;
             }
-
-            if (_userQueues[user.Id].Count == 0) return null;
-
-            var result = _userQueues[user.Id][0];
-            _userQueues[user.Id].RemoveAt(0);
-            return result;
         }
 
         private List<MaterialDistributionInfo> GetUserQueue(UserDistributionInfo user)
@@ -60,7 +68,13 @@ namespace Iis.MaterialDistributor.DataStorage
             {
                 material.FinalRating = _finalRatingEvaluator.GetFinalRating(material, user);
             }
-            var result = _materials.Values.OrderByDescending(_ => _.FinalRating).Take(QueueSize).ToList();
+
+            var result = _materials.Values
+                .Where(_ => _.FinalRating > 0)
+                .OrderByDescending(_ => _.FinalRating)
+                .Take(QueueSize)
+                .ToList();
+
             return result;
         }
     }

@@ -8,6 +8,7 @@ namespace Iis.Interfaces.SecurityLevels
     {
         ISecurityLevel RootLevel { get; }
         void Reload();
+        void Reload(IReadOnlyList<SecurityLevelPlain> plainLevels);
         ISecurityLevel GetSecurityLevel(Guid id);
         ISecurityLevel GetSecurityLevel(int uniqueIndex);
         IReadOnlyList<ISecurityLevel> GetSecurityLevels(IReadOnlyList<Guid> securityLevelIds);

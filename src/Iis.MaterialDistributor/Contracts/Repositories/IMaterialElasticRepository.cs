@@ -7,11 +7,9 @@ using Iis.MaterialDistributor.DataStorage;
 
 namespace Iis.MaterialDistributor.Contracts.Repositories
 {
-    public interface IDistributionElasticRepository
+    public interface IMaterialElasticRepository
     {
         Task<SearchResult> BeginSearchByScrollAsync(SearchParams searchParams, CancellationToken cancellationToken);
         Task<SearchResult> SearchByScrollAsync(string scrollId, CancellationToken cancellationToken);
-        Task<IReadOnlyList<UserDistributionInfo>> GetOperatorsAsync(CancellationToken cancellationToken);
-        Task<IReadOnlyList<SecurityLevelPlain>> GetSecurityLevelsPlainAsync(CancellationToken cancellationToken);
     }
 }

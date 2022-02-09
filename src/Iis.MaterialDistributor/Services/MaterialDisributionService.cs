@@ -24,22 +24,19 @@ namespace Iis.MaterialDistributor.Services
             "SecurityLevels"
         };
 
-        private readonly IDistributionElasticRepository _elasticRepository;
-        private readonly IVariableCoefficientService _coefficientService;
+        private readonly IMaterialElasticRepository _materialElasticRepository;
 
         public MaterialDisributionService(
-            IDistributionElasticRepository elasticRepository,
-            IVariableCoefficientService coefficientService)
+            IMaterialElasticRepository materialElasticRepository)
         {
-            _elasticRepository = elasticRepository;
-            _coefficientService = coefficientService;
+            _materialElasticRepository = materialElasticRepository;
         }
 
         public async Task<List<MaterialDistributionInfo>> GetMaterialCollectionAsync(int offsetHours, CancellationToken cancellationToken)
         {
             var searchParam = new SearchParams(GetSuggestion(offsetHours), _defaultPagination, _resultFieldCollection);
 
-            var result = await _elasticRepository.BeginSearchByScrollAsync(searchParam, cancellationToken);
+            var result = await _materialElasticRepository.BeginSearchByScrollAsync(searchParam, cancellationToken);
 
             var resultCollection = new List<MaterialDistributionInfo>(result.Count);
 
@@ -47,25 +44,13 @@ namespace Iis.MaterialDistributor.Services
 
             while (result.Items.Count > 0)
             {
-                result = await _elasticRepository.SearchByScrollAsync(result.ScrollId, cancellationToken);
+                result = await _materialElasticRepository.SearchByScrollAsync(result.ScrollId, cancellationToken);
 
                 resultCollection.AddRange(MapSearchResultToMaterialDocumentCollections(result.Items.Values));
             }
 
             return resultCollection;
         }
-
-        public async Task<List<MaterialDistributionInfo>> GetMaterialCollectionAsync(CancellationToken cancellationToken)
-        {
-            var coefficient = await _coefficientService.GetWithMaxOffsetHoursAsync(cancellationToken);
-
-            if (coefficient is null) return new List<MaterialDistributionInfo>();
-
-            return await GetMaterialCollectionAsync(coefficient.OffsetHours, cancellationToken);
-        }
-
-        public Task<IReadOnlyList<UserDistributionInfo>> GetOperatorsAsync(CancellationToken cancellationToken) =>
-            _elasticRepository.GetOperatorsAsync(cancellationToken);
 
         private static IReadOnlyList<MaterialDistributionInfo> MapSearchResultToMaterialDocumentCollections(IReadOnlyCollection<SearchResultItem> searchResultItemCollection)
         {

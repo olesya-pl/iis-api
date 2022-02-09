@@ -28,6 +28,15 @@ namespace Iis.Security.SecurityLevels
 
         public SecurityLevelChecker(IReadOnlyList<SecurityLevelPlain> plainLevels)
         {
+            Reload(plainLevels);
+        }
+
+        public ISecurityLevel RootLevel => _rootLevel;
+
+        public void Reload() => Initialize();
+
+        public void Reload(IReadOnlyList<SecurityLevelPlain> plainLevels)
+        {
             var levelsDict = plainLevels.Select(_ => new SecurityLevel
             {
                 Id = _.Id,
@@ -47,10 +56,6 @@ namespace Iis.Security.SecurityLevels
 
             _rootLevel = levelsDict.Values.First().Root;
         }
-
-        public ISecurityLevel RootLevel => _rootLevel;
-
-        public void Reload() => Initialize();
 
         public ISecurityLevel GetSecurityLevel(Guid id) => _rootLevel.GetAllItems().Single(_ => _.Id == id);
 
@@ -163,7 +168,6 @@ namespace Iis.Security.SecurityLevels
             userLevel == objectLevel ||
             userLevel.IsParentOf(objectLevel) ||
             userLevel.IsChildOf(objectLevel);
-
         
         private IReadOnlyList<SecurityLevel> GetAllAccessibleLevels(IReadOnlyList<ISecurityLevel> baseItems) =>
             _rootLevel.GetAllItems().Where(_ => AccessGranted(baseItems, _)).ToList();
