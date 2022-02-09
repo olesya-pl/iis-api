@@ -1,10 +1,8 @@
-﻿using Iis.MaterialDistributor.Contracts.DataStorage;
-using Iis.MaterialDistributor.Contracts.Services;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
+using Iis.MaterialDistributor.Contracts.DataStorage;
+using Iis.MaterialDistributor.Contracts.Services;
 
 namespace Iis.MaterialDistributor.DataStorage
 {
@@ -13,7 +11,6 @@ namespace Iis.MaterialDistributor.DataStorage
         private const int QueueSize = 200;
         private readonly IFinalRatingEvaluator _finalRatingEvaluator;
         private Dictionary<Guid, MaterialDistributionInfo> _materials;
-        private IReadOnlyList<UserDistributionInfo> _users;
         private Dictionary<Guid, List<MaterialDistributionInfo>> _userQueues = new Dictionary<Guid, List<MaterialDistributionInfo>>();
         private object _lock = new object();
 
@@ -37,8 +34,7 @@ namespace Iis.MaterialDistributor.DataStorage
             lock (_lock)
             {
                 _userQueues.Clear();
-                _users = users;
-                foreach (var user in _users)
+                foreach (var user in users)
                 {
                     _userQueues[user.Id] = GetUserQueue(user);
                 }
@@ -49,7 +45,7 @@ namespace Iis.MaterialDistributor.DataStorage
         {
             lock (_lock)
             {
-                if (_userQueues.GetValueOrDefault(user.Id) == null)
+                if (_userQueues.ContainsKey(user.Id))
                 {
                     _userQueues[user.Id] = GetUserQueue(user);
                 }

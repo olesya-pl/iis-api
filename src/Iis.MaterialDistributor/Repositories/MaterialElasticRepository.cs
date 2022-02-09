@@ -6,10 +6,7 @@ using System.Linq;
 using Iis.Elastic;
 using Iis.Elastic.SearchQueryExtensions;
 using Iis.Interfaces.Elastic;
-using Iis.Interfaces.SecurityLevels;
 using Iis.MaterialDistributor.Contracts.Repositories;
-using Iis.MaterialDistributor.DataStorage;
-using Newtonsoft.Json.Linq;
 
 namespace Iis.MaterialDistributor.Repositories
 {

@@ -314,7 +314,7 @@ namespace Iis.Api.Controllers
             var log = new StringBuilder();
             _adminElasticService.Logger = log;
 
-            var index = _elasticState.SecurityIndexes.First();
+            var index = _elasticState.SecurityIndex;
 
             await _elasticManager.DeleteIndexAsync(index, cancellationToken);
 
