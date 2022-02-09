@@ -2,6 +2,7 @@ Feature: Material_HotKeys - regression
 	- IIS-8238 - Hotkeys for audio rewind
 	- IIS-8257 - Possibility save  material by hotkeys
 	- IIS-8240 - Possibility to change the priority for materials using hotkeys
+	- IIS-7314 - Hotkeys for audio play/pause audio materials
 
 Background:
 	Given I sign in with the user olya and password 123 in the Contour
@@ -72,3 +73,15 @@ Scenario: IIS-8240 - Possibility to change the priority for materials using hotk
 	When I pressed the Previous material button
 	Then I must see that the session priority value must be set to Translation
 	When I clean up uploaded material via API
+
+	@regression @UI @Material_HotKeys
+Scenario: IIS-7314 - Hotkeys for audio play/pause audio materials
+	When I navigated to Materials page
+	Then I clicked on the type`s filter audio
+	When I clicked search button in the Materials section
+	And I searched neizvesten-peregovory-po-racii.mp3 data in the materials
+	And I clicked on the first material in the Materials list
+	When I press hotkeys Ctrl+Space
+	Then I must see the play/pause button in look like arrow
+	When I press hotkeys Ctrl+Space
+	Then I must see the play/pause button in look like pause
