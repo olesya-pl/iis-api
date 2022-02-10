@@ -198,21 +198,21 @@ namespace IIS.Services.Materials
 
         private void CheckIsAllowedRelatedObjectForUser(Material material, User user)
         {
-            foreach (var @object in material.RelatedObjectCollection)
+            foreach (var entity in material.RelatedObjectCollection)
             {
-                @object.AccessAllowed = _securityLevelChecker.AccessGranted(user.SecurityLevelsIndexes,
-                    _ontologyService.GetNode(@object.Id).OriginalNode.GetSecurityLevelIndexes());
+                entity.AccessAllowed = _securityLevelChecker.AccessGranted(user.SecurityLevelsIndexes,
+                    _ontologyService.GetNode(entity.Id).OriginalNode.GetSecurityLevelIndexes());
 
-                if (@object.AccessAllowed) continue;
+                if (entity.AccessAllowed) continue;
                 
-                @object.Id = Guid.Empty;
-                @object.Title = string.Empty;
-                @object.Importance = string.Empty;
-                @object.ImportanceSortOrder = default;
-                @object.NodeType = string.Empty;
-                @object.RelatedSignId = Guid.Empty;
-                @object.RelationType = string.Empty;
-                @object.RelationCreatingType = string.Empty;
+                entity.Id = Guid.Empty;
+                entity.Title = string.Empty;
+                entity.Importance = string.Empty;
+                entity.ImportanceSortOrder = default;
+                entity.NodeType = string.Empty;
+                entity.RelatedSignId = Guid.Empty;
+                entity.RelationType = string.Empty;
+                entity.RelationCreatingType = string.Empty;
             }
         }
     }
