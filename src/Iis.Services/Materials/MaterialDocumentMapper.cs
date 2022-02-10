@@ -66,13 +66,14 @@ namespace IIS.Services.Materials
             return material;
         }
 
-        public Material Map(MaterialDocument document, Guid userId)
+        public Material Map(MaterialDocument document, User user)
         {
             var material = Map(document);
 
-            material.CanBeEdited = document.ProcessedStatus.Id == MaterialEntity.ProcessingStatusProcessingSignId
-                ? (document.Editor == null || document.Editor.Id == userId)
-                : true;
+            material.CanBeEdited = document.ProcessedStatus.Id != MaterialEntity.ProcessingStatusProcessingSignId 
+                                   || (document.Editor == null || document.Editor.Id == user.Id);
+
+            CheckIsAllowedRelatedObjectForUser(material, user);
 
             return material;
         }
@@ -193,6 +194,26 @@ namespace IIS.Services.Materials
             var result = _mapper.Map<MaterialFeature>(feature);
             result.Node = _ontologyService.GetNode(feature.NodeId);
             return result;
+        }
+
+        private void CheckIsAllowedRelatedObjectForUser(Material material, User user)
+        {
+            foreach (var @object in material.RelatedObjectCollection)
+            {
+                @object.AccessAllowed = _securityLevelChecker.AccessGranted(user.SecurityLevelsIndexes,
+                    _ontologyService.GetNode(@object.Id).OriginalNode.GetSecurityLevelIndexes());
+
+                if (@object.AccessAllowed) continue;
+                
+                @object.Id = Guid.Empty;
+                @object.Title = string.Empty;
+                @object.Importance = string.Empty;
+                @object.ImportanceSortOrder = default;
+                @object.NodeType = string.Empty;
+                @object.RelatedSignId = Guid.Empty;
+                @object.RelationType = string.Empty;
+                @object.RelationCreatingType = string.Empty;
+            }
         }
     }
 }

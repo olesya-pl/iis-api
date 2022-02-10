@@ -135,7 +135,7 @@ namespace IIS.Services.Materials
             {
                 throw new ArgumentException($"{FrontEndErrorCodes.NotFound}:Матеріал не знайдено");
             }
-            return _materialDocumentMapper.Map(entity, user.Id);
+            return _materialDocumentMapper.Map(entity, user);
         }
 
         public async Task<Material[]> GetMaterialsByIdsAsync(ISet<Guid> ids, User user)
