@@ -17,7 +17,7 @@ namespace Iis.MaterialDistributor.Services
         {
             if (!_securityLevelChecker.AccessGranted(user.SecurityLevels, material.SecurityLevels)) return 0;
 
-            return 1;
+            return material.VariableCoefficient * 1;
         }
     }
 }
