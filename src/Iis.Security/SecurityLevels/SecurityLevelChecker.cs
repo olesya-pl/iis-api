@@ -41,6 +41,7 @@ namespace Iis.Security.SecurityLevels
             {
                 Id = _.Id,
                 Name = _.Name,
+                Description = _.Description,
                 UniqueIndex = _.UniqueIndex
             }).ToDictionary(_ => _.UniqueIndex);
 
@@ -182,6 +183,7 @@ namespace Iis.Security.SecurityLevels
                     {
                         Id = _.Id,
                         Name = _.GetSingleDirectProperty(OntologyNames.NameField)?.Value,
+                        Description = _.GetSingleDirectProperty(OntologyNames.DescriptionField)?.Value,
                         UniqueIndex = int.Parse(_.GetSingleDirectProperty(OntologyNames.UniqueIndexField)?.Value),
                     },
                     ParentIndexStr = _.GetSingleDirectProperty(OntologyNames.ParentField)

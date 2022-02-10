@@ -52,6 +52,7 @@ namespace Iis.Desktop.SecurityManager.Controls
             menu.Items[0].Click += (sender, e) => { CreateLevel(); };
             menu.Items.Add("Видалити рівень");
             menu.Items[1].Click += (sender, e) => { RemoveLevel(); };
+            menu.Items[1].Visible = false;
             _treeView.ContextMenuStrip = menu;
         }
 

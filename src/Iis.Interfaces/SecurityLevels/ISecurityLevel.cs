@@ -8,6 +8,7 @@ namespace Iis.Interfaces.SecurityLevels
     {
         public Guid Id { get; }
         public string Name { get; }
+        public string Description { get; }
         public int UniqueIndex { get; }
         public int? ParentUniqueIndex { get; }
         public ISecurityLevel Parent { get; }

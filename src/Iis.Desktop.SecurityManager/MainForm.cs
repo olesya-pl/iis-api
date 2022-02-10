@@ -30,7 +30,7 @@ namespace Iis.Desktop.SecurityManager
         private IConfiguration _configuration;
         private IReadOnlyDictionary<string, EnvConfig> _environmentProperties;
         private IDesktopStyle _style;
-        private const string VERSION = "0.93";
+        private const string VERSION = "0.94";
         private const string DEFAULT_ENVIRONMENT_KEY = "defaultEnvironment";
         private string _selectedEnvironment;
         private ILogger _logger;
