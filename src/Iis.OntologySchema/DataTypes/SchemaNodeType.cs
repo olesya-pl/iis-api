@@ -420,7 +420,7 @@ namespace Iis.OntologySchema.DataTypes
 
         public IReadOnlyList<IRelationTypeLinked> GetComputedRelationTypes()
         {
-            return GetAllOutgoingRelations().Where(r => r.NodeType.MetaObject.Formula != null).ToList();
+            return GetAllOutgoingRelations().Where(r => r.NodeType.IsComputed).ToList();
         }
 
         public INodeTypeLinked GetProperty(string relationName)
