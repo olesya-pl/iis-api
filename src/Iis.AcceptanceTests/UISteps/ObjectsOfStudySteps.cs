@@ -230,6 +230,7 @@ namespace AcceptanceTests.UISteps
         [When(@"I clicked on the save button to create a new object of study")]
         public void WhenIClickedOnTheSaveButtonToCreateANewObjectOfStudy()
         {
+            driver.WaitFor(2);
             objectsOfStudyPage.SaveObjectOfStudyButton.Click();
             driver.WaitFor(2);
         }
@@ -378,11 +379,6 @@ namespace AcceptanceTests.UISteps
                 if (!string.IsNullOrWhiteSpace(accordionName))
                     ToggleAccordion(accordionElement, false);
             }
-
-            objectsOfStudyPage.SaveObjectOfStudyButton.Click();
-            driver.WaitFor(2);
-            objectsOfStudyPage.ConfirmSaveOfANewObjectOfStudyButton.Click();
-            driver.WaitFor(6);
         }
 
         private void ToggleAccordion(IWebElement accordionElement, bool open)
