@@ -139,7 +139,7 @@ namespace AcceptanceTests.UISteps
         public void WhenIBindedAMaterialToTheEvent(string materialName)
         {
             var materialInput = eventPage.BindedMaterialsField.FindElement(By.TagName("input"));
-            materialInput.SendKeys(context.Get<string>("uploadedMaterial"));
+            materialInput.SendKeys(materialName);
             driver.WaitFor(4);
             materialInput.SendKeys(Keys.Down);
             materialInput.SendKeys(Keys.Enter);
@@ -160,7 +160,7 @@ namespace AcceptanceTests.UISteps
         public void WhenIPressedTheSaveButton()
         {
             eventPage.SaveEventChangesButton.Click();
-            driver.WaitFor(2);
+            driver.WaitFor(3);
         }
 
         [When(@"I pressed the confirm save changes in the event")]
@@ -195,7 +195,8 @@ namespace AcceptanceTests.UISteps
         [When(@"I pressed the delete button to delete the specified (.*) material")]
         public void WhenIPressedTheDeleteButtonToDeleteTheSpecifiedMaterial(string materialName)
         {
-            eventPage.MaterialsRelatedToEvent.FirstOrDefault(relatedMaterial => relatedMaterial.Title == materialName).DeleteRelation();
+            eventPage.DeleteRelation(materialName).Click();
+            driver.WaitFor(2);
         }
 
         [When(@"I entered (.*) text in the addition data text field")]
@@ -259,7 +260,7 @@ namespace AcceptanceTests.UISteps
         [Then(@"I must not see the (.*) material binded to the event")]
         public void ThenIMustNotSeeTheMaterialBindedToTheEvent(string materialName)
         {
-            Assert.DoesNotContain(eventPage.MaterialsRelatedToEvent, _ => _.Title == materialName);
+            Assert.DoesNotContain(eventPage.MaterialsRelatedToEvent(materialName), _ => _.Title == materialName);
         }
 
         [Then(@"I must see the (.*) text in the additional data text field")]
