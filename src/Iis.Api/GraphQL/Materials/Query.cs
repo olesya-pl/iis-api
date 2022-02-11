@@ -10,6 +10,7 @@ using Iis.Interfaces.Elastic;
 using Iis.Api.GraphQL.Common;
 using Iis.Api.GraphQL.Entities;
 using HotChocolate.Resolvers;
+using IIS.Core.GraphQL.Users;
 using IIS.Services.Contracts.Interfaces;
 using Iis.Services.Contracts.Elastic;
 using Iis.Services.Contracts.Dtos;
@@ -17,6 +18,7 @@ using Newtonsoft.Json.Linq;
 using IIS.Services.Contracts.Materials;
 using Iis.Domain.Materials;
 using Iis.Interfaces.Common;
+using Iis.Interfaces.SecurityLevels;
 
 namespace IIS.Core.GraphQL.Materials
 {
@@ -167,6 +169,7 @@ namespace IIS.Core.GraphQL.Materials
             IResolverContext ctx,
             [Service] IMaterialProvider materialProvider,
             [Service] IMapper mapper,
+            [Service] ISecurityLevelChecker securityLevelChecker,
             Guid nodeId)
         {
             var tokenPayload = ctx.GetToken();
@@ -174,22 +177,8 @@ namespace IIS.Core.GraphQL.Materials
             var materialCollectionResult = await materialProvider.GetMaterialsByNodeIdAsync(nodeId, tokenPayload.UserId, ctx.RequestAborted);
 
             var mappedMaterialCollection = mapper.Map<Material[]>(materialCollectionResult.Items);
-
-            return (mappedMaterialCollection, materialCollectionResult.Count);
-        }
-
-        [GraphQLType(typeof(MaterialCollection))]
-        public async Task<(IEnumerable<Material> materials, int totalCount)> GetRelatedMaterialsByEventId(
-            IResolverContext ctx,
-            [Service] IMaterialProvider materialProvider,
-            [Service] IMapper mapper,
-            Guid nodeId)
-        {
-            var tokenPayload = ctx.GetToken();
-
-            var materialCollectionResult = await materialProvider.GetMaterialsByNodeIdAsync(nodeId, tokenPayload.UserId, ctx.RequestAborted);
-
-            var mappedMaterialCollection = mapper.Map<Material[]>(materialCollectionResult.Items);
+            
+            CheckIsAllowedRelatedMaterialsForUser(mappedMaterialCollection, tokenPayload, securityLevelChecker);
 
             return (mappedMaterialCollection, materialCollectionResult.Count);
         }
@@ -309,5 +298,57 @@ namespace IIS.Core.GraphQL.Materials
                 && Enum.TryParse<RelationsState>(relationsState.Trim(), true, out var value)
                 ? value
                 : default(RelationsState?);
+
+        private static void CheckIsAllowedRelatedMaterialsForUser(IEnumerable<Material> mappedMaterialCollection,
+            TokenPayload tokenPayload, ISecurityLevelChecker securityLevelChecker)
+        {
+            foreach (var material in mappedMaterialCollection)
+            {
+                var materialSecurityLevelIndexes = material.SecurityLevels.Select(_ => _.UniqueIndex).ToList();
+                
+                material.AccessAllowed = securityLevelChecker.AccessGranted(tokenPayload.User.SecurityLevelsIndexes, materialSecurityLevelIndexes);
+                
+                if (material.AccessAllowed) continue;
+                
+                material.Assignees = new List<User>();
+                material.Caller = new IdTitle();
+                material.Children = new List<Material>();
+                material.Code = string.Empty;
+                material.Completeness = new MaterialSign();
+                material.Content = string.Empty;
+                material.Coordinates = string.Empty;
+                material.Data = new List<Data>();
+                material.Editor = new User();
+                material.Events = new List<JObject>();
+                material.Features = new List<JObject>();
+                material.From = string.Empty;
+                material.Highlight = new JObject();
+                material.Id = Guid.Empty;
+                material.Importance = new MaterialSign();
+                material.Metadata = new JObject();
+                material.Objects = new List<string>();
+                material.Receiver = new IdTitle();
+                material.Relevance = new MaterialSign();
+                material.Reliability = new MaterialSign();
+                material.Source = string.Empty;
+                material.States = new List<string>();
+                material.Tags = new List<string>();
+                material.Title = string.Empty;
+                material.Transcriptions = new List<JObject>();
+                material.Type = string.Empty;
+                material.AccessLevel = default(int);
+                material.CoordinateList = new List<GeoCoordinate>();
+                material.CreatedDate = string.Empty;
+                material.UpdatedAt = string.Empty;
+                material.ObjectsOfStudy = new JObject();
+                material.RelatedSignCollection = new List<RelatedObject>();
+                material.RelatedObjectCollection = new List<RelatedObjectOfStudy>();
+                material.SecurityLevels = new List<MaterialSecurityLevel>();
+                material.FileId = Guid.Empty;
+                material.ReceivingDate = DateTime.Now;
+                material.ProcessedStatus = new MaterialSign();
+            }
+        }
+
     }
 }

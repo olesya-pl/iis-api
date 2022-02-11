@@ -72,6 +72,7 @@ namespace IIS.Core.GraphQL.Materials
         public IReadOnlyCollection<RelatedObject> RelatedSignCollection { get; set; } = Array.Empty<RelatedObject>();
         public int ObjectsOfStudyCount { get; set; }
         public IReadOnlyCollection<MaterialSecurityLevel> SecurityLevels { get; set; } = new List<MaterialSecurityLevel>();
+        public bool AccessAllowed { get; set; }
 
         public async Task<FileInfo> GetFile([Service] IFileService fileService)
         {

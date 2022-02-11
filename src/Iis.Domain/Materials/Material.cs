@@ -59,5 +59,6 @@ namespace Iis.Domain.Materials
         public IReadOnlyCollection<RelatedObject> RelatedSignCollection { get; set; } = Array.Empty<RelatedObject>();
         public int ObjectsOfStudyCount { get; set; }
         public IReadOnlyCollection<ISecurityLevel> SecurityLevels { get; set; }
+        public bool AccessAllowed { get; set; }
     }
 }
