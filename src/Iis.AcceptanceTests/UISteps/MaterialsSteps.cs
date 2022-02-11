@@ -42,7 +42,7 @@ namespace AcceptanceTests.UISteps
         {
             driver.WaitFor(2);
             materialsSectionPage.FirstMaterialInTheMaterialsList.Click();
-            driver.WaitFor(3);
+            driver.WaitFor(2);
         }
 
         [When(@"I clicked on the relations tab in the material card")]
@@ -256,6 +256,7 @@ namespace AcceptanceTests.UISteps
         public void WhenIClickedOnThePatternTab()
         {
             materialsSectionPage.PatternTab.Click();
+            driver.WaitFor(3);
         }
 
         [When(@"I binded the (.*) event to the material")]
@@ -336,7 +337,6 @@ namespace AcceptanceTests.UISteps
         [When(@"I clicked pause button")]
         public void WhenIClickedPauseButton()
         {
-            driver.WaitFor(2);
             materialsSectionPage.ClickPauseButton();
             driver.WaitFor(5);
         }
