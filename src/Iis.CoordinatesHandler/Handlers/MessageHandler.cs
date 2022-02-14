@@ -18,6 +18,7 @@ namespace Iis.CoordinatesEventHandler.Handlers
     public class MessageHandler : BackgroundService
     {
         private const int RetryIntervalSec = 5;
+        private const string ApplicationName = "Iis.Api.CoordinatesEventHandler";
         private ILogger<MessageHandler> _logger;
         private IConnectionFactory _connectionFactory;
         private IConnection _connection;
@@ -57,7 +58,7 @@ namespace Iis.CoordinatesEventHandler.Handlers
 
         protected override Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            _connection = _connectionFactory.CreateAndWaitConnection(RetryIntervalSec, _logger, _handlerConfiguration.HandlerName);
+            _connection = _connectionFactory.CreateAndWaitConnection(RetryIntervalSec, _logger, ApplicationName);
 
             _consumeChannel = new ConsumeMessageChannel<MaterialProcessingEventMessage>(
                 _connection,

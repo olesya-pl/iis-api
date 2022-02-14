@@ -6,7 +6,6 @@ namespace Iis.MaterialDistributor.Configurations
     {
         public const string SectionName = "materialCoefficientsPublisher";
 
-        public string HandlerName { get; set; }
         public ChannelConfig SourceChannel { get; set; }
     }
 }

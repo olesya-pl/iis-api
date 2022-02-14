@@ -14,7 +14,7 @@ namespace Iis.Api.Modules
 {
     internal static class MaterialEventRegistrationModule
     {
-        private const string ApiConnectionLoggerName = "Iis.Api.Connection";
+        private const string ApplicationName = "Iis.Api";
         private const string EventSectionName = "materialEventPublisher";
         private const string AssignerSectionName = "operatorAssigner";
         private const string FeatureHandlerSectionName = "featureHandler";
@@ -57,7 +57,7 @@ namespace Iis.Api.Modules
         {
             var logger = provider.GetRequiredService<ILogger<IConnectionFactory>>();
             var connectionFactory = provider.GetRequiredService<IConnectionFactory>();
-            return connectionFactory.CreateAndWaitConnection(logger: logger, clientName: ApiConnectionLoggerName);
+            return connectionFactory.CreateAndWaitConnection(logger: logger, clientName: ApplicationName);
         }
     }
 }
