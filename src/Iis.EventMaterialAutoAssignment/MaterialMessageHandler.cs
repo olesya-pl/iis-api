@@ -18,6 +18,7 @@ namespace Iis.EventMaterialAutoAssignment
     public class MaterialMessageHandler : BackgroundService
     {
         private const int RetryIntervalSec = 5;
+        private const string ApplicationName = "Iis.Api.TermCheck.MaterialMessageHandler";
         private readonly ILogger<MaterialMessageHandler> _logger;
         private readonly MaterialMessageHandlerConfiguration _configuration;
         private readonly IServiceScopeFactory _serviceScopeFactory;
@@ -35,7 +36,7 @@ namespace Iis.EventMaterialAutoAssignment
             _configuration = configuration;
             _serviceScopeFactory = serviceScopeFactory;
 
-            _connection = connectionFactory.CreateAndWaitConnection(RetryIntervalSec, _logger, "TermCheck.MaterialMessageHandler");
+            _connection = connectionFactory.CreateAndWaitConnection(RetryIntervalSec, _logger, ApplicationName);
 
             _incommingChannel = _connection.CreateModel();
             _incommingChannel.QueueDeclare(

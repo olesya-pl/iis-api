@@ -30,6 +30,7 @@ namespace Iis.Api.Materials.Handlers
         private const bool durableQueue = true;
         private const bool autoDeleteQueue = false;
         private const int ReConnectTimeoutSec = 5;
+        private const string ApplicationName = "Iis.Api.FeatureHandler";
         private readonly ILogger<FeatureHandler> _logger;
         private readonly FeatureHandlerConfig _config;
         private readonly IServiceProvider _provider;
@@ -39,7 +40,8 @@ namespace Iis.Api.Materials.Handlers
         private IModel _channel;
         private readonly JsonSerializerOptions options;
 
-        public FeatureHandler(ILogger<FeatureHandler> logger,
+        public FeatureHandler(
+            ILogger<FeatureHandler> logger,
             IConnectionFactory connectionFactory,
             FeatureHandlerConfig configuration,
             IServiceProvider provider,
@@ -51,7 +53,8 @@ namespace Iis.Api.Materials.Handlers
             _provider = provider;
             _unitOfWorkFactory = unitOfWorkFactory;
             _materialElasticService = materialElasticService;
-            _connection = connectionFactory.CreateAndWaitConnection(ReConnectTimeoutSec, logger);
+
+            _connection = connectionFactory.CreateAndWaitConnection(ReConnectTimeoutSec, logger, ApplicationName);
 
             _channel = _connection.CreateModel();
 

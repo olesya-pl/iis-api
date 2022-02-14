@@ -15,7 +15,7 @@ namespace Iis.MaterialDistributor.Workers
 {
     public class DistributionWorker : BackgroundService
     {
-        private const string ApplicationName = nameof(DistributionWorker);
+        private const string ApplicationName = "Iis.MaterialDistributor.DistributionWorker";
         private readonly ILogger _logger;
         private readonly IMediator _mediator;
         private readonly IConnectionFactory _connectionFactory;
