@@ -32,7 +32,8 @@ namespace Iis.Api.GraphQL.Hierarchy
         private const string CommonInfoName = "commonInfo";
         private const string OpenName = "OpenName";
         private const string RealNameShortName = "RealNameShort";
-        public async Task<HierarchyResult> GetHierarchy(
+
+        public HierarchyResult GetHierarchy(
             IResolverContext ctx,
             [Service] IOntologyService ontologyService,
             [Service] ISecurityLevelChecker securityLevelChecker,
