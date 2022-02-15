@@ -24,6 +24,44 @@ namespace IIS.Core.GraphQL.Materials
 {
     public class Query
     {
+        private static readonly List<User> DefaultAssignees = new List<User>();
+        private static readonly IdTitle DefaultCaller = new IdTitle();
+        private static readonly List<Material>DefaultChildren = new List<Material>();
+        private static readonly string DefaultCode = string.Empty;
+        private static readonly MaterialSign DefaultCompleteness = new MaterialSign();
+        private static readonly string DefaultContent = string.Empty;
+        private static readonly string DefaultCoordinates = string.Empty;
+        private static readonly List<Data> DefaultData = new List<Data>();
+        private static readonly User DefaultEditor = new User();
+        private static readonly List<JObject> DefaultEvents = new List<JObject>();
+        private static readonly List<JObject> DefaultFeatures = new List<JObject>();
+        private static readonly string DefaultFrom = string.Empty;
+        private static readonly JObject DefaultHighlight = new JObject();
+        private static readonly Guid DefaultId = Guid.Empty;
+        private static readonly MaterialSign DefaultImportance = new MaterialSign();
+        private static readonly JObject DefaultMetadata = new JObject();
+        private static readonly List<string> DefaultObjects = new List<string>();
+        private static readonly IdTitle DefaultReceiver = new IdTitle();
+        private static readonly MaterialSign DefaultRelevance = new MaterialSign();
+        private static readonly MaterialSign DefaultReliability = new MaterialSign();
+        private static readonly string DefaultSource = string.Empty;
+        private static readonly List<string> DefaultStates = new List<string>();
+        private static readonly List<string> DefaultTags = new List<string>();
+        private static readonly string DefaultTitle = string.Empty;
+        private static readonly List<JObject> DefaultTranscriptions = new List<JObject>();
+        private static readonly string DefaultType = string.Empty;
+        private static readonly int DefaultAccessLevel = default(int);
+        private static readonly List<GeoCoordinate> DefaultCoordinateList = new List<GeoCoordinate>();
+        private static readonly string DefaultCreatedDate = string.Empty;
+        private static readonly string DefaultUpdatedAt = string.Empty;
+        private static readonly JObject DefaultObjectsOfStudy = new JObject();
+        private static readonly List<RelatedObject> DefaultRelatedSignCollection = new List<RelatedObject>();
+        private static readonly List<RelatedObjectOfStudy> DefaultRelatedObjectCollection = new List<RelatedObjectOfStudy>();
+        private static readonly List<MaterialSecurityLevel> DefaultSecurityLevels = new List<MaterialSecurityLevel>();
+        private static readonly Guid DefaultFileId = Guid.Empty;
+        private static readonly DateTime DefaultReceivingDate = DateTime.Now;
+        private static readonly MaterialSign DefaultProcessedStatus = new MaterialSign();
+        
         [GraphQLType(typeof(AggregatedMaterialCollection))]
         public async Task<(IEnumerable<Material> materials, Dictionary<string, AggregationItem> aggregations, int totalCount)> GetMaterials(
             IResolverContext ctx,
@@ -310,43 +348,43 @@ namespace IIS.Core.GraphQL.Materials
                 
                 if (material.AccessAllowed) continue;
                 
-                material.Assignees = new List<User>();
-                material.Caller = new IdTitle();
-                material.Children = new List<Material>();
-                material.Code = string.Empty;
-                material.Completeness = new MaterialSign();
-                material.Content = string.Empty;
-                material.Coordinates = string.Empty;
-                material.Data = new List<Data>();
-                material.Editor = new User();
-                material.Events = new List<JObject>();
-                material.Features = new List<JObject>();
-                material.From = string.Empty;
-                material.Highlight = new JObject();
-                material.Id = Guid.Empty;
-                material.Importance = new MaterialSign();
-                material.Metadata = new JObject();
-                material.Objects = new List<string>();
-                material.Receiver = new IdTitle();
-                material.Relevance = new MaterialSign();
-                material.Reliability = new MaterialSign();
-                material.Source = string.Empty;
-                material.States = new List<string>();
-                material.Tags = new List<string>();
-                material.Title = string.Empty;
-                material.Transcriptions = new List<JObject>();
-                material.Type = string.Empty;
-                material.AccessLevel = default(int);
-                material.CoordinateList = new List<GeoCoordinate>();
-                material.CreatedDate = string.Empty;
-                material.UpdatedAt = string.Empty;
-                material.ObjectsOfStudy = new JObject();
-                material.RelatedSignCollection = new List<RelatedObject>();
-                material.RelatedObjectCollection = new List<RelatedObjectOfStudy>();
-                material.SecurityLevels = new List<MaterialSecurityLevel>();
-                material.FileId = Guid.Empty;
-                material.ReceivingDate = DateTime.Now;
-                material.ProcessedStatus = new MaterialSign();
+                material.Assignees = DefaultAssignees;
+                material.Caller = DefaultCaller;
+                material.Children = DefaultChildren;
+                material.Code = DefaultCode;
+                material.Completeness = DefaultCompleteness;
+                material.Content = DefaultContent;
+                material.Coordinates = DefaultCoordinates;
+                material.Data = DefaultData;
+                material.Editor = DefaultEditor;
+                material.Events = DefaultEvents;
+                material.Features = DefaultFeatures;
+                material.From = DefaultFrom;
+                material.Highlight = DefaultHighlight;
+                material.Id = DefaultId;
+                material.Importance = DefaultImportance;
+                material.Metadata = DefaultMetadata;
+                material.Objects = DefaultObjects;
+                material.Receiver = DefaultReceiver;
+                material.Relevance = DefaultRelevance;
+                material.Reliability = DefaultReliability;
+                material.Source = DefaultSource;
+                material.States = DefaultStates;
+                material.Tags = DefaultTags;
+                material.Title = DefaultTitle;
+                material.Transcriptions = DefaultTranscriptions;
+                material.Type = DefaultType;
+                material.AccessLevel = DefaultAccessLevel;
+                material.CoordinateList = DefaultCoordinateList;
+                material.CreatedDate = DefaultCreatedDate;
+                material.UpdatedAt = DefaultUpdatedAt;
+                material.ObjectsOfStudy = DefaultObjectsOfStudy;
+                material.RelatedSignCollection = DefaultRelatedSignCollection;
+                material.RelatedObjectCollection = DefaultRelatedObjectCollection;
+                material.SecurityLevels = DefaultSecurityLevels;
+                material.FileId = DefaultFileId;
+                material.ReceivingDate = DefaultReceivingDate;
+                material.ProcessedStatus = DefaultProcessedStatus;
             }
         }
 
