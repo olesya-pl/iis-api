@@ -33,6 +33,7 @@ namespace Iis.Services
 
         private INodeTypeLinked SecurityLevelType => _ontologyData.Schema.GetEntityTypeByName(EntityTypeNames.SecurityLevel.ToString());
         private IRelationType NameType => SecurityLevelType.GetRelationByName(OntologyNames.NameField);
+        private IRelationType DescriptionType => SecurityLevelType.GetRelationByName(OntologyNames.DescriptionField);
         private IRelationType UniqueIndexType => SecurityLevelType.GetRelationByName(OntologyNames.UniqueIndexField);
         private IRelationType ParentType => SecurityLevelType.GetRelationByName(OntologyNames.ParentField);
 
@@ -86,6 +87,7 @@ namespace Iis.Services
             _ontologyData.WriteLock(() =>
             {
                 var node = _ontologyData.GetNode(levelPlain.Id) ?? _ontologyData.CreateNode(SecurityLevelType.Id);
+
                 var nameRelation = node.GetSingleDirectRelation(OntologyNames.NameField);
                 var oldName = nameRelation?.TargetNode.Value;
 
@@ -108,6 +110,19 @@ namespace Iis.Services
                 {
                     var parentLevel = _securityLevelChecker.GetSecurityLevel((int)levelPlain.ParentUniqueIndex);
                     _ontologyData.CreateRelation(node.Id, parentLevel.Id, ParentType.Id);
+                }
+
+                var descriptionRelation = node.GetSingleDirectRelation(OntologyNames.DescriptionField);
+                var oldDescription = descriptionRelation?.TargetNode.Value;
+
+                if (descriptionRelation != null && levelPlain.Description != oldDescription)
+                {
+                    _ontologyData.RemoveNodeAndRelations(descriptionRelation.Id);
+                }
+
+                if (levelPlain.Description != oldDescription)
+                {
+                    _ontologyData.CreateRelationWithAttribute(node.Id, DescriptionType.Id, levelPlain.Description);
                 }
             });
             _securityLevelChecker.Reload();
