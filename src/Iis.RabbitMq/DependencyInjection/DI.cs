@@ -29,7 +29,7 @@ namespace Iis.RabbitMq.DependencyInjection
             mqConnectionString = $"amqp://{connectionFactory.UserName}:{connectionFactory.Password}@{connectionFactory.HostName}{portString}/{connectionFactory.VirtualHost}";
 
             return services
-                    .AddTransient<IConnectionFactory>(serviceProvider => connectionFactory);
+                    .AddSingleton<IConnectionFactory>(serviceProvider => connectionFactory);
         }
     }
 }

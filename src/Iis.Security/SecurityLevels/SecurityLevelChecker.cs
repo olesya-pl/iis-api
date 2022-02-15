@@ -28,10 +28,20 @@ namespace Iis.Security.SecurityLevels
 
         public SecurityLevelChecker(IReadOnlyList<SecurityLevelPlain> plainLevels)
         {
+            Reload(plainLevels);
+        }
+
+        public ISecurityLevel RootLevel => _rootLevel;
+
+        public void Reload() => Initialize();
+
+        public void Reload(IReadOnlyList<SecurityLevelPlain> plainLevels)
+        {
             var levelsDict = plainLevels.Select(_ => new SecurityLevel
             {
                 Id = _.Id,
                 Name = _.Name,
+                Description = _.Description,
                 UniqueIndex = _.UniqueIndex
             }).ToDictionary(_ => _.UniqueIndex);
 
@@ -47,10 +57,6 @@ namespace Iis.Security.SecurityLevels
 
             _rootLevel = levelsDict.Values.First().Root;
         }
-
-        public ISecurityLevel RootLevel => _rootLevel;
-
-        public void Reload() => Initialize();
 
         public ISecurityLevel GetSecurityLevel(Guid id) => _rootLevel.GetAllItems().Single(_ => _.Id == id);
 
@@ -89,6 +95,19 @@ namespace Iis.Security.SecurityLevels
             var objectLevels = GetSecurityLevels(objectIndexes);
             return AccessGranted(userLevels, objectLevels);
         }
+
+        public bool AccessGranted(IReadOnlyList<ISecurityLevel> userLevels, IReadOnlyList<ISecurityLevel> objectLevels)
+        {
+            var accessibleLevels = objectLevels.Where(_ => AccessGranted(userLevels, _)).ToList();
+            if (accessibleLevels.Count == objectLevels.Count) return true;
+            var restLevels = objectLevels.Where(_ => !accessibleLevels.Contains(_)).ToList();
+            var accessibleByBrother = restLevels
+                .Where(rl => !rl.IsGroup && accessibleLevels
+                    .Any(al => al.ParentUniqueIndex == rl.ParentUniqueIndex))
+                .ToList();
+            return accessibleByBrother.Count == restLevels.Count;
+        }
+
 
         /// This is security code for elastic painless script.
         /// See details here: https://confluence.infozahyst.com/pages/viewpage.action?pageId=192484154 
@@ -143,19 +162,6 @@ namespace Iis.Security.SecurityLevels
         internal SecurityLevel GetSecurityLevelConcrete(int uniqueIndex) =>
             _rootLevel.GetAllItems().Where(_ => _.UniqueIndex == uniqueIndex).Single();
 
-        
-        private bool AccessGranted(IReadOnlyList<ISecurityLevel> userLevels, IReadOnlyList<ISecurityLevel> objectLevels)
-        {
-            var accessibleLevels = objectLevels.Where(_ => AccessGranted(userLevels, _)).ToList();
-            if (accessibleLevels.Count == objectLevels.Count) return true;
-            var restLevels = objectLevels.Where(_ => !accessibleLevels.Contains(_)).ToList();
-            var accessibleByBrother = restLevels
-                .Where(rl => !rl.IsGroup && accessibleLevels
-                    .Any(al => al.ParentUniqueIndex == rl.ParentUniqueIndex))
-                .ToList();
-            return accessibleByBrother.Count == restLevels.Count;
-        }
-        
         private bool AccessGranted(IReadOnlyList<ISecurityLevel> userLevels, ISecurityLevel objectLevel) =>
             userLevels.Any(userLevel => AccessGranted(userLevel, objectLevel));
         
@@ -163,7 +169,6 @@ namespace Iis.Security.SecurityLevels
             userLevel == objectLevel ||
             userLevel.IsParentOf(objectLevel) ||
             userLevel.IsChildOf(objectLevel);
-
         
         private IReadOnlyList<SecurityLevel> GetAllAccessibleLevels(IReadOnlyList<ISecurityLevel> baseItems) =>
             _rootLevel.GetAllItems().Where(_ => AccessGranted(baseItems, _)).ToList();
@@ -178,6 +183,7 @@ namespace Iis.Security.SecurityLevels
                     {
                         Id = _.Id,
                         Name = _.GetSingleDirectProperty(OntologyNames.NameField)?.Value,
+                        Description = _.GetSingleDirectProperty(OntologyNames.DescriptionField)?.Value,
                         UniqueIndex = int.Parse(_.GetSingleDirectProperty(OntologyNames.UniqueIndexField)?.Value),
                     },
                     ParentIndexStr = _.GetSingleDirectProperty(OntologyNames.ParentField)

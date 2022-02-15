@@ -12,12 +12,14 @@ namespace Iis.Interfaces.SecurityLevels
         {
             Id = level.Id;
             Name = level.Name;
+            Description = level.Description;
             UniqueIndex = level.UniqueIndex;
             ParentUniqueIndex = level.ParentUniqueIndex;
         }
 
         public Guid Id { get; set; }
         public string Name { get; set; }
+        public string Description { get; set; }
         public int UniqueIndex { get; set; }
         public int? ParentUniqueIndex { get; set; }
         public bool IsNew => UniqueIndex == -1;

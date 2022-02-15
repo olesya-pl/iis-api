@@ -84,6 +84,7 @@ namespace AcceptanceTests.UISteps
         {
             materialsSectionPage.SearchField.SendKeys(input);
             materialsSectionPage.SearchField.SendKeys(Keys.Enter);
+            driver.WaitFor(2);
         }
 
         [When(@"I searched for uploaded material in the materials")]
@@ -426,10 +427,18 @@ namespace AcceptanceTests.UISteps
             driver.WaitFor(3);
         }
 
-        #endregion When
+        [When(@"I press hotkeys Ctrl\+Space")]
+        public void WhenIPressHotkeysCtrlSpace()
+        {
 
-        #region Then
-        [Then(@"I must see the Materials page")]
+            navigationSection.ObjectOfStudyLink.SendKeys(Keys.Control + Keys.Space);
+            driver.WaitFor(5);
+        }
+
+            #endregion When
+
+            #region Then
+            [Then(@"I must see the Materials page")]
         public void ThenIMustSeeMaterialsPage()
         {
             Assert.Contains("input-stream/?sort=createdDate_desc&page=1", driver.Url);
@@ -747,6 +756,18 @@ namespace AcceptanceTests.UISteps
         {
             Assert.True(materialsSectionPage.CreatedDateNULL.Displayed);
             driver.WaitFor(2);
+        }
+
+        [Then(@"I must see the play/pause button in look like arrow")]
+        public void ThenIMustSeeThePlayPauseButtonInLookLikeArrow()
+        {
+            Assert.True(materialsSectionPage.PauseButton.Displayed);
+        }
+
+        [Then(@"I must see the play/pause button in look like pause")]
+        public void ThenIMustSeeThePlayPauseButtonInLookLikePause()
+        {
+            Assert.True(materialsSectionPage.PlayButton.Displayed);
         }
 
         #endregion

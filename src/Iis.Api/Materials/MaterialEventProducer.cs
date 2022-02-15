@@ -5,7 +5,6 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using RabbitMQ.Client;
 using Iis.Messages;
-using Iis.Utility;
 using Iis.RabbitMq.Channels;
 using Iis.RabbitMq.Helpers;
 using Iis.Messages.Materials;
@@ -26,37 +25,31 @@ namespace IIS.Core.Materials
 
     public class MaterialEventProducer : IMaterialEventProducer
     {
-        private readonly IConnectionFactory _connectionFactory;
-        private readonly IConnection _connection;
         private readonly IModel _channel;
         private readonly ILogger _logger;
-        private readonly IModel _materialEventChannel;
         private readonly IPublishMessageChannel<MaterialProcessingEventMessage> _eventPublishChannel;
         private readonly IPublishMessageChannel<MaterialCreatedMessage> _materialCreatedChannel;
         private readonly IPublishMessageChannel<MaterialProcessingEventMessage> _elasticSaverChannel;
         private readonly MaterialEventConfiguration _eventConfiguration;
         private readonly MaterialOperatorAssignerConfiguration _assignerConfiguration;
         private readonly MaterialElasticSaverConfiguration _elasticSaverConfiguration;
+        private IConnection _connection;
 
-        public MaterialEventProducer(IConnectionFactory connectionFactory,
-            ILoggerFactory loggerFactory,
+        public MaterialEventProducer(
+            IConnectionFactory connectionFactory,
+            ILogger<MaterialEventProducer> logger,
             MaterialEventConfiguration eventConfiguration,
             MaterialOperatorAssignerConfiguration assignerConfiguration,
-            MaterialElasticSaverConfiguration elasticSaverConfiguration)
+            MaterialElasticSaverConfiguration elasticSaverConfiguration,
+            IConnection connection)
         {
-            _logger = loggerFactory.CreateLogger<MaterialEventProducer>();
-
-            _connectionFactory = connectionFactory;
+            _logger = logger;
             _eventConfiguration = eventConfiguration;
             _assignerConfiguration = assignerConfiguration;
             _elasticSaverConfiguration = elasticSaverConfiguration;
-
-            _connection = _connectionFactory.CreateAndWaitConnection();
+            _connection = connection;
 
             _channel = _connection.CreateModel();
-
-            _materialEventChannel = ConfigChannel(_connection.CreateModel(), _eventConfiguration.TargetChannel);
-
             _eventPublishChannel = new PublishMessageChannel<MaterialProcessingEventMessage>(_connection, _eventConfiguration.TargetChannel);
             _materialCreatedChannel = new PublishMessageChannel<MaterialCreatedMessage>(_connection, new ChannelConfig { ExchangeName = MaterialRabbitConsts.DefaultExchangeName, RoutingKeys = new[] { MaterialRabbitConsts.QueueName } });
             _elasticSaverChannel = new PublishMessageChannel<MaterialProcessingEventMessage>(_connection, new ChannelConfig { ExchangeName = MaterialRabbitConsts.DefaultExchangeName, RoutingKeys = new[] { _elasticSaverConfiguration.QueueName } });
@@ -105,12 +98,12 @@ namespace IIS.Core.Materials
         public void Dispose()
         {
             _channel.Dispose();
-            _materialEventChannel.Dispose();
             _eventPublishChannel.Dispose();
             _materialCreatedChannel.Dispose();
             _elasticSaverChannel.Dispose();
-            _connection.Dispose();
+            _connection = null;
         }
+
         public void SendAvailableForOperatorEvent(Guid materialId)
         {
             _channel.QueueDeclare(

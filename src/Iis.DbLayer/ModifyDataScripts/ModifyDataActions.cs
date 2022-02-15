@@ -1086,6 +1086,17 @@ namespace Iis.DbLayer.ModifyDataScripts
             });
         }
 
+        public void AddSecurityLevelDescription(OntologyContext context, IOntologyNodesData data)
+        {
+            const string DESCRIPTION = "description";
+
+            var securityLevelType = data.Schema.GetEntityTypeByName(EntityTypeNames.SecurityLevel.ToString());
+            if (securityLevelType.GetProperty(DESCRIPTION) != null) return;
+
+            data.Schema.CreateAttributeType(securityLevelType.Id, DESCRIPTION, "Опис", ScalarType.String, EmbeddingOptions.Optional);
+            SaveOntologySchema(data.Schema);
+        }
+
         private static INode GetOrAddSingNode(IOntologyNodesData data, Guid signId, string phoneNumber, string imei, string tmsi)
         {
             const string singTypeName = "CellphoneSign";

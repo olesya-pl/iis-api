@@ -23,6 +23,8 @@ using MoreLinq;
 using Iis.Services.Contracts.Elastic;
 using Iis.Utility;
 using Iis.Elastic.Entities;
+using Iis.Interfaces.SecurityLevels;
+using Newtonsoft.Json;
 
 namespace Iis.Api.Controllers
 {
@@ -45,6 +47,7 @@ namespace Iis.Api.Controllers
         private readonly ICsvService _csvService;
         private readonly IMaterialProvider _materialProvider;
         private readonly NodeMaterialRelationService<IIISUnitOfWork> _nodeMaterialRelationService;
+        private readonly ISecurityLevelChecker _securityLevelChecker;
 
         public AdminController(
             IMaterialElasticService materialElasticService,
@@ -60,7 +63,8 @@ namespace Iis.Api.Controllers
             IAccessLevelService accessLevelService,
             ICsvService csvService,
             IMaterialProvider materialProvider,
-            NodeMaterialRelationService<IIISUnitOfWork> nodeMaterialRelationService)
+            NodeMaterialRelationService<IIISUnitOfWork> nodeMaterialRelationService,
+            ISecurityLevelChecker securityLevelChecker)
         {
             _materialElasticService = materialElasticService;
             _elasticManager = elasticManager;
@@ -76,6 +80,7 @@ namespace Iis.Api.Controllers
             _csvService = csvService;
             _materialProvider = materialProvider;
             _nodeMaterialRelationService = nodeMaterialRelationService;
+            _securityLevelChecker = securityLevelChecker;
         }
 
         [HttpGet("CreateBindingNodesToMaterial/{nodeId}/{limit}")]
@@ -297,6 +302,29 @@ namespace Iis.Api.Controllers
             log.AppendLine("Users created");
 
             log.AppendLine($"spend: {stopwatch.ElapsedMilliseconds} ms");
+
+            return Content(log.ToString());
+        }
+
+        [HttpGet("ReInitializeSecurityIndexes")]
+        public async Task<IActionResult> ReInitializeSecurityIndexesAsync(CancellationToken cancellationToken)
+        {
+            var stopwatch = Stopwatch.StartNew();
+
+            var log = new StringBuilder();
+            _adminElasticService.Logger = log;
+
+            var index = _elasticState.SecurityIndex;
+
+            await _elasticManager.DeleteIndexAsync(index, cancellationToken);
+
+            var securityLevelsPlain = _securityLevelChecker.GetSecurityLevelsPlain();
+            foreach (var level in securityLevelsPlain)
+            {
+                var json = JsonConvert.SerializeObject(level);
+                await _elasticManager.PutDocumentAsync(index, level.Id, json, cancellationToken);
+            }
+            log.AppendLine($"Security indexes created. Spend: {stopwatch.ElapsedMilliseconds} ms");
 
             return Content(log.ToString());
         }

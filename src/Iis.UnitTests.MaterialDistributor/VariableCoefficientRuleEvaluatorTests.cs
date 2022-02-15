@@ -13,7 +13,7 @@ namespace Iis.UnitTests.MaterialDistributor
         public void DefaultCoefficientWhenNullRuleCollection()
         {
             var coefficient = new VariableCoefficientRuleEvaluator()
-                .GetVariableCoefficientValue(null, DateTime.Now, new MaterialDocument());
+                .GetVariableCoefficientValue(null, DateTime.Now, new MaterialDistributionInfo());
 
             coefficient.Should().Be(0);
         }
@@ -22,7 +22,7 @@ namespace Iis.UnitTests.MaterialDistributor
         public void DefaultCoefficientWhenEmprtyRuleCollection()
         {
             var coefficient = new VariableCoefficientRuleEvaluator()
-                .GetVariableCoefficientValue(Array.Empty<VariableCoefficientRule>(), DateTime.Now, new MaterialDocument());
+                .GetVariableCoefficientValue(Array.Empty<VariableCoefficientRule>(), DateTime.Now, new MaterialDistributionInfo());
 
             coefficient.Should().Be(0);
         }
@@ -60,7 +60,7 @@ namespace Iis.UnitTests.MaterialDistributor
         {
             var comparisonTimeStamp = new DateTime(2021, 01, 01, 16, 15, 25);
 
-            var document = new MaterialDocument
+            var document = new MaterialDistributionInfo
             {
                 Id = Guid.NewGuid(),
                 RegistrationDate = new DateTime(2021, 01, 01, hour, minute, 25),
@@ -97,7 +97,7 @@ namespace Iis.UnitTests.MaterialDistributor
         {
             var comparisonTimeStamp = new DateTime(2021, 01, 01, 16, 15, 25);
 
-            var document = new MaterialDocument
+            var document = new MaterialDistributionInfo
             {
                 Id = Guid.NewGuid(),
                 RegistrationDate = null,

@@ -318,7 +318,7 @@ namespace Iis.Services
 
             await _userElasticService.SaveAllUsersAsync(elasticUsers, cancellationToken);
         }
-        
+
         public string GetPasswordHashAsBase64String(string password)
         {
             var salt = _configuration.GetValue("salt", string.Empty);

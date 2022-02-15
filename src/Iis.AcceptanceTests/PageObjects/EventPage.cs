@@ -60,7 +60,7 @@ namespace AcceptanceTests.PageObjects
         [FindsBy(How = How.CssSelector, Using = "button[name='btn-close'] > .el-icon-close")]
         public IWebElement CloseEventCreationWindow;
 
-        [FindsBy(How = How.XPath, Using = "//div[@class='event-card__linked-materials']")]
+        [FindsBy(How = How.XPath, Using = "//div[@class='event-card__linked-materials']//div[@class='wrapper']")]
         public IWebElement BindedMaterialsField;
 
         [FindsBy(How = How.XPath, Using = "//div[@class='el-form-item event-card__objects-associated-with-event el-form-item--small']")]
@@ -84,7 +84,7 @@ namespace AcceptanceTests.PageObjects
 
         public List<Event> Events => driver.FindElements(By.CssSelector(".events-table .p-datatable-tbody > tr"))
                     .Select(webElement => new Event(driver, webElement)).ToList();
-        public List<EventRelatedItems> MaterialsRelatedToEvent => driver.FindElement(By.CssSelector(".event-card__linked-materials")).FindElements(By.CssSelector(".el-tag"))
+        public List<EventRelatedItems> MaterialsRelatedToEvent(string materialName) => driver.FindElements(By.XPath($"//div[@class='event-card__linked-materials']//div[@class='wrapper']//span[contains(text(),'{materialName}')]"))
                     .Select(webElement => new EventRelatedItems(driver, webElement)).ToList();
 
         public Event GetEventByTitle(string title)
@@ -94,7 +94,7 @@ namespace AcceptanceTests.PageObjects
 
         public bool IsMaterialVisible(string materialName)
         {
-            var bindedMaterial = driver.FindElement(By.XPath($"//*[contains(@class, 'event-card__linked-materials')]//*[contains(@class, 'wrapper')]//*[text()]"));
+            var bindedMaterial = driver.FindElement(By.XPath($"//div[@class='event-card__linked-materials']//div[@class='wrapper']//span[contains(text(),'{materialName}')]"));
             return bindedMaterial.Displayed;
         }
 
@@ -106,5 +106,7 @@ namespace AcceptanceTests.PageObjects
 
         [FindsBy(How = How.XPath, Using = "//button[@name='delete']")]
         public IWebElement DeleteRelatedMaterialButton;
+        public IWebElement DeleteRelation(string materialName) =>
+        driver.FindElement(By.XPath($"//span[contains(text(),'{materialName}')]//i[@class='el-tag__close el-icon-close']"));
     }
 }

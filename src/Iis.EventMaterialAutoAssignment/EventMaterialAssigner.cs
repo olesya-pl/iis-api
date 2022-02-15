@@ -23,6 +23,7 @@ namespace Iis.EventMaterialAutoAssignment
     public class EventMaterialAssigner : BackgroundService
     {
         private const int RetryIntervalSec = 5;
+        private const string ApplicationName = "Iis.Api.TermCheck.EventMaterialAssigner";
         private readonly ILogger<EventMaterialAssigner> _logger;
         private readonly EventMaterialAssignerConfiguration _configuration;
         private readonly IServiceScopeFactory _serviceScopeFactory;
@@ -55,7 +56,7 @@ namespace Iis.EventMaterialAutoAssignment
             _eventStateType = ontologyData.Schema.GetEntityTypeByName("EventState");
             _accessLevelType = ontologyData.Schema.GetEntityTypeByName("AccessLevel");
 
-            _connection = connectionFactory.CreateAndWaitConnection(RetryIntervalSec, _logger, nameof(EventMaterialAssigner));
+            _connection = connectionFactory.CreateAndWaitConnection(RetryIntervalSec, _logger, ApplicationName);
 
             _incommingChannel = _connection.CreateModel();
             _incommingChannel.QueueDeclare(

@@ -17,6 +17,7 @@ using Microsoft.Extensions.Configuration;
 using Iis.Interfaces.Ontology.Schema;
 using Microsoft.Extensions.Logging;
 using Iis.Api.GraphQL.NodeMaterialRelation;
+using Iis.Api.GraphQL.Hierarchy;
 
 namespace IIS.Core.GraphQL
 {
@@ -87,7 +88,7 @@ namespace IIS.Core.GraphQL
                 d.Include<GraphQuery>();
                 d.Include<ResQuery>();
                 d.Include<NodeMaterialRelationQuery>();
-
+                d.Include<HierarchyQuery>();
 
                 if (_configuration.GetValue("reportsAvailable", true))
                 {

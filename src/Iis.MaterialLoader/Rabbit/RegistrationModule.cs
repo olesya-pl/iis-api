@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Configuration;
@@ -11,10 +12,9 @@ namespace Iis.MaterialLoader.Rabbit
 {
     internal static class RegistrationModule
     {
+        private const string ApplicationName = "Iis.MaterialLoader";
         private const string EventProducerSectionName = "eventProducer";
         private const string ExternalExchangesSectionName = "externalExchanges";
-        private const string MaterialLoaderLoggerName = "MaterialLoader.RabbitMq.Connection";
-        private const int RetryTimeOutSec = 5;
 
         public static IServiceCollection RegisterMqInstances(this IServiceCollection services, IConfiguration configuration)
         {
@@ -25,11 +25,7 @@ namespace Iis.MaterialLoader.Rabbit
 
             services.AddSingleton(eventProducerConfig);
 
-            services.AddSingleton<IConnection>(provider => { 
-                var factory = provider.GetService<IConnectionFactory>();
-                var logger = provider.GetService<ILoggerFactory>().CreateLogger(MaterialLoaderLoggerName);
-                return factory.CreateAndWaitConnection(RetryTimeOutSec, logger);
-            });
+            services.AddSingleton<IConnection>(_ => CreateRabbitMQConnection(_));
 
             var provider = services.BuildServiceProvider();
             var connection = provider.GetService<IConnection>();
@@ -43,6 +39,13 @@ namespace Iis.MaterialLoader.Rabbit
             });
 
             return services;
+        }
+
+        private static IConnection CreateRabbitMQConnection(IServiceProvider provider)
+        {
+            var logger = provider.GetRequiredService<ILogger<IConnectionFactory>>();
+            var connectionFactory = provider.GetRequiredService<IConnectionFactory>();
+            return connectionFactory.CreateAndWaitConnection(logger: logger, clientName: ApplicationName);
         }
 
         private static void BindExchanges(IConnection connection, ChannelConfig sourceConfig, IReadOnlyCollection<ChannelConfig> destinationConfigList)

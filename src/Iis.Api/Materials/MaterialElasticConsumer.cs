@@ -17,6 +17,7 @@ namespace Iis.Api.Materials
 {
     public class MaterialElasticConsumer : BackgroundService
     {
+        private const string ApplicationName = "Iis.Api.MaterialElasticConsumer";
         private const int RetryIntervalSec = 5;
         private const int MaxBatchSize = 50;
         private readonly ILogger<MaterialElasticConsumer> _logger;
@@ -31,7 +32,8 @@ namespace Iis.Api.Materials
         private static readonly TimeSpan LowIntenseDelay = TimeSpan.FromSeconds(1);
         private static readonly TimeSpan HighIntenseDelay = TimeSpan.FromMilliseconds(100);
 
-        public MaterialElasticConsumer(ILogger<MaterialElasticConsumer> logger,
+        public MaterialElasticConsumer(
+            ILogger<MaterialElasticConsumer> logger,
             IConnectionFactory connectionFactory,
             IMaterialElasticService materialElasticService,
             IMaterialEventProducer materialEventProducer,
@@ -42,7 +44,7 @@ namespace Iis.Api.Materials
             _configuration = configuration;
             _materialEventProducer = materialEventProducer;
 
-            _connection = connectionFactory.CreateAndWaitConnection(RetryIntervalSec, _logger, nameof(MaterialElasticConsumer));
+            _connection = connectionFactory.CreateAndWaitConnection(RetryIntervalSec, _logger, ApplicationName);
 
             _channel = _connection.CreateModel();
             _channel.QueueDeclare(

@@ -19,7 +19,7 @@ namespace Iis.Services
         {
             _elasticManager = elasticManager;
         }
-         
+
         public Task SaveAllUsersAsync(IReadOnlyCollection<ElasticUserDto> elasticUsers, CancellationToken cancellationToken)
         {
             var tasks = elasticUsers.Select(p => SaveUserAsync(p, cancellationToken));

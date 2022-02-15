@@ -55,6 +55,7 @@ namespace Iis.DbLayer.ModifyDataScripts
             _items.Add("AddSecurityLevels", actions.AddSecurityLevels);
             _items.Add("AddSecurityLevelsData", actions.AddSecurityLevelsData);
             _items.Add("AddAttributesManagerToAccessObjects", actions.AddAttributesManagerToAccessObjects);
+            _items.Add("AddSecurityLevelDescription", actions.AddSecurityLevelDescription);
         }
         public bool Run()
         {

@@ -142,24 +142,10 @@ namespace IIS.Core.GraphQL.Materials
         {
             var tokenPayload = context.GetToken();
 
-            // этот вызов замеменит тот что ниже когда реализуем MaterialDistribution
-            //var material = await materialProvider.GetNextAssignedMaterialForUserAsync(tokenPayload.User, context.RequestAborted);
+            var material = await materialProvider.GetNextAssignedMaterialForUserAsync(tokenPayload.User, context.RequestAborted);
 
-            var sorting = new SortingParams("createdDate", "desc");
-            var pagination = new PaginationParams(1, 100);
-            var materialsResult = await materialProvider.GetMaterialsAsync(
-                tokenPayload.UserId,
-                string.Empty,
-                null,
-                Array.Empty<Property>(),
-                Array.Empty<string>(),
-                new DateRange(),
-                pagination,
-                sorting);
-            var index = new Random().Next(0, 100);
-
-            var material = materialsResult.Materials.ElementAt(index);
             var result = mapper.Map<Material>(material);
+
             var locationDtoList = await materialProvider.GetLocationHistoriesAsync(result.Id);
 
             result.CoordinateList = MapLocationsToGeoCoordinates(locationDtoList);

@@ -80,7 +80,7 @@ namespace Iis.UnitTests.MaterialDistributor
 
             var comparisonTimeStamp = new DateTime(2021, 01, 01, 16, 15, 25);
 
-            var document = new MaterialDocument
+            var document = new MaterialDistributionInfo
             {
                 Id = Guid.NewGuid(),
                 RegistrationDate = new DateTime(2021, 01, 01, hour, minute, 25),

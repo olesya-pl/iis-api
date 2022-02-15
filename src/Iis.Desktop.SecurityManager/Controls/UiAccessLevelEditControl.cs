@@ -9,10 +9,11 @@ namespace Iis.Desktop.SecurityManager.Controls
 {
     public class UiAccessLevelEditControl : UiBaseControl
     {
-        public Action<SecurityLevelPlain> OnSave; 
+        public Action<SecurityLevelPlain> OnSave;
 
         private TextBox txtId;
         private TextBox txtName;
+        private TextBox txtDescription;
         private TextBox txtUniqueIndex;
         private TextBox txtParent;
         private Button btnSave;
@@ -21,6 +22,7 @@ namespace Iis.Desktop.SecurityManager.Controls
 
         private ISecurityLevel CurrentLevel => (ISecurityLevel)treeNode.Tag;
         private string CurrentName => txtName.Text.Trim();
+        private string CurrentDescription => txtDescription.Text.Trim();
 
         public void SetSecurityLevelChecker(ISecurityLevelChecker securityLevelChecker)
         {
@@ -31,6 +33,7 @@ namespace Iis.Desktop.SecurityManager.Controls
             treeNode = node;
             txtId.Text = CurrentLevel.Id.ToString("N");
             txtName.Text = CurrentLevel.Name;
+            txtDescription.Text = CurrentLevel.Description;
             txtUniqueIndex.Text = CurrentLevel.IsNew ? string.Empty : CurrentLevel.UniqueIndex.ToString();
             txtParent.Text = CurrentLevel.Parent?.Name;
         }
@@ -39,14 +42,19 @@ namespace Iis.Desktop.SecurityManager.Controls
         {
             _container.Add(txtId = new TextBox { ReadOnly = true }, "ИД");
             _container.Add(txtName = new TextBox(), "Назва");
+            _container.Add(txtDescription = new TextBox(), "Опис");
             _container.Add(txtUniqueIndex = new TextBox { Enabled = false }, "Унікальний індекс");
             _container.Add(txtParent = new TextBox { Enabled = false }, "Належить до");
             _container.Add(btnSave = _uiControlsCreator.GetButton("Зберегти"));
             btnSave.Click += BtnSaveClick;
         }
 
-        private SecurityLevelPlain GetSecurityLevelPlain()
-            => new SecurityLevelPlain(CurrentLevel) { Name = CurrentName };
+        private SecurityLevelPlain GetSecurityLevelPlain() =>
+            new SecurityLevelPlain(CurrentLevel)
+            {
+                Name = CurrentName,
+                Description = CurrentDescription
+            };
 
         private void BtnSaveClick(object sender, EventArgs e)
         {

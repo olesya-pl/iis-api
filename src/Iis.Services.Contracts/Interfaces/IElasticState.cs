@@ -12,6 +12,7 @@ namespace Iis.Services.Contracts.Interfaces
         string ReportIndex { get; }
         IReadOnlyCollection<string> SignIndexes { get; }
         IReadOnlyCollection<string> ChangeHistoryIndexes { get; }
+        string SecurityIndex { get; }
         Dictionary<string, IEnumerable<string>> FieldsToExcludeByIndex { get; }
     }
 }

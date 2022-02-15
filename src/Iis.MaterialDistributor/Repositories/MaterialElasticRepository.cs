@@ -1,9 +1,11 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Iis.Interfaces.Elastic;
+using System.Collections.Generic;
+using System.Linq;
 using Iis.Elastic;
 using Iis.Elastic.SearchQueryExtensions;
+using Iis.Interfaces.Elastic;
 using Iis.MaterialDistributor.Contracts.Repositories;
 
 namespace Iis.MaterialDistributor.Repositories
@@ -49,9 +51,9 @@ namespace Iis.MaterialDistributor.Repositories
         private TimeSpan GetScrollDuration()
         {
             return TimeSpan.FromMinutes(
-            _elasticConfiguration.ScrollDurationMinutes == ZeroScrollDurationMinutes
-            ? ElasticConstants.DefaultScrollDurationMinutes
-            : _elasticConfiguration.ScrollDurationMinutes);
+                _elasticConfiguration.ScrollDurationMinutes == ZeroScrollDurationMinutes
+                ? ElasticConstants.DefaultScrollDurationMinutes
+                : _elasticConfiguration.ScrollDurationMinutes);
         }
     }
 }

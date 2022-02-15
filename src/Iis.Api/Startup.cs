@@ -1,4 +1,10 @@
-﻿using AutoMapper;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
+using System.Security.Authentication;
+using System.Threading.Tasks;
+using AutoMapper;
 using HotChocolate;
 using HotChocolate.AspNetCore;
 using HotChocolate.AspNetCore.Subscriptions;
@@ -50,7 +56,6 @@ using Iis.Services.ExternalUserServices;
 using Iis.Services.MatrixServices;
 using Iis.Utility;
 using IIS.Core.Analytics.EntityFramework;
-using IIS.Core.GraphQL;
 using IIS.Core.GraphQL.Entities.Resolvers;
 using IIS.Core.Materials;
 using IIS.Core.Materials.EntityFramework;
@@ -73,13 +78,6 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
-using RabbitMQ.Client;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Security.Authentication;
-using System.Threading.Tasks;
 using Iis.CoordinatesEventHandler.DependencyInjection;
 using Iis.Utility.Csv;
 using Iis.Utility.Logging;
@@ -95,8 +93,6 @@ namespace IIS.Core
 {
     public class Startup
     {
-        public IConfiguration Configuration { get; }
-
         public ILoggerFactory MyLoggerFactory;
 
         public Startup(IConfiguration configuration)
@@ -106,6 +102,8 @@ namespace IIS.Core
             MyLoggerFactory = LoggerFactory.Create(builder => { builder.AddConsole(); });
 #endif
         }
+
+        public IConfiguration Configuration { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
@@ -178,7 +176,6 @@ namespace IIS.Core
                     var ontologyData = provider.GetRequiredService<IOntologyNodesData>();
                     return new CommonData(ontologyData);
                 });
-                services.AddSingleton<ISecurityLevelChecker, SecurityLevelChecker>();
 
                 services.AddTransient<IFieldToAliasMapper>(provider => provider.GetRequiredService<IOntologySchema>());
                 services.AddTransient<INodeSaveService, NodeSaveService>();
@@ -212,6 +209,7 @@ namespace IIS.Core
             services.AddTransient<IOntologySchemaService, OntologySchemaService>();
             services.AddTransient<IConnectionStringService, ConnectionStringService>();
             services.AddTransient<IAccessLevelService, AccessLevelService>();
+            services.AddSingleton<ISecurityLevelChecker, SecurityLevelChecker>();
             services.AddTransient<ISecurityLevelService, SecurityLevelService>();
             services.AddTransient<AccessObjectService>();
             services.AddTransient<IFeatureProcessorFactory, FeatureProcessorFactory>();
@@ -272,7 +270,7 @@ namespace IIS.Core
             services.AddDataLoaderRegistry();
 
             /* message queue registration*/
-            services.RegisterMqFactory(Configuration, out string mqConnectionString)
+            services.RegisterMqFactory(Configuration, out _)
                     .RegisterMaterialEventServices(Configuration);
 
             services.RegisterElasticManager(Configuration, out ElasticConfiguration elasticConfiguration);
@@ -285,7 +283,7 @@ namespace IIS.Core
             {
                 services.AddHealthChecks()
                 .AddNpgSql(dbConnectionString)
-                .AddRabbitMQ(mqConnectionString, (SslOption)null)
+                .AddRabbitMQ(_ => _.GetRequiredService<RabbitMQ.Client.IConnection>())
                 .ForwardToPrometheus()
                 .AddElasticsearch(options => options
                     .UseServer(elasticConfiguration.Uri)
@@ -340,6 +338,69 @@ namespace IIS.Core
             services.AddMetrics();
         }
 
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        {
+            if (env.IsDevelopment())
+            {
+                app.UseDeveloperExceptionPage();
+            }
+
+            app.ReloadElasticFieldsConfiguration();
+
+            if (!Configuration.GetValue<bool>("disableCORS", false))
+            {
+                app.UseCors(builder =>
+                    builder
+                        .AllowAnyOrigin()
+                        .AllowAnyHeader()
+                        .AllowAnyMethod());
+            }
+
+            app.UseMiddleware<LogHeaderMiddleware>();
+
+#if !DEBUG
+            app.UseMiddleware<LoggingMiddleware>();
+#endif
+            app.UseGraphQL();
+            app.UsePlayground();
+            app.UseHealthChecks("/api/server-health", new HealthCheckOptions { ResponseWriter = ReportHealthCheck });
+
+            app.UseRouting();
+            app.UseAuthentication();
+            app.UseAuthorization();
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapControllers();
+                endpoints.MapMetrics();
+            });
+        }
+
+        private static async Task ReportHealthCheck(HttpContext c, HealthReport r)
+        {
+            c.Response.ContentType = "application/health+json";
+            var result = JsonConvert.SerializeObject(
+                new
+                {
+                    version = Assembly.GetEntryAssembly().GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion,
+                    availability = r.Entries.Select(e =>
+                        new
+                        {
+                            description = e.Key,
+                            status = e.Value.Status.ToString(),
+                            responseTime = e.Value.Duration.TotalMilliseconds
+                        }),
+                    totalResponseTime = r.TotalDuration.TotalMilliseconds
+                },
+                Formatting.Indented);
+
+            if (r.Entries.Any(x => x.Value.Status != HealthStatus.Healthy))
+            {
+                c.Response.StatusCode = 503;
+            }
+
+            await c.Response.WriteAsync(result);
+        }
+
         private async Task AuthenticateAsync(IQueryContext context, HashSet<string> publiclyAccesible)
         {
             // TODO: remove this method when hotchocolate will allow to add attribute for authentication
@@ -388,70 +449,6 @@ namespace IIS.Core
 
                 context.ContextData.Add(TokenPayload.TokenPropertyName, validatedToken);
             }
-        }
-
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
-        {
-            if (env.IsDevelopment())
-            {
-                app.UseDeveloperExceptionPage();
-            }
-
-            app.ReloadElasticFieldsConfiguration();
-
-            if (!Configuration.GetValue<bool>("disableCORS", false))
-            {
-                app.UseCors(builder =>
-                    builder
-                        .AllowAnyOrigin()
-                        .AllowAnyHeader()
-                        .AllowAnyMethod()
-                );
-            }
-
-            app.UseMiddleware<LogHeaderMiddleware>();
-
-#if !DEBUG
-            app.UseMiddleware<LoggingMiddleware>();
-#endif
-            app.UseGraphQL();
-            app.UsePlayground();
-            app.UseHealthChecks("/api/server-health", new HealthCheckOptions { ResponseWriter = ReportHealthCheck });
-
-            app.UseRouting();
-            app.UseAuthentication();
-            app.UseAuthorization();
-            app.UseEndpoints(endpoints =>
-            {
-                endpoints.MapControllers();
-                endpoints.MapMetrics();
-            });
-        }
-
-        private static async Task ReportHealthCheck(HttpContext c, HealthReport r)
-        {
-            c.Response.ContentType = "application/health+json";
-            var result = JsonConvert.SerializeObject(
-                new
-                {
-                    version = Assembly.GetEntryAssembly().GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion,
-                    availability = r.Entries.Select(e =>
-                        new
-                        {
-                            description = e.Key,
-                            status = e.Value.Status.ToString(),
-                            responseTime = e.Value.Duration.TotalMilliseconds
-                        }),
-                    totalResponseTime = r.TotalDuration.TotalMilliseconds
-                },
-                Formatting.Indented);
-
-            if (r.Entries.Any(x => x.Value.Status != HealthStatus.Healthy))
-            {
-                c.Response.StatusCode = 503;
-            }
-
-            await c.Response.WriteAsync(result);
         }
     }
 }
