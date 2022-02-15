@@ -275,6 +275,7 @@ namespace Iis.Elastic
             var indexUrl = GetRealIndexName(attributesList.EntityTypeName);
             var jObject = mappingConfiguration.ToJObject();
             ApplyRussianAnalyzerAsync(jObject);
+            ApplyCustomSimilarity(jObject);
             ApplyIndexMappingSettings(jObject);
             var response = await DoRequestAsync(HttpMethod.PUT, indexUrl, jObject.ToString(), null, cancellationToken);
             return response.Success;
@@ -341,9 +342,24 @@ namespace Iis.Elastic
                         ""lowercase"",
                         ""russian_stop"",
                         ""russian_stemmer""
-                ]}}}}";
+                ]}}}
+        }";
 
             createRequest["settings"] = JObject.Parse(analyzerSettings);
+        }
+
+        public void ApplyCustomSimilarity(JObject createRequest)
+        {
+            var similaritySettings = $@"{{
+                ""{ElasticConstants.CustomSimilarityFunctionName}"": {{
+                    ""type"": ""scripted"",
+                        ""script"": {{
+                            ""source"": ""double tf = Math.sqrt(doc.freq); double idf = 1.0; double norm = 1 / Math.sqrt(doc.length); return query.boost * tf * idf * norm; ""
+                    }}
+                }}
+            }}";
+            var settings = createRequest["settings"] as JObject;
+            settings.Add("similarity", JObject.Parse(similaritySettings));
         }
 
         public async Task<JObject> GetUsersAsync(CancellationToken cancellationToken = default)

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Iis.Interfaces.Elastic;
@@ -24,20 +25,32 @@ namespace Iis.MaterialDistributor.Repositories
                 .GetUsersAsync(cancellationToken);
 
             var result = new List<UserDistributionInfo>();
+
             foreach (var token in jObject.Children())
             {
                 var user = GetUserDistributionInfo(token);
+
+                if (!IsRegisteredContourUser(user)) continue;
+
                 result.Add(user);
             }
             return result;
         }
 
-        private UserDistributionInfo GetUserDistributionInfo(JToken token)
+        private static UserDistributionInfo GetUserDistributionInfo(JToken token)
         {
+            var userName = ((JProperty)token).Name;
+
             return new UserDistributionInfo
             {
-                Username = ((JProperty)token).Name
+                Id = Guid.TryParse(userName, out Guid id) ? id : Guid.Empty,
+                Username = userName
             };
+        }
+
+        private static bool IsRegisteredContourUser(UserDistributionInfo user)
+        {
+            return user.Id != Guid.Empty;
         }
     }
 }

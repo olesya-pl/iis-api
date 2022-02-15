@@ -49,6 +49,7 @@ namespace Iis.MaterialDistributor.DataStorage
             var users = await _userElasticRepository.GetOperatorsAsync(cancellationToken);
 
             var securityLevelsPlain = await _securityLevelElasticRepository.GetSecurityLevelsPlainAsync(cancellationToken);
+
             _securityLevelChecker.Reload(securityLevelsPlain);
 
             _distributionData.Distribute(users);

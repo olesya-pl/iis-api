@@ -20,6 +20,7 @@ namespace Iis.MaterialDistributor.Workers
     public class MaterialCoefficientsConsumer : BackgroundService
     {
         private const int RetryIntervalSeconds = 5;
+        private const string ApplicationName = "Iis.MaterialDistributor.MaterialCoefficientsConsumer";
         private readonly ILogger<MaterialCoefficientsConsumer> _logger;
         private readonly IMapper _mapper;
         private readonly IConnectionFactory _connectionFactory;
@@ -67,7 +68,7 @@ namespace Iis.MaterialDistributor.Workers
 
         protected override Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            _connection = _connectionFactory.CreateAndWaitConnection(RetryIntervalSeconds, _logger, _consumerOptions.HandlerName);
+            _connection = _connectionFactory.CreateAndWaitConnection(RetryIntervalSeconds, _logger, ApplicationName);
 
             _publishChannel = new PublishMessageChannel<MaterialCoefficientEvaluatedEventMessage>(
                 _connection,

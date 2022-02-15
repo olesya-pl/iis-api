@@ -26,8 +26,6 @@ namespace AcceptanceTests.PageObjects
 		{
 			DeleteRelationButton.Click();
 			_driver.WaitFor(2);
-			DeleteRelationButton.Click();
-			_driver.WaitFor(1);
 		}
 		public EventRelatedItems(IWebDriver driver, string value)
 		{

@@ -41,7 +41,6 @@ using RabbitMQ.Client;
 using Iis.RabbitMq.Channels;
 using Iis.Messages.Materials;
 using Iis.Messages;
-using Iis.RabbitMq.Helpers;
 using Iis.Interfaces.SecurityLevels;
 
 namespace Iis.Services
@@ -84,9 +83,9 @@ namespace Iis.Services
         private readonly IMapper _mapper;
         private readonly IOntologyNodesData _ontologyData;
         private readonly ILogger<MaterialElasticService<TUnitOfWork>> _logger;
-        private readonly IConnection _connection;
         private readonly PublishMessageChannel<MaterialProcessingCoefficientEventMessage> _materialCoefficientChannel;
         private readonly ISecurityLevelChecker _securityLevelChecker;
+        private IConnection _connection;
 
         public MaterialElasticService(
             IElasticManager elasticManager,
@@ -98,8 +97,8 @@ namespace Iis.Services
             IOntologyNodesData ontologyData,
             IUnitOfWorkFactory<TUnitOfWork> unitOfWorkFactory,
             ILogger<MaterialElasticService<TUnitOfWork>> logger,
-            IConnectionFactory connectionFactory,
-            ISecurityLevelChecker securityLevelChecker)
+            ISecurityLevelChecker securityLevelChecker,
+            IConnection connection)
             : base(unitOfWorkFactory)
         {
             _elasticManager = elasticManager;
@@ -110,7 +109,7 @@ namespace Iis.Services
             _mapper = mapper;
             _ontologyData = ontologyData;
             _logger = logger;
-            _connection = connectionFactory.CreateAndWaitConnection();
+            _connection = connection;
             _materialCoefficientChannel = new PublishMessageChannel<MaterialProcessingCoefficientEventMessage>(_connection, new ChannelConfig { ExchangeName = MaterialRabbitConsts.DefaultExchangeName, RoutingKeys = new[] { MaterialRabbitConsts.MaterialCoefficientsQueueName } });
             _securityLevelChecker = securityLevelChecker;
         }
@@ -119,7 +118,7 @@ namespace Iis.Services
 
         public void Dispose()
         {
-            _connection.Dispose();
+            _connection = null;
             _materialCoefficientChannel.Dispose();
         }
 

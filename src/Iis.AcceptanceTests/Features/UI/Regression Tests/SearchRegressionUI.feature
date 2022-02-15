@@ -3,7 +3,6 @@
 	- IIS-6791 - Possibility to search an object of study by concrete name
     - IIS-6081 - Possibility to search an object of study by a field name
     - IIS-6055 - Possibility to search an object by a fragment of a description
-    - IIS-5953 - Possibility to search a material by a creation date 
 
 	Background:
 		Given I sign in with the user olya and password 123 in the Contour
@@ -42,25 +41,3 @@
 		And I searched additionalInfo:"Дотакова інформація, по частині тексту" data in the Objects of study section
 		When I clicked on the first search result title in the Objects of study section
 		Then I must see the title Підрозділ без назви in the small card
-
-    @regression @UI @MaterialsSearchUI
-	Scenario: IIS-5953 - Possibility to search a material by a creation date
-		When I navigated to Materials page
-		And I clicked search button in the Materials section
-	    And I searched CreatedDate: 07.06.2021 data in the materials
-        Then I must see the NATO PUBLIC DIPLOMACY PROGRAMMES title of the material
-		When I clicked on the clear search button
-		And I clicked search button in the Materials section
-        And I searched CreatedDate: 07,06,2021 data in the materials
-        Then I must see the NATO PUBLIC DIPLOMACY PROGRAMMES title of the material
-		When I clicked on the clear search button
-		And I clicked search button in the Materials section
-        And I searched CreatedDate: 2021.06.07 data in the materials
-        Then I must see the NATO PUBLIC DIPLOMACY PROGRAMMES title of the material
-		When I clicked on the clear search button
-		And I clicked search button in the Materials section
-        And I searched CreatedDate: 2021,06,07 data in the materials
-        Then I must see the NATO PUBLIC DIPLOMACY PROGRAMMES title of the material
-		
-	
-

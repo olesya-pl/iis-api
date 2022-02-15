@@ -84,6 +84,7 @@ namespace AcceptanceTests.UISteps
         {
             materialsSectionPage.SearchField.SendKeys(input);
             materialsSectionPage.SearchField.SendKeys(Keys.Enter);
+            driver.WaitFor(2);
         }
 
         [When(@"I searched for uploaded material in the materials")]

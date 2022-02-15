@@ -17,6 +17,7 @@ namespace Iis.Api.Materials
     public class MaterialConsumer : BackgroundService
     {
         private const int RetryIntervalSec = 5;
+        private const string ApplicationName = "Iis.Api.MaterialConsumer";
         private readonly ILogger<MaterialConsumer> _logger;
         private IConnection _connection;
         private IConnectionFactory _connectionFactory;
@@ -38,7 +39,7 @@ namespace Iis.Api.Materials
 
         protected override Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            _connection = _connectionFactory.CreateAndWaitConnection(RetryIntervalSec, _logger, _configuration.HandlerName);
+            _connection = _connectionFactory.CreateAndWaitConnection(RetryIntervalSec, _logger, ApplicationName);
 
             _consumeChannel = new ConsumeMessageChannel<MaterialCreatedMessage>(
                 _connection,
