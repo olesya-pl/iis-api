@@ -80,7 +80,7 @@ namespace IIS.Core.GraphQL.Materials
             var materials = materialsResult.Materials.Select(m => mapper.Map<Material>(m)).ToList();
             MapHighlights(materials, materialsResult.Highlights);
             
-            var checkedMaterials = CheckIsAllowedMaterialsForUser(materials, tokenPayload, securityLevelChecker);
+            var checkedMaterials = ReplaceForbiddenMaterialsForUser(materials, tokenPayload, securityLevelChecker);
             
             return (checkedMaterials, materialsResult.Aggregations, materialsResult.Count);
         }
@@ -169,7 +169,7 @@ namespace IIS.Core.GraphQL.Materials
 
             var mappedMaterialCollection = mapper.Map<Material[]>(materialCollectionResult.Items);
             
-            var securityCheckedMaterialCollection = CheckIsAllowedMaterialsForUser(mappedMaterialCollection, tokenPayload, securityLevelChecker);
+            var securityCheckedMaterialCollection = ReplaceForbiddenMaterialsForUser(mappedMaterialCollection, tokenPayload, securityLevelChecker);
 
             return (securityCheckedMaterialCollection, materialCollectionResult.Count);
         }
@@ -290,7 +290,7 @@ namespace IIS.Core.GraphQL.Materials
                 ? value
                 : default(RelationsState?);
 
-        private static  IEnumerable<Material> CheckIsAllowedMaterialsForUser(IEnumerable<Material> materialCollection,
+        private static IEnumerable<Material> ReplaceForbiddenMaterialsForUser(IEnumerable<Material> materialCollection,
             TokenPayload tokenPayload, ISecurityLevelChecker securityLevelChecker)
         {
             return materialCollection

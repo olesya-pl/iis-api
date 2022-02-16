@@ -158,16 +158,16 @@ namespace IIS.Services.Materials
 
                         if (isAllowed) material.AccessAllowed = true;
                         
-                        CheckIsAllowedRelatedEntityCollectionsForUser(material.RelatedEventCollection, user);
-                        CheckIsAllowedRelatedEntityCollectionsForUser(material.RelatedObjectCollection, user);
-                        CheckIsAllowedRelatedEntityCollectionsForUser(material.RelatedSignCollection, user);
+                        ReplaceForbiddenRelatedEntityCollectionsForUser(material.RelatedEventCollection, user);
+                        ReplaceForbiddenRelatedEntityCollectionsForUser(material.RelatedObjectCollection, user);
+                        ReplaceForbiddenRelatedEntityCollectionsForUser(material.RelatedSignCollection, user);
 
                         return material;
                     })
                     .ToArray();
         }
         
-        private void CheckIsAllowedRelatedEntityCollectionsForUser(IEnumerable<Iis.Domain.Materials.RelatedObject> relatedEntityCollection, User user)
+        private void ReplaceForbiddenRelatedEntityCollectionsForUser(IEnumerable<Iis.Domain.Materials.RelatedObject> relatedEntityCollection, User user)
         {
             foreach (var entity in relatedEntityCollection)
             {
@@ -272,8 +272,6 @@ namespace IIS.Services.Materials
                                     .Select(_ => _materialDocumentMapper.Map(_))
                                     .ToArray();
             
-            
-
             return new OutputCollection<Material>(materialCollection);
         }
 

@@ -73,9 +73,9 @@ namespace IIS.Services.Materials
             material.CanBeEdited = document.ProcessedStatus.Id != MaterialEntity.ProcessingStatusProcessingSignId 
                                    || (document.Editor == null || document.Editor.Id == user.Id);
 
-            CheckIsAllowedRelatedEntityCollectionsForUser(material.RelatedEventCollection, user);
-            CheckIsAllowedRelatedEntityCollectionsForUser(material.RelatedObjectCollection, user);
-            CheckIsAllowedRelatedEntityCollectionsForUser(material.RelatedSignCollection, user);
+            ReplaceForbiddenRelatedEntityCollectionsForUser(material.RelatedEventCollection, user);
+            ReplaceForbiddenRelatedEntityCollectionsForUser(material.RelatedObjectCollection, user);
+            ReplaceForbiddenRelatedEntityCollectionsForUser(material.RelatedSignCollection, user);
 
             return material;
         }
@@ -198,7 +198,7 @@ namespace IIS.Services.Materials
             return result;
         }
 
-        private void CheckIsAllowedRelatedEntityCollectionsForUser(IEnumerable<Iis.Domain.Materials.RelatedObject> relatedEntityCollection, User user)
+        private void ReplaceForbiddenRelatedEntityCollectionsForUser(IEnumerable<Iis.Domain.Materials.RelatedObject> relatedEntityCollection, User user)
         {
             foreach (var entity in relatedEntityCollection)
             {
