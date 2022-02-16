@@ -299,9 +299,9 @@ namespace Iis.Elastic
                 string accessLevelFieldName)> parameters,
             CancellationToken cancellationToken)
         {
-            var baseDirectory = System.IO.Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
-            var sectionBaseText = File.ReadAllText(Path.Combine(baseDirectory, @"data\elastic\RoleIndexSection.json"));
-            var scriptBaseText = File.ReadAllText(Path.Combine(baseDirectory, @"data\elastic\SecurityLevelFilter.painless"));
+            var baseDirectory = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
+            var sectionBaseText = File.ReadAllText(Path.Combine(baseDirectory, "data", "elastic", "RoleIndexSection.json"));
+            var scriptBaseText = File.ReadAllText(Path.Combine(baseDirectory, "data", "elastic", "SecurityLevelFilter.painless"));
             var scriptText = Regex.Replace(scriptBaseText, @"\s+", " ");
             var sectionText = sectionBaseText.Replace("{SCRIPT}", scriptText, StringComparison.Ordinal);
             var settings = new StringBuilder("{\"indices\": [");
