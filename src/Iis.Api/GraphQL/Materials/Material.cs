@@ -80,5 +80,59 @@ namespace IIS.Core.GraphQL.Materials
             var f = await fileService.GetFileAsync(FileId.Value);
             return f.ToView();
         }
+        
+        public static Material CreateEmptyMaterial()
+        {
+            return new Material
+            {
+                Id = Guid.Empty,
+                FileId = Guid.Empty,
+                Metadata = new JObject(),
+                Type = string.Empty,
+                Source = string.Empty,
+                CreatedDate = string.Empty,
+                UpdatedAt = string.Empty,
+                Content = string.Empty,
+                Importance = new MaterialSign(),
+                Reliability = new MaterialSign(),
+                Relevance = new MaterialSign(),
+                Completeness = new MaterialSign(),
+                SourceReliability = new MaterialSign(),
+                ProcessedStatus = new MaterialSign(),
+                SessionPriority = new MaterialSign(),
+                Data = new List<Data>(),
+                Transcriptions = new List<JObject>(),
+                Title = string.Empty,
+                From = string.Empty,
+                LoadedBy = string.Empty,
+                Coordinates = string.Empty,
+                Code = string.Empty,
+                ReceivingDate = DateTime.Now,
+                Objects = new List<string>(),
+                Tags = new List<string>(),
+                States = new List<string>(),
+                Children = new List<Material>(),
+                Highlight = new JObject(),
+                ObjectsOfStudy = new JObject(),
+                Events = new List<JObject>(),
+                Features = new List<JObject>(),
+                Assignees = new List<User>(),
+                Editor = new User(),
+                MlHandlersCount = default,
+                ProcessedMlHandlersCount = default,
+                CanBeEdited = default,
+                AccessLevel = default,
+                Caller = new IdTitle(),
+                Receiver = new IdTitle(),
+                RegistrationDate = string.Empty,
+                CoordinateList = new List<GeoCoordinate>(),
+                RelatedObjectCollection = new List<RelatedObjectOfStudy>(),
+                RelatedEventCollection = new List<RelatedObject>(),
+                RelatedSignCollection = new List<RelatedObject>(),
+                ObjectsOfStudyCount = default,
+                SecurityLevels = new List<MaterialSecurityLevel>(),
+                AccessAllowed = default
+            };
+        }
     }
 }

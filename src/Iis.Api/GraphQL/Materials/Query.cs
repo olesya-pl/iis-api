@@ -10,7 +10,6 @@ using Iis.Interfaces.Elastic;
 using Iis.Api.GraphQL.Common;
 using Iis.Api.GraphQL.Entities;
 using HotChocolate.Resolvers;
-using IIS.Core.GraphQL.Users;
 using IIS.Services.Contracts.Interfaces;
 using Iis.Services.Contracts.Elastic;
 using Iis.Services.Contracts.Dtos;
@@ -24,13 +23,14 @@ namespace IIS.Core.GraphQL.Materials
 {
     public class Query
     {
-        private static readonly Material EmptyMaterial = CreateEmptyMaterial();
+        private static readonly Material EmptyMaterial = Material.CreateEmptyMaterial();
 
         [GraphQLType(typeof(AggregatedMaterialCollection))]
         public async Task<(IEnumerable<Material> materials, Dictionary<string, AggregationItem> aggregations, int totalCount)> GetMaterials(
             IResolverContext ctx,
             [Service] IMaterialProvider materialProvider,
             [Service] IMapper mapper,
+            [Service] ISecurityLevelChecker securityLevelChecker,
             [GraphQLNonNullType] PaginationInput pagination,
             MaterialsFilterInput filter,
             SortingInput sorting,
@@ -79,7 +79,10 @@ namespace IIS.Core.GraphQL.Materials
             ChangeAssigneeAggregations(materialsResult.Aggregations, tokenPayload.UserId);
             var materials = materialsResult.Materials.Select(m => mapper.Map<Material>(m)).ToList();
             MapHighlights(materials, materialsResult.Highlights);
-            return (materials, materialsResult.Aggregations, materialsResult.Count);
+            
+            var checkedMaterials = CheckIsAllowedMaterialsForUser(materials, tokenPayload, securityLevelChecker);
+            
+            return (checkedMaterials, materialsResult.Aggregations, materialsResult.Count);
         }
 
         public async Task<Material> GetMaterial(
@@ -166,7 +169,7 @@ namespace IIS.Core.GraphQL.Materials
 
             var mappedMaterialCollection = mapper.Map<Material[]>(materialCollectionResult.Items);
             
-            var securityCheckedMaterialCollection = CheckIsAllowedRelatedMaterialsForUser(mappedMaterialCollection, tokenPayload, securityLevelChecker);
+            var securityCheckedMaterialCollection = CheckIsAllowedMaterialsForUser(mappedMaterialCollection, tokenPayload, securityLevelChecker);
 
             return (securityCheckedMaterialCollection, materialCollectionResult.Count);
         }
@@ -287,73 +290,20 @@ namespace IIS.Core.GraphQL.Materials
                 ? value
                 : default(RelationsState?);
 
-        private static  IEnumerable<Material> CheckIsAllowedRelatedMaterialsForUser(IEnumerable<Material> mappedMaterialCollection,
+        private static  IEnumerable<Material> CheckIsAllowedMaterialsForUser(IEnumerable<Material> materialCollection,
             TokenPayload tokenPayload, ISecurityLevelChecker securityLevelChecker)
         {
-            return mappedMaterialCollection
+            return materialCollection
                 .Select(material =>
                     {
                         var materialSecurityLevelIndexes = material.SecurityLevels.Select(_ => _.UniqueIndex).ToList();
-                        var isAllowed = securityLevelChecker.AccessGranted(tokenPayload.User.SecurityLevelsIndexes,
-                            materialSecurityLevelIndexes);
                         
-                        return isAllowed ? material : EmptyMaterial;
+                        material.AccessAllowed = securityLevelChecker.AccessGranted(tokenPayload.User.SecurityLevelsIndexes,
+                            materialSecurityLevelIndexes);
+
+                        return material.AccessAllowed ? material : EmptyMaterial;
                     })
                 .ToList();
-        }
-        
-        private static Material CreateEmptyMaterial()
-        {
-            return new Material
-            {
-                Id = Guid.Empty,
-                FileId = Guid.Empty,
-                Metadata = new JObject(),
-                Type = string.Empty,
-                Source = string.Empty,
-                CreatedDate = string.Empty,
-                UpdatedAt = string.Empty,
-                Content = string.Empty,
-                Importance = new MaterialSign(),
-                Reliability = new MaterialSign(),
-                Relevance = new MaterialSign(),
-                Completeness = new MaterialSign(),
-                SourceReliability = new MaterialSign(),
-                ProcessedStatus = new MaterialSign(),
-                SessionPriority = new MaterialSign(),
-                Data = new List<Data>(),
-                Transcriptions = new List<JObject>(),
-                Title = string.Empty,
-                From = string.Empty,
-                LoadedBy = string.Empty,
-                Coordinates = string.Empty,
-                Code = string.Empty,
-                ReceivingDate = DateTime.Now,
-                Objects = new List<string>(),
-                Tags = new List<string>(),
-                States = new List<string>(),
-                Children = new List<Material>(),
-                Highlight = new JObject(),
-                ObjectsOfStudy = new JObject(),
-                Events = new List<JObject>(),
-                Features = new List<JObject>(),
-                Assignees = new List<User>(),
-                Editor = new User(),
-                MlHandlersCount = default,
-                ProcessedMlHandlersCount = default,
-                CanBeEdited = default,
-                AccessLevel = default,
-                Caller = new IdTitle(),
-                Receiver = new IdTitle(),
-                RegistrationDate = string.Empty,
-                CoordinateList = new List<GeoCoordinate>(),
-                RelatedObjectCollection = new List<RelatedObjectOfStudy>(),
-                RelatedEventCollection = new List<RelatedObject>(),
-                RelatedSignCollection = new List<RelatedObject>(),
-                ObjectsOfStudyCount = default,
-                SecurityLevels = new List<MaterialSecurityLevel>(),
-                AccessAllowed = default
-            };
         }
     }
 }

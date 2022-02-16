@@ -33,6 +33,7 @@ using IIS.Services.Contracts.Materials;
 using Iis.RabbitMq.Channels;
 using MaterialSign = Iis.Domain.Materials.MaterialSign;
 using NextAssignedMessage = Iis.Messages.Materials.MaterialNextAssignedMessage;
+using Iis.Interfaces.SecurityLevels;
 
 namespace IIS.Services.Materials
 {
@@ -56,6 +57,7 @@ namespace IIS.Services.Materials
         private readonly IConnection _connection;
         private readonly MaterialNextAssignedPublisherConfig _nextAssignedConfig;
         private readonly ILogger<IMaterialProvider> _logger;
+        private readonly ISecurityLevelChecker _securityLevelChecker;
 
         public MaterialProvider(
             IOntologyService ontologyService,
@@ -68,6 +70,7 @@ namespace IIS.Services.Materials
             IImageVectorizer imageVectorizer,
             MaterialDocumentMapper materialDocumentMapper,
             IConnection connection,
+            ISecurityLevelChecker securityLevelChecker,
             IOptions<MaterialNextAssignedPublisherConfig> nextAssignedConfigOption,
             ILogger<IMaterialProvider> logger) : base(unitOfWorkFactory)
         {
@@ -82,6 +85,7 @@ namespace IIS.Services.Materials
             _connection = connection;
             _nextAssignedConfig = nextAssignedConfigOption.Value;
             _logger = logger;
+            _securityLevelChecker = securityLevelChecker;
         }
 
         public async Task<MaterialsDto> GetMaterialsAsync(
@@ -146,7 +150,43 @@ namespace IIS.Services.Materials
 
             return documentCollection
                     .Select(_ => _materialDocumentMapper.Map(_))
+                    .Select(material =>
+                    {
+                        var materialSecurityLevelIndexes = material.SecurityLevels.Select(_ => _.UniqueIndex).ToList();
+                        var isAllowed = _securityLevelChecker.AccessGranted(user.SecurityLevelsIndexes,
+                            materialSecurityLevelIndexes);
+
+                        if (isAllowed) material.AccessAllowed = true;
+                        
+                        CheckIsAllowedRelatedEntityCollectionsForUser(material.RelatedEventCollection, user);
+                        CheckIsAllowedRelatedEntityCollectionsForUser(material.RelatedObjectCollection, user);
+                        CheckIsAllowedRelatedEntityCollectionsForUser(material.RelatedSignCollection, user);
+
+                        return material;
+                    })
                     .ToArray();
+        }
+        
+        private void CheckIsAllowedRelatedEntityCollectionsForUser(IEnumerable<Iis.Domain.Materials.RelatedObject> relatedEntityCollection, User user)
+        {
+            foreach (var entity in relatedEntityCollection)
+            {
+                entity.AccessAllowed = IsAllowedEntityForUser(entity.Id, user);
+
+                if (entity.AccessAllowed) continue;
+                
+                entity.Id = Guid.Empty;
+                entity.Title = string.Empty;
+                entity.NodeType = string.Empty;
+                entity.RelationType = string.Empty;
+                entity.RelationCreatingType = string.Empty;
+            }
+        }
+
+        private bool IsAllowedEntityForUser(Guid id, User user)
+        {
+            return _securityLevelChecker.AccessGranted(user.SecurityLevelsIndexes,
+                _ontologyService.GetNode(id).OriginalNode.GetSecurityLevelIndexes());
         }
 
         public Task<IEnumerable<MaterialEntity>> GetMaterialEntitiesAsync()
@@ -231,6 +271,8 @@ namespace IIS.Services.Materials
             var materialCollection = documentCollection
                                     .Select(_ => _materialDocumentMapper.Map(_))
                                     .ToArray();
+            
+            
 
             return new OutputCollection<Material>(materialCollection);
         }

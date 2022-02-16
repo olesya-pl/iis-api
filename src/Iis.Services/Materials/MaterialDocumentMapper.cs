@@ -73,7 +73,9 @@ namespace IIS.Services.Materials
             material.CanBeEdited = document.ProcessedStatus.Id != MaterialEntity.ProcessingStatusProcessingSignId 
                                    || (document.Editor == null || document.Editor.Id == user.Id);
 
-            CheckIsAllowedRelatedObjectForUser(material, user);
+            CheckIsAllowedRelatedEntityCollectionsForUser(material.RelatedEventCollection, user);
+            CheckIsAllowedRelatedEntityCollectionsForUser(material.RelatedObjectCollection, user);
+            CheckIsAllowedRelatedEntityCollectionsForUser(material.RelatedSignCollection, user);
 
             return material;
         }
@@ -196,24 +198,26 @@ namespace IIS.Services.Materials
             return result;
         }
 
-        private void CheckIsAllowedRelatedObjectForUser(Material material, User user)
+        private void CheckIsAllowedRelatedEntityCollectionsForUser(IEnumerable<Iis.Domain.Materials.RelatedObject> relatedEntityCollection, User user)
         {
-            foreach (var entity in material.RelatedObjectCollection)
+            foreach (var entity in relatedEntityCollection)
             {
-                entity.AccessAllowed = _securityLevelChecker.AccessGranted(user.SecurityLevelsIndexes,
-                    _ontologyService.GetNode(entity.Id).OriginalNode.GetSecurityLevelIndexes());
+                entity.AccessAllowed = IsAllowedEntityForUser(entity.Id, user);
 
                 if (entity.AccessAllowed) continue;
                 
                 entity.Id = Guid.Empty;
                 entity.Title = string.Empty;
-                entity.Importance = string.Empty;
-                entity.ImportanceSortOrder = default;
                 entity.NodeType = string.Empty;
-                entity.RelatedSignId = Guid.Empty;
                 entity.RelationType = string.Empty;
                 entity.RelationCreatingType = string.Empty;
             }
+        }
+
+        private bool IsAllowedEntityForUser(Guid id, User user)
+        {
+            return _securityLevelChecker.AccessGranted(user.SecurityLevelsIndexes,
+                _ontologyService.GetNode(id).OriginalNode.GetSecurityLevelIndexes());
         }
     }
 }
