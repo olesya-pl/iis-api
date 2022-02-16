@@ -87,8 +87,8 @@ namespace Iis.Api.GraphQL.Hierarchy
             foreach (var childRelation in childRelations)
             {
                 var childObj = childShort ?
-                    GetShortJson(childRelation.TargetNode) :
-                    GetHierarchyJson(childRelation.TargetNode, true, true, user, securityLevelChecker);
+                    GetShortJson(childRelation.SourceNode) :
+                    GetHierarchyJson(childRelation.SourceNode, true, true, user, securityLevelChecker);
                 childArray.Add(childObj);
             }
             result[ChildName] = childArray;
