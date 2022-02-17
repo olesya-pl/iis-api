@@ -138,7 +138,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
 
             if (isElasticSearch)
             {
-                var searchResult = await _elasticService.SearchByConfiguredFieldsAsync(derivedTypes.Select(t => t.Name), filter, user.Id, cancellationToken);
+                var searchResult = await _elasticService.AutocompleteByFieldsAsync(derivedTypes.Select(t => t.Name), filter, user.Id, cancellationToken);
                 var nodes = _data.GetNodes(searchResult.Items.Select(e => e.Key));
                 return nodes.Select(n => MapNode(n));
             }
@@ -157,7 +157,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
             var isElasticSearch = !string.IsNullOrEmpty(filter.Suggestion) && _elasticService.TypesAreSupported(derivedTypes.Select(nt => nt.Name));
             if (isElasticSearch)
             {
-                return await _elasticService.CountByConfiguredFieldsAsync(derivedTypes.Select(t => t.Name), filter, cancellationToken);
+                return await _elasticService.CountAutocompleteByFieldsAsync(derivedTypes.Select(t => t.Name), filter, user.Id, cancellationToken);
             }
             else
             {
@@ -166,6 +166,7 @@ namespace Iis.DbLayer.Ontology.EntityFramework
                 return nodes.Count();
             }
         }
+
         public (IEnumerable<Node> nodes, int count) GetNodesByIds(IEnumerable<Guid> matchList, CancellationToken cancellationToken = default)
         {
             var nodes = _data.GetNodes(matchList);
