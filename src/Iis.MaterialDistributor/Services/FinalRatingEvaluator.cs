@@ -6,6 +6,7 @@ namespace Iis.MaterialDistributor.Services
 {
     public class FinalRatingEvaluator : IFinalRatingEvaluator
     {
+        private const int DefaultCoefficient = 1;
         private readonly ISecurityLevelChecker _securityLevelChecker;
 
         public FinalRatingEvaluator(ISecurityLevelChecker securityLevelChecker)
@@ -17,7 +18,7 @@ namespace Iis.MaterialDistributor.Services
         {
             if (!_securityLevelChecker.AccessGranted(user.SecurityLevels, material.SecurityLevels)) return 0;
 
-            return material.VariableCoefficient * 1;
+            return material.VariableCoefficient * (material.PermanentCoefficient ?? DefaultCoefficient);
         }
     }
 }
