@@ -178,7 +178,8 @@ namespace IIS.Core.GraphQL.Entities.Resolvers
             {
                 Id = node.Id,
                 Type = type.Name,
-                RequestId = requestId
+                RequestId = requestId,
+                SecurityLevelChanged = properties.ContainsKey(OntologyNames.SecurityLevelField)
             });
             return node;
         }

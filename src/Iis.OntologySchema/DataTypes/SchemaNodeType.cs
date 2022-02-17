@@ -20,6 +20,7 @@ namespace Iis.OntologySchema.DataTypes
         internal SchemaRelationType _relationType;
         public IRelationTypeLinked RelationType => _relationType;
         public IOntologySchema Schema { get; internal set; }
+
         public Type ClrType
         {
             get
@@ -306,7 +307,9 @@ namespace Iis.OntologySchema.DataTypes
                 && IsAbstract == nodeType.IsAbstract
                 && UniqueValueFieldName == nodeType.UniqueValueFieldName
                 && scalarTypesAreEqual
-                && IconBase64Body == nodeType.IconBase64Body;
+                && IconBase64Body == nodeType.IconBase64Body
+                && IsHierarchyParent == nodeType.IsHierarchyParent
+                && SecurityStrategy == nodeType.SecurityStrategy;
         }
 
         public Dictionary<string, string> GetPropertiesDict()
@@ -483,6 +486,12 @@ namespace Iis.OntologySchema.DataTypes
                     .FirstOrDefault()
                 : Name;
         }
+
+        public SecurityStrategy? GetSecurityStrategy() =>
+            _outgoingRelations
+            .Where(_ => _.NodeType.IsHierarchyParent)
+            .Select(_ => _?.NodeType.SecurityStrategy)
+            .SingleOrDefault();
 
         private string GetTitleAttributeName()
         {

@@ -20,6 +20,8 @@ namespace Iis.Interfaces.Ontology.Schema
         bool IsAbstract { get; }
         string UniqueValueFieldName { get; }
         string IconBase64Body { get; }
+        bool IsHierarchyParent { get; }
+        SecurityStrategy SecurityStrategy { get; }
         bool HasUniqueValues { get; }
         Type ClrType { get; }
         bool HasInversed { get; }
@@ -72,12 +74,13 @@ namespace Iis.Interfaces.Ontology.Schema
         bool IsAttributeType { get; }
         bool IsEntityType { get; }
         INodeTypeLinked TargetType { get; }
+        bool IsMultiple { get; }
+        bool IsRequired { get; }
         bool IsSubtypeOf(INodeTypeLinked type);
         bool AcceptsScalar(object value);
         bool AcceptsOperation(EntityOperation create);
         string GetIconName();
-        bool IsMultiple { get; }
-        bool IsRequired { get; }
+        SecurityStrategy? GetSecurityStrategy();
     }
 
     public class NodeAggregationInfo

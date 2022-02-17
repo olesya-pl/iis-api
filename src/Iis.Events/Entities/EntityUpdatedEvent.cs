@@ -6,5 +6,6 @@ namespace Iis.Events.Entities
     public class EntityUpdatedEvent : EntityEvent, INotification
     {
         public Guid RequestId { get; set; }
+        public bool SecurityLevelChanged { get; set; }
     }
 }

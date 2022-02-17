@@ -19,5 +19,7 @@ namespace Iis.OntologySchema.ChangeParameters
         public Guid? ParentTypeId { get; set; }
         public string UniqueValueFieldName { get; set; }
         public string IconBase64Body { get; set; }
+        public bool? IsHierarchyParent { get; set; }
+        public SecurityStrategy? SecurityStrategy { get; set; }
     }
 }

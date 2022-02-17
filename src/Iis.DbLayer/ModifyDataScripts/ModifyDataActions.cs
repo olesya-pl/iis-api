@@ -1097,6 +1097,25 @@ namespace Iis.DbLayer.ModifyDataScripts
             SaveOntologySchema(data.Schema);
         }
 
+        public void SetMilitaryOrganizationHierarchy(OntologyContext context, IOntologyNodesData data)
+        {
+            const string MilitaryOrganizationTypeName = "militaryOrganization";
+
+            var militaryOrganizationType = data.Schema.GetEntityTypeByName(MilitaryOrganizationTypeName);
+            if (militaryOrganizationType == null) return;
+
+            var parentType = militaryOrganizationType.GetProperty(OntologyNames.ParentField);
+            if (parentType == null) return;
+
+            data.Schema.UpdateNodeType(new NodeTypeUpdateParameter
+            {
+                Id = parentType.Id,
+                IsHierarchyParent = true,
+                SecurityStrategy = SecurityStrategy.SetForAllHierarchyChildren
+            });
+            SaveOntologySchema(data.Schema);
+        }
+
         private static INode GetOrAddSingNode(IOntologyNodesData data, Guid signId, string phoneNumber, string imei, string tmsi)
         {
             const string singTypeName = "CellphoneSign";
