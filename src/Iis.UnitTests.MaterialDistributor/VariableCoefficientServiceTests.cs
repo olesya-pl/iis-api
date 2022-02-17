@@ -91,7 +91,7 @@ namespace Iis.UnitTests.MaterialDistributor
 
             var service = new VariableCoefficientService(_repositoryMock.Object, new VariableCoefficientRuleEvaluator(), _mapperMock.Object);
 
-            var collection = await service.SetForMaterialsAsync(
+            var collection = await service.SetVariableCoefficientForMaterialsAsync(
                 comparisonTimeStamp,
                 documentCollection,
                 CancellationToken.None);

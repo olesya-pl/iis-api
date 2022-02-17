@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Iis.Interfaces.SecurityLevels;
@@ -37,9 +38,12 @@ namespace Iis.MaterialDistributor.DataStorage
         {
             var coefficient = await _coefficientService.GetWithMaxOffsetHoursAsync(cancellationToken);
 
-            var materials = (await _materialDistributionService
-                .GetMaterialCollectionAsync(coefficient.OffsetHours, cancellationToken))
-                .ToDictionary(_ => _.Id);
+            var materialCollection = await _materialDistributionService.GetMaterialCollectionAsync(coefficient.OffsetHours, cancellationToken);
+
+            materialCollection = await _coefficientService.SetVariableCoefficientForMaterialsAsync(DateTime.UtcNow, materialCollection, cancellationToken);
+
+            var materials = materialCollection
+                                .ToDictionary(_ => _.Id);
 
             _distributionData.RefreshMaterials(materials);
         }
