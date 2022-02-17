@@ -33,6 +33,7 @@ using IIS.Services.Contracts.Materials;
 using Iis.RabbitMq.Channels;
 using MaterialSign = Iis.Domain.Materials.MaterialSign;
 using NextAssignedMessage = Iis.Messages.Materials.MaterialNextAssignedMessage;
+using Iis.Services;
 using Iis.Interfaces.SecurityLevels;
 
 namespace IIS.Services.Materials
@@ -58,6 +59,7 @@ namespace IIS.Services.Materials
         private readonly MaterialNextAssignedPublisherConfig _nextAssignedConfig;
         private readonly ILogger<IMaterialProvider> _logger;
         private readonly ISecurityLevelChecker _securityLevelChecker;
+        private readonly ForbiddenEntityReplacer _forbiddenEntityReplacer;
 
         public MaterialProvider(
             IOntologyService ontologyService,
@@ -71,6 +73,7 @@ namespace IIS.Services.Materials
             MaterialDocumentMapper materialDocumentMapper,
             IConnection connection,
             ISecurityLevelChecker securityLevelChecker,
+            ForbiddenEntityReplacer forbiddenEntityReplacer,
             IOptions<MaterialNextAssignedPublisherConfig> nextAssignedConfigOption,
             ILogger<IMaterialProvider> logger) : base(unitOfWorkFactory)
         {
@@ -86,6 +89,7 @@ namespace IIS.Services.Materials
             _nextAssignedConfig = nextAssignedConfigOption.Value;
             _logger = logger;
             _securityLevelChecker = securityLevelChecker;
+            _forbiddenEntityReplacer = forbiddenEntityReplacer;
         }
 
         public async Task<MaterialsDto> GetMaterialsAsync(
@@ -153,40 +157,17 @@ namespace IIS.Services.Materials
                     .Select(material =>
                     {
                         var materialSecurityLevelIndexes = material.SecurityLevels.Select(_ => _.UniqueIndex).ToList();
-                        var isAllowed = _securityLevelChecker.AccessGranted(user.SecurityLevelsIndexes,
-                            materialSecurityLevelIndexes);
+                        var isAllowed = _securityLevelChecker.AccessGranted(user.SecurityLevelsIndexes,materialSecurityLevelIndexes);
 
                         if (isAllowed) material.AccessAllowed = true;
-                        
-                        ReplaceForbiddenRelatedEntityCollectionsForUser(material.RelatedEventCollection, user);
-                        ReplaceForbiddenRelatedEntityCollectionsForUser(material.RelatedObjectCollection, user);
-                        ReplaceForbiddenRelatedEntityCollectionsForUser(material.RelatedSignCollection, user);
+
+                        _forbiddenEntityReplacer.Replace(material.RelatedEventCollection, user);
+                        _forbiddenEntityReplacer.Replace(material.RelatedObjectCollection, user);
+                        _forbiddenEntityReplacer.Replace(material.RelatedSignCollection, user);
 
                         return material;
                     })
                     .ToArray();
-        }
-        
-        private void ReplaceForbiddenRelatedEntityCollectionsForUser(IEnumerable<Iis.Domain.Materials.RelatedObject> relatedEntityCollection, User user)
-        {
-            foreach (var entity in relatedEntityCollection)
-            {
-                entity.AccessAllowed = IsAllowedEntityForUser(entity.Id, user);
-
-                if (entity.AccessAllowed) continue;
-                
-                entity.Id = Guid.Empty;
-                entity.Title = string.Empty;
-                entity.NodeType = string.Empty;
-                entity.RelationType = string.Empty;
-                entity.RelationCreatingType = string.Empty;
-            }
-        }
-
-        private bool IsAllowedEntityForUser(Guid id, User user)
-        {
-            return _securityLevelChecker.AccessGranted(user.SecurityLevelsIndexes,
-                _ontologyService.GetNode(id).OriginalNode.GetSecurityLevelIndexes());
         }
 
         public Task<IEnumerable<MaterialEntity>> GetMaterialEntitiesAsync()
@@ -401,41 +382,6 @@ namespace IIS.Services.Materials
             };
         }
 
-        private IReadOnlyCollection<Guid> GetDescendantsByGivenRelationTypeNameList(IReadOnlyCollection<Guid> entityIdList, IReadOnlyCollection<string> relationTypeNameList)
-        {
-            var result = new List<Guid>();
-
-            var tempValues = entityIdList.ToList();
-
-            while (tempValues.Any())
-            {
-                var relationList = _ontologyData.GetIncomingRelations(tempValues, relationTypeNameList);
-
-                tempValues = relationList
-                            .Select(e => e.SourceNodeId)
-                            .ToList();
-
-                result.AddRange(tempValues);
-            }
-            return result.AsReadOnly();
-        }
-
-        private Task<IReadOnlyCollection<MaterialEntity>> GetMaterialCollectionByNodeIdAsync(Guid nodeId, bool includeRelatedEntities)
-        {
-            var nodeIdList = new List<Guid> { nodeId };
-
-            if (includeRelatedEntities)
-            {
-                var featureIdCollection = _ontologyService.GetObjectFeatureRelationCollection(nodeIdList)
-                                            .Select(e => e.FeatureId)
-                                            .ToArray();
-
-                nodeIdList.AddRange(featureIdCollection);
-            }
-
-            return RunWithoutCommitAsync(uow => uow.MaterialRepository.GetMaterialCollectionByNodeIdAsync(nodeIdList, MaterialIncludeEnum.WithChildren, MaterialIncludeEnum.WithFeatures, MaterialIncludeEnum.WithFiles));
-        }
-
         public async Task<IReadOnlyCollection<LocationHistoryDto>> GetLocationHistoriesAsync(Guid materialId)
         {
             var entity = await RunWithoutCommitAsync(uow => uow.MaterialRepository.GetByIdAsync(materialId, MaterialIncludeEnum.WithFeatures));
@@ -490,5 +436,41 @@ namespace IIS.Services.Materials
         public Task<IReadOnlyList<ResCallerReceiverDto>> GetCallInfoAsync(IReadOnlyList<Guid> nodeIds, CancellationToken cancellationToken = default) =>
             RunWithoutCommitAsync((unitOfWork) =>
                 unitOfWork.MaterialRepository.GetCallInfoAsync(nodeIds, cancellationToken));
+        
+        private IReadOnlyCollection<Guid> GetDescendantsByGivenRelationTypeNameList(
+            IReadOnlyCollection<Guid> entityIdList, IReadOnlyCollection<string> relationTypeNameList)
+        {
+            var result = new List<Guid>();
+
+            var tempValues = entityIdList.ToList();
+
+            while (tempValues.Any())
+            {
+                var relationList = _ontologyData.GetIncomingRelations(tempValues, relationTypeNameList);
+
+                tempValues = relationList
+                    .Select(e => e.SourceNodeId)
+                    .ToList();
+
+                result.AddRange(tempValues);
+            }
+            return result.AsReadOnly();
+        }
+
+        private Task<IReadOnlyCollection<MaterialEntity>> GetMaterialCollectionByNodeIdAsync(Guid nodeId, bool includeRelatedEntities)
+        {
+            var nodeIdList = new List<Guid> { nodeId };
+
+            if (includeRelatedEntities)
+            {
+                var featureIdCollection = _ontologyService.GetObjectFeatureRelationCollection(nodeIdList)
+                    .Select(e => e.FeatureId)
+                    .ToArray();
+
+                nodeIdList.AddRange(featureIdCollection);
+            }
+
+            return RunWithoutCommitAsync(uow => uow.MaterialRepository.GetMaterialCollectionByNodeIdAsync(nodeIdList, MaterialIncludeEnum.WithChildren, MaterialIncludeEnum.WithFeatures, MaterialIncludeEnum.WithFiles));
+        }
     }
 }

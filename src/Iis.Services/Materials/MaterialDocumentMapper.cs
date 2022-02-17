@@ -22,12 +22,14 @@ namespace IIS.Services.Materials
         private readonly IOntologySchema _ontologySchema;
         private readonly NodeToJObjectMapper _nodeToJObjectMapper;
         private readonly ISecurityLevelChecker _securityLevelChecker;
+        private readonly ForbiddenEntityReplacer _forbiddenEntityReplacer;
 
         public MaterialDocumentMapper(
             IMapper mapper,
             IOntologySchema ontologySchema,
             IOntologyService ontologyService,
             NodeToJObjectMapper nodeToJObjectMapper,
+            ForbiddenEntityReplacer forbiddenEntityReplacer,
             ISecurityLevelChecker securityLevelChecker)
         {
             _mapper = mapper;
@@ -35,6 +37,7 @@ namespace IIS.Services.Materials
             _ontologySchema = ontologySchema;
             _nodeToJObjectMapper = nodeToJObjectMapper;
             _securityLevelChecker = securityLevelChecker;
+            _forbiddenEntityReplacer = forbiddenEntityReplacer;
         }
 
         public Material Map(MaterialDocument document)
@@ -73,9 +76,9 @@ namespace IIS.Services.Materials
             material.CanBeEdited = document.ProcessedStatus.Id != MaterialEntity.ProcessingStatusProcessingSignId 
                                    || (document.Editor == null || document.Editor.Id == user.Id);
 
-            ReplaceForbiddenRelatedEntityCollectionsForUser(material.RelatedEventCollection, user);
-            ReplaceForbiddenRelatedEntityCollectionsForUser(material.RelatedObjectCollection, user);
-            ReplaceForbiddenRelatedEntityCollectionsForUser(material.RelatedSignCollection, user);
+            _forbiddenEntityReplacer.Replace(material.RelatedEventCollection, user);
+            _forbiddenEntityReplacer.Replace(material.RelatedObjectCollection, user);
+            _forbiddenEntityReplacer.Replace(material.RelatedSignCollection, user);
 
             return material;
         }
@@ -196,28 +199,6 @@ namespace IIS.Services.Materials
             var result = _mapper.Map<MaterialFeature>(feature);
             result.Node = _ontologyService.GetNode(feature.NodeId);
             return result;
-        }
-
-        private void ReplaceForbiddenRelatedEntityCollectionsForUser(IEnumerable<Iis.Domain.Materials.RelatedObject> relatedEntityCollection, User user)
-        {
-            foreach (var entity in relatedEntityCollection)
-            {
-                entity.AccessAllowed = IsAllowedEntityForUser(entity.Id, user);
-
-                if (entity.AccessAllowed) continue;
-                
-                entity.Id = Guid.Empty;
-                entity.Title = string.Empty;
-                entity.NodeType = string.Empty;
-                entity.RelationType = string.Empty;
-                entity.RelationCreatingType = string.Empty;
-            }
-        }
-
-        private bool IsAllowedEntityForUser(Guid id, User user)
-        {
-            return _securityLevelChecker.AccessGranted(user.SecurityLevelsIndexes,
-                _ontologyService.GetNode(id).OriginalNode.GetSecurityLevelIndexes());
         }
     }
 }

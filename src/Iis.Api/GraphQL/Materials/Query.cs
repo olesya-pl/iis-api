@@ -302,8 +302,7 @@ namespace IIS.Core.GraphQL.Materials
                             materialSecurityLevelIndexes);
 
                         return material.AccessAllowed ? material : EmptyMaterial;
-                    })
-                .ToList();
+                    });
         }
     }
 }
