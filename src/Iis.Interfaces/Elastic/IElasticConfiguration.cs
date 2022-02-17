@@ -6,6 +6,7 @@ namespace Iis.Interfaces.Elastic
     {
         void ReloadFields(IEnumerable<IElasticFieldEntity> elasticFields, string typeName = null);
         IReadOnlyList<IIisElasticField> GetOntologyIncludedFields(IEnumerable<string> typeNames);
+        IReadOnlyCollection<string> GetFieldsEligibleForAutocomplete(IEnumerable<string> typeNames);
         IReadOnlyList<IIisElasticField> GetMaterialsIncludedFields(IEnumerable<string> typeNames);
     }
 }

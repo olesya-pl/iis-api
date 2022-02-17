@@ -12,7 +12,8 @@ namespace Iis.Interfaces.Elastic
         Task<bool> PutNodeAsync(Guid id, CancellationToken ct = default);
         Task<bool> PutNodeAsync(Guid id, IEnumerable<string> fieldsToExtract, CancellationToken ct = default);
         Task<SearchResult> SearchByConfiguredFieldsAsync(IEnumerable<string> typeNames, ElasticFilter filter, Guid userId, CancellationToken ct = default);
-        Task<int> CountByConfiguredFieldsAsync(IEnumerable<string> typeNames, ElasticFilter filter, CancellationToken ct = default);
+        Task<SearchResult> AutocompleteByFieldsAsync(IEnumerable<string> enumerable, ElasticFilter filter, Guid id, CancellationToken cancellationToken);
+        Task<int> CountAutocompleteByFieldsAsync(IEnumerable<string> enumerable, ElasticFilter filter, Guid userId, CancellationToken cancellationToken);
         Task<SearchEntitiesByConfiguredFieldsResult> SearchEntitiesByConfiguredFieldsAsync(IEnumerable<string> typeNames, ElasticFilter filter, Guid userId, CancellationToken ct = default);
         Task<SearchEntitiesByConfiguredFieldsResult> FilterNodeCoordinatesAsync(IEnumerable<string> typeNames, ElasticFilter filter, CancellationToken ct = default);
         Task<SearchResult> SearchSignsAsync(IEnumerable<string> typeNames, ElasticFilter filter, CancellationToken ct = default);
