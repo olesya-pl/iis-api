@@ -490,8 +490,8 @@ namespace Iis.OntologySchema.DataTypes
         public SecurityStrategy? GetSecurityStrategy() =>
             _outgoingRelations
             .Where(_ => _.NodeType.IsHierarchyParent)
-            .Select(_ => _?.NodeType.SecurityStrategy)
-            .SingleOrDefault();
+            .SingleOrDefault()
+            ?.NodeType.SecurityStrategy;
 
         private string GetTitleAttributeName()
         {

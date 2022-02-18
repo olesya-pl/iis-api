@@ -321,10 +321,7 @@ namespace Iis.OntologyData.DataTypes
         {
             var directChildren = GetHierarchyDirectChildren();
             var result = new List<INode>(directChildren);
-            foreach (var child in directChildren)
-            {
-                result.AddRange(child.GetHierarchyDirectChildren());
-            }
+            result.AddRange(directChildren.SelectMany(_ => _.GetHierarchyChildren()));
             return result;
         }
 
