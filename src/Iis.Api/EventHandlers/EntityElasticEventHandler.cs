@@ -14,11 +14,16 @@ namespace Iis.Api.EventHandlers
     {
         private readonly IElasticService _elasticService;
         private readonly IElasticState _elasticState;
+        private readonly ISecurityLevelService _securityLevelService;
 
-        public EntityElasticEventHandler(IElasticService elasticService, IElasticState elasticState)
+        public EntityElasticEventHandler(
+            IElasticService elasticService,
+            IElasticState elasticState,
+            ISecurityLevelService securityLevelService)
         {
             _elasticService = elasticService;
             _elasticState = elasticState;
+            _securityLevelService = securityLevelService;
         }
 
         public Task Handle(EntityCreatedEvent notification, CancellationToken cancellationToken)
@@ -26,9 +31,14 @@ namespace Iis.Api.EventHandlers
             return PutActualNodeAsync(notification, cancellationToken);
         }
 
-        public Task Handle(EntityUpdatedEvent notification, CancellationToken cancellationToken)
+        public async Task Handle(EntityUpdatedEvent notification, CancellationToken cancellationToken)
         {
-            return PutActualNodeAsync(notification, cancellationToken);
+            await PutActualNodeAsync(notification, cancellationToken);
+            if (notification.SecurityLevelChanged)
+            {
+                var changedNodes = _securityLevelService.ChangeSecurityLevelsForLinkedNodes(notification.Id);
+                await _elasticService.PutNodesAsync(changedNodes, cancellationToken);
+            }
         }
 
         public Task Handle(EntityDeleteEvent notification, CancellationToken cancellationToken)

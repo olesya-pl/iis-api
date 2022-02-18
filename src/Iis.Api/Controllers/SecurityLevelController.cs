@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Iis.Api.Controllers
@@ -41,8 +42,8 @@ namespace Iis.Api.Controllers
             _securityLevelService.GetObjectSecurityDtosAsync(id);
 
         [HttpPost("saveObjectSecurityDto")]
-        public Task SaveObjectSecurityDtoAsync(ObjectSecurityDto objectSecurityDto) =>
-            _securityLevelService.SaveObjectSecurityDtoAsync(objectSecurityDto);
+        public Task SaveObjectSecurityDtoAsync(ObjectSecurityDto objectSecurityDto, CancellationToken cancellationToken) =>
+            _securityLevelService.SaveObjectSecurityDtoAsync(objectSecurityDto, cancellationToken);
 
         [HttpPost("saveSecurityLevel")]
         public void SaveSecurityLevel(SecurityLevelPlain levelPlain) =>

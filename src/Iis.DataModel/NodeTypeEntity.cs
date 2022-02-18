@@ -17,6 +17,8 @@ namespace Iis.DataModel
         public bool IsAbstract { get; set; }
         public string UniqueValueFieldName { get; set; }
         public string IconBase64Body { get; set; }
+        public bool IsHierarchyParent { get; set; }
+        public SecurityStrategy SecurityStrategy { get; set; }
 
         public virtual List<RelationTypeEntity> IncomingRelations { get; set; } = new List<RelationTypeEntity>();
         public virtual List<RelationTypeEntity> OutgoingRelations { get; set; } = new List<RelationTypeEntity>();

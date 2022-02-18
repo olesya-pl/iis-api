@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Iis.Services
@@ -52,34 +53,19 @@ namespace Iis.Services
             };
         }
 
-        public async Task SaveObjectSecurityDtoAsync(ObjectSecurityDto objectSecurityDto)
+        public async Task SaveObjectSecurityDtoAsync(ObjectSecurityDto objectSecurityDto, CancellationToken cancellationToken)
         {
             var node = _ontologyData.GetNode(objectSecurityDto.Id);
             if (node == null) throw new Exception($"Node with id = {objectSecurityDto.Id} is not found");
-            var newLevels = _securityLevelChecker.GetSecurityLevels(objectSecurityDto.SecurityIndexes);
-            var relations = node.GetSecurityLevelRelations();
-            var idsToDelete = relations
-                .Where(r => !newLevels.Any(l => l.Id == r.TargetNodeId))
-                .Select(r => r.Id)
-                .ToList();
 
-            var idsToAdd = newLevels
-                .Where(l => !relations.Any(r => r.TargetNodeId == l.Id))
-                .Select(l => l.Id)
-                .ToList();
+            var changedNodes = new List<INode> { node };
 
             _ontologyData.WriteLock(() =>
             {
-                _ontologyData.RemoveNodes(idsToDelete);
-                var objectType = _ontologyData.Schema.GetEntityTypeByName(EntityTypeNames.Object.ToString());
-                var securityLevelType = objectType.GetRelationByName(OntologyNames.SecurityLevelField);
-
-                foreach (var id in idsToAdd)
-                {
-                    _ontologyData.CreateRelation(objectSecurityDto.Id, id, securityLevelType.Id);
-                }
+                SetObjectSecurity(objectSecurityDto.Id, objectSecurityDto.SecurityIndexes);
+                changedNodes.AddRange(ChangeSecurityLevelsForLinkedNodes(node));
             });
-            await _nodeSaveService.PutNodeAsync(node.Id);
+            await _nodeSaveService.PutNodesAsync(changedNodes, cancellationToken);
         }
 
         public void SaveSecurityLevel(SecurityLevelPlain levelPlain)
@@ -128,6 +114,25 @@ namespace Iis.Services
             _securityLevelChecker.Reload();
         }
 
+        public IReadOnlyList<INode> ChangeSecurityLevelsForLinkedNodes(INode node)
+        {
+            var securityStrategy = node.NodeType.GetSecurityStrategy();
+            if (securityStrategy == SecurityStrategy.SetForAllHierarchyChildren)
+            {
+                var securityIndexes = node.GetSecurityLevelIndexes();
+                var hierarchyChildren = node.GetHierarchyChildren();
+                foreach (var child in hierarchyChildren)
+                {
+                    SetObjectSecurity(child.Id, securityIndexes);
+                }
+                return hierarchyChildren;
+            }
+            return new List<INode>();
+        }
+
+        public IReadOnlyList<INode> ChangeSecurityLevelsForLinkedNodes(Guid nodeId) =>
+            ChangeSecurityLevelsForLinkedNodes(_ontologyData.GetNode(nodeId));
+
         public void RemoveSecurityLevel(Guid id)
         {
             _ontologyData.WriteLock(() =>
@@ -146,6 +151,32 @@ namespace Iis.Services
                 select a.Value).ToList();
 
             return values.Count == 0 ? 0 : values.Max(_ => int.Parse(_)) + 1;
+        }
+
+        private void SetObjectSecurity(Guid nodeId, IReadOnlyList<int> securityIndexes)
+        {
+            var node = _ontologyData.GetNode(nodeId);
+            if (node == null) throw new Exception($"Node with id = {nodeId} is not found");
+            var newLevels = _securityLevelChecker.GetSecurityLevels(securityIndexes);
+            var relations = node.GetSecurityLevelRelations();
+            var idsToDelete = relations
+                .Where(r => !newLevels.Any(l => l.Id == r.TargetNodeId))
+                .Select(r => r.Id)
+                .ToList();
+
+            var idsToAdd = newLevels
+                .Where(l => !relations.Any(r => r.TargetNodeId == l.Id))
+                .Select(l => l.Id)
+                .ToList();
+
+            _ontologyData.RemoveNodes(idsToDelete);
+            var objectType = _ontologyData.Schema.GetEntityTypeByName(EntityTypeNames.Object.ToString());
+            var securityLevelType = objectType.GetRelationByName(OntologyNames.SecurityLevelField);
+
+            foreach (var idToAdd in idsToAdd)
+            {
+                _ontologyData.CreateRelation(nodeId, idToAdd, securityLevelType.Id);
+            }
         }
     }
 }

@@ -17,5 +17,7 @@ namespace Iis.Interfaces.Ontology.Schema
         bool IsAbstract { get; }
         string UniqueValueFieldName { get; }
         string IconBase64Body { get; }
+        bool IsHierarchyParent { get; }
+        SecurityStrategy SecurityStrategy { get; }
     }
 }
