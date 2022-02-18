@@ -5,6 +5,7 @@ using Iis.Domain;
 using Iis.Api.Controllers.Dto;
 using Iis.Interfaces.SecurityLevels;
 using Iis.Domain.TreeResult;
+using System;
 
 namespace Iis.Api.Controllers
 {
@@ -53,6 +54,12 @@ namespace Iis.Api.Controllers
             };
 
             return Task.FromResult<IActionResult>(contentResult);
+        }
+
+        [HttpPost("GetEntity")]
+        public IActionResult GetEntity(Guid id)
+        {
+
         }
     }
 }
