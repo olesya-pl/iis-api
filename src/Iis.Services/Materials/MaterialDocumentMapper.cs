@@ -21,8 +21,8 @@ namespace IIS.Services.Materials
         private readonly IOntologyService _ontologyService;
         private readonly IOntologySchema _ontologySchema;
         private readonly NodeToJObjectMapper _nodeToJObjectMapper;
-        private readonly ISecurityLevelChecker _securityLevelChecker;
         private readonly ForbiddenEntityReplacer _forbiddenEntityReplacer;
+        private readonly ISecurityLevelChecker _securityLevelChecker;
 
         public MaterialDocumentMapper(
             IMapper mapper,
@@ -36,8 +36,8 @@ namespace IIS.Services.Materials
             _ontologyService = ontologyService;
             _ontologySchema = ontologySchema;
             _nodeToJObjectMapper = nodeToJObjectMapper;
-            _securityLevelChecker = securityLevelChecker;
             _forbiddenEntityReplacer = forbiddenEntityReplacer;
+            _securityLevelChecker = securityLevelChecker;
         }
 
         public Material Map(MaterialDocument document)
@@ -73,7 +73,7 @@ namespace IIS.Services.Materials
         {
             var material = Map(document);
 
-            material.CanBeEdited = document.ProcessedStatus.Id != MaterialEntity.ProcessingStatusProcessingSignId 
+            material.CanBeEdited = document.ProcessedStatus.Id != MaterialEntity.ProcessingStatusProcessingSignId
                                    || (document.Editor == null || document.Editor.Id == user.Id);
 
             _forbiddenEntityReplacer.Replace(material.RelatedEventCollection, user);
@@ -179,11 +179,7 @@ namespace IIS.Services.Materials
 
         private IReadOnlyCollection<Material> MapChildren(MaterialEntity material)
         {
-            if (material.Children == null)
-            {
-                return Array.Empty<Material>();
-            }
-            return material.Children.Select(child => Map(child)).ToArray();
+            return material.Children == null ? Array.Empty<Material>() : material.Children.Select(child => Map(child)).ToArray();
         }
 
         private MaterialInfo Map(MaterialInfoEntity info)

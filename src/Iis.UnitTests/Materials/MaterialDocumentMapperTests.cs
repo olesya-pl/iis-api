@@ -3,6 +3,7 @@ using AutoMapper;
 using Iis.DataModel.Materials;
 using Iis.Domain;
 using Iis.Domain.Materials;
+using Iis.Domain.Users;
 using Iis.Elastic.Entities;
 using Iis.Interfaces.Ontology.Schema;
 using Iis.Interfaces.SecurityLevels;
@@ -15,6 +16,8 @@ namespace Iis.UnitTests.Materials
 {
     public class MaterialDocumentMapperTests
     {
+        private readonly Mock<ISecurityLevelChecker> _securityLevelChecker = new Mock<ISecurityLevelChecker>();
+        private readonly Mock<IOntologyService> _ontologyService = new Mock<IOntologyService>();
         public MaterialDocumentMapper CreateFixture(Mock<IMapper> mapper)
         {
             var ontologyServiceMock = new Mock<IOntologyService>();
@@ -24,12 +27,13 @@ namespace Iis.UnitTests.Materials
                     new Mock<IOntologySchema>().Object,
                     ontologyServiceMock.Object,
                     new NodeToJObjectMapper(),
+                    new ForbiddenEntityReplacer(_securityLevelChecker.Object, _ontologyService.Object),
                     new Mock<ISecurityLevelChecker>().Object);
         }
 
         [Theory]
         [RecursiveAutoData]
-        public void CanBeEdited_EditorIsNull_NotInProcessing_ReturnsTrue(MaterialDocument document, Material material, Guid userId)
+        public void CanBeEdited_EditorIsNull_NotInProcessing_ReturnsTrue(MaterialDocument document, Material material, User user)
         {
             //arrange
             document.Editor = null;
@@ -40,7 +44,7 @@ namespace Iis.UnitTests.Materials
             var sut = CreateFixture(mapperMock);
 
             //act
-            var res = sut.Map(document, userId);
+            var res = sut.Map(document, user);
 
             //assert
             Assert.True(res.CanBeEdited);
@@ -48,7 +52,7 @@ namespace Iis.UnitTests.Materials
 
         [Theory]
         [RecursiveAutoData]
-        public void CanBeEdited_EditorIsOtherUser_NotInProcessing_ReturnsTrue(MaterialDocument document, Material material, Guid userId, Guid otherUserId)
+        public void CanBeEdited_EditorIsOtherUser_NotInProcessing_ReturnsTrue(MaterialDocument document, Material material, User user, Guid otherUserId)
         {
             //arrange
             document.Editor = new Editor { Id = otherUserId };
@@ -59,7 +63,7 @@ namespace Iis.UnitTests.Materials
             var sut = CreateFixture(mapperMock);
 
             //act
-            var res = sut.Map(document, userId);
+            var res = sut.Map(document, user);
 
             //assert
             Assert.True(res.CanBeEdited);
@@ -67,10 +71,10 @@ namespace Iis.UnitTests.Materials
 
         [Theory]
         [RecursiveAutoData]
-        public void CanBeEdited_EditorIsSameUser_NotInProcessing_ReturnsTrue(MaterialDocument document, Material material, Guid userId)
+        public void CanBeEdited_EditorIsSameUser_NotInProcessing_ReturnsTrue(MaterialDocument document, Material material, User user)
         {
             //arrange
-            document.Editor = new Editor { Id = userId };
+            document.Editor = new Editor { Id = user.Id };
             document.ProcessedStatus = new Elastic.Entities.MaterialSign { Id = MaterialEntity.ProcessingStatusNotProcessedSignId };
 
             var mapperMock = new Mock<IMapper>();
@@ -78,7 +82,7 @@ namespace Iis.UnitTests.Materials
             var sut = CreateFixture(mapperMock);
 
             //act
-            var res = sut.Map(document, userId);
+            var res = sut.Map(document, user);
 
             //assert
             Assert.True(res.CanBeEdited);
@@ -86,7 +90,7 @@ namespace Iis.UnitTests.Materials
 
         [Theory]
         [RecursiveAutoData]
-        public void CanBeEdited_EditorIsNull_InProcessing_ReturnsTrue(MaterialDocument document, Material material, Guid userId)
+        public void CanBeEdited_EditorIsNull_InProcessing_ReturnsTrue(MaterialDocument document, Material material, User user)
         {
             //arrange
             document.Editor = null;
@@ -97,7 +101,7 @@ namespace Iis.UnitTests.Materials
             var sut = CreateFixture(mapperMock);
 
             //act
-            var res = sut.Map(document, userId);
+            var res = sut.Map(document, user);
 
             //assert
             Assert.True(res.CanBeEdited);
@@ -105,7 +109,7 @@ namespace Iis.UnitTests.Materials
 
         [Theory]
         [RecursiveAutoData]
-        public void CanBeEdited_EditorIsOtherUser_InProcessing_ReturnsTrue(MaterialDocument document, Material material, Guid userId, Guid otherUserId)
+        public void CanBeEdited_EditorIsOtherUser_InProcessing_ReturnsTrue(MaterialDocument document, Material material, User user, Guid otherUserId)
         {
             //arrange
             document.Editor = new Editor { Id = otherUserId };
@@ -116,7 +120,7 @@ namespace Iis.UnitTests.Materials
             var sut = CreateFixture(mapperMock);
 
             //act
-            var res = sut.Map(document, userId);
+            var res = sut.Map(document, user);
 
             //assert
             Assert.False(res.CanBeEdited);
@@ -124,10 +128,10 @@ namespace Iis.UnitTests.Materials
 
         [Theory]
         [RecursiveAutoData]
-        public void CanBeEdited_EditorIsSameUser_InProcessing_ReturnsTrue(MaterialDocument document, Material material, Guid userId)
+        public void CanBeEdited_EditorIsSameUser_InProcessing_ReturnsTrue(MaterialDocument document, Material material, User user)
         {
             //arrange
-            document.Editor = new Editor { Id = userId };
+            document.Editor = new Editor { Id = user.Id };
             document.ProcessedStatus = new Elastic.Entities.MaterialSign { Id = MaterialEntity.ProcessingStatusProcessingSignId };
 
             var mapperMock = new Mock<IMapper>();
@@ -135,12 +139,10 @@ namespace Iis.UnitTests.Materials
             var sut = CreateFixture(mapperMock);
 
             //act
-            var res = sut.Map(document, userId);
+            var res = sut.Map(document, user);
 
             //assert
             Assert.True(res.CanBeEdited);
         }
     }
-
-    
 }

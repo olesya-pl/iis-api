@@ -24,7 +24,7 @@ namespace Iis.Services
                 entity.AccessAllowed = IsAllowedEntityForUser(entity.Id, user);
 
                 if (entity.AccessAllowed) continue;
-                
+
                 entity.Id = Guid.Empty;
                 entity.Title = string.Empty;
                 entity.NodeType = string.Empty;

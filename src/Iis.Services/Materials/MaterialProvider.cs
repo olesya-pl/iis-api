@@ -157,7 +157,7 @@ namespace IIS.Services.Materials
                     .Select(material =>
                     {
                         var materialSecurityLevelIndexes = material.SecurityLevels.Select(_ => _.UniqueIndex).ToList();
-                        var isAllowed = _securityLevelChecker.AccessGranted(user.SecurityLevelsIndexes,materialSecurityLevelIndexes);
+                        var isAllowed = _securityLevelChecker.AccessGranted(user.SecurityLevelsIndexes, materialSecurityLevelIndexes);
 
                         if (isAllowed) material.AccessAllowed = true;
 
@@ -252,7 +252,7 @@ namespace IIS.Services.Materials
             var materialCollection = documentCollection
                                     .Select(_ => _materialDocumentMapper.Map(_))
                                     .ToArray();
-            
+
             return new OutputCollection<Material>(materialCollection);
         }
 
@@ -322,7 +322,8 @@ namespace IIS.Services.Materials
             return MaterialsDto.Create(materials, searchResult.Count, searchResult.Items, searchResult.Aggregations);
         }
 
-        public async Task<MaterialsDto> GetMaterialsCommonForEntitiesAsync(Guid userId,
+        public async Task<MaterialsDto> GetMaterialsCommonForEntitiesAsync(
+            Guid userId,
             IEnumerable<Guid> nodeIdList,
             bool includeDescendants,
             string suggestion,
@@ -436,7 +437,7 @@ namespace IIS.Services.Materials
         public Task<IReadOnlyList<ResCallerReceiverDto>> GetCallInfoAsync(IReadOnlyList<Guid> nodeIds, CancellationToken cancellationToken = default) =>
             RunWithoutCommitAsync((unitOfWork) =>
                 unitOfWork.MaterialRepository.GetCallInfoAsync(nodeIds, cancellationToken));
-        
+
         private IReadOnlyCollection<Guid> GetDescendantsByGivenRelationTypeNameList(
             IReadOnlyCollection<Guid> entityIdList, IReadOnlyCollection<string> relationTypeNameList)
         {

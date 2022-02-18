@@ -51,7 +51,7 @@ namespace Iis.UnitTests.Materials
             unitOfWorkFactoryMock.Setup(x => x.Create()).Returns(unitOfWorkMock.Object);
             unitOfWorkMock.Setup(x => x.MaterialRepository).Returns(materialRepositoryMock.Object);
             materialProvider = new MaterialProvider<IIISUnitOfWork>(new Mock<IOntologyService>().Object,
-                
+
                 new Mock<IOntologyNodesData>().Object,
                 new Mock<IMaterialElasticService>().Object,
                 new Mock<IMLResponseRepository>().Object,
@@ -64,8 +64,11 @@ namespace Iis.UnitTests.Materials
                     new Mock<IOntologySchema>().Object,
                     new Mock<IOntologyService>().Object,
                     new NodeToJObjectMapper(),
+                    new ForbiddenEntityReplacer(new Mock<ISecurityLevelChecker>().Object, new Mock<IOntologyService>().Object),
                     new Mock<ISecurityLevelChecker>().Object),
                 new Mock<IConnection>().Object,
+                new Mock<ISecurityLevelChecker>().Object,
+                new ForbiddenEntityReplacer(new Mock<ISecurityLevelChecker>().Object, new Mock<IOntologyService>().Object),
                 new Mock<IOptions<MaterialNextAssignedPublisherConfig>>().Object,
                 new Mock<ILogger<IMaterialProvider>>().Object);
         }
