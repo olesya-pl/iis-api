@@ -88,19 +88,63 @@ namespace IIS.Core.Ontology.EntityFramework
             };
         }
 
-        public Task<int> CountByConfiguredFieldsAsync(IEnumerable<string> typeNames, ElasticFilter filter, CancellationToken ct = default)
+        public async Task<SearchResult> AutocompleteByFieldsAsync(IEnumerable<string> typeNames, ElasticFilter filter, Guid userId, CancellationToken cancellationToken = default)
         {
-            var ontologyFields = GetSearchFields(typeNames);
-            var searchParams = new IisElasticSearchParams
+            var ontologyFields = GetTetxSearchFieldName(typeNames);
+            var autocompleteQuery = string.Empty;
+            if (ontologyFields.Count > 0)
             {
-                BaseIndexNames = typeNames.ToList(),
-                Query = string.IsNullOrEmpty(filter.Suggestion) ? SearchQueryExtension.Wildcard : $"{filter.Suggestion}",
-                From = filter.Offset,
-                Size = filter.Limit,
-                SearchFields = ontologyFields,
-                IsExact = filter.IsExact
+                autocompleteQuery = new DisjunctionQueryBuilder(filter.Suggestion, ontologyFields)
+                    .WithPagination(filter.Offset, filter.Limit)
+                    .BuildSearchQuery()
+                    .ToString();
+            }
+            else
+            {
+                autocompleteQuery = new ExactQueryBuilder()
+                    .WithPagination(filter.Offset, filter.Limit)
+                    .WithQueryString(filter.Suggestion)
+                    .BuildSearchQuery()
+                    .ToString();
+            }
+
+            var searchResult = await _elasticManager
+                .WithUserId(userId)
+                .SearchAsync(autocompleteQuery, typeNames, cancellationToken);
+
+            return new SearchResult
+            {
+                Count = searchResult.Count,
+                Items = searchResult.Items
+                    .ToDictionary(
+                        key => new Guid(key.Identifier),
+                        value => new SearchResultItem { Highlight = value.Higlight, SearchResult = value.SearchResult })
             };
-            return _elasticManager.CountAsync(searchParams, ct);
+        }
+
+        public Task<int> CountAutocompleteByFieldsAsync(IEnumerable<string> typeNames, ElasticFilter filter, Guid userId, CancellationToken ct = default)
+        {
+            var ontologyFields = GetTetxSearchFieldName(typeNames);
+            var autocompleteQuery = string.Empty;
+            if (ontologyFields.Count > 0)
+            {
+                autocompleteQuery = new DisjunctionQueryBuilder(filter.Suggestion, ontologyFields)
+                    .WithPagination(filter.Offset, filter.Limit)
+                    .BuildCountQuery()
+                    .ToString();
+            }
+            else
+            {
+                autocompleteQuery = new ExactQueryBuilder()
+                    .WithPagination(filter.Offset, filter.Limit)
+                    .WithQueryString(filter.Suggestion)
+                    .BuildCountQuery()
+                    .ToString();
+            }
+
+            return _elasticManager
+               .WithUserId(userId)
+               .CountAsync(autocompleteQuery, typeNames, ct);
         }
 
         public bool ShouldReturnAllEntities(ElasticFilter filter)
@@ -392,6 +436,10 @@ namespace IIS.Core.Ontology.EntityFramework
                     .ToString();
             }
         }
+
+        private IReadOnlyList<string> GetTetxSearchFieldName(IEnumerable<string> typeNames) => _elasticConfiguration
+                .GetFieldsEligibleForAutocomplete(typeNames.Where(_ => _elasticState.ObjectIndexes.Contains(_)))
+                .ToList();
 
         private IReadOnlyList<IIisElasticField> GetSearchFields(IEnumerable<string> typeNames) => _elasticConfiguration
                 .GetOntologyIncludedFields(typeNames.Where(_ => _elasticState.ObjectIndexes.Contains(_)))

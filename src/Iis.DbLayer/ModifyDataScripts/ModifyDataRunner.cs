@@ -56,6 +56,7 @@ namespace Iis.DbLayer.ModifyDataScripts
             _items.Add("AddSecurityLevelsData", actions.AddSecurityLevelsData);
             _items.Add("AddAttributesManagerToAccessObjects", actions.AddAttributesManagerToAccessObjects);
             _items.Add("AddSecurityLevelDescription", actions.AddSecurityLevelDescription);
+            _items.Add("SetMilitaryOrganizationHierarchy", actions.SetMilitaryOrganizationHierarchy);
         }
         public bool Run()
         {

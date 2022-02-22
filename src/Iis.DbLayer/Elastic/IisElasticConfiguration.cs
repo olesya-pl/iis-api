@@ -65,6 +65,16 @@ namespace Iis.DbLayer.Elastic
             return MergeConfiguredElasticFields(fields, GetConfiguredElasticFields(typeNames));
         }
 
+        public IReadOnlyCollection<string> GetFieldsEligibleForAutocomplete(IEnumerable<string> typeNames)
+        {
+            var fields = new Dictionary<string, NodeAggregationInfo>();
+            foreach (var typeName in typeNames)
+            {
+                MergeOntologyFields(fields, GetFieldsByNodeType(typeName, new[] { ScalarType.String }, false));
+            }
+            return fields.Keys.ToList();
+        }
+
         public IReadOnlyList<IIisElasticField> GetMaterialsIncludedFields(IEnumerable<string> typeNames)
         {
             var fieldNames = GetMaterialFieldNames();
@@ -168,13 +178,18 @@ namespace Iis.DbLayer.Elastic
             return result;
         }
 
-        private List<NodeAggregationInfo> GetFieldsByNodeType(string typeName)
+        private List<NodeAggregationInfo> GetFieldsByNodeType(string typeName, IReadOnlyCollection<ScalarType> types = null, bool includeDefaultFields = true)
         {
             var nodeType = _ontologySchema.GetEntityTypeByName(typeName);
             if (nodeType != null)
             {
-                var nodes = _ontologySchema.GetAttributesInfo(typeName)
-                    .Items
+                var attributes = _ontologySchema.GetAttributesInfo(typeName)
+                    .Items;
+                if (types?.Count > 0)
+                {
+                    attributes = attributes.Where(p => types.Contains(p.ScalarType)).ToArray();
+                }
+                var nodes = attributes
                     .Select(p => new NodeAggregationInfo
                     {
                         Name = p.DotName,
@@ -182,7 +197,10 @@ namespace Iis.DbLayer.Elastic
                         IsAggregated = p.IsAggregated
                     }).ToList();
 
-                nodes.AddRange(_defaultNodeTypeFieldList);
+                if (includeDefaultFields)
+                {
+                    nodes.AddRange(_defaultNodeTypeFieldList);
+                }
 
                 return nodes;
             }

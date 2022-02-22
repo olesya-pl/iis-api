@@ -215,6 +215,16 @@ namespace Iis.OntologySchema
                 nodeType._attributeType.ScalarType = (ScalarType)updateParameter.ScalarType;
             }
 
+            if (updateParameter.IsHierarchyParent != null)
+            {
+                nodeType.IsHierarchyParent = (bool)updateParameter.IsHierarchyParent;
+            }
+
+            if (updateParameter.SecurityStrategy != null)
+            {
+                nodeType.SecurityStrategy = (SecurityStrategy)updateParameter.SecurityStrategy;
+            }
+
             nodeType.UniqueValueFieldName = updateParameter.UniqueValueFieldName;
             nodeType.IconBase64Body = updateParameter.IconBase64Body;
             nodeType.Schema = this;

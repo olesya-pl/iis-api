@@ -42,5 +42,7 @@ namespace Iis.Interfaces.Ontology.Data
         int GetAccessLevelIndex();
         IReadOnlyList<int> GetSecurityLevelIndexes();
         IReadOnlyList<IRelation> GetSecurityLevelRelations();
+        IReadOnlyList<INode> GetHierarchyDirectChildren();
+        IReadOnlyList<INode> GetHierarchyChildren();
     }
 }

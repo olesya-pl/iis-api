@@ -305,10 +305,26 @@ namespace Iis.OntologyData.DataTypes
             .Where(_ => _.Node.NodeType.Name == OntologyNames.SecurityLevelField)
             .Select(_ => int.Parse(_.TargetNode.GetSingleDirectProperty(OntologyNames.UniqueIndexField).Value))
             .ToList();
+
         public IReadOnlyList<IRelation> GetSecurityLevelRelations() =>
             _outgoingRelations
             .Where(_ => _.Node.NodeType.Name == OntologyNames.SecurityLevelField)
             .ToList();
+
+        public IReadOnlyList<INode> GetHierarchyDirectChildren() =>
+            _incomingRelations
+            .Where(_ => _.Node.NodeType.IsHierarchyParent)
+            .Select(_ => _.SourceNode)
+            .ToList();
+
+        public IReadOnlyList<INode> GetHierarchyChildren()
+        {
+            var directChildren = GetHierarchyDirectChildren();
+            var result = new List<INode>(directChildren);
+            result.AddRange(directChildren.SelectMany(_ => _.GetHierarchyChildren()));
+            return result;
+        }
+
         private object ResolveSingleFormula(string formula)
         {
             var replaced = ReplaceVariables(formula);

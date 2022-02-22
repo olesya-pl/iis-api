@@ -25,7 +25,7 @@ namespace Iis.MaterialDistributor.Services
             _mapper = mapper;
         }
 
-        public async Task<IReadOnlyCollection<MaterialDistributionInfo>> SetForMaterialsAsync(
+        public async Task<IReadOnlyCollection<MaterialDistributionInfo>> SetVariableCoefficientForMaterialsAsync(
             DateTime comparisonTimeStamp,
             IReadOnlyCollection<MaterialDistributionInfo> documentCollection,
             CancellationToken cancellationToken)
