@@ -33,6 +33,8 @@ using IIS.Services.Contracts.Materials;
 using Iis.RabbitMq.Channels;
 using MaterialSign = Iis.Domain.Materials.MaterialSign;
 using NextAssignedMessage = Iis.Messages.Materials.MaterialNextAssignedMessage;
+using Iis.Services;
+using Iis.Interfaces.SecurityLevels;
 
 namespace IIS.Services.Materials
 {
@@ -56,6 +58,8 @@ namespace IIS.Services.Materials
         private readonly IConnection _connection;
         private readonly MaterialNextAssignedPublisherConfig _nextAssignedConfig;
         private readonly ILogger<IMaterialProvider> _logger;
+        private readonly ISecurityLevelChecker _securityLevelChecker;
+        private readonly ForbiddenEntityReplacer _forbiddenEntityReplacer;
 
         public MaterialProvider(
             IOntologyService ontologyService,
@@ -68,6 +72,8 @@ namespace IIS.Services.Materials
             IImageVectorizer imageVectorizer,
             MaterialDocumentMapper materialDocumentMapper,
             IConnection connection,
+            ISecurityLevelChecker securityLevelChecker,
+            ForbiddenEntityReplacer forbiddenEntityReplacer,
             IOptions<MaterialNextAssignedPublisherConfig> nextAssignedConfigOption,
             ILogger<IMaterialProvider> logger) : base(unitOfWorkFactory)
         {
@@ -82,6 +88,8 @@ namespace IIS.Services.Materials
             _connection = connection;
             _nextAssignedConfig = nextAssignedConfigOption.Value;
             _logger = logger;
+            _securityLevelChecker = securityLevelChecker;
+            _forbiddenEntityReplacer = forbiddenEntityReplacer;
         }
 
         public async Task<MaterialsDto> GetMaterialsAsync(
@@ -135,7 +143,7 @@ namespace IIS.Services.Materials
             {
                 throw new ArgumentException($"{FrontEndErrorCodes.NotFound}:Матеріал не знайдено");
             }
-            return _materialDocumentMapper.Map(entity, user.Id);
+            return _materialDocumentMapper.Map(entity, user);
         }
 
         public async Task<Material[]> GetMaterialsByIdsAsync(ISet<Guid> ids, User user)
@@ -146,6 +154,19 @@ namespace IIS.Services.Materials
 
             return documentCollection
                     .Select(_ => _materialDocumentMapper.Map(_))
+                    .Select(material =>
+                    {
+                        var materialSecurityLevelIndexes = material.SecurityLevels.Select(_ => _.UniqueIndex).ToList();
+                        var isAllowed = _securityLevelChecker.AccessGranted(user.SecurityLevelsIndexes, materialSecurityLevelIndexes);
+
+                        if (isAllowed) material.AccessAllowed = true;
+
+                        _forbiddenEntityReplacer.Replace(material.RelatedEventCollection, user);
+                        _forbiddenEntityReplacer.Replace(material.RelatedObjectCollection, user);
+                        _forbiddenEntityReplacer.Replace(material.RelatedSignCollection, user);
+
+                        return material;
+                    })
                     .ToArray();
         }
 
@@ -301,7 +322,8 @@ namespace IIS.Services.Materials
             return MaterialsDto.Create(materials, searchResult.Count, searchResult.Items, searchResult.Aggregations);
         }
 
-        public async Task<MaterialsDto> GetMaterialsCommonForEntitiesAsync(Guid userId,
+        public async Task<MaterialsDto> GetMaterialsCommonForEntitiesAsync(
+            Guid userId,
             IEnumerable<Guid> nodeIdList,
             bool includeDescendants,
             string suggestion,
@@ -361,41 +383,6 @@ namespace IIS.Services.Materials
             };
         }
 
-        private IReadOnlyCollection<Guid> GetDescendantsByGivenRelationTypeNameList(IReadOnlyCollection<Guid> entityIdList, IReadOnlyCollection<string> relationTypeNameList)
-        {
-            var result = new List<Guid>();
-
-            var tempValues = entityIdList.ToList();
-
-            while (tempValues.Any())
-            {
-                var relationList = _ontologyData.GetIncomingRelations(tempValues, relationTypeNameList);
-
-                tempValues = relationList
-                            .Select(e => e.SourceNodeId)
-                            .ToList();
-
-                result.AddRange(tempValues);
-            }
-            return result.AsReadOnly();
-        }
-
-        private Task<IReadOnlyCollection<MaterialEntity>> GetMaterialCollectionByNodeIdAsync(Guid nodeId, bool includeRelatedEntities)
-        {
-            var nodeIdList = new List<Guid> { nodeId };
-
-            if (includeRelatedEntities)
-            {
-                var featureIdCollection = _ontologyService.GetObjectFeatureRelationCollection(nodeIdList)
-                                            .Select(e => e.FeatureId)
-                                            .ToArray();
-
-                nodeIdList.AddRange(featureIdCollection);
-            }
-
-            return RunWithoutCommitAsync(uow => uow.MaterialRepository.GetMaterialCollectionByNodeIdAsync(nodeIdList, MaterialIncludeEnum.WithChildren, MaterialIncludeEnum.WithFeatures, MaterialIncludeEnum.WithFiles));
-        }
-
         public async Task<IReadOnlyCollection<LocationHistoryDto>> GetLocationHistoriesAsync(Guid materialId)
         {
             var entity = await RunWithoutCommitAsync(uow => uow.MaterialRepository.GetByIdAsync(materialId, MaterialIncludeEnum.WithFeatures));
@@ -450,5 +437,41 @@ namespace IIS.Services.Materials
         public Task<IReadOnlyList<ResCallerReceiverDto>> GetCallInfoAsync(IReadOnlyList<Guid> nodeIds, CancellationToken cancellationToken = default) =>
             RunWithoutCommitAsync((unitOfWork) =>
                 unitOfWork.MaterialRepository.GetCallInfoAsync(nodeIds, cancellationToken));
+
+        private IReadOnlyCollection<Guid> GetDescendantsByGivenRelationTypeNameList(
+            IReadOnlyCollection<Guid> entityIdList, IReadOnlyCollection<string> relationTypeNameList)
+        {
+            var result = new List<Guid>();
+
+            var tempValues = entityIdList.ToList();
+
+            while (tempValues.Any())
+            {
+                var relationList = _ontologyData.GetIncomingRelations(tempValues, relationTypeNameList);
+
+                tempValues = relationList
+                    .Select(e => e.SourceNodeId)
+                    .ToList();
+
+                result.AddRange(tempValues);
+            }
+            return result.AsReadOnly();
+        }
+
+        private Task<IReadOnlyCollection<MaterialEntity>> GetMaterialCollectionByNodeIdAsync(Guid nodeId, bool includeRelatedEntities)
+        {
+            var nodeIdList = new List<Guid> { nodeId };
+
+            if (includeRelatedEntities)
+            {
+                var featureIdCollection = _ontologyService.GetObjectFeatureRelationCollection(nodeIdList)
+                    .Select(e => e.FeatureId)
+                    .ToArray();
+
+                nodeIdList.AddRange(featureIdCollection);
+            }
+
+            return RunWithoutCommitAsync(uow => uow.MaterialRepository.GetMaterialCollectionByNodeIdAsync(nodeIdList, MaterialIncludeEnum.WithChildren, MaterialIncludeEnum.WithFeatures, MaterialIncludeEnum.WithFiles));
+        }
     }
 }

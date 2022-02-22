@@ -8,6 +8,7 @@ namespace Iis.Domain.Materials
         public string NodeType { get; set; }
         public string RelationType { get; set; }
         public string RelationCreatingType { get; set; }
+        public bool AccessAllowed { get; set; }
     }
 
     public class RelatedObjectOfStudy : RelatedObject
