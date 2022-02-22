@@ -195,13 +195,12 @@ namespace Iis.Api.Materials.Handlers
                         throw new InvalidOperationException($"We received message from wrong exchange. Expected:{config.ExchangeName}. Received:{args.Exchange}");
                     }
 
-                    if (args.Body.LongLength == 0)
+                    if (args.Body.Span.Length == 0)
                     {
                         throw new InvalidOperationException($"We received empty message.");
                     }
 
-
-                    var message = BodyToObject<MaterialProcessingEventMessage>(args.Body, options);
+                    var message = BodyToObject<MaterialProcessingEventMessage>(args.Body.Span, options);
 
                     await handler(message);
 
@@ -245,7 +244,7 @@ namespace Iis.Api.Materials.Handlers
             }
         }
 
-        private static T BodyToObject<T>(byte[] jsonBytes, JsonSerializerOptions deserializationOptions = null)
+        private static T BodyToObject<T>(ReadOnlySpan<byte> jsonBytes, JsonSerializerOptions deserializationOptions = null)
         {
             var json = Encoding.UTF8.GetString(jsonBytes);
 

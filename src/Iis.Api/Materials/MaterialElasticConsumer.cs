@@ -71,7 +71,7 @@ namespace Iis.Api.Materials
 
                     if (getResult != null)
                     {
-                        var message = GetEventMessage(getResult.Body);
+                        var message = GetEventMessage(getResult.Body.Span);
 
                         _channel.BasicAck(getResult.DeliveryTag, false);
 
@@ -104,9 +104,9 @@ namespace Iis.Api.Materials
             }
         }
 
-        private MaterialProcessingEventMessage GetEventMessage(byte[] messageBody)
+        private MaterialProcessingEventMessage GetEventMessage(ReadOnlySpan<byte> messageBody)
         {
-            if (messageBody is null || messageBody.Length == 0) return default(MaterialProcessingEventMessage);
+            if (messageBody.Length == 0) return default(MaterialProcessingEventMessage);
 
             var messageBodyString = Encoding.UTF8.GetString(messageBody);
 

@@ -111,6 +111,8 @@ namespace IIS.Core.GraphQL.Materials
 
             var material = await materialProvider.GetNextAssignedMaterialForUserAsync(tokenPayload.User, context.RequestAborted);
 
+            if (material is null) return null;
+
             var result = mapper.Map<Material>(material);
 
             var locationDtoList = await materialProvider.GetLocationHistoriesAsync(result.Id);

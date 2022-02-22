@@ -74,7 +74,7 @@ namespace Iis.EventMaterialAutoAssignment
                             .Select(p => new { p.Keywords, p.Id })
                             .ToArrayAsync();
 
-                        var json = Encoding.UTF8.GetString(args.Body);
+                        var json = Encoding.UTF8.GetString(args.Body.Span);
                         var materialIds = JsonConvert.DeserializeObject<List<Guid>>(json);
 
                         foreach (var config in configs)
