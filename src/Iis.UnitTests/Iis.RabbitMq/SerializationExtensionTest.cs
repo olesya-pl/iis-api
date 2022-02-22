@@ -19,21 +19,14 @@ namespace Iis.UnitTests.Iis.RabbitMq
         {
             (null as object).ToByteArray()
                 .Should()
-                .BeNull();
-        }
-
-        [Fact]
-        public void ToObject_NullByteArrayReturnsDefaultOfType()
-        {
-            (null as byte[]).ToObject<object>()
-                .Should()
-                .BeNull();
+                .BeEquivalentTo(ReadOnlyMemory<byte>.Empty);
         }
 
         [Fact]
         public void ToObject_EmptyByteArrayReturnsDefaultOfType()
         {
-            Array.Empty<byte>().ToObject<object>()
+            ReadOnlyMemory<byte>.Empty.
+            ToObject<object>()
                 .Should()
                 .BeNull();
         }
@@ -44,7 +37,7 @@ namespace Iis.UnitTests.Iis.RabbitMq
             var actual = new MessageType { Name = "user", Type = "userType" };
             var expected = Encoding.UTF8.GetBytes("{\"Name\":\"user\",\"Type\":\"userType\"}");
 
-            actual.ToByteArray()
+            actual.ToByteArray().ToArray()
                 .Should().BeEquivalentTo(expected);
         }
 
@@ -55,14 +48,14 @@ namespace Iis.UnitTests.Iis.RabbitMq
             var expected = Encoding.UTF8.GetBytes("{\"name\":\"user\",\"type\":\"userType\"}");
             var options = new JsonSerializerOptions(JsonSerializerDefaults.Web);
 
-            actual.ToByteArray(options)
-                .Should().BeEquivalentTo(expected);
+            actual.ToByteArray(options).ToArray().
+                Should().BeEquivalentTo(expected);
         }
 
         [Fact]
         public void ToObject_ByteArrayReturnsSuccess()
         {
-            var actual = Encoding.UTF8.GetBytes("{\"Name\":\"user\",\"Type\":\"userType\"}");
+            var actual = new ReadOnlyMemory<byte>(Encoding.UTF8.GetBytes("{\"Name\":\"user\",\"Type\":\"userType\"}"));
 
             var expected = new MessageType { Name = "user", Type = "userType" };
 
@@ -72,7 +65,7 @@ namespace Iis.UnitTests.Iis.RabbitMq
         [Fact]
         public void ToObject_ByteArrayJsonWebOptionsReturnsSuccess()
         {
-            var actual = Encoding.UTF8.GetBytes("{\"name\":\"user\",\"type\":\"userType\"}");
+            var actual = new ReadOnlyMemory<byte>(Encoding.UTF8.GetBytes("{\"name\":\"user\",\"type\":\"userType\"}"));
 
             var options = new JsonSerializerOptions(JsonSerializerDefaults.Web);
 

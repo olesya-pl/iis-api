@@ -1,3 +1,4 @@
+using System;
 using System.Text;
 using System.Text.Json;
 
@@ -7,28 +8,28 @@ namespace Iis.RabbitMq.Helpers
     {
         public static JsonSerializerOptions DefaultJsonSerializerOptions => new JsonSerializerOptions(JsonSerializerDefaults.Web);
 
-        public static byte[] ToByteArray<T>(this T value, JsonSerializerOptions options = null)
+        public static ReadOnlyMemory<byte> ToByteArray<T>(this T value, JsonSerializerOptions options = null)
         {
             if (value is null) return default(byte[]);
 
             var json = JsonSerializer.Serialize<T>(value, options);
 
-            return Encoding.UTF8.GetBytes(json);
+            return new ReadOnlyMemory<byte>(Encoding.UTF8.GetBytes(json));
         }
 
-        public static T ToObject<T>(this byte[] value, JsonSerializerOptions options = null)
+        public static T ToObject<T>(this ReadOnlyMemory<byte> value, JsonSerializerOptions options = null)
         {
-            if (value is null || value.Length == 0) return default(T);
+            if (value.Length == 0) return default(T);
 
-            var jsonString = Encoding.UTF8.GetString(value);
+            var jsonString = Encoding.UTF8.GetString(value.Span);
 
             return JsonSerializer.Deserialize<T>(jsonString, options);
         }
-        public static string ToText(this byte[] value)
+        public static string ToText(this ReadOnlyMemory<byte> value)
         {
-            if (value is null || value.Length == 0) return null;
+            if (value.Length == 0) return null;
 
-            return Encoding.UTF8.GetString(value);
+            return Encoding.UTF8.GetString(value.Span);
         }
     }
 }

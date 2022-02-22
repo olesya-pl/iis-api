@@ -81,7 +81,7 @@ namespace Iis.EventMaterialAutoAssignment
                         var nodeMaterialRelationService = scope.ServiceProvider.GetRequiredService<NodeMaterialRelationService<IIISUnitOfWork>>();
                         var createEntityService = scope.ServiceProvider.GetRequiredService<CreateEntityService>();
 
-                        var json = Encoding.UTF8.GetString(args.Body);
+                        var json = Encoding.UTF8.GetString(args.Body.Span);
                         var message = JsonConvert.DeserializeObject<FoundMaterialMessage>(json);
 
                         var config = await GetAssignmentConfigById(context, message);
