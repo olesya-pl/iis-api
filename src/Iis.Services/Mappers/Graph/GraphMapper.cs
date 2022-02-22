@@ -1,11 +1,14 @@
 using System;
 using System.Linq;
 using System.Collections.Generic;
+using Iis.Domain;
 using Newtonsoft.Json.Linq;
 using Iis.Utility;
 using Iis.Domain.Graph;
 using Iis.Domain.Materials;
+using Iis.Domain.Users;
 using Iis.Interfaces.Ontology.Data;
+using Iis.Interfaces.SecurityLevels;
 
 namespace Iis.Services.Mappers.Graph
 {
@@ -70,7 +73,7 @@ namespace Iis.Services.Mappers.Graph
             };
         }
 
-        public static GraphNode MapNodeToGraphNode(INode node, IReadOnlyCollection<Guid> exclusionNodeIdList)
+        public static GraphNode MapNodeToGraphNode(INode node, IReadOnlyCollection<Guid> exclusionNodeIdList, ISecurityLevelChecker securityLevelChecker, IOntologyService ontologyService, User user)
         {
             if (node is null) return null;
 
@@ -83,6 +86,7 @@ namespace Iis.Services.Mappers.Graph
             extraObject.Add(GraphTypeExtraPropNames.ImportanceCode, GetGraphNodeImportanceProperty(node));
             extraObject.Add(GraphTypeExtraPropNames.IconName, GetGraphNodeIconNameProperty(node));
             extraObject.Add(GraphTypeExtraPropNames.PhotoUrl, GetGraphNodePhotoUrl(node));
+            extraObject.Add(GraphTypeExtraPropNames.AccessAllowed, IsAllowedEntityForUser(node.Id, securityLevelChecker, ontologyService, user));
 
             return new GraphNode
             {
@@ -91,7 +95,7 @@ namespace Iis.Services.Mappers.Graph
             };
         }
 
-        public static GraphNode MapMaterialToGraphNode(Material material, bool? hasLinks = null, Guid fromNodeId = default)
+        public static GraphNode MapMaterialToGraphNode(Material material, ISecurityLevelChecker securityLevelChecker, IOntologyService ontologyService, User user, bool? hasLinks = null, Guid fromNodeId = default)
         {
             if (material is null) return null;
 
@@ -109,6 +113,7 @@ namespace Iis.Services.Mappers.Graph
             extraObject.Add(GraphTypeExtraPropNames.ImportanceCode, null);
             extraObject.Add(GraphTypeExtraPropNames.IconName, material.Type);
             extraObject.Add(GraphTypeExtraPropNames.MetaData, metaDataObject);
+            extraObject.Add(GraphTypeExtraPropNames.AccessAllowed, IsAllowedMaterialForUser(material, securityLevelChecker, user));
 
             return new GraphNode
             {
@@ -197,5 +202,19 @@ namespace Iis.Services.Mappers.Graph
             { IsObjectSign: true } => GraphNodeNodeTypeNames.Sign,
             _ => $"related{node.NodeType.Name}"
         };
+
+        private static bool IsAllowedEntityForUser(Guid id, ISecurityLevelChecker securityLevelChecker, IOntologyService ontologyService, User user)
+        {
+            return securityLevelChecker.AccessGranted(
+                user.SecurityLevelsIndexes,
+                ontologyService.GetNode(id).OriginalNode.GetSecurityLevelIndexes());
+        }
+
+        private static bool IsAllowedMaterialForUser(Material material, ISecurityLevelChecker securityLevelChecker, User user)
+        {
+            var materialSecurityLevelIndexes = material.SecurityLevels.Select(_ => _.UniqueIndex).ToList();
+
+            return securityLevelChecker.AccessGranted(user.SecurityLevelsIndexes, materialSecurityLevelIndexes);
+        }
     }
 }

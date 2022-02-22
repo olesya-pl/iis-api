@@ -79,9 +79,9 @@ namespace IIS.Core.GraphQL.Materials
             ChangeAssigneeAggregations(materialsResult.Aggregations, tokenPayload.UserId);
             var materials = materialsResult.Materials.Select(m => mapper.Map<Material>(m)).ToList();
             MapHighlights(materials, materialsResult.Highlights);
-            
+
             var checkedMaterials = ReplaceForbiddenMaterialsForUser(materials, tokenPayload, securityLevelChecker);
-            
+
             return (checkedMaterials, materialsResult.Aggregations, materialsResult.Count);
         }
 
@@ -168,7 +168,7 @@ namespace IIS.Core.GraphQL.Materials
             var materialCollectionResult = await materialProvider.GetMaterialsByNodeIdAsync(nodeId, tokenPayload.UserId, ctx.RequestAborted);
 
             var mappedMaterialCollection = mapper.Map<Material[]>(materialCollectionResult.Items);
-            
+
             var securityCheckedMaterialCollection = ReplaceForbiddenMaterialsForUser(mappedMaterialCollection, tokenPayload, securityLevelChecker);
 
             return (securityCheckedMaterialCollection, materialCollectionResult.Count);
@@ -290,15 +290,16 @@ namespace IIS.Core.GraphQL.Materials
                 ? value
                 : default(RelationsState?);
 
-        private static IEnumerable<Material> ReplaceForbiddenMaterialsForUser(IEnumerable<Material> materialCollection,
-            TokenPayload tokenPayload, ISecurityLevelChecker securityLevelChecker)
+        private static IEnumerable<Material> ReplaceForbiddenMaterialsForUser(
+            IEnumerable<Material> materialCollection, TokenPayload tokenPayload, ISecurityLevelChecker securityLevelChecker)
         {
             return materialCollection
                 .Select(material =>
                     {
                         var materialSecurityLevelIndexes = material.SecurityLevels.Select(_ => _.UniqueIndex).ToList();
-                        
-                        material.AccessAllowed = securityLevelChecker.AccessGranted(tokenPayload.User.SecurityLevelsIndexes,
+
+                        material.AccessAllowed = securityLevelChecker.AccessGranted(
+                            tokenPayload.User.SecurityLevelsIndexes,
                             materialSecurityLevelIndexes);
 
                         return material.AccessAllowed ? material : EmptyMaterial;

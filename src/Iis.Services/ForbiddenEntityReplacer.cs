@@ -35,7 +35,8 @@ namespace Iis.Services
 
         private bool IsAllowedEntityForUser(Guid id, User user)
         {
-            return _securityLevelChecker.AccessGranted(user.SecurityLevelsIndexes,
+            return _securityLevelChecker.AccessGranted(
+                user.SecurityLevelsIndexes,
                 _ontologyService.GetNode(id).OriginalNode.GetSecurityLevelIndexes());
         }
     }
