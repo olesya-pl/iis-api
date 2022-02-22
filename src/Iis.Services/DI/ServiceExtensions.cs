@@ -33,6 +33,7 @@ namespace Iis.Services.DI
             services.AddTransient<INodeSaveService, NodeSaveService>();
             services.AddTransient<IMaterialDistributionService, MaterialDistributionService>();
             services.AddTransient<MaterialDocumentMapper>();
+            services.AddTransient<ForbiddenEntityReplacer>();
 
             return services;
         }

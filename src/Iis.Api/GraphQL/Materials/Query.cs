@@ -17,16 +17,20 @@ using Newtonsoft.Json.Linq;
 using IIS.Services.Contracts.Materials;
 using Iis.Domain.Materials;
 using Iis.Interfaces.Common;
+using Iis.Interfaces.SecurityLevels;
 
 namespace IIS.Core.GraphQL.Materials
 {
     public class Query
     {
+        private static readonly Material EmptyMaterial = Material.CreateEmptyMaterial();
+
         [GraphQLType(typeof(AggregatedMaterialCollection))]
         public async Task<(IEnumerable<Material> materials, Dictionary<string, AggregationItem> aggregations, int totalCount)> GetMaterials(
             IResolverContext ctx,
             [Service] IMaterialProvider materialProvider,
             [Service] IMapper mapper,
+            [Service] ISecurityLevelChecker securityLevelChecker,
             [GraphQLNonNullType] PaginationInput pagination,
             MaterialsFilterInput filter,
             SortingInput sorting,
@@ -75,7 +79,10 @@ namespace IIS.Core.GraphQL.Materials
             ChangeAssigneeAggregations(materialsResult.Aggregations, tokenPayload.UserId);
             var materials = materialsResult.Materials.Select(m => mapper.Map<Material>(m)).ToList();
             MapHighlights(materials, materialsResult.Highlights);
-            return (materials, materialsResult.Aggregations, materialsResult.Count);
+
+            var checkedMaterials = ReplaceForbiddenMaterialsForUser(materials, tokenPayload, securityLevelChecker);
+
+            return (checkedMaterials, materialsResult.Aggregations, materialsResult.Count);
         }
 
         public async Task<Material> GetMaterial(
@@ -153,6 +160,7 @@ namespace IIS.Core.GraphQL.Materials
             IResolverContext ctx,
             [Service] IMaterialProvider materialProvider,
             [Service] IMapper mapper,
+            [Service] ISecurityLevelChecker securityLevelChecker,
             Guid nodeId)
         {
             var tokenPayload = ctx.GetToken();
@@ -161,23 +169,9 @@ namespace IIS.Core.GraphQL.Materials
 
             var mappedMaterialCollection = mapper.Map<Material[]>(materialCollectionResult.Items);
 
-            return (mappedMaterialCollection, materialCollectionResult.Count);
-        }
+            var securityCheckedMaterialCollection = ReplaceForbiddenMaterialsForUser(mappedMaterialCollection, tokenPayload, securityLevelChecker);
 
-        [GraphQLType(typeof(MaterialCollection))]
-        public async Task<(IEnumerable<Material> materials, int totalCount)> GetRelatedMaterialsByEventId(
-            IResolverContext ctx,
-            [Service] IMaterialProvider materialProvider,
-            [Service] IMapper mapper,
-            Guid nodeId)
-        {
-            var tokenPayload = ctx.GetToken();
-
-            var materialCollectionResult = await materialProvider.GetMaterialsByNodeIdAsync(nodeId, tokenPayload.UserId, ctx.RequestAborted);
-
-            var mappedMaterialCollection = mapper.Map<Material[]>(materialCollectionResult.Items);
-
-            return (mappedMaterialCollection, materialCollectionResult.Count);
+            return (securityCheckedMaterialCollection, materialCollectionResult.Count);
         }
 
         public async Task<List<MaterialsCountByType>> CountMaterialsByTypeAndNodeAsync(
@@ -295,5 +289,21 @@ namespace IIS.Core.GraphQL.Materials
                 && Enum.TryParse<RelationsState>(relationsState.Trim(), true, out var value)
                 ? value
                 : default(RelationsState?);
+
+        private static IEnumerable<Material> ReplaceForbiddenMaterialsForUser(
+            IEnumerable<Material> materialCollection, TokenPayload tokenPayload, ISecurityLevelChecker securityLevelChecker)
+        {
+            return materialCollection
+                .Select(material =>
+                    {
+                        var materialSecurityLevelIndexes = material.SecurityLevels.Select(_ => _.UniqueIndex).ToList();
+
+                        material.AccessAllowed = securityLevelChecker.AccessGranted(
+                            tokenPayload.User.SecurityLevelsIndexes,
+                            materialSecurityLevelIndexes);
+
+                        return material.AccessAllowed ? material : EmptyMaterial;
+                    });
+        }
     }
 }

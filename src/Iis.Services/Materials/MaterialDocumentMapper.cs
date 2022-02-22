@@ -21,6 +21,7 @@ namespace IIS.Services.Materials
         private readonly IOntologyService _ontologyService;
         private readonly IOntologySchema _ontologySchema;
         private readonly NodeToJObjectMapper _nodeToJObjectMapper;
+        private readonly ForbiddenEntityReplacer _forbiddenEntityReplacer;
         private readonly ISecurityLevelChecker _securityLevelChecker;
 
         public MaterialDocumentMapper(
@@ -28,12 +29,14 @@ namespace IIS.Services.Materials
             IOntologySchema ontologySchema,
             IOntologyService ontologyService,
             NodeToJObjectMapper nodeToJObjectMapper,
+            ForbiddenEntityReplacer forbiddenEntityReplacer,
             ISecurityLevelChecker securityLevelChecker)
         {
             _mapper = mapper;
             _ontologyService = ontologyService;
             _ontologySchema = ontologySchema;
             _nodeToJObjectMapper = nodeToJObjectMapper;
+            _forbiddenEntityReplacer = forbiddenEntityReplacer;
             _securityLevelChecker = securityLevelChecker;
         }
 
@@ -66,13 +69,16 @@ namespace IIS.Services.Materials
             return material;
         }
 
-        public Material Map(MaterialDocument document, Guid userId)
+        public Material Map(MaterialDocument document, User user)
         {
             var material = Map(document);
 
-            material.CanBeEdited = document.ProcessedStatus.Id == MaterialEntity.ProcessingStatusProcessingSignId
-                ? (document.Editor == null || document.Editor.Id == userId)
-                : true;
+            material.CanBeEdited = document.ProcessedStatus.Id != MaterialEntity.ProcessingStatusProcessingSignId
+                                   || (document.Editor == null || document.Editor.Id == user.Id);
+
+            _forbiddenEntityReplacer.Replace(material.RelatedEventCollection, user);
+            _forbiddenEntityReplacer.Replace(material.RelatedObjectCollection, user);
+            _forbiddenEntityReplacer.Replace(material.RelatedSignCollection, user);
 
             return material;
         }
@@ -173,11 +179,7 @@ namespace IIS.Services.Materials
 
         private IReadOnlyCollection<Material> MapChildren(MaterialEntity material)
         {
-            if (material.Children == null)
-            {
-                return Array.Empty<Material>();
-            }
-            return material.Children.Select(child => Map(child)).ToArray();
+            return material.Children == null ? Array.Empty<Material>() : material.Children.Select(child => Map(child)).ToArray();
         }
 
         private MaterialInfo Map(MaterialInfoEntity info)

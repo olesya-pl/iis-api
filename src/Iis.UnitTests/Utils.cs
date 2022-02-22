@@ -47,11 +47,7 @@ namespace Iis.UnitTests
     public class AutoMoqDataAttribute : AutoDataAttribute
     {
         public AutoMoqDataAttribute()
-            : base(() => {
-                return new Fixture().Customize(new AutoMoqCustomization());
-            }
-
-            )
+            : base(() => new Fixture().Customize(new AutoMoqCustomization()))
         { }
     }
 

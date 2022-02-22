@@ -120,7 +120,8 @@ namespace Iis.Services
 
         public Task CreateReportIndexWithMappingsAsync(CancellationToken cancellationToken = default)
         {
-            var mappingConfiguration = new ElasticMappingConfiguration(new List<ElasticMappingProperty> {
+            var mappingConfiguration = new ElasticMappingConfiguration(new List<ElasticMappingProperty>
+            {
                 KeywordProperty.Create(nameof(ReportEntity.Id), false),
                 TextProperty.Create(nameof(ReportEntity.Recipient), true),
                 TextProperty.Create(nameof(ReportEntity.Title), true),
