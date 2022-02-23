@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Iis.MaterialDistributor.Contracts.Services.DataTypes
+namespace Iis.MaterialDistributor.Contracts.Services
 {
     public class MaterialPermanentCoefficient
     {

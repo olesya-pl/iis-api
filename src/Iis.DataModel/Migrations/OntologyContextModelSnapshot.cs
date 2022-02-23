@@ -1203,6 +1203,9 @@ namespace Iis.DataModel.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
+                    b.Property<short?>("MaterialChannelCoefficient")
+                        .HasColumnType("smallint");
+
                     b.Property<Guid>("RoleId")
                         .HasColumnType("uuid");
 

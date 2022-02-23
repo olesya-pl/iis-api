@@ -1,5 +1,5 @@
 ﻿using Iis.Interfaces.Constants;
-using Iis.MaterialDistributor.Contracts.Services.DataTypes;
+using Iis.MaterialDistributor.Contracts.Services;
 
 namespace Iis.MaterialDistributor.Services
 {

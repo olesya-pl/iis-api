@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using Iis.MaterialDistributor.Contracts.Services;
-using Iis.MaterialDistributor.Contracts.Services.DataTypes;
 using Iis.MaterialDistributor.DataModel.Entities;
 
 namespace Iis.MaterialDistributor.Services

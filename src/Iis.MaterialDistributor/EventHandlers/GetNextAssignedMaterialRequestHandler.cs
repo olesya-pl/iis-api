@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using MediatR;
 using Iis.MaterialDistributor.Contracts.Events;
 using Iis.MaterialDistributor.Contracts.DataStorage;
-using Iis.MaterialDistributor.DataStorage;
+using Iis.MaterialDistributor.Contracts.Services;
 
 namespace Iis.MaterialDistributor.MediatR.EventHandlers
 {

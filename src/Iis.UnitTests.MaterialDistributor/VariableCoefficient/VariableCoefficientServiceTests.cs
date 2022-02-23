@@ -36,7 +36,7 @@ namespace Iis.UnitTests.MaterialDistributor
         }
 
         [Fact]
-        public async Task GetVariableСoefficientWithMaxOffsetHoursAsync_Success()
+        public async Task GetVariableCoefficientWithMaxOffsetHoursAsync_Success()
         {
             _coefficientEntityCollection.Add(new VariableCoefficientEntity { Id = Guid.NewGuid(), OffsetHours = 0, Coefficient = 100 });
             _coefficientEntityCollection.Add(new VariableCoefficientEntity { Id = Guid.NewGuid(), OffsetHours = 5, Coefficient = 75 });
@@ -71,7 +71,7 @@ namespace Iis.UnitTests.MaterialDistributor
         [InlineData(00, 50, 10)]
         [InlineData(00, 10, 0)]
         [InlineData(00, 01, 0)]
-        public async Task SetVariableСoefficientForMaterialCollectionAsync_Success(int hour, int minute, int expected)
+        public async Task SetVariableCoefficientForMaterialCollectionAsync_Success(int hour, int minute, int expected)
         {
             _coefficientEntityCollection.Add(new VariableCoefficientEntity { Id = Guid.NewGuid(), OffsetHours = 0, Coefficient = 100 });
             _coefficientEntityCollection.Add(new VariableCoefficientEntity { Id = Guid.NewGuid(), OffsetHours = 5, Coefficient = 75 });

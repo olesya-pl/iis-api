@@ -1,7 +1,7 @@
 ﻿using Iis.Messages.Materials;
 using Newtonsoft.Json.Linq;
 
-namespace Iis.MaterialDistributor.Contracts.Services.DataTypes
+namespace Iis.MaterialDistributor.Contracts.Services
 {
     public class MaterialInfo
     {

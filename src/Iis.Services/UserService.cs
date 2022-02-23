@@ -1,10 +1,14 @@
 ﻿using System;
+using System.Text;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Collections.Generic;
+using System.Security.Cryptography;
+using System.Security.Authentication;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using AutoMapper;
 using Iis.DataModel;
 using Iis.DataModel.Materials;
@@ -17,11 +21,7 @@ using IIS.Repository;
 using IIS.Repository.Factories;
 using Iis.Services.Contracts.Enums;
 using Iis.Domain.Users;
-using Microsoft.Extensions.Configuration;
-using System.Security.Authentication;
 using Iis.Interfaces.Users;
-using System.Security.Cryptography;
-using System.Text;
 using Iis.Services.Contracts.Materials.Distribution;
 using Iis.Services.Contracts.Extensions;
 using Microsoft.Extensions.Logging;
@@ -34,6 +34,7 @@ namespace Iis.Services
     public class UserService<TUnitOfWork> : BaseService<TUnitOfWork>, IUserService where TUnitOfWork : IIISUnitOfWork
     {
         private const string DefaultRoleName = "Користувач";
+        private const short DefaultMaterialChannelCoefficient = 2;
 
         private readonly ILogger<UserService<TUnitOfWork>> _logger;
         private readonly OntologyContext _context;
@@ -312,9 +313,19 @@ namespace Iis.Services
 
         public async Task PutAllUsersToElasticSearchAsync(CancellationToken cancellationToken)
         {
-            var users = await RunWithoutCommitAsync(uowfactory => uowfactory.UserRepository.GetAllUsersAsync(cancellationToken));
+            var usersTask = RunWithoutCommitAsync(_ => _.UserRepository.GetAllUsersAsync(cancellationToken));
 
-            var elasticUsers = users.Select(GetElasticUser).ToList();
+            var materialChannelMappingsTask = RunWithoutCommitAsync(_ => _.UserRepository.GetAllMaterialChannelMappingAsync(cancellationToken));
+
+            await Task.WhenAll(usersTask, materialChannelMappingsTask);
+
+            var users = await usersTask;
+
+            var materialChannelMappings = await materialChannelMappingsTask;
+
+            var elasticUsers = users
+                                .Select(_ => GetElasticUser(_, materialChannelMappings))
+                                .ToArray();
 
             await _userElasticService.SaveAllUsersAsync(elasticUsers, cancellationToken);
         }
@@ -498,6 +509,22 @@ namespace Iis.Services
             await PutUserToElasticSearchAsync(userEntity.Id, cancellationToken);
         }
 
+        private static IReadOnlyList<ElasticUserChannelDto> GetUserChannels(IReadOnlyList<UserRoleEntity> userRoles, IReadOnlyList<MaterialChannelMappingEntity> materialChannelMappings)
+        {
+            if (userRoles is null || !userRoles.Any()) return Array.Empty<ElasticUserChannelDto>();
+
+            return userRoles
+                        .Join(
+                        materialChannelMappings,
+                        _ => _.RoleId,
+                        _ => _.RoleId,
+                        (ur, mcm) => new ElasticUserChannelDto
+                        {
+                            Channel = mcm.ChannelName,
+                            Coefficient = ur.MaterialChannelCoefficient ?? DefaultMaterialChannelCoefficient
+                        }).ToArray();
+        }
+
         private RoleEntity GetDefaultRole(IEnumerable<RoleEntity> roles)
         {
             var defaultRole = roles.SingleOrDefault(_ => _.Name == DefaultRoleName);
@@ -538,17 +565,23 @@ namespace Iis.Services
         private async Task PutUserToElasticSearchAsync(Guid id, CancellationToken cancellationToken)
         {
             var userEntity = await RunWithoutCommitAsync(uowfactory => uowfactory.UserRepository.GetByIdAsync(id, cancellationToken));
+
             await PutUserToElasticSearchAsync(userEntity, cancellationToken);
         }
 
         private async Task PutUserToElasticSearchAsync(UserEntity userEntity, CancellationToken cancellationToken)
         {
-            await _userElasticService.SaveUserAsync(GetElasticUser(userEntity), cancellationToken);
+            var materialChannelMappings = await RunWithoutCommitAsync(_ => _.UserRepository.GetAllMaterialChannelMappingAsync(cancellationToken));
+
+            await _userElasticService.SaveUserAsync(GetElasticUser(userEntity, materialChannelMappings), cancellationToken);
         }
 
-        private ElasticUserDto GetElasticUser(UserEntity userEntity)
+        private ElasticUserDto GetElasticUser(UserEntity userEntity, IReadOnlyList<MaterialChannelMappingEntity> materialChannelMappings)
         {
             var elasticUser = _mapper.Map<ElasticUserDto>(userEntity);
+
+            elasticUser.Metadata.Channels = GetUserChannels(userEntity.UserRoles, materialChannelMappings);
+
             if (userEntity.SecurityLevels != null)
             {
                 var securityLevelIndexes = userEntity.SecurityLevels.Select(_ => _.SecurityLevelIndex).ToList();
