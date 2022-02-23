@@ -29,8 +29,10 @@ namespace Iis.OntologyData.DataTypes
         internal OntologyNodesData AllData { get; set; }
         internal IRelation _relation { get; set; }
 
-        public IReadOnlyList<IRelation> GetDirectRelations() =>
-            AllData.Locker.ReadLock(() => _outgoingRelations.ToList());
+        public IReadOnlyList<IRelation> GetDirectRelations(string relationTypeName = null) =>
+            AllData.Locker.ReadLock(() => _outgoingRelations
+                .Where(_ => relationTypeName == null || _.Node.NodeType.Name == relationTypeName)
+                .ToList());
 
         public override string ToString() => $"{NodeType.Name} {Id}";
         public IReadOnlyList<IRelation> GetInversedRelations()

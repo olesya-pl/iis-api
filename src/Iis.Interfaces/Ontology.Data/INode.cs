@@ -15,7 +15,7 @@ namespace Iis.Interfaces.Ontology.Data
         IRelation Relation { get; }
 
         string Value { get; }
-        public IReadOnlyList<IRelation> GetDirectRelations();
+        public IReadOnlyList<IRelation> GetDirectRelations(string relationTypeName = null);
         public IReadOnlyList<IRelation> GetInversedRelations();
         IDotNameValues GetDotNameValues(bool showTitlesForSeparateObjects = false);
         INode GetChildNode(string childTypeName);

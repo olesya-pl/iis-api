@@ -28,6 +28,7 @@ using Microsoft.Extensions.Logging;
 using Iis.Services.Contracts.ExternalUserServices;
 using Iis.Interfaces.Elastic;
 using Iis.Interfaces.SecurityLevels;
+using Microsoft.AspNetCore.Http;
 
 namespace Iis.Services
 {

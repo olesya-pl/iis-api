@@ -88,6 +88,8 @@ using Prometheus;
 using Iis.Api.Metrics;
 using Iis.Interfaces.SecurityLevels;
 using Iis.Security.SecurityLevels;
+using Iis.Services.Contracts.Dtos;
+using Iis.Services.Ontology;
 
 namespace IIS.Core
 {
@@ -336,6 +338,8 @@ namespace IIS.Core
             services.AddSingleton<IDirectQueryFactory>(new DirectQueryFactory(System.IO.Path.GetDirectoryName(Assembly.GetEntryAssembly().Location)));
 
             services.AddMetrics();
+            services.AddTransient<IAuthTokenService, AuthTokenService>();
+            services.AddTransient<INodeJsonService, NodeJsonService>();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -421,19 +425,16 @@ namespace IIS.Core
             if (!publiclyAccesible.Contains(fieldNode.Name.Value))
             {
                 var httpContext = (HttpContext)context.ContextData["HttpContext"];
-                if (!httpContext.Request.Headers.TryGetValue("Authorization", out var token))
-                {
-                    throw new AuthenticationException("Requires \"Authorization\" header to contain a token");
-                }
 
                 var userService = context.Services.GetService<IUserService>();
+                var authTokenService = context.Services.GetService<IAuthTokenService>();
                 var graphQLAccessList = context.Services.GetService<GraphQLAccessList>();
 
                 var operationName = context.Request.OperationName ?? fieldNode.Name.Value;
 
                 var graphQLAccessItems = graphQLAccessList.GetAccessItem(operationName, context.Request.VariableValues);
 
-                var validatedToken = await TokenHelper.ValidateTokenAsync(token, Configuration, userService);
+                var validatedToken = await authTokenService.GetTokenPayloadAsync(httpContext.Request);
 
                 foreach (var graphQLAccessItem in graphQLAccessItems)
                 {

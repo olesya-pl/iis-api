@@ -6,6 +6,7 @@ namespace Iis.Services.Contracts.Ontology
 {
     public class GetEntityOptions
     {
-        public bool ReturnDummyIfNoAccess { get; set; }
+        public bool DummyIfNoAccess { get; set; }
+        public bool NullValues { get; set; }
     }
 }

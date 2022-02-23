@@ -13,20 +13,20 @@ namespace IIS.Core.GraphQL.Users
     public class LoginResolver
     {
         private readonly OntologyContext _context;
-        private IMapper _mapper;
-        private IUserService _userService;
-        private IConfiguration _configuration;
+        private readonly IMapper _mapper;
+        private readonly IUserService _userService;
+        private readonly IAuthTokenService _authTokenService;
 
         public LoginResolver(
-            IConfiguration configuration, 
-            OntologyContext context, 
-            IMapper mapper, 
-            IUserService userService)
+            OntologyContext context,
+            IMapper mapper,
+            IUserService userService,
+            IAuthTokenService authTokenService)
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
             _mapper = mapper;
             _userService = userService;
-            _configuration = configuration;
+            _authTokenService = authTokenService;
         }
 
         public async Task<LoginResponse> Login(
@@ -39,11 +39,12 @@ namespace IIS.Core.GraphQL.Users
             return new LoginResponse
             {
                 User = _mapper.Map<User>(user),
-                Token = TokenHelper.NewToken(_configuration, user.Id)
+                Token = _authTokenService.NewToken(user.Id)
             };
         }
 
-        public async Task<LoginResponse> RefreshToken(IResolverContext ctx) {
+        public async Task<LoginResponse> RefreshToken(IResolverContext ctx)
+        {
             var tokenPayload = ctx.GetToken();
 
             if (tokenPayload == null)
@@ -61,7 +62,7 @@ namespace IIS.Core.GraphQL.Users
             return new LoginResponse
             {
                 User = _mapper.Map<User>(user),
-                Token = TokenHelper.NewToken(_configuration, Guid.NewGuid())
+                Token = _authTokenService.NewToken(Guid.NewGuid())
             };
         }
     }

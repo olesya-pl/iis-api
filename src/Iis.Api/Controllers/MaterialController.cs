@@ -22,37 +22,35 @@ namespace Iis.Api.Controllers
         private readonly IConfiguration _configuration;
         private readonly IMaterialProvider _materialProvider;
         private readonly IMaterialService _materialService;
+        private readonly IAuthTokenService _authTokenService;
 
         public MaterialController(
             IUserService userService,
             IConfiguration configuration,
             IMaterialProvider materialProvider,
-            IMaterialService materialService)
+            IMaterialService materialService,
+            IAuthTokenService authTokenService)
         {
             _userService = userService;
             _configuration = configuration;
             _materialProvider = materialProvider;
             _materialService = materialService;
+            _authTokenService = authTokenService;
         }
 
         [HttpGet("GetAccess/{id}")]
         public async Task<IActionResult> GetAccess(Guid id)
         {
-            if (!Request.Headers.TryGetValue("Authorization", out var token))
-            {
-                throw new AuthenticationException("Requires \"Authorization\" header to contain a token");
-            }
+            var user = await _authTokenService.GetHttpRequestUserAsync(Request);
 
-            var tokenPayload = await TokenHelper.ValidateTokenAsync(token, _configuration, _userService);
-
-            if (await _materialProvider.GetMaterialAsync(id, tokenPayload.User) == null)
+            if (await _materialProvider.GetMaterialAsync(id, user) == null)
             {
                 return ValidationProblem("Material is not found");
             }
 
             var objectAccess = new ObjectAccess
             {
-                Commenting = tokenPayload.User.IsGranted(
+                Commenting = user.IsGranted(
                     AccessKind.Material,
                     AccessOperation.Commenting,
                     AccessCategory.Entity)

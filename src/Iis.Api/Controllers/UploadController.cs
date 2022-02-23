@@ -34,13 +34,15 @@ namespace Iis.Api.Controllers
         private readonly IUserService _userService;
         private readonly IConfiguration _configuration;
         private readonly ILogger<UploadController> _logger;
+        private readonly IAuthTokenService _authTokenService;
 
         public UploadController(IFileService fileService,
             IMaterialService materialService,
             UploadConfiguration uploadConfiguration,
             IUserService userService,
             IConfiguration configuration,
-            ILogger<UploadController> logger)
+            ILogger<UploadController> logger,
+            IAuthTokenService authTokenService)
         {
             _fileService = fileService;
             _materialService = materialService;
@@ -48,22 +50,18 @@ namespace Iis.Api.Controllers
             _userService = userService;
             _configuration = configuration;
             _logger = logger;
+            _authTokenService = authTokenService;
         }
 
         [HttpPost]
         [DisableRequestSizeLimit]
         public async Task<UploadResult> Post([FromForm] IFormFile file, [FromForm]string fileInfo,  CancellationToken ct)
         {
-            if (!Request.Headers.TryGetValue("Authorization", out var token))
-            {
-                throw new AuthenticationException("Requires \"Authorization\" header to contain a token");
-            }
-
-            var tokenPayload = await TokenHelper.ValidateTokenAsync(token, _configuration, _userService);
+            var user = await _authTokenService.GetHttpRequestUserAsync(Request);
 
             var input = JsonConvert.DeserializeObject<UploadInput>(fileInfo);
 
-            return await UploadSingleFile(file.OpenReadStream(), input, tokenPayload.User);
+            return await UploadSingleFile(file.OpenReadStream(), input, user);
         }
 
         private async Task<UploadResult> UploadSingleFile(Stream fileStream, UploadInput input, User user)

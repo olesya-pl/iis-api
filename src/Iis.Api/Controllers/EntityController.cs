@@ -22,18 +22,15 @@ namespace Iis.Api.Controllers
     {
         private readonly IOntologyService _ontologySerivice;
         private readonly IMediator _mediator;
-        private readonly IUserService _userService;
-        private readonly IConfiguration _configuration;
+        private readonly IAuthTokenService _authTokenService;
         public EntityController(
             IOntologyService ontologyService,
             IMediator mediator,
-            IUserService userService,
-            IConfiguration configuration)
+            IAuthTokenService authTokenService)
         {
             _ontologySerivice = ontologyService;
             _mediator = mediator;
-            _userService = userService;
-            _configuration = configuration;
+            _authTokenService = authTokenService;
         }
 
         [Authorize(AuthenticationSchemes = AuthenticationSchemeConstants.OntologyAuthenticationScheme)]
@@ -54,20 +51,15 @@ namespace Iis.Api.Controllers
         [HttpGet("GetAccess/{id}")]
         public async Task<IActionResult> GetAccess(Guid id)
         {
-            if (!Request.Headers.TryGetValue("Authorization", out var token))
-            {
-                throw new AuthenticationException("Requires \"Authorization\" header to contain a token");
-            }
-
-            var tokenPayload = await TokenHelper.ValidateTokenAsync(token, _configuration, _userService);
+            var user = await _authTokenService.GetHttpRequestUserAsync(Request);
 
             if (_ontologySerivice.GetNode(id) == null) return ValidationProblem("Entity is not found");
 
             var objectAccess = new ObjectAccess
             {
-                Commenting = tokenPayload.User.IsGranted(
-                    AccessKind.Entity, 
-                    AccessOperation.Commenting, 
+                Commenting = user.IsGranted(
+                    AccessKind.Entity,
+                    AccessOperation.Commenting,
                     AccessCategory.Entity)
             };
 
