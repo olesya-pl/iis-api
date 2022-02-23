@@ -1,13 +1,12 @@
 using System;
-using System.Security.Authentication;
 using System.Threading;
 using System.Threading.Tasks;
-using IIS.Core;
 using IIS.Core.Materials;
 using Iis.Interfaces.Roles;
 using Iis.Services.Contracts.Access;
 using Iis.Services.Contracts.Interfaces;
 using IIS.Services.Contracts.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
@@ -35,27 +34,21 @@ namespace Iis.Api.Controllers
             _materialService = materialService;
         }
 
+        [Authorize]
         [HttpGet("GetAccess/{id}")]
         public async Task<IActionResult> GetAccess(Guid id)
         {
-            if (!Request.Headers.TryGetValue("Authorization", out var token))
-            {
-                throw new AuthenticationException("Requires \"Authorization\" header to contain a token");
-            }
+            var user = await _userService.GetAuthenticatedUserAsync(HttpContext);
 
-            var tokenPayload = await TokenHelper.ValidateTokenAsync(token, _configuration, _userService);
-
-            if (await _materialProvider.GetMaterialAsync(id, tokenPayload.User) == null)
+            if (await _materialProvider.GetMaterialAsync(id, user) == null)
             {
                 return ValidationProblem("Material is not found");
             }
 
+            var isCommentingGranted = user.IsGranted(AccessKind.Material, AccessOperation.Commenting, AccessCategory.Entity);
             var objectAccess = new ObjectAccess
             {
-                Commenting = tokenPayload.User.IsGranted(
-                    AccessKind.Material,
-                    AccessOperation.Commenting,
-                    AccessCategory.Entity)
+                Commenting = isCommentingGranted
             };
 
             var json = JsonConvert.SerializeObject(objectAccess);

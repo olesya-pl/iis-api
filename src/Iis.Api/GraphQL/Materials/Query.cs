@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using AutoMapper;
 using HotChocolate;
@@ -18,6 +17,7 @@ using IIS.Services.Contracts.Materials;
 using Iis.Domain.Materials;
 using Iis.Interfaces.Common;
 using Iis.Interfaces.SecurityLevels;
+using Iis.Api.Authentication.OntologyJwtBearerAuthentication;
 
 namespace IIS.Core.GraphQL.Materials
 {

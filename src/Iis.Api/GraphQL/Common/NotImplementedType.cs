@@ -10,14 +10,19 @@ namespace IIS.Core.GraphQL.Common
             Description = "This field is not yet implemented. Don't even try querying it. Seriously.";
         }
 
-        public override Type ClrType => typeof(object);
+        public override Type RuntimeType => typeof(object);
 
         public override bool IsInstanceOfType(IValueNode literal)
         {
             throw new NotImplementedException();
         }
 
-        public override object ParseLiteral(IValueNode literal)
+        public override object ParseLiteral(IValueNode literal, bool withDefaults = true)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override IValueNode ParseResult(object resultValue)
         {
             throw new NotImplementedException();
         }

@@ -1,14 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Security.Authentication;
+using System.Security.Claims;
 using System.Security.Cryptography;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using AutoMapper;
 using Iis.DataModel;
 using Iis.DataModel.Materials;
@@ -23,16 +22,20 @@ using IIS.Repository.Factories;
 using Iis.Services.Contracts;
 using Iis.Services.Contracts.Dtos;
 using Iis.Services.Contracts.Enums;
-using Iis.Services.Contracts.Materials.Distribution;
 using Iis.Services.Contracts.Extensions;
 using Iis.Services.Contracts.ExternalUserServices;
 using Iis.Services.Contracts.Interfaces;
+using Iis.Services.Contracts.Materials.Distribution;
+using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
 namespace Iis.Services
 {
     public class UserService<TUnitOfWork> : BaseService<TUnitOfWork>, IUserService where TUnitOfWork : IIISUnitOfWork
     {
+        private const string ClaimTypeUID = "uid";
         private const string DefaultRoleName = "Користувач";
         private const short DefaultMaterialChannelCoefficient = 2;
 
@@ -180,6 +183,14 @@ namespace Iis.Services
                 throw new ArgumentException($"User does not exist for id = {userId}");
             }
             return Map(userEntity);
+        }
+
+        public Task<User> GetAuthenticatedUserAsync(HttpContext httpContext)
+        {
+            var claim = httpContext.User.FindFirstValue(ClaimTypeUID);
+            var userId = Guid.Parse(claim);
+
+            return GetUserAsync(userId, httpContext.RequestAborted);
         }
 
         public async Task<User> ValidateAndGetUserAsync(string username, string password, CancellationToken cancellationToken = default)

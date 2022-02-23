@@ -7,6 +7,7 @@ using Iis.Interfaces.Elastic;
 using Iis.Interfaces.SecurityLevels;
 using Iis.Services.Contracts.Enums;
 using Iis.Services.Contracts.Materials.Distribution;
+using Microsoft.AspNetCore.Http;
 
 namespace Iis.Services.Contracts.Interfaces
 {
@@ -17,6 +18,7 @@ namespace Iis.Services.Contracts.Interfaces
         Task<List<User>> GetOperatorsAsync(CancellationToken ct = default);
         Task<UserDistributionList> GetOperatorsForMaterialsAsync();
         Task<User> GetUserAsync(Guid userId, CancellationToken cancellationToken = default);
+        Task<User> GetAuthenticatedUserAsync(HttpContext httpContext);
         Task<(IReadOnlyCollection<User> Users, int TotalCount)> GetUsersByStatusAsync(PaginationParams page, SortingParams sorting, string suggestion, UserStatusType userStatusFilter, CancellationToken ct = default);
         Task<User> RejectRole(Guid userId, Guid roleId);
         bool IsAccessLevelAllowedForUser(int userAccessLevel, int newAccessLevel);
