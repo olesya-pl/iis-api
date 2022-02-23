@@ -1,21 +1,22 @@
 ﻿using System;
 using System.IO;
-using System.Security.Authentication;
+using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
+using IIS.Core.GraphQL.Files;
+using IIS.Core.Materials;
+using Iis.Domain.Materials;
+using Iis.Domain.Users;
+using Iis.Services.Contracts.Configurations;
+using Iis.Services.Contracts.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using Iis.Domain.Materials;
-using Iis.Domain.Users;
-using Iis.Services.Contracts.Configurations;
-using Iis.Services.Contracts.Interfaces;
 using IIS.Core;
-using IIS.Core.GraphQL.Files;
-using IIS.Core.Materials;
 
 namespace Iis.Api.Controllers
 {
@@ -50,20 +51,18 @@ namespace Iis.Api.Controllers
             _logger = logger;
         }
 
+        [Authorize]
         [HttpPost]
         [DisableRequestSizeLimit]
         public async Task<UploadResult> Post([FromForm] IFormFile file, [FromForm]string fileInfo,  CancellationToken ct)
         {
-            if (!Request.Headers.TryGetValue("Authorization", out var token))
-            {
-                throw new AuthenticationException("Requires \"Authorization\" header to contain a token");
-            }
-
-            var tokenPayload = await TokenHelper.ValidateTokenAsync(token, _configuration, _userService);
+            var claim = HttpContext.User.FindFirstValue(TokenHelper.ClaimTypeUID);
+            var userId = Guid.Parse(claim);
+            var user = await _userService.GetUserAsync(userId, HttpContext.RequestAborted);
 
             var input = JsonConvert.DeserializeObject<UploadInput>(fileInfo);
 
-            return await UploadSingleFile(file.OpenReadStream(), input, tokenPayload.User);
+            return await UploadSingleFile(file.OpenReadStream(), input, user);
         }
 
         private async Task<UploadResult> UploadSingleFile(Stream fileStream, UploadInput input, User user)

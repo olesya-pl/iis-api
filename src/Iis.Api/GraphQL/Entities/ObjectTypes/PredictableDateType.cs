@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using HotChocolate.Language;
 using HotChocolate.Types;
 
@@ -15,7 +12,7 @@ namespace Iis.Api.GraphQL.Entities.ObjectTypes
         {
         }
 
-        public override Type ClrType { get; } = typeof(DateTime);
+        public override Type RuntimeType { get; } = typeof(DateTime);
 
         // define which literals this type can be parsed from.
         public override bool IsInstanceOfType(IValueNode literal)
@@ -30,27 +27,29 @@ namespace Iis.Api.GraphQL.Entities.ObjectTypes
         }
 
         // define how a literal is parsed to the native .NET type.
-        public override object ParseLiteral(IValueNode literal)
+        public override object ParseLiteral(IValueNode valueSyntax, bool withDefaults = true)
         {
-            if (literal == null)
+            if (valueSyntax == null)
             {
-                throw new ArgumentNullException(nameof(literal));
+                throw new ArgumentNullException(nameof(valueSyntax));
             }
 
-            if (literal is StringValueNode stringLiteral)
+            if (valueSyntax is StringValueNode stringLiteral)
             {
                 return stringLiteral.Value;
             }
 
-            if (literal is NullValueNode)
+            if (valueSyntax is NullValueNode)
             {
                 return null;
             }
 
             throw new ArgumentException(
                 "The string type can only parse string literals.",
-                nameof(literal));
+                nameof(valueSyntax));
         }
+
+        public override IValueNode ParseResult(object resultValue) => ParseValue(resultValue);
 
         // define how a native type is parsed into a literal,
         public override IValueNode ParseValue(object value)

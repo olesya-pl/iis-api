@@ -1,18 +1,18 @@
 using System;
+using System.Security.Claims;
 using System.Threading.Tasks;
-using System.Security.Authentication;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
-using MediatR;
-using Newtonsoft.Json;
-using Iis.Events.Entities;
-using Iis.Domain;
+using Iis.Api.Authentication;
 using IIS.Core;
+using Iis.Domain;
+using Iis.Events.Entities;
 using Iis.Interfaces.Roles;
 using Iis.Services.Contracts.Access;
 using Iis.Services.Contracts.Interfaces;
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
-using Iis.Api.Authentication;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json;
 
 namespace Iis.Api.Controllers
 {
@@ -42,7 +42,7 @@ namespace Iis.Api.Controllers
         {
             var node = _ontologySerivice.GetNode(id) as Entity;
 
-            if(node is null) return NotFound(id);
+            if (node is null) return NotFound(id);
 
             _ontologySerivice.RemoveNode(node);
 
@@ -51,24 +51,19 @@ namespace Iis.Api.Controllers
             return Ok($"Deleted:{id:N}");
         }
 
+        [Authorize]
         [HttpGet("GetAccess/{id}")]
         public async Task<IActionResult> GetAccess(Guid id)
         {
-            if (!Request.Headers.TryGetValue("Authorization", out var token))
-            {
-                throw new AuthenticationException("Requires \"Authorization\" header to contain a token");
-            }
-
-            var tokenPayload = await TokenHelper.ValidateTokenAsync(token, _configuration, _userService);
-
             if (_ontologySerivice.GetNode(id) == null) return ValidationProblem("Entity is not found");
 
+            var claim = HttpContext.User.FindFirstValue(TokenHelper.ClaimTypeUID);
+            var userId = Guid.Parse(claim);
+            var user = await _userService.GetUserAsync(userId, HttpContext.RequestAborted);
+            var isCommentingGranted = user.IsGranted(AccessKind.Entity, AccessOperation.Commenting, AccessCategory.Entity);
             var objectAccess = new ObjectAccess
             {
-                Commenting = tokenPayload.User.IsGranted(
-                    AccessKind.Entity, 
-                    AccessOperation.Commenting, 
-                    AccessCategory.Entity)
+                Commenting = isCommentingGranted
             };
 
             var json = JsonConvert.SerializeObject(objectAccess);

@@ -16,7 +16,7 @@ namespace IIS.Core.GraphQL.Scalars
         {
         }
 
-        public override Type ClrType => typeof(object);
+        public override Type RuntimeType => typeof(object);
 
         public override bool IsInstanceOfType(IValueNode literal)
         {
@@ -24,10 +24,15 @@ namespace IIS.Core.GraphQL.Scalars
             return literal is NullValueNode || literal is ObjectValueNode;
         }
 
-        public override object ParseLiteral(IValueNode literal)
+        public override object ParseLiteral(IValueNode valueSyntax, bool withDefaults = true)
         {
-            if (literal is NullValueNode) // NullValueNode is present after TryDeserialize call
+            if (valueSyntax is NullValueNode) // NullValueNode is present after TryDeserialize call
                 return null;
+            throw new NotImplementedException();
+        }
+
+        public override IValueNode ParseResult(object resultValue)
+        {
             throw new NotImplementedException();
         }
 

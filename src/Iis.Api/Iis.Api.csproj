@@ -46,15 +46,16 @@
   <ItemGroup>
     <PackageReference Include="AspNetCore.HealthChecks.Elasticsearch" Version="3.1.1" />
     <PackageReference Include="CsvHelper" Version="19.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="3.1.22" />
     <PackageReference Include="Nest" Version="7.8.0" />
     <PackageReference Include="AspNetCore.HealthChecks.NpgSql" Version="3.1.1" />
     <PackageReference Include="AspNetCore.HealthChecks.Rabbitmq" Version="3.1.4" />
     <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="7.0.0" />
     <PackageReference Include="DocumentFormat.OpenXml" Version="2.10.0" />
     <PackageReference Include="Flee" Version="1.2.2" />
-    <PackageReference Include="HotChocolate" Version="11.0.0-preview.62" />
-    <PackageReference Include="HotChocolate.AspNetCore" Version="11.0.0-preview.62" />
-    <PackageReference Include="HotChocolate.AspNetCore.Playground" Version="11.0.0-preview.62" />
+    <PackageReference Include="HotChocolate" Version="11.3.8" />
+    <PackageReference Include="HotChocolate.AspNetCore" Version="11.3.8" />
+    <PackageReference Include="HotChocolate.AspNetCore.Authorization" Version="11.3.8" />
     <PackageReference Include="LinqKit.Core" Version="1.1.17" />
     <PackageReference Include="MediatR.Extensions.Microsoft.DependencyInjection" Version="8.1.0" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="3.1.0" />

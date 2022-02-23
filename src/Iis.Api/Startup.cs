@@ -1,13 +1,10 @@
-﻿using AutoMapper;
-using HotChocolate;
-using HotChocolate.AspNetCore;
-using HotChocolate.AspNetCore.Subscriptions;
-using HotChocolate.Execution;
-using HotChocolate.Execution.Batching;
-using HotChocolate.Execution.Configuration;
-using HotChocolate.Language;
-using HotChocolate.Types.Relay;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
+using System.Threading.Tasks;
+using AutoMapper;
 using Iis.Api;
+using Iis.Api.Authentication.OntologyBasicAuthentication;
 using Iis.Api.BackgroundServices;
 using Iis.Api.Bootstrap;
 using Iis.Api.Configuration;
@@ -15,11 +12,21 @@ using Iis.Api.EventHandlers;
 using Iis.Api.Export;
 using Iis.Api.FlightRadar;
 using Iis.Api.GraphQL.Access;
+using Iis.Api.Metrics;
 using Iis.Api.Modules;
 using Iis.Api.Ontology;
+using Iis.CoordinatesEventHandler.DependencyInjection;
+using IIS.Core.Analytics.EntityFramework;
+using IIS.Core.GraphQL.Entities.Resolvers;
+using IIS.Core.Materials;
+using IIS.Core.Materials.EntityFramework;
+using IIS.Core.Materials.EntityFramework.FeatureProcessors;
+using IIS.Core.Materials.FeatureProcessors;
+using IIS.Core.Ontology.EntityFramework;
 using Iis.DataModel;
 using Iis.DataModel.Cache;
 using Iis.DbLayer.Common;
+using Iis.DbLayer.DirectQueries;
 using Iis.DbLayer.Elastic;
 using Iis.DbLayer.ModifyDataScripts;
 using Iis.DbLayer.Ontology.EntityFramework;
@@ -30,15 +37,18 @@ using Iis.Domain;
 using Iis.Domain.Vocabularies;
 using Iis.Elastic;
 using Iis.EventMaterialAutoAssignment;
-using Iis.RabbitMq.DependencyInjection;
 using Iis.FlightRadar.DataModel;
 using Iis.Interfaces.Common;
+using Iis.Interfaces.DirectQueries;
 using Iis.Interfaces.Elastic;
 using Iis.Interfaces.Ontology;
 using Iis.Interfaces.Ontology.Data;
 using Iis.Interfaces.Ontology.Schema;
-using Iis.Interfaces.Roles;
+using Iis.Interfaces.SecurityLevels;
 using Iis.OntologyData;
+using Iis.RabbitMq.DependencyInjection;
+using IIS.Repository.Factories;
+using Iis.Security.SecurityLevels;
 using Iis.Services;
 using Iis.Services.Contracts;
 using Iis.Services.Contracts.Configurations;
@@ -49,15 +59,8 @@ using Iis.Services.DI;
 using Iis.Services.ExternalUserServices;
 using Iis.Services.MatrixServices;
 using Iis.Utility;
-using IIS.Core.Analytics.EntityFramework;
-using IIS.Core.GraphQL;
-using IIS.Core.GraphQL.Entities.Resolvers;
-using IIS.Core.Materials;
-using IIS.Core.Materials.EntityFramework;
-using IIS.Core.Materials.EntityFramework.FeatureProcessors;
-using IIS.Core.Materials.FeatureProcessors;
-using IIS.Core.Ontology.EntityFramework;
-using IIS.Repository.Factories;
+using Iis.Utility.Csv;
+using Iis.Utility.Logging;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
@@ -73,23 +76,13 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
-using RabbitMQ.Client;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Security.Authentication;
-using System.Threading.Tasks;
-using Iis.CoordinatesEventHandler.DependencyInjection;
-using Iis.Utility.Csv;
-using Iis.Utility.Logging;
-using Iis.Api.Authentication.OntologyBasicAuthentication;
-using Iis.Interfaces.DirectQueries;
-using Iis.DbLayer.DirectQueries;
 using Prometheus;
-using Iis.Api.Metrics;
-using Iis.Interfaces.SecurityLevels;
-using Iis.Security.SecurityLevels;
+using RabbitMQ.Client;
+using IIS.Core.GraphQL;
+using Iis.Api.Authentication.OntologyJwtBearerAuthentication;
+using HotChocolate.AspNetCore.Serialization;
+using Iis.Api.Authorization;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 namespace IIS.Core
 {
@@ -233,43 +226,16 @@ namespace IIS.Core
 
             var publiclyAccesible = new HashSet<string> { "login", "__schema" };
 
-            QueryExecutionBuilder.New()
-                .Use(next => async context =>
-                {
-                    try
-                    {
-                        await AuthenticateAsync(context, publiclyAccesible);
-                    }
-                    catch (Exception e)
-                    {
-                        if (!(e is AuthenticationException) && !(e is InvalidOperationException) && !(e is AccessViolationException))
-                            throw;
-
-                        var errorHandler = context.Services.GetService<IErrorHandler>();
-                        var error = ErrorBuilder.New()
-                            .SetMessage(e.Message)
-                            .SetException(e)
-                            .Build();
-                        context.Exception = e;
-                        context.Result = QueryResult.CreateError(errorHandler.Handle(error));
-                        return;
-                    }
-
-                    await next(context);
-                })
-                .UseDefaultPipeline()
+            services.AddGraphQLServer()
                 .AddErrorFilter<AppErrorFilter>()
-                .Populate(services);
+                .ConfigureSchema()
+                .AddIdSerializer()
+                .AddInMemorySubscriptions()
+                .UseDefaultPipeline()
+                .AddHttpRequestInterceptor<AuthenticationInterceptor>()
+                .AddAuthorization();
 
-            services.AddTransient<IErrorHandlerOptionsAccessor>(_ => new QueryExecutionOptions { IncludeExceptionDetails = true });
-            services.AddSingleton(s => s.GetService<GraphQL.ISchemaProvider>().GetSchema())
-                .AddTransient<IBatchQueryExecutor, BatchQueryExecutor>()
-                .AddTransient<IIdSerializer, IdSerializer>()
-                .AddJsonQueryResultSerializer()
-                .AddJsonArrayResponseStreamSerializer()
-                .AddGraphQLSubscriptions();
-            // end of graphql engine registration
-            services.AddDataLoaderRegistry();
+            services.AddHttpResultSerializer(batchSerialization: HttpResultSerialization.JsonArray, deferSerialization: HttpResultSerialization.MultiPartChunked);
 
             /* message queue registration*/
             services.RegisterMqFactory(Configuration, out string mqConnectionString)
@@ -308,9 +274,16 @@ namespace IIS.Core
             services.AddHostedService<ThemeCounterBackgroundService>();
             services.AddServices();
 
-            services.AddAuthentication()
+            services.AddAuthentication(options =>
+                {
+                    options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+                    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                })
+                .AddOntologyJwtBearerAuthentication(Configuration)
                 .AddOntologyScheme();
-            services.AddAuthorization();
+
+            services.AddServiceAuthorization();
 
             services.AddControllers();
             services.AddAutoMapper(typeof(Startup), typeof(CsvDataItem));
@@ -340,56 +313,6 @@ namespace IIS.Core
             services.AddMetrics();
         }
 
-        private async Task AuthenticateAsync(IQueryContext context, HashSet<string> publiclyAccesible)
-        {
-            // TODO: remove this method when hotchocolate will allow to add attribute for authentication
-            var qd = context.Request.Query as QueryDocument;
-            if (qd == null || qd.Document == null)
-            {
-                throw new InvalidOperationException("Cannot find query in document");
-            }
-
-            var odn = qd.Document.Definitions[0] as OperationDefinitionNode;
-            if (odn.SelectionSet?.Selections.Count != 1)
-            {
-                throw new InvalidOperationException("Does not support multiple selections in query");
-            }
-
-            var fieldNode = (FieldNode)odn.SelectionSet.Selections[0];
-
-            if (!publiclyAccesible.Contains(fieldNode.Name.Value))
-            {
-                var httpContext = (HttpContext)context.ContextData["HttpContext"];
-                if (!httpContext.Request.Headers.TryGetValue("Authorization", out var token))
-                {
-                    throw new AuthenticationException("Requires \"Authorization\" header to contain a token");
-                }
-
-                var userService = context.Services.GetService<IUserService>();
-                var graphQLAccessList = context.Services.GetService<GraphQLAccessList>();
-
-                var operationName = context.Request.OperationName ?? fieldNode.Name.Value;
-
-                var graphQLAccessItems = graphQLAccessList.GetAccessItem(operationName, context.Request.VariableValues);
-
-                var validatedToken = await TokenHelper.ValidateTokenAsync(token, Configuration, userService);
-
-                foreach (var graphQLAccessItem in graphQLAccessItems)
-                {
-                    if (graphQLAccessItem == null || graphQLAccessItem.Kind == AccessKind.FreeForAll)
-                    {
-                        break;
-                    }
-                    if (!validatedToken.User.IsGranted(graphQLAccessItem.Kind, graphQLAccessItem.Operation, AccessCategory.Entity))
-                    {
-                        throw new AccessViolationException($"Access denied to {operationName} for user {validatedToken.User.UserName}");
-                    }
-                }
-
-                context.ContextData.Add(TokenPayload.TokenPropertyName, validatedToken);
-            }
-        }
-
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())
@@ -414,8 +337,6 @@ namespace IIS.Core
 #if !DEBUG
             app.UseMiddleware<LoggingMiddleware>();
 #endif
-            app.UseGraphQL();
-            app.UsePlayground();
             app.UseHealthChecks("/api/server-health", new HealthCheckOptions { ResponseWriter = ReportHealthCheck });
 
             app.UseRouting();
@@ -423,6 +344,7 @@ namespace IIS.Core
             app.UseAuthorization();
             app.UseEndpoints(endpoints =>
             {
+                endpoints.MapGraphQL();
                 endpoints.MapControllers();
                 endpoints.MapMetrics();
             });
