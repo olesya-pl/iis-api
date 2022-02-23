@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using Iis.MaterialDistributor.Contracts.Services.DataTypes;
 
 namespace Iis.MaterialDistributor.Contracts.Services
 {

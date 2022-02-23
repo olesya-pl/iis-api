@@ -1,11 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
 using Newtonsoft.Json;
 
 namespace Iis.Services.Contracts.Dtos
 {
-    public class ElasticUserDtoMetadata
+    public class ElasticUserMetadataDto
     {
-        public ElasticUserDtoMetadata(Guid id, string username, int accessLevel)
+        public ElasticUserMetadataDto(Guid id, string username, int accessLevel)
         {
             Id = id;
             Username = username;
@@ -18,5 +19,6 @@ namespace Iis.Services.Contracts.Dtos
         [JsonProperty("_reserved")]
         public bool? Reserved { get; set; }
         public string SecurityLevels { get; set; }
+        public IReadOnlyList<ElasticUserChannelDto> Channels { get; set; }
     }
 }

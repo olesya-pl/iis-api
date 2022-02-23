@@ -8,6 +8,6 @@ namespace Iis.Services.Contracts.Dtos
         public string[] Roles { get; set; }
         public bool Enabled { get; set; }
         public IReadOnlyList<int> SecurityLevelIndexes { get; set; }
-        public ElasticUserDtoMetadata Metadata { get; set; }
+        public ElasticUserMetadataDto Metadata { get; set; }
     }
 }

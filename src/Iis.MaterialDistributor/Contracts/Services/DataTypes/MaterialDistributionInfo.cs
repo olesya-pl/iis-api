@@ -10,6 +10,7 @@ namespace Iis.MaterialDistributor.Contracts.Services
         public Guid Id { get; set; }
         public DateTime CreatedDate { get; set; }
         public DateTime? RegistrationDate { get; set; }
+        public string Channel { get; set; }
         public int VariableCoefficient { get; set; }
         public int? PermanentCoefficient { get; set; }
         [JsonIgnore]

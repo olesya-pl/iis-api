@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
 using Iis.Interfaces.Constants;
-using Iis.MaterialDistributor.Contracts.Services.DataTypes;
+using Iis.MaterialDistributor.Contracts.Services;
 using Iis.Messages.Materials;
 using Newtonsoft.Json.Linq;
 

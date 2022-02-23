@@ -1,16 +1,23 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Iis.Interfaces.Elastic;
 using Iis.MaterialDistributor.Contracts.Repositories;
-using Iis.MaterialDistributor.DataStorage;
-using Newtonsoft.Json.Linq;
 
 namespace Iis.MaterialDistributor.Repositories
 {
     public class UserElasticRepository : IUserElasticRepository
     {
+        private const string UserNamePropertyName = "username";
+        private const string EnabledPropertyName = "enabled";
+        private const string MetadataPropertyName = "metadata";
+        private const string ChannelsPropertyName = "channels";
+
+        private static readonly UserDistributionEntity EmptyUserEntity = new UserDistributionEntity { Id = Guid.Empty };
         private readonly IElasticManager _elasticManager;
 
         public UserElasticRepository(IElasticManager elasticManager)
@@ -18,13 +25,13 @@ namespace Iis.MaterialDistributor.Repositories
             _elasticManager = elasticManager;
         }
 
-        public async Task<IReadOnlyList<UserDistributionInfo>> GetOperatorsAsync(CancellationToken cancellationToken)
+        public async Task<IReadOnlyList<UserDistributionEntity>> GetOperatorsAsync(CancellationToken cancellationToken)
         {
             var jObject = await _elasticManager
                 .WithDefaultUser()
                 .GetUsersAsync(cancellationToken);
 
-            var result = new List<UserDistributionInfo>();
+            var result = new List<UserDistributionEntity>();
 
             foreach (var token in jObject.Children())
             {
@@ -32,25 +39,54 @@ namespace Iis.MaterialDistributor.Repositories
 
                 if (!IsRegisteredContourUser(user)) continue;
 
+                if (!user.Enabled) continue;
+
                 result.Add(user);
             }
             return result;
         }
 
-        private static UserDistributionInfo GetUserDistributionInfo(JToken token)
+        private static UserDistributionEntity GetUserDistributionInfo(JToken token)
         {
-            var userName = ((JProperty)token).Name;
+            var tokenName = ((JProperty)token).Name;
 
-            return new UserDistributionInfo
+            if (!Guid.TryParse(tokenName, out Guid userId))
             {
-                Id = Guid.TryParse(userName, out Guid id) ? id : Guid.Empty,
-                Username = userName
+                return EmptyUserEntity;
+            }
+
+            var tokenValue = token
+                            .Children<JObject>()
+                            .FirstOrDefault();
+
+            if (tokenValue is null)
+            {
+                return EmptyUserEntity;
+            }
+
+            var metadataTokenValue = tokenValue[MetadataPropertyName];
+
+            return new UserDistributionEntity
+            {
+                Id = userId,
+                UserName = tokenValue.Value<string>(UserNamePropertyName),
+                Enabled = tokenValue.Value<bool>(EnabledPropertyName),
+                Channels = GetUserChannelEntities(metadataTokenValue)
             };
         }
 
-        private static bool IsRegisteredContourUser(UserDistributionInfo user)
+        private static bool IsRegisteredContourUser(UserDistributionEntity user)
         {
             return user.Id != Guid.Empty;
+        }
+
+        private static IReadOnlyList<UserChannelEntity> GetUserChannelEntities(JToken metadataToken)
+        {
+            var channelArray = metadataToken.Value<JArray>(ChannelsPropertyName);
+
+            if (channelArray is null) return Array.Empty<UserChannelEntity>();
+
+            return JsonConvert.DeserializeObject<IReadOnlyList<UserChannelEntity>>(channelArray.ToString());
         }
     }
 }

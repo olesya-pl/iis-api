@@ -1,4 +1,4 @@
-﻿using Iis.MaterialDistributor.Contracts.Services.DataTypes;
+﻿using Iis.MaterialDistributor.Contracts.Services;
 using Iis.Messages.Materials;
 
 namespace Iis.MaterialDistributor.Services

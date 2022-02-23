@@ -13,7 +13,6 @@ using Iis.Messages.Materials;
 using Iis.MaterialDistributor.Configurations;
 using Iis.MaterialDistributor.Contracts.Services;
 using Iis.MaterialDistributor.Contracts.Repositories;
-using Iis.MaterialDistributor.Contracts.Services.DataTypes;
 
 namespace Iis.MaterialDistributor.Workers
 {

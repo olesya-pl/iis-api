@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Linq.Expressions;
+using System.ComponentModel;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Collections.Generic;
@@ -8,8 +9,8 @@ using Microsoft.EntityFrameworkCore;
 using IIS.Repository;
 using Iis.DataModel;
 using Iis.DataModel.Roles;
+using Iis.DataModel.Materials;
 using Iis.DbLayer.Extensions;
-using System.ComponentModel;
 using Iis.Interfaces.Constants;
 
 namespace Iis.DbLayer.Repositories
@@ -96,6 +97,13 @@ namespace Iis.DbLayer.Repositories
                     Roles = user.UserRoles.Select(userRole => userRole.Role)
                 })
                 .ToDictionaryAsync(userRoles => userRoles.UserName, userRoles => userRoles.Roles, cancellationToken);
+        }
+
+        public Task<MaterialChannelMappingEntity[]> GetAllMaterialChannelMappingAsync(CancellationToken cancellationToken = default)
+        {
+            return Context.MaterialChannelMappings
+                .AsNoTracking()
+                .ToArrayAsync(cancellationToken);
         }
 
         private IQueryable<UserEntity> GetUsersQuery()
