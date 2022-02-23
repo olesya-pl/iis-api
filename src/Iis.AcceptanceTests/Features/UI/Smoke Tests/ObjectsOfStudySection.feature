@@ -37,6 +37,8 @@ Feature: ObjectsOfStudySection - smoke
 		 | Загальна інформація                            | Умовне (відкрите) найменування                                  | Тестове умовне (відкрите) найменування                                 |
 		 | Загальна інформація                            | Оперативне (бойове) призначення                                 | Тестове оперативне (бойове) призначення                                |
 
+        And I clicked on the save button to create a new object of study
+        When I clicked on the confirm save button to create a new object of study
         Then I must see Тестове найменування дійсне скорочене title of the object
         When I clicked on the Objects section
         And I clicked on search button in the Object of study section
