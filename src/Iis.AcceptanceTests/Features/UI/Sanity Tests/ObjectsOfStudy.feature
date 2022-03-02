@@ -10,86 +10,79 @@ Feature: ObjectsOfStudySection - sanity
         Given I sign in with the user olya and password 123 in the Contour
 
     @sanity @UI @ObjectOfStudySectionUI
-    Scenario: IIS-6119 - Possibility to switch between hierarchy objects in the OOS section
-        When I clicked on the hierarchy tab in the object of study section
-        And I collapsed relation of the Силові структури parent card
-        When I expanded relation of the Силові структури parent card
-        Then I must see these cards in hierarchy
+Scenario: IIS-6119 - Possibility to switch between hierarchy objects in the OOS section
+    When I clicked on the hierarchy tab in the object of study section
+    When I expanded relation of the Силові структури parent card
+    Then I must see these cards in hierarchy
 
-            | ФСБ РФ   |
-            | ЗС РФ    |
-            | ФСВНГ РФ |
-            | ЗС РФ    |
-
-
-    @sanity @UI @ObjectOfStudySectionUI
-    Scenario: IIS-6211 - Search results must contain third brigade Berkut
-        When I clicked on search button in the Object of study section
-        And I searched 3 омсбр data in the Objects of study section
-        Then I must see the specified result
-
-            | 3 окрема мотострілецька бригада "Беркут" |
+        | ФСБ РФ   |
+        | ЗС РФ    |
+        | ФСВНГ РФ |
+        | ЗС РФ    |
+    When I collapsed relation of the Силові структури parent card
 
 
     @sanity @UI @ObjectOfStudySectionUI
-    Scenario: IIS-6370 - View and interact with data in profile in the objects section
-        When I clicked on search button in the Object of study section
-        And I searched 3 окрема мотострілецька бригада data in the Objects of study section
-        And I clicked on the first search result title in the Objects of study section
-        And I clicked on enlarge small card button
-        And I clicked on the Classifier block in the big card window
-        And I clicked on the Direct reporting relationship link in the big card window
-        Then I must see the specified title in the small object of study card
+Scenario: IIS-6211 - Search results must contain third brigade Berkut
+    When I clicked on search button in the Object of study section
+    And I searched 3 омсбр data in the Objects of study section
+    Then I must see the specified result
+    | 3 окрема мотострілецька бригада "Беркут" |
 
-            """
-            1 АК
-            """
-        When I clicked on enlarge small card button
-        When I clicked on the General info block in the big card window
-        Then I must see the specified title in the name real full section
-
-            """
-            1 армійський корпус
-            """
 
     @sanity @UI @ObjectOfStudySectionUI
-    Scenario: IS-5885 - Create a military organization
-        When I clicked on the create a new object of study button
-        And I clicked on the create a new military organization button
-        And I entered the джокер value in the affiliation field
-        And I entered the першочерговий value in the importance field
-        And I entered the НВ - Не визначено value in the security classification
-        And I clicked on the classifiers block
-        And I entered the 28 обр РХБЗ value in the direct reporting relationship field
-        And I clicked on the general info block
-        And I entered the 29-я окрема бригада РХБ захисту імені Героя Радянського Союзу генерал-полковника В. К. Пікалова, в/ч 34081 value in the name real full field
-        And I clicked on the dislocation block
-        And I entered the 48 value in the latitude field at the dislocation block
-        And I entered the 48 value in the longitude field at dislocation block
-        And I entered the Росія value in the country field at the dislocation block
-        And I clicked on the save button to create a new object of study
-        When I clicked on the confirm save button to create a new object of study
-        Then I must see the 29-я окрема бригада РХБ захисту імені Героя Радянського Союзу генерал-полковника В. К. Пікалова, в/ч 34081 predefined title of the newely created object of study
+Scenario: IIS-6370 - View and interact with data in profile in the objects section
+    When I clicked on search button in the Object of study section
+    And I searched 3 окрема мотострілецька бригада data in the Objects of study section
+    And I clicked on the first search result title in the Objects of study section
+    And I clicked on enlarge small card button
+    And I clicked on the Classifier block in the big card window
+    And I clicked on the Direct reporting relationship link in the big card window
+    Then I must see the specified title in the small object of study card
+
+        """
+        1 АК
+        """
+    When I clicked on enlarge small card button
+    When I clicked on the General info block in the big card window
+    Then I must see the specified title in the name real full section
+
+        """
+        1 армійський корпус
+        """
 
     @sanity @UI @ObjectOfStudySectionUI
-    Scenario: IIS-6373 - Display connection in the relations tab in the Objects section
-        When I clicked on first object of study
-        And I clicked on enlarge small card button
-        Then I must see these tabs in the big object of study card
+Scenario: IS-5885 - Create a military organization
+    When I clicked on the create a new object of study button
+    And I clicked on the create a new military organization button
+    And I entered the джокер value in the affiliation field
+    And I entered the першочерговий value in the importance field
+    And I entered the НВ - Не визначено value in the security classification
+    And I clicked on the classifiers block
+    And I entered the 28 обр РХБЗ value in the direct reporting relationship field
+    And I clicked on the general info block
+    And I entered the 29-я окрема бригада РХБ захисту імені Героя Радянського Союзу генерал-полковника В. К. Пікалова, в/ч 34081 value in the name real full field
+    And I clicked on the dislocation block
+    And I entered the 48 value in the latitude field at the dislocation block
+    And I entered the 48 value in the longitude field at dislocation block
+    And I entered the Росія value in the country field at the dislocation block
+    And I clicked on the save button to create a new object of study
+    When I clicked on the confirm save button to create a new object of study
+    Then I must see the 29-я окрема бригада РХБ захисту імені Героя Радянського Союзу генерал-полковника В. К. Пікалова, в/ч 34081 predefined title of the newely created object of study
 
-            | BigCardProfileTab       |
-            | BigCardMaterialsTab     |
-            | BigCardEventsTab        |
-            | BigCardChangeHistoryTab |
-            | BigCardRelationsTab     |
+    @sanity @UI @ObjectOfStudySectionUI
+Scenario: IIS-6373 - Display connection in the relations tab in the Objects section
+    When I clicked on first object of study
+    And I clicked on enlarge small card button
+    Then I must see these tabs in the big object of study card
 
-        Then I must see the specific text blocks in big object of study card
-
-            | BigCardAffiliation |
-            | BigCardImportance  |
-        When I clicked on the relations tab
-        Then I must see graph
-
-
-
-
+        | BigCardProfileTab       |
+        | BigCardMaterialsTab     |
+        | BigCardEventsTab        |
+        | BigCardChangeHistoryTab |
+        | BigCardRelationsTab     |
+    Then I must see the specific text blocks in big object of study card
+        | BigCardAffiliation |
+        | BigCardImportance  |
+    When I clicked on the relations tab
+    Then I must see graph
