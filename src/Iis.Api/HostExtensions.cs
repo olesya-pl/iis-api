@@ -1,4 +1,6 @@
-﻿using Iis.DataModel;
+﻿using System;
+using System.Threading.Tasks;
+using Iis.DataModel;
 using Iis.DbLayer.ModifyDataScripts;
 using Iis.EventMaterialAutoAssignment;
 using Iis.FlightRadar.DataModel;
@@ -8,14 +10,12 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Threading.Tasks;
 
 namespace Iis.Api
 {
     internal static class HostExtensions
     {
-        private static int OntologyMigrateTimeout = 10;
+        private const int OntologyMigrateTimeout = 10;
 
         public static async Task SeedExternalUsersAsync(this IHost host)
         {

@@ -1,12 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Text;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Security.Authentication;
+using System.Security.Cryptography;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Collections.Generic;
-using System.Security.Cryptography;
-using System.Security.Authentication;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using AutoMapper;
@@ -14,20 +14,20 @@ using Iis.DataModel;
 using Iis.DataModel.Materials;
 using Iis.DataModel.Roles;
 using Iis.DbLayer.Repositories;
-using Iis.Services.Contracts;
-using Iis.Services.Contracts.Dtos;
-using Iis.Services.Contracts.Interfaces;
-using IIS.Repository;
-using IIS.Repository.Factories;
-using Iis.Services.Contracts.Enums;
 using Iis.Domain.Users;
-using Iis.Interfaces.Users;
-using Iis.Services.Contracts.Materials.Distribution;
-using Iis.Services.Contracts.Extensions;
-using Microsoft.Extensions.Logging;
-using Iis.Services.Contracts.ExternalUserServices;
 using Iis.Interfaces.Elastic;
 using Iis.Interfaces.SecurityLevels;
+using Iis.Interfaces.Users;
+using IIS.Repository;
+using IIS.Repository.Factories;
+using Iis.Services.Contracts;
+using Iis.Services.Contracts.Dtos;
+using Iis.Services.Contracts.Enums;
+using Iis.Services.Contracts.Materials.Distribution;
+using Iis.Services.Contracts.Extensions;
+using Iis.Services.Contracts.ExternalUserServices;
+using Iis.Services.Contracts.Interfaces;
+using Microsoft.Extensions.Logging;
 
 namespace Iis.Services
 {
@@ -41,10 +41,10 @@ namespace Iis.Services
         private readonly MaxMaterialsPerOperatorConfig _maxMaterialsConfig;
         private readonly IMapper _mapper;
         private readonly IUserElasticService _userElasticService;
-        private IConfiguration _configuration;
-        private IExternalUserService _externalUserService;
-        private IMatrixService _matrixService;
-        private ISecurityLevelChecker _securityLevelChecker;
+        private readonly IConfiguration _configuration;
+        private readonly IExternalUserService _externalUserService;
+        private readonly IMatrixService _matrixService;
+        private readonly ISecurityLevelChecker _securityLevelChecker;
 
         public UserService(
             ILogger<UserService<TUnitOfWork>> logger,
@@ -208,8 +208,8 @@ namespace Iis.Services
                 throw new InvalidCredentialException($"User {username} has wrong source");
             }
 
-            if (user.Source == UserSource.Internal && !ValidateCredentials(user, password) ||
-                user.Source == _externalUserService?.GetUserSource() && _externalUserService?.ValidateCredentials(username, password) == false)
+            if ((user.Source == UserSource.Internal && !ValidateCredentials(user, password)) ||
+                (user.Source == _externalUserService?.GetUserSource() && _externalUserService?.ValidateCredentials(username, password) == false))
             {
                 throw new InvalidCredentialException($"Wrong password");
             }
@@ -341,8 +341,8 @@ namespace Iis.Services
             if (_externalUserService == null) return null;
 
             var externalUsers = _externalUserService.GetUsers()
-                .Where(eu => userNames == null || userNames.Contains(eu.UserName)
-                    && !eu.UserName.Contains('$'));
+                .Where(eu => userNames == null || (userNames.Contains(eu.UserName)
+                    && !eu.UserName.Contains('$', StringComparison.Ordinal)));
             var users = await _context.Users
                 .AsNoTracking()
                 .Include(u => u.UserRoles)
@@ -425,7 +425,7 @@ namespace Iis.Services
                 }
             }
 
-            await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync(cancellationToken);
 
             return sb.ToString();
         }
