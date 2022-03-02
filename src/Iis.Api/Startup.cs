@@ -321,7 +321,8 @@ namespace IIS.Core
             services.RegisterCoordinatesMessageHandler(Configuration);
 
             var eusConfiguration = Configuration.GetSection("externalUserService").Get<ExternalUserServiceConfiguration>();
-            services.AddTransient<IExternalUserService>(_ => new ExternalUserServiceFactory().GetInstance(eusConfiguration));
+            services.AddSingleton(eusConfiguration);
+            services.AddTransient<IExternalUserService, ActiveDirectoryUserService>();
 
             var matrixConfiguration = Configuration.GetSection("matrix").Get<MatrixServiceConfiguration>();
             services.AddSingleton(matrixConfiguration);

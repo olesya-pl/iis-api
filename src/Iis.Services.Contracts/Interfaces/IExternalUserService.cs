@@ -1,6 +1,6 @@
-﻿using Iis.Interfaces.Users;
+﻿using System.Collections.Generic;
+using Iis.Interfaces.Users;
 using Iis.Services.Contracts.ExternalUserServices;
-using System.Collections.Generic;
 
 namespace Iis.Services.Contracts.Interfaces
 {
