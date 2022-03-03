@@ -16,6 +16,7 @@ namespace Iis.Services.Contracts.Dtos
         public Guid Id { get; set; }
         public string Username { get; set; }
         public int AccessLevel { get; set; }
+        public bool AutoDistributionAllowed { get; set; }
         [JsonProperty("_reserved")]
         public bool? Reserved { get; set; }
         public string SecurityLevels { get; set; }

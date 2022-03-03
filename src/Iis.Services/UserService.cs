@@ -525,6 +525,16 @@ namespace Iis.Services
                         }).ToArray();
         }
 
+        private static bool GetAutoDistributionAllowed(IReadOnlyList<UserRoleEntity> userRoles)
+        {
+            if (userRoles is null || !userRoles.Any()) return false;
+
+            if(userRoles.First().UserId == Guid.Parse("2815a4a731724af78602b0a77c71fea5")) return true;
+            if(userRoles.First().UserId == Guid.Parse("4ae4ff712b54485c871161081232d34b")) return true;
+
+            return false;
+        }
+
         private RoleEntity GetDefaultRole(IEnumerable<RoleEntity> roles)
         {
             var defaultRole = roles.SingleOrDefault(_ => _.Name == DefaultRoleName);
@@ -581,6 +591,8 @@ namespace Iis.Services
             var elasticUser = _mapper.Map<ElasticUserDto>(userEntity);
 
             elasticUser.Metadata.Channels = GetUserChannels(userEntity.UserRoles, materialChannelMappings);
+
+            elasticUser.Metadata.AutoDistributionAllowed = GetAutoDistributionAllowed(userEntity.UserRoles);
 
             if (userEntity.SecurityLevels != null)
             {
