@@ -140,8 +140,6 @@ namespace Iis.Services
 
             graphData.AddNode(GraphTypeMapper.MapMaterialToGraphNode(material, IsAllowedMaterialForUser(material, user), false));
 
-            Console.WriteLine(nodes);
-
             foreach (var node in nodes)
             {
                 graphData.AddLink(GraphTypeMapper.MapRelatedFromMaterialNodeGraphLink(material, node));
