@@ -20,10 +20,11 @@ namespace Iis.Services.Mappers.Graph
         {
             if (relation is null) return null;
 
-            var extra = new JObject();
-
-            extra.Add(GraphTypeExtraPropNames.Type, relation.RelationTypeName);
-            extra.Add(GraphTypeExtraPropNames.Name, GetGraphLinkNameProperty(relation));
+            var extra = new JObject
+            {
+                { GraphTypeExtraPropNames.Type, relation.RelationTypeName },
+                { GraphTypeExtraPropNames.Name, GetGraphLinkNameProperty(relation) }
+            };
 
             return new GraphLink
             {
@@ -38,10 +39,11 @@ namespace Iis.Services.Mappers.Graph
         {
             if (material is null) return null;
 
-            var extraObject = new JObject();
-
-            extraObject.Add(GraphTypeExtraPropNames.Type, GraphTypePropValues.MaterialGraphLinkTypePropValue);
-            extraObject.Add(GraphTypeExtraPropNames.Name, GraphTypePropValues.MaterialGraphLinkNamePropValue);
+            var extraObject = new JObject
+            {
+                { GraphTypeExtraPropNames.Type, GraphTypePropValues.MaterialGraphLinkTypePropValue },
+                { GraphTypeExtraPropNames.Name, GraphTypePropValues.MaterialGraphLinkNamePropValue }
+            };
 
             return new GraphLink
             {
@@ -56,10 +58,11 @@ namespace Iis.Services.Mappers.Graph
         {
             if (material is null || node is null) return null;
 
-            var extraObject = new JObject();
-
-            extraObject.Add(GraphTypeExtraPropNames.Type, GetTypePropertyForRelatedFromMaterialNode(node));
-            extraObject.Add(GraphTypeExtraPropNames.Name, node.NodeType.Title);
+            var extraObject = new JObject
+            {
+                { GraphTypeExtraPropNames.Type, GetTypePropertyForRelatedFromMaterialNode(node) },
+                { GraphTypeExtraPropNames.Name, node.NodeType.Title }
+            };
 
             return new GraphLink
             {
@@ -70,19 +73,21 @@ namespace Iis.Services.Mappers.Graph
             };
         }
 
-        public static GraphNode MapNodeToGraphNode(INode node, IReadOnlyCollection<Guid> exclusionNodeIdList)
+        public static GraphNode MapNodeToGraphNode(INode node, IReadOnlyCollection<Guid> exclusionNodeIdList, bool isAccessAllowed)
         {
             if (node is null) return null;
 
-            var extraObject = new JObject();
-
-            extraObject.Add(GraphTypeExtraPropNames.HasLinks, DoesNodeHaveLinks(node, exclusionNodeIdList));
-            extraObject.Add(GraphTypeExtraPropNames.Type, $"Entity{node.NodeType.Name}");
-            extraObject.Add(GraphTypeExtraPropNames.Name, GetGraphNodeNameProperty(node));
-            extraObject.Add(GraphTypeExtraPropNames.NodeType, GetGraphNodeNodeTypeProperty(node));
-            extraObject.Add(GraphTypeExtraPropNames.ImportanceCode, GetGraphNodeImportanceProperty(node));
-            extraObject.Add(GraphTypeExtraPropNames.IconName, GetGraphNodeIconNameProperty(node));
-            extraObject.Add(GraphTypeExtraPropNames.PhotoUrl, GetGraphNodePhotoUrl(node));
+            var extraObject = new JObject
+            {
+                { GraphTypeExtraPropNames.HasLinks, isAccessAllowed && DoesNodeHaveLinks(node, exclusionNodeIdList) },
+                { GraphTypeExtraPropNames.Type, isAccessAllowed ? $"Entity{node.NodeType.Name}" : string.Empty },
+                { GraphTypeExtraPropNames.Name, isAccessAllowed ? GetGraphNodeNameProperty(node) : string.Empty },
+                { GraphTypeExtraPropNames.NodeType, GetGraphNodeNodeTypeProperty(node) },
+                { GraphTypeExtraPropNames.ImportanceCode, isAccessAllowed ? GetGraphNodeImportanceProperty(node) : string.Empty },
+                { GraphTypeExtraPropNames.IconName, isAccessAllowed ? GetGraphNodeIconNameProperty(node) : string.Empty },
+                { GraphTypeExtraPropNames.PhotoUrl, isAccessAllowed ? GetGraphNodePhotoUrl(node) : string.Empty },
+                { GraphTypeExtraPropNames.AccessAllowed, isAccessAllowed }
+            };
 
             return new GraphNode
             {
@@ -91,16 +96,17 @@ namespace Iis.Services.Mappers.Graph
             };
         }
 
-        public static GraphNode MapMaterialToGraphNode(Material material, bool? hasLinks = null, Guid fromNodeId = default)
+        public static GraphNode MapMaterialToGraphNode(Material material, bool isAccessAllowed, bool? hasLinks = null, Guid fromNodeId = default)
         {
             if (material is null) return null;
 
             var extraObject = new JObject();
 
-            var metaDataObject = new JObject();
-
-            metaDataObject.Add(GraphTypeExtraPropNames.Type, material.Type);
-            metaDataObject.Add(GraphTypeExtraPropNames.Source, material.Source);
+            var metaDataObject = new JObject
+            {
+                { GraphTypeExtraPropNames.Type, material.Type },
+                { GraphTypeExtraPropNames.Source, material.Source }
+            };
 
             extraObject.Add(GraphTypeExtraPropNames.HasLinks, hasLinks ?? DoesMaterialHaveLinks(material, fromNodeId));
             extraObject.Add(GraphTypeExtraPropNames.Type, GraphTypePropValues.MaterialGraphNodeTypePropValue);
@@ -109,6 +115,7 @@ namespace Iis.Services.Mappers.Graph
             extraObject.Add(GraphTypeExtraPropNames.ImportanceCode, null);
             extraObject.Add(GraphTypeExtraPropNames.IconName, material.Type);
             extraObject.Add(GraphTypeExtraPropNames.MetaData, metaDataObject);
+            extraObject.Add(GraphTypeExtraPropNames.AccessAllowed, isAccessAllowed);
 
             return new GraphNode
             {
