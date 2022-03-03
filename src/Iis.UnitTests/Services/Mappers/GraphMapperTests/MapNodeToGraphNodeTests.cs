@@ -18,7 +18,7 @@ namespace Iis.UnitTests.Services.Mappers.GraphMapperTests
         [Fact]
         public void Should_ReturnNull_WhenNodeIsNull()
         {
-            GraphTypeMapper.MapNodeToGraphNode(null, Array.Empty<Guid>())
+            GraphTypeMapper.MapNodeToGraphNode(null, Array.Empty<Guid>(), true)
             .Should().BeNull();
         }
     }

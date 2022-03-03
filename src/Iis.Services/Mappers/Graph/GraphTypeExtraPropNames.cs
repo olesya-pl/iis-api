@@ -12,5 +12,6 @@ namespace Iis.Services.Mappers.Graph
         public const string IconName = "iconName";
         public const string PhotoUrl = "photoUrl";
         public const string MetaData = "metadata";
+        public const string AccessAllowed = "accessAllowed";
     }
 }

@@ -20,7 +20,7 @@ namespace Iis.UnitTests.Services.Mappers.GraphMapperTests
         {
             Material material = null;
 
-            var result = GraphTypeMapper.MapMaterialToGraphNode(material);
+            var result = GraphTypeMapper.MapMaterialToGraphNode(material, true);
 
             result.Should().BeNull();
         }
@@ -31,7 +31,7 @@ namespace Iis.UnitTests.Services.Mappers.GraphMapperTests
         {
             var expected = CreateGraphNode(material, true, material.File.Name);
 
-            var result = GraphTypeMapper.MapMaterialToGraphNode(material, true);
+            var result = GraphTypeMapper.MapMaterialToGraphNode(material, true, true);
 
             result.Should().BeEquivalentTo(expected);
         }
@@ -42,7 +42,7 @@ namespace Iis.UnitTests.Services.Mappers.GraphMapperTests
         {
             var expected = CreateGraphNode(material, false, material.File.Name);
 
-            var result = GraphTypeMapper.MapMaterialToGraphNode(material, false);
+            var result = GraphTypeMapper.MapMaterialToGraphNode(material, true);
 
             result.Should().BeEquivalentTo(expected);
         }
@@ -91,7 +91,7 @@ namespace Iis.UnitTests.Services.Mappers.GraphMapperTests
             var material = SetupMaterialWithFeatures(typeName, materialInfos);
             var expected = CreateGraphNode(material, true, material.File.Name);
 
-            var result = GraphTypeMapper.MapMaterialToGraphNode(material, null);
+            var result = GraphTypeMapper.MapMaterialToGraphNode(material, true, null);
 
             result.Should().BeEquivalentTo(expected);
         }
@@ -109,7 +109,7 @@ namespace Iis.UnitTests.Services.Mappers.GraphMapperTests
             var material = SetupMaterialWithFeatures(typeName, materialInfos);
             var expected = CreateGraphNode(material, false, material.File.Name);
 
-            var result = GraphTypeMapper.MapMaterialToGraphNode(material, null);
+            var result = GraphTypeMapper.MapMaterialToGraphNode(material, true, null);
 
             result.Should().BeEquivalentTo(expected);
         }
@@ -121,7 +121,7 @@ namespace Iis.UnitTests.Services.Mappers.GraphMapperTests
             material.ObjectsOfStudy = null;
             var expected = CreateGraphNode(material, false, material.File.Name);
 
-            var result = GraphTypeMapper.MapMaterialToGraphNode(material, null);
+            var result = GraphTypeMapper.MapMaterialToGraphNode(material, true, null);
 
             result.Should().BeEquivalentTo(expected);
         }
@@ -133,7 +133,7 @@ namespace Iis.UnitTests.Services.Mappers.GraphMapperTests
             material.ObjectsOfStudy = new JObject();
             var expected = CreateGraphNode(material, false, material.File.Name);
 
-            var result = GraphTypeMapper.MapMaterialToGraphNode(material, null);
+            var result = GraphTypeMapper.MapMaterialToGraphNode(material, true, null);
 
             result.Should().BeEquivalentTo(expected);
         }
@@ -145,7 +145,7 @@ namespace Iis.UnitTests.Services.Mappers.GraphMapperTests
             SetupObjectsOfStudy(material, fromNodeId);
             var expected = CreateGraphNode(material, false, material.File.Name);
 
-            var result = GraphTypeMapper.MapMaterialToGraphNode(material, null);
+            var result = GraphTypeMapper.MapMaterialToGraphNode(material, true, null);
 
             result.Should().BeEquivalentTo(expected);
         }
@@ -157,7 +157,7 @@ namespace Iis.UnitTests.Services.Mappers.GraphMapperTests
             SetupObjectsOfStudy(material, fromNodeId, true);
             var expected = CreateGraphNode(material, true, material.File.Name);
 
-            var result = GraphTypeMapper.MapMaterialToGraphNode(material, null);
+            var result = GraphTypeMapper.MapMaterialToGraphNode(material, true, null);
 
             result.Should().BeEquivalentTo(expected);
         }
@@ -169,7 +169,7 @@ namespace Iis.UnitTests.Services.Mappers.GraphMapperTests
             SetupObjectsOfStudy(material, fromNodeId);
             var expected = CreateGraphNode(material, false, material.File.Name);
 
-            var result = GraphTypeMapper.MapMaterialToGraphNode(material, null);
+            var result = GraphTypeMapper.MapMaterialToGraphNode(material, true, null);
 
             result.Should().BeEquivalentTo(expected);
         }
@@ -188,6 +188,7 @@ namespace Iis.UnitTests.Services.Mappers.GraphMapperTests
             extraObject.Add(GraphTypeExtraPropNames.ImportanceCode, null);
             extraObject.Add(GraphTypeExtraPropNames.IconName, material.Type);
             extraObject.Add(GraphTypeExtraPropNames.MetaData, metaDataObject);
+            extraObject.Add(GraphTypeExtraPropNames.AccessAllowed, true);
 
             return new GraphNode
             {
