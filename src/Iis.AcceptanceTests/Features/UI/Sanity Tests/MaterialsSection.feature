@@ -25,15 +25,6 @@ Feature: MaterialsSectionUI - Sanity
 
     @sanity @UI @MaterialsSanityUI
     Scenario: IIS-6374 - ML results display for DOCX material
-        Given I upload a new docx material via API
-		| Field                 | Value                                      |
-		| FileName              | тестовий матеріал                          |
-		| SourceReliabilityText | Здебільшого надійне                        |
-		| ReliabilityText       | Достовірна                                 |
-		| Content               | таємний контент                           |
-		| AccessLevel           | 0                                          |
-		| LoadedBy              | автотест                                   |
-		| MetaData              | {"type":"document","source":"contour.doc"} |
         When I navigated to Materials page
         And I clicked search button in the Materials section
         And I searched таємн data in the materials
@@ -42,7 +33,7 @@ Feature: MaterialsSectionUI - Sanity
         And I pressed Show button to show Text classifier ML output
         Then I must see Text classifier ML output form
         When I close the material card
-        And I clean up uploaded material via API
+
 
     @sanity @UI @MaterialsSanityUI
     Scenario: IIS-5837- Connect a material with an object of study from material
@@ -133,7 +124,7 @@ Feature: MaterialsSectionUI - Sanity
     When I navigated to Materials page
     Then I clicked on the type`s filter audio
     When I clicked search button in the Materials section
-    And I searched neizvesten-peregovory-po-racii.mp3 data in the materials
+    And I searched mp3 data in the materials
     When I clicked on the first material in the Materials list
     Then I clicked on the text field
     Then I wrote on the text field  Якийсь текст

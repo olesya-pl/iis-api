@@ -134,7 +134,7 @@ namespace AcceptanceTests.PageObjects
         [FindsBy(How = How.XPath, Using = "//button[contains(@class, 'search__clear-button')]")]
         public IWebElement ClearSearchFieldButton;
 
-        [FindsBy(How = How.CssSelector, Using = ".icon-wrapper-close")]
+        [FindsBy(How = How.CssSelector, Using = ".material-page__header-actions .el-icon-close")]
         public IWebElement CloseMaterialCardButton;
 
         [FindsBy(How = How.CssSelector, Using = "button.action-button--important")]
@@ -240,7 +240,7 @@ namespace AcceptanceTests.PageObjects
         [FindsBy(How = How.CssSelector, Using = ".action-button--next-page span")]
         public IWebElement NextMaterialButton;
 
-        [FindsBy(How = How.XPath, Using = "//*[@class='material-viewer__editor']//*[@class='ProseMirror-trailingBreak']")]
+        [FindsBy(How = How.XPath, Using = "//br[@class='ProseMirror-trailingBreak']")]
         public IWebElement ClearTextField;
 
         [FindsBy(How = How.XPath, Using = "//button[@aria-label='Жирний']")]
