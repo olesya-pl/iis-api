@@ -42,7 +42,7 @@ namespace AcceptanceTests.PageObjects
         [CacheLookup]
         public IWebElement ShowMLResultsButton;
 
-        [FindsBy(How = How.CssSelector, Using = ".action-tab--connection")]
+        [FindsBy(How = How.XPath, Using = "//div[@class='material-tabs__header']//*[contains(text(),'Зв')]")]
         public IWebElement RelationsTab;
 
         [FindsBy(How = How.CssSelector, Using = ".action-tab--features")]
@@ -51,7 +51,7 @@ namespace AcceptanceTests.PageObjects
         [FindsBy(How = How.XPath, Using = "//span[contains(text(),'value')]/following-sibling::span[1]")]
         public IWebElement PhoneNumberPatternNode;
 
-        [FindsBy(How = How.CssSelector, Using = ".material__tabs-menu > .action-tab--ml")]
+        [FindsBy(How = How.XPath, Using = "//div[@class='material-tabs__header']//*[contains(text(),' Обробка ML ')]")]
         public IWebElement MLTab;
 
         [FindsBy(How = How.CssSelector, Using = ".material-events__header .el-input__inner")]
@@ -61,7 +61,7 @@ namespace AcceptanceTests.PageObjects
         [FindsBy(How = How.CssSelector, Using = ".material-objects input")]
         public IWebElement ObjectsSearch;
 
-        [FindsBy(How = How.CssSelector, Using = ".sidebar__nav li.objects")]
+        [FindsBy(How = How.CssSelector, Using = ".material-objects__header .material-relations-input")]
         public IWebElement ObjectsTabSearch;
 
         public MaterialPage MaterialPage => new MaterialPage(driver);

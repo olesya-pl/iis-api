@@ -128,15 +128,6 @@ Feature: MaterialsSectionUI - Smoke
 
     @smoke @UI @MaterialsCardGeneralTabUI
     Scenario: IIS-6190 - Open ML tab in the materials card
-     Given I upload a new docx material via API
-		| Field                 | Value                                      |
-		| FileName              | тестовий матеріал                          |
-		| SourceReliabilityText | Здебільшого надійне                        |
-		| ReliabilityText       | Достовірна                                 |
-		| Content               | таємний контент                           |
-		| AccessLevel           | 0                                          |
-		| LoadedBy              | автотест                                   |
-		| MetaData              | {"type":"document","source":"contour.doc"} |
         When I navigated to Materials page
         And Loading icon is not displayed
         And I clicked search button in the Materials section
@@ -145,4 +136,3 @@ Feature: MaterialsSectionUI - Smoke
         And I clicked on the first material in the Materials list
         And I clicked on the ML tab in the material card
         Then I must see Show button in the ML tab
-        When I clean up uploaded material via API
