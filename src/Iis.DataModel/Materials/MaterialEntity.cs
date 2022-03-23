@@ -130,7 +130,6 @@ namespace Iis.DataModel.Materials
         public MaterialSignEntity Reliability { get; set; }
         public MaterialSignEntity Relevance { get; set; }
         public MaterialSignEntity Completeness { get; set; }
-
         public MaterialSignEntity SourceReliability { get; set; }
         public MaterialSignEntity SessionPriority { get; set; }
         public string Title { get; set; }
@@ -143,6 +142,8 @@ namespace Iis.DataModel.Materials
         public DateTime? RegistrationDate { get; set; }
         public int? PermanentCoefficient { get; set; }
         public List<MaterialSecurityLevelEntity> SecurityLevels { get; set; }
+        public MaterialSourceAliasEntity SourceAlias { get; set; }
+        public Guid? SourceAliasId { get; set; }
     }
 
     public class MaterialAccessEntity : BaseEntity

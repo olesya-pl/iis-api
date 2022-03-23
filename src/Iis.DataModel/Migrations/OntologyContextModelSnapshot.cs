@@ -475,6 +475,9 @@ namespace Iis.DataModel.Migrations
                     b.Property<string>("Source")
                         .HasColumnType("text");
 
+                    b.Property<Guid?>("SourceAliasId")
+                        .HasColumnType("uuid");
+
                     b.Property<Guid?>("SourceReliabilitySignId")
                         .HasColumnType("uuid");
 
@@ -508,6 +511,8 @@ namespace Iis.DataModel.Migrations
                     b.HasIndex("ReliabilitySignId");
 
                     b.HasIndex("SessionPriorityId");
+
+                    b.HasIndex("SourceAliasId");
 
                     b.HasIndex("SourceReliabilitySignId");
 
@@ -858,6 +863,30 @@ namespace Iis.DataModel.Migrations
                             Name = "SourceReliability",
                             Title = "Надійність джерела"
                         });
+                });
+
+            modelBuilder.Entity("Iis.DataModel.Materials.MaterialSourceAliasEntity", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Alias")
+                        .IsRequired()
+                        .HasColumnType("character varying(256)")
+                        .HasMaxLength(256);
+
+                    b.Property<string>("Source")
+                        .IsRequired()
+                        .HasColumnType("character varying(50)")
+                        .HasMaxLength(50);
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Source")
+                        .IsUnique();
+
+                    b.ToTable("MaterialSourceAliasEntity");
                 });
 
             modelBuilder.Entity("Iis.DataModel.ModifyDataLogEntity", b =>
@@ -1575,6 +1604,10 @@ namespace Iis.DataModel.Migrations
                     b.HasOne("Iis.DataModel.Materials.MaterialSignEntity", "SessionPriority")
                         .WithMany()
                         .HasForeignKey("SessionPriorityId");
+
+                    b.HasOne("Iis.DataModel.Materials.MaterialSourceAliasEntity", "SourceAlias")
+                        .WithMany("Materials")
+                        .HasForeignKey("SourceAliasId");
 
                     b.HasOne("Iis.DataModel.Materials.MaterialSignEntity", "SourceReliability")
                         .WithMany()
