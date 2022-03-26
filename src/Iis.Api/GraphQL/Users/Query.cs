@@ -10,17 +10,19 @@ using Iis.Services.Contracts.Enums;
 using Iis.Services.Contracts.Interfaces;
 using Iis.Api.GraphQL.Common;
 using Iis.Interfaces.Elastic;
+using HotChocolate.Resolvers;
 
 namespace IIS.Core.GraphQL.Users
 {
     public class Query
     {
         public async Task<User> GetUser(
+            IResolverContext resolverContext,
             [Service] IUserService userService,
             [Service] IMapper mapper,
             [GraphQLType(typeof(NonNullType<IdType>))] Guid id)
         {
-            var user = await userService.GetUserAsync(id);
+            var user = await userService.GetUserAsync(id, resolverContext.RequestAborted);
 
             return mapper.Map<User>(user);
         }
