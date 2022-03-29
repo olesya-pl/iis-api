@@ -97,7 +97,7 @@ namespace Iis.Api.Controllers
 
             var loadData = new MaterialLoadData
             {
-                LoadedBy = user.FullUserName
+                LoadedBy = user.Name
             };
 
             var material = new Material
@@ -133,7 +133,7 @@ namespace Iis.Api.Controllers
             var fileName = Path.Combine(directory, input.Name);
             var dataFileName = $"{Path.GetFileNameWithoutExtension(input.Name)}{DataFileExtension}";
             var fullDataName = Path.Combine(directory, dataFileName);
-            var userName = user?.FullUserName ?? string.Empty;
+            var userName = user?.Name ?? string.Empty;
 
             using (var sw = System.IO.File.CreateText(fullDataName))
             {

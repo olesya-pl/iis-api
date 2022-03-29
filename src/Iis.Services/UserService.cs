@@ -35,7 +35,21 @@ namespace Iis.Services
     {
         private const string DefaultRoleName = "Користувач";
         private const short DefaultMaterialChannelCoefficient = 2;
+        private const string FullNameSorting = "FullName";
 
+        private readonly HashSet<string> _userEntityProperties = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+        {
+            "Username",
+            "Name",
+            "LastName",
+            "FirstName",
+            "Patronymic",
+            "Comment",
+            "PasswordHash",
+            "IsBlocked",
+            "AccessLevel",
+            "Source"
+        };
         private readonly ILogger<UserService<TUnitOfWork>> _logger;
         private readonly OntologyContext _context;
         private readonly MaxMaterialsPerOperatorConfig _maxMaterialsConfig;
@@ -241,7 +255,7 @@ namespace Iis.Services
             else if (!string.IsNullOrWhiteSpace(suggestion) && !isBlocked.HasValue)
                 predicate = user => EF.Functions.ILike(user.Username, $"%{suggestion}%") || EF.Functions.ILike(user.Name, $"%{suggestion}%");
 
-            var getUserListTask = RunWithoutCommitAsync(uow => uow.UserRepository.GetUsersAsync(skip, take, sorting.ColumnName, sorting.AsSortDirection(), predicate, ct));
+            var getUserListTask = RunWithoutCommitAsync(uow => uow.UserRepository.GetUsersAsync(skip, take, AsEntityColumnName(sorting), sorting.AsSortDirection(), predicate, ct));
             var getUserCountTask = RunWithoutCommitAsync(uow => uow.UserRepository.GetUserCountAsync(predicate, ct));
 
             await Task.WhenAll(getUserListTask, getUserCountTask);
@@ -367,6 +381,7 @@ namespace Iis.Services
                         FirstName = externalUser.FirstName,
                         Patronymic = externalUser.SecondName,
                         LastName = externalUser.LastName,
+                        Name = $"{externalUser.LastName} {externalUser.FirstName} {externalUser.SecondName}".Trim(),
                         Source = _externalUserService.GetUserSource(),
                         UserRoles = new List<UserRoleEntity>()
                     };
@@ -608,6 +623,7 @@ namespace Iis.Services
             userEntity.FirstName = externalUser.FirstName;
             userEntity.Patronymic = externalUser.SecondName;
             userEntity.LastName = externalUser.LastName;
+            userEntity.Name = $"{externalUser.LastName} {externalUser.FirstName} {externalUser.SecondName}".Trim();
 
             return userEntity;
         }
@@ -621,6 +637,7 @@ namespace Iis.Services
                 FirstName = externalUser.FirstName,
                 Patronymic = externalUser.SecondName,
                 LastName = externalUser.LastName,
+                Name = $"{externalUser.LastName} {externalUser.FirstName} {externalUser.SecondName}".Trim(),
                 Source = _externalUserService.GetUserSource(),
                 UserRoles = new List<UserRoleEntity>()
             };
@@ -724,6 +741,22 @@ namespace Iis.Services
                 var generatedHashString = Convert.ToBase64String(generatedHash);
                 return generatedHashString;
             }
+        }
+
+        private string AsEntityColumnName(SortingParams sortingParams)
+        {
+            if (string.IsNullOrWhiteSpace(sortingParams.ColumnName))
+            {
+                return null;
+            }
+            if (sortingParams.ColumnName.Equals(FullNameSorting, StringComparison.OrdinalIgnoreCase))
+            {
+                return nameof(UserEntity.Name);
+            }
+
+            return _userEntityProperties.TryGetValue(sortingParams.ColumnName, out var result)
+                ? result
+                : sortingParams.ColumnName;
         }
     }
 }

@@ -1,13 +1,11 @@
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using HotChocolate;
 using HotChocolate.Types;
 using IIS.Core.GraphQL.Roles;
-using Iis.Interfaces.Enums;
-using Iis.Interfaces.Users;
-using System.Linq;
 using Iis.Interfaces.Constants;
+using Iis.Interfaces.Users;
 
 namespace IIS.Core.GraphQL.Users
 {
@@ -21,7 +19,7 @@ namespace IIS.Core.GraphQL.Users
         public string LastName { get; set; }
         public string FirstName { get; set; }
         public string Patronymic { get; set; }
-        public string FullName => $"{LastName} {FirstName} {Patronymic}";
+        public string FullName { get; set; }
         public string Comment { get; set; }
         public string UserName { get; set; }
         public string UserNameActiveDirectory { get; set; }

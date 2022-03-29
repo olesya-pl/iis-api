@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Iis.Interfaces.Enums;
 using Iis.Interfaces.Roles;
 using Iis.Interfaces.SecurityLevels;
 using Iis.Interfaces.Users;
@@ -16,6 +15,7 @@ namespace Iis.Domain.Users
         public string Patronymic { get; set; }
         public string Comment { get; set; }
         public string UserName { get; set; }
+        public string Name { get; set; }
         public string PasswordHash { get; set; }
         public string UserNameActiveDirectory { get; set; }
         public bool IsBlocked { get; set; }
@@ -28,7 +28,6 @@ namespace Iis.Domain.Users
         public AccessGrantedList AccessGrantedItems { get; set; } = new AccessGrantedList();
         public List<AccessGranted> Tabs => AccessGrantedItems.Where(ag => ag.Category == AccessCategory.Tab).ToList();
         public List<AccessGranted> Entities => AccessGrantedItems.Where(ag => ag.Category == AccessCategory.Entity).ToList();
-        public string FullUserName => $"{this.LastName} {this.FirstName} {this.Patronymic}";
         public bool IsGranted(AccessKind kind, AccessOperation operation, AccessCategory category)
         {
             return IsAdmin || AccessGrantedItems.IsGranted(kind, operation, category);
