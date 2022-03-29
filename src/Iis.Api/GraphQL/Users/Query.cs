@@ -37,7 +37,7 @@ namespace IIS.Core.GraphQL.Users
                 ? UserStatusType.All
                 : (UserStatusType)filter.UserStatus;
 
-            var usersResult = await userService.GetUsersByStatusAsync(pageParam, sortingParams, filter?.Suggestion, userStatusFilterValue);
+            var usersResult = await userService.GetUsersByStatusAsync(pageParam, sortingParams, filter?.Suggestion, filter?.RoleId, userStatusFilterValue);
 
             var graphQLUsers = usersResult.Users
                                     .Select(user => mapper.Map<User>(user))

@@ -1,4 +1,4 @@
-using Iis.Services.Contracts.Enums;
+using System;
 
 namespace IIS.Core.GraphQL.Users
 {
@@ -6,5 +6,6 @@ namespace IIS.Core.GraphQL.Users
     {
         public string Suggestion { get; set; }
         public int UserStatus { get; set; }
+        public Guid? RoleId { get; set; }
     }
 }

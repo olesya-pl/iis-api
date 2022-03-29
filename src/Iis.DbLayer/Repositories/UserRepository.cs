@@ -63,11 +63,14 @@ namespace Iis.DbLayer.Repositories
             string sortColumn,
             ListSortDirection? sortDirection,
             Expression<Func<UserEntity, bool>> predicate = null,
+            Guid? roleId = null,
             CancellationToken cancellationToken = default)
         {
             var query = GetUsersQuery();
             if (predicate != null)
                 query = query.Where(predicate);
+            if (roleId.HasValue)
+                query = query.Where(_ => _.UserRoles.Any(_ => _.RoleId == roleId));
 
             return query.OrderBy(sortColumn, sortDirection)
                 .Skip(skip)

@@ -129,7 +129,7 @@ namespace Iis.UnitTests.UserManagement
             // arrange: end
 
             //act
-            var usersResult = await service.GetUsersByStatusAsync(page, SortingParams.Default, null, UserStatusType.All);
+            var usersResult = await service.GetUsersByStatusAsync(page, SortingParams.Default, null, null, UserStatusType.All);
 
             //assert
             Assert.Equal(userEntities.Count, usersResult.TotalCount);
@@ -173,7 +173,7 @@ namespace Iis.UnitTests.UserManagement
             // arrange: end
 
             //act
-            var usersResult = await service.GetUsersByStatusAsync(page, SortingParams.Default, null, UserStatusType.All);
+            var usersResult = await service.GetUsersByStatusAsync(page, SortingParams.Default, null, null, UserStatusType.All);
 
             //assert
             Assert.Equal(userEntities.Count, usersResult.TotalCount);
@@ -236,7 +236,7 @@ namespace Iis.UnitTests.UserManagement
             // arrange: end
 
             //act
-            var usersResult = await service.GetUsersByStatusAsync(page, sorting, null, UserStatusType.All);
+            var usersResult = await service.GetUsersByStatusAsync(page, sorting, null, null, UserStatusType.All);
 
             //assert
             Assert.Equal(userEntities.Count, usersResult.TotalCount);
@@ -287,7 +287,7 @@ namespace Iis.UnitTests.UserManagement
             // arrange: end
 
             //act
-            var usersResult = await service.GetUsersByStatusAsync(page, SortingParams.Default, suggestion, UserStatusType.All);
+            var usersResult = await service.GetUsersByStatusAsync(page, SortingParams.Default, suggestion, null, UserStatusType.All);
 
             //assert
             Assert.Equal(1, usersResult.TotalCount);
@@ -337,7 +337,7 @@ namespace Iis.UnitTests.UserManagement
             // arrange: end
 
             //act
-            var usersResult = await service.GetUsersByStatusAsync(page, SortingParams.Default, suggestion, UserStatusType.All);
+            var usersResult = await service.GetUsersByStatusAsync(page, SortingParams.Default, suggestion, null, UserStatusType.All);
 
             //assert
             Assert.Equal(1, usersResult.TotalCount);
@@ -384,7 +384,7 @@ namespace Iis.UnitTests.UserManagement
             // arrange: end
 
             //act
-            var usersResult = await service.GetUsersByStatusAsync(page, SortingParams.Default, null, UserStatusType.Blocked);
+            var usersResult = await service.GetUsersByStatusAsync(page, SortingParams.Default, null, null, UserStatusType.Blocked);
 
             //assert
             Assert.Equal(2, usersResult.TotalCount);
@@ -431,7 +431,7 @@ namespace Iis.UnitTests.UserManagement
             // arrange: end
 
             //act
-            var usersResult = await service.GetUsersByStatusAsync(page, SortingParams.Default, null, UserStatusType.Active);
+            var usersResult = await service.GetUsersByStatusAsync(page, SortingParams.Default, null, null, UserStatusType.Active);
 
             //assert
             Assert.Equal(2, usersResult.TotalCount);
