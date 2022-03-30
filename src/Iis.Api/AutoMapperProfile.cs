@@ -1,46 +1,46 @@
-﻿using AutoMapper;
-using Iis.DataModel;
-using Iis.DataModel.Elastic;
-using Iis.DataModel.Materials;
-using Iis.DataModel.Roles;
-using Iis.DataModel.Themes;
-using Iis.DataModel.Annotations;
-using Iis.Domain.Materials;
-using Iis.Interfaces.Elastic;
-using Iis.Interfaces.Materials;
-using Iis.Interfaces.Roles;
+﻿using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
+using AutoMapper;
+using Iis.Api.GraphQL.Aliases;
+using Iis.Api.GraphQL.Common;
+using Iis.Api.GraphQL.Roles;
 using IIS.Core.GraphQL.Materials;
 using IIS.Core.GraphQL.Roles;
 using IIS.Core.GraphQL.Themes;
 using IIS.Core.GraphQL.Users;
-using Iis.Api.GraphQL.Common;
-using Iis.Api.GraphQL.Roles;
-using Iis.Api.GraphQL.Aliases;
-using GraphQLGraphTypes = Iis.Api.GraphQL.Graph;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using Iis.Services.Contracts.Dtos;
-using Role = Iis.Domain.Users.Role;
-using User = IIS.Core.GraphQL.Users.User;
-using DomainGraphTypes = Iis.Domain.Graph;
-using Iis.Interfaces.Ontology.Data;
-using Contracts = Iis.Services.Contracts;
-using Iis.DataModel.Reports;
-using Iis.Events.Reports;
+using Iis.DataModel;
+using Iis.DataModel.Annotations;
 using Iis.DataModel.ChangeHistory;
-using Iis.Elastic;
+using Iis.DataModel.Elastic;
+using Iis.DataModel.Materials;
+using Iis.DataModel.Reports;
+using Iis.DataModel.Roles;
+using Iis.DataModel.Themes;
+using Iis.Domain.Materials;
 using Iis.Domain.Users;
+using Iis.Elastic;
+using Iis.Elastic.Entities;
+using Iis.Events.Reports;
+using Iis.Interfaces.Elastic;
+using Iis.Interfaces.Materials;
+using Iis.Interfaces.Ontology;
+using Iis.Interfaces.Ontology.Data;
+using Iis.Interfaces.Roles;
+using Iis.Interfaces.SecurityLevels;
+using Iis.Services.Contracts.Dtos;
+using Iis.Services.Contracts.Dtos.Roles;
 using Iis.Utility;
 using Iis.Utility.Automapper;
-using Iis.DbLayer.Repositories;
-using Iis.Interfaces.Ontology;
-using Iis.Api.GraphQL.RadioElectronicSituation;
-using Iis.Elastic.Entities;
-using Iis.Interfaces.SecurityLevels;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using Contracts = Iis.Services.Contracts;
+using DomainGraphTypes = Iis.Domain.Graph;
+using GraphQLGraphTypes = Iis.Api.GraphQL.Graph;
+using Group = Iis.Api.GraphQL.Roles.Group;
+using Role = Iis.Domain.Users.Role;
+using User = IIS.Core.GraphQL.Users.User;
 
 namespace Iis.Api
 {
@@ -145,6 +145,7 @@ namespace Iis.Api
                     .MapFrom(src => src.GrantedOperations.Contains(AccessGranted.AccessLevelUpdateAccessName)));
             CreateMap<AccessObjectEntity, AccessGranted>();
             CreateMap<ActiveDirectoryGroupDto, Group>();
+            CreateMap<GroupAccessDto, GroupRoles>();
 
             CreateMap<Role, IIS.Core.GraphQL.Roles.Role>()
                 .ForMember(dest => dest.ActiveDirectoryGroupIds, opts => opts.MapFrom(src => src.ActiveDirectoryGroupIds.Select(g => g.ToString("N"))));
@@ -310,6 +311,9 @@ namespace Iis.Api
             //mapping: Roles.User -> GraphQl.User
             CreateMap<Iis.Domain.Users.User, User>()
                 .ForMember(_ => _.FullName, _ => _.MapFrom(user => user.Name));
+
+            //mapping: Roles.Group -> GraphQl.GroupRights
+            CreateMap<GroupDto, GroupAccess>();
 
             //mapping: UserEntity -> Roles.User
             CreateMap<UserEntity, Iis.Domain.Users.User>()

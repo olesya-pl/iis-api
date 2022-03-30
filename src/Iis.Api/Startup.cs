@@ -88,6 +88,8 @@ using Prometheus;
 using Iis.Api.Metrics;
 using Iis.Interfaces.SecurityLevels;
 using Iis.Security.SecurityLevels;
+using Iis.Services.Contracts.Interfaces.Roles;
+using Iis.Services.Roles;
 
 namespace IIS.Core
 {
@@ -301,6 +303,7 @@ namespace IIS.Core
                     Configuration["activeDirectory:server"],
                     Configuration["activeDirectory:login"],
                     Configuration["activeDirectory:password"]));
+            services.AddTransient<IGroupsService, GroupsService>();
             services.AddSingleton<IElasticState, ElasticState>();
             services.AddTransient<IAdminOntologyElasticService, AdminOntologyElasticService>();
             services.AddHostedService<ThemeCounterBackgroundService>();
