@@ -235,8 +235,9 @@ namespace Iis.Services
             PaginationParams page,
             SortingParams sorting,
             string suggestion,
+            Guid? roleId,
             UserStatusType userStatusFilter,
-            CancellationToken ct = default)
+            CancellationToken cancellationToken = default)
         {
             var (skip, take) = page.ToEFPage();
             bool? isBlocked = userStatusFilter switch
@@ -255,8 +256,8 @@ namespace Iis.Services
             else if (!string.IsNullOrWhiteSpace(suggestion) && !isBlocked.HasValue)
                 predicate = user => EF.Functions.ILike(user.Username, $"%{suggestion}%") || EF.Functions.ILike(user.Name, $"%{suggestion}%");
 
-            var getUserListTask = RunWithoutCommitAsync(uow => uow.UserRepository.GetUsersAsync(skip, take, AsEntityColumnName(sorting), sorting.AsSortDirection(), predicate, ct));
-            var getUserCountTask = RunWithoutCommitAsync(uow => uow.UserRepository.GetUserCountAsync(predicate, ct));
+            var getUserListTask = RunWithoutCommitAsync(uow => uow.UserRepository.GetUsersAsync(skip, take, AsEntityColumnName(sorting), sorting.AsSortDirection(), predicate, roleId, cancellationToken));
+            var getUserCountTask = RunWithoutCommitAsync(uow => uow.UserRepository.GetUserCountAsync(predicate, cancellationToken));
 
             await Task.WhenAll(getUserListTask, getUserCountTask);
 

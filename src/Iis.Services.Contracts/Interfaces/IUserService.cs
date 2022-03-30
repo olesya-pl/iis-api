@@ -17,7 +17,7 @@ namespace Iis.Services.Contracts.Interfaces
         Task<List<User>> GetOperatorsAsync(CancellationToken ct = default);
         Task<UserDistributionList> GetOperatorsForMaterialsAsync();
         Task<User> GetUserAsync(Guid userId, CancellationToken cancellationToken = default);
-        Task<(IReadOnlyCollection<User> Users, int TotalCount)> GetUsersByStatusAsync(PaginationParams page, SortingParams sorting, string suggestion, UserStatusType userStatusFilter, CancellationToken ct = default);
+        Task<(IReadOnlyCollection<User> Users, int TotalCount)> GetUsersByStatusAsync(PaginationParams page, SortingParams sorting, string suggestion, Guid? roleId, UserStatusType userStatusFilter, CancellationToken ct = default);
         Task<User> RejectRole(Guid userId, Guid roleId);
         bool IsAccessLevelAllowedForUser(int userAccessLevel, int newAccessLevel);
         Task<Guid> UpdateUserAsync(User updatedUser, CancellationToken cancellationToken = default);
