@@ -157,7 +157,8 @@ namespace Iis.Api
             .ForMember(dest => dest.Tabs, opts => opts.Ignore())
             .ForMember(dest => dest.Entities, opts => opts.Ignore());
 
-            CreateMap<UserEntity, IIS.Core.GraphQL.Users.User>();
+            CreateMap<UserEntity, IIS.Core.GraphQL.Users.User>()
+                .ForMember(_ => _.FullName, _ => _.MapFrom(user => user.Name));
 
             CreateMap<IIS.Core.GraphQL.ML.MachineLearningResponseInput, Iis.Domain.MachineLearning.MLResponse>()
                 .ForMember(dest => dest.ProcessingDate, opts => opts.MapFrom(src => DateTime.Now));
@@ -307,7 +308,8 @@ namespace Iis.Api
                 .ForMember(dest => dest.UserName, opts => opts.Ignore());
 
             //mapping: Roles.User -> GraphQl.User
-            CreateMap<Iis.Domain.Users.User, User>();
+            CreateMap<Iis.Domain.Users.User, User>()
+                .ForMember(_ => _.FullName, _ => _.MapFrom(user => user.Name));
 
             //mapping: UserEntity -> Roles.User
             CreateMap<UserEntity, Iis.Domain.Users.User>()
